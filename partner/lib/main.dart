@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:app/firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,12 +21,7 @@ void main() async {
   }
 
   await Future.wait([
-    // if (kIsWeb)
-    //   Firebase.initializeApp(
-    //     options: firebaseOptionsPREPROD,
-    //   )
-    // else if (!Platform.isWindows)
-    //   Firebase.initializeApp(),
+    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
     if (!kIsWeb) ...[
       if (Platform.isAndroid)
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
