@@ -123,7 +123,7 @@ class _OtpScreenState extends State<OtpScreen> {
             TextButton(
               onPressed: _isResendButtonEnabled ? _resendOtp : null,
               child: Text(_isResendButtonEnabled
-                  ? 'Gửi lại mã OTP'
+                  ? 'Gửi lại'
                   : 'Gửi lại sau $_secondsRemaining giây'),
             ),
           ],
