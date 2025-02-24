@@ -1,12 +1,8 @@
+import 'package:app/src/presentation/login/login_screen.dart';
+import 'package:app/src/presentation/otp/otp_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app/src/presentation/home/cubit/home_cubit.dart';
 
-import '../presentation/home/home_screen.dart';
-import '../presentation/page1/bloc/page1_bloc.dart';
-import '../presentation/page1/page1_screen.dart';
-import '../presentation/page2/page2_screen.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -21,29 +17,16 @@ final goRouter = GoRouter(
     GoRoute(
       name: '/',
       path: '/',
-
-      /// Example register new [bloc] using at [homescreen]
-      builder: (context, state) => BlocProvider(
-        create: (context) => HomeCubit(),
-        child: const HomeScreen(),
-      ),
-      routes: [
-        GoRoute(
-          name: 'page1',
-          path: 'page1',
-
-          /// Example register new [bloc] using at [Page1Screen]
-          builder: (context, state) => BlocProvider(
-            create: (context) => Page1Bloc(),
-            child: const Page1Screen(),
-          ),
-        ),
-        GoRoute(
-          name: 'page2',
-          path: 'page2',
-          builder: (context, state) => const Page2Screen(),
-        ),
-      ],
+      // builder: (context, state) => BlocProvider(
+      //   create: (context) => HomeCubit(),
+      //   child: const HomeScreen(),
+      // ),
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      name: 'otp',
+      path: '/otp',
+      builder: (context, state) => OtpScreen(args: state.extra as OtpArgs),
     ),
   ],
 );
