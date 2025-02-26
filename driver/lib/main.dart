@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 
@@ -16,9 +17,14 @@ import 'src/utils/utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    setPathUrlStrategy();
-  }
+
+  Stripe.publishableKey = !kDebugMode
+      ? "pk_live_51FdoD5FOB1XEXlZFImtB8bzWGoYDGYA6aZn5v2a9QrBQsdDmbxze6RExqKymtuT19uNY5pqZ1vth13WwSdNmQs0Z00ywRf7YmF"
+      : 'pk_test_51FdoD5FOB1XEXlZFtO8jzDpP3TULTy1U949LdRNNC0zIq91d3e3L7ZvUDzxIRyS6RcDvXAhiOuQH0gYqzrgAWtt100iXwRjDzB';
+  Stripe.merchantIdentifier = kDebugMode
+      ? 'merchant.flutter.stripe.test'
+      : 'merchant.flutter.stripe.test';
+  Stripe.urlScheme = 'flutterstripe';
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),

@@ -1,8 +1,10 @@
-import 'package:app/src/presentation/login/login_screen.dart';
-import 'package:app/src/presentation/otp/otp_screen.dart';
+import 'package:app/src/presentation/auth/auth_screen.dart';
+import 'package:app/src/presentation/auth/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../presentation/home/home_screen.dart';
+import '../presentation/splash/splash_screen.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -12,21 +14,24 @@ BuildContext get appContext => appNavigatorKey.currentContext!;
 
 // GoRouter configuration
 final goRouter = GoRouter(
+  initialLocation: '/',
   navigatorKey: appNavigatorKey,
   routes: [
     GoRoute(
-      name: '/',
-      path: '/',
-      // builder: (context, state) => BlocProvider(
-      //   create: (context) => HomeCubit(),
-      //   child: const HomeScreen(),
-      // ),
+      path: '/', 
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/auth',
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-      name: 'otp',
       path: '/otp',
       builder: (context, state) => OtpScreen(args: state.extra as OtpArgs),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const HomeScreen(),
     ),
   ],
 );

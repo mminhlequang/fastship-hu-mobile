@@ -1,4 +1,4 @@
-import 'package:app/src/presentation/otp/otp_screen.dart';
+import 'package:app/src/presentation/auth/otp_screen.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

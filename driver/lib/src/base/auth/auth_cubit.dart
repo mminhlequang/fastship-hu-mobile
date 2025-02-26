@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:go_router/go_router.dart';
 
 enum AuthStateType { none, logged }
 
@@ -49,8 +50,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   _redirect() {
     if (state.stateType == AuthStateType.logged) {
-      // Get.offAllNamed(Routes.nav);
-    } else {}
+      appContext.pushReplacement('/home');
+    } else {
+      appContext.pushReplacement('/auth');
+    }
   }
 }
 
