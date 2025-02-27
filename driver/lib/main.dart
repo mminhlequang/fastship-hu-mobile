@@ -20,7 +20,7 @@ void main() async {
 
   Stripe.publishableKey = !kDebugMode
       ? "pk_live_51FdoD5FOB1XEXlZFImtB8bzWGoYDGYA6aZn5v2a9QrBQsdDmbxze6RExqKymtuT19uNY5pqZ1vth13WwSdNmQs0Z00ywRf7YmF"
-      : 'pk_test_51FdoD5FOB1XEXlZFtO8jzDpP3TULTy1U949LdRNNC0zIq91d3e3L7ZvUDzxIRyS6RcDvXAhiOuQH0gYqzrgAWtt100iXwRjDzB';
+      : 'pk_test_51QwQfYGbnQCWi1BqsVDBmUNXwsA6ye6daczJ5E7j8zgGTjuVAWjLluexegaACZTaHP14XUtrGxDLHwxWzMksUVod00p0ZXsyPd';
   Stripe.merchantIdentifier = kDebugMode
       ? 'merchant.flutter.stripe.test'
       : 'merchant.flutter.stripe.test';
