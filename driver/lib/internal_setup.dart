@@ -11,7 +11,7 @@ internalSetup() {
       appColors: AppColors.instance,
       appPrefs: AppPrefs.instance,
       appTextStyleWrap: AppTextStyleWrap(
-        fontWrap: (textStyle) => GoogleFonts.poppins(textStyle: textStyle),
+        fontWrap: (textStyle) => GoogleFonts.inter(textStyle: textStyle),
       ),
       // networkOptions: PNetworkOptionsImpl(
       //   loggingEnable: kDebugMode,
@@ -25,4 +25,4 @@ internalSetup() {
       // ),
     ),
   );
-} 
+}

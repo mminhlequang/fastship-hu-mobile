@@ -21,7 +21,7 @@ class AuthCubit extends Cubit<AuthState> {
     // }
   }
 
-  load({Duration delayRedirect = const Duration(seconds: 1)}) async {
+  load({Duration delayRedirect = const Duration(seconds: 3)}) async {
     try {
       emit(state.update(stateType: AuthStateType.logged));
     } catch (e) {

@@ -37,7 +37,7 @@ class WidgetAppShimmer extends StatelessWidget {
   Color get baseColor => appColors?.shimmerBaseColor ?? Colors.white;
 
   Color get highlightColor =>
-      appColors?.shimerHighlightColor ?? Colors.grey[200]!;
+      appColors?.shimmerHighlightColor ?? Colors.grey[200]!;
 
   @override
   Widget build(BuildContext context) {

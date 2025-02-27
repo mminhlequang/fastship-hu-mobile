@@ -25,14 +25,36 @@ abstract class AppColorsBase {
 
   Color get background;
 
-  Color get element;
-
   Color get text;
 
-  //Shimmer for image placeholder
-  Color get shimmerBaseColor;
+  Color get error;
 
-  Color get shimerHighlightColor;
+  /// green
+  Color get green1;
+  Color get green2;
+
+  /// grey
+  Color get grey1;
+  Color get grey2;
+  Color get grey3;
+  Color get grey4;
+  Color get grey5;
+  Color get grey6;
+  Color get grey7;
+  Color get grey8;
+
+  /// yellow
+  Color get yellow1;
+
+  /// orange
+  Color get orange1;
+
+  /// blue
+  Color get blue1;
+
+  Color get element;
+  Color get shimmerBaseColor;
+  Color get shimmerHighlightColor;
 }
 
 class AppTextStyleWrap {

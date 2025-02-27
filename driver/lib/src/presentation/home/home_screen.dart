@@ -11,12 +11,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJFQ09TIiwiYXVkIjoiZWNvc0BnbWFpbC5jb20iLCJpYXQiOjE3NDA2MjIyNTgsIm5iZiI6MTc0MDYyMjI1OSwiZXhwIjoxNzQwNjI1ODU4LCJkYXRhIjp7ImlkIjo1LCJuYW1lIjoiXHUwMTEwXHUwMGVjbmggRFx1MDFiMFx1MDFhMW5nIiwicGhvbmUiOiIwOTY0NTQxMzQwIiwicGFzc3dvcmQiOiJlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZSJ9fQ.7qr11NAzObH0xjz9WzUccdje6N-PJHfgiHxlF4IEAEE';
-  
-  pay()async{
+  String bearerToken =
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJFQ09TIiwiYXVkIjoiZWNvc0BnbWFpbC5jb20iLCJpYXQiOjE3NDA2MjIyNTgsIm5iZiI6MTc0MDYyMjI1OSwiZXhwIjoxNzQwNjI1ODU4LCJkYXRhIjp7ImlkIjo1LCJuYW1lIjoiXHUwMTEwXHUwMGVjbmggRFx1MDFiMFx1MDFhMW5nIiwicGhvbmUiOiIwOTY0NTQxMzQwIiwicGFzc3dvcmQiOiJlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZSJ9fQ.7qr11NAzObH0xjz9WzUccdje6N-PJHfgiHxlF4IEAEE';
+
+  pay() async {
     try {
       // Gọi API backend để lấy clientSecret
-      
+
       final response = await http.post(
         Uri.parse('https://zennail23.com/api/v1/transaction/create_payment'),
         headers: {
@@ -25,10 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'accept': '*/*',
           'X-CSRF-TOKEN': ''
         },
-        body: jsonEncode({
-          'amount': 1000,
-          'currency': 'usd'
-        }),
+        body: jsonEncode({'amount': 1000, 'currency': 'usd'}),
       );
 
       final data = jsonDecode(response.body);
@@ -40,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: 'FastshipHu', // Tên app của Minh
-           applePay: PaymentSheetApplePay(
+          applePay: PaymentSheetApplePay(
             merchantCountryCode: 'US', // Thay bằng mã quốc gia hợp lệ
           ),
           googlePay: PaymentSheetGooglePay(
@@ -64,12 +62,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     pay();
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Center(
+        child: Text('Home Screen'),
+      ),
+    );
   }
-} 
+}
 //import 'dart:async';
 
 // import 'package:app/src/presentation/widgets/widget_app_map.dart';

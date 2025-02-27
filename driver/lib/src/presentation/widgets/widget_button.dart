@@ -6,12 +6,14 @@ class WidgetButton extends StatelessWidget {
   final bool loading;
   final String label;
   final VoidCallback? onTap;
-  const WidgetButton(
-      {super.key,
-      this.enable = true,
-      this.loading = false,
-      required this.label,
-      this.onTap});
+
+  const WidgetButton({
+    super.key,
+    this.enable = true,
+    this.loading = false,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +24,9 @@ class WidgetButton extends StatelessWidget {
         child: Ink(
           height: 48,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: enable ? appColorText : appColorElement),
+            borderRadius: BorderRadius.circular(8),
+            color: enable ? appColorText : appColorElement,
+          ),
           child: Center(
             child: loading
                 ? SizedBox(

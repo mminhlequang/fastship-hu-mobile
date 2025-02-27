@@ -22,9 +22,10 @@ class _WidgetDeleteButtonState extends State<WidgetDeleteButton> {
     return PortalTarget(
       visible: isHover,
       anchor: const Aligned(
-          follower: Alignment.bottomCenter,
-          target: Alignment.topCenter,
-          offset: Offset(0, -8)),
+        follower: Alignment.bottomCenter,
+        target: Alignment.topCenter,
+        offset: Offset(0, -8),
+      ),
       portalFollower: Stack(
         alignment: Alignment.bottomCenter,
         children: [
