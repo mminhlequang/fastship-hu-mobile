@@ -12,8 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String bearerToken =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJFQ09TIiwiYXVkIjoiZWNvc0BnbWFpbC5jb20iLCJpYXQiOjE3NDA2MjIyNTgsIm5iZiI6MTc0MDYyMjI1OSwiZXhwIjoxNzQwNjI1ODU4LCJkYXRhIjp7ImlkIjo1LCJuYW1lIjoiXHUwMTEwXHUwMGVjbmggRFx1MDFiMFx1MDFhMW5nIiwicGhvbmUiOiIwOTY0NTQxMzQwIiwicGFzc3dvcmQiOiJlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZSJ9fQ.7qr11NAzObH0xjz9WzUccdje6N-PJHfgiHxlF4IEAEE';
-
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJFQ09TIiwiYXVkIjoiZWNvc0BnbWFpbC5jb20iLCJpYXQiOjE3NDA3MDk2MjQsIm5iZiI6MTc0MDcwOTYyNSwiZXhwIjoxNzQwNzEzMjI0LCJkYXRhIjp7ImlkIjo1LCJuYW1lIjoiXHUwMTEwXHUwMGVjbmggRFx1MDFiMFx1MDFhMW5nIiwicGhvbmUiOiIwOTY0NTQxMzQwIiwicGFzc3dvcmQiOiJlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZSJ9fQ.yhcq4zN8yFsjry1z7GPsgl4FpT4hS7O_heLAhDgEtOk";
   pay() async {
     try {
       // Gọi API backend để lấy clientSecret
@@ -26,18 +25,51 @@ class _HomeScreenState extends State<HomeScreen> {
           'accept': '*/*',
           'X-CSRF-TOKEN': ''
         },
-        body: jsonEncode({'amount': 1000, 'currency': 'usd'}),
+        body: jsonEncode({
+          'amount': 1000,
+          'currency': 'usd',
+          // Thêm thông tin khách hàng nếu cần
+          'customer_info': {
+            'name': 'Nguyễn Văn A',
+            'email': 'nguyenvana@example.com',
+            'phone': '0987654321',
+            'address': 'Hà Nội, Việt Nam'
+          }
+        }),
       );
 
       final data = jsonDecode(response.body);
       print(data);
       final clientSecret = data['data']['clientSecret'];
 
+      // Lấy thông tin khách hàng từ API response (giả sử backend trả về)
+      // Nếu backend của bạn chưa hỗ trợ, bạn cần yêu cầu backend bổ sung API endpoints để hỗ trợ
+      final customerId = data['data']['customerId']; // ID khách hàng từ Stripe
+      final ephemeralKeySecret =
+          data['data']['ephemeralKeySecret']; // Khóa tạm thời
+
       // Hiển thị giao diện thanh toán
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: 'FastshipHu', // Tên app của Minh
+          customerId: "customerId5", // ID khách hàng từ Stripe
+          customerEphemeralKeySecret:
+              ephemeralKeySecret, // Khóa tạm thời để xác thực
+          // Cấu hình bổ sung cho khách hàng
+          billingDetails: const BillingDetails(
+            name: 'Nguyễn Văn A',
+            email: 'nguyenvana@example.com',
+            phone: '0987654321',
+            address: const Address(
+              city: 'Hà Nội',
+              country: 'VN',
+              line1: 'Địa chỉ nhà, phố',
+              line2: 'Quận/Huyện',
+              postalCode: '100000',
+              state: 'Hà Nội',
+            ),
+          ),
           applePay: PaymentSheetApplePay(
             merchantCountryCode: 'US', // Thay bằng mã quốc gia hợp lệ
           ),
