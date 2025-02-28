@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:938800403743:android:4de3e2b7207a9877268c2a",
+        "mobilesdk_app_id": "1:938800403743:android:0809b6405f54b6f1268c2a",
         "android_client_info": {
           "package_name": "com.devfastshiphu.customer"
         }
@@ -26,7 +26,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:938800403743:android:5560b69b280a735f268c2a",
+        "mobilesdk_app_id": "1:938800403743:android:85967b6fdda0aa70268c2a",
         "android_client_info": {
           "package_name": "com.devfastshiphu.driver"
         }
@@ -45,9 +45,66 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:938800403743:android:b1b2a847f7800a63268c2a",
+        "mobilesdk_app_id": "1:938800403743:android:781f7380826a831c268c2a",
         "android_client_info": {
           "package_name": "com.devfastshiphu.partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr1H8EmQFxGogHh029GQf-MIl9jzM_aO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938800403743:android:4de3e2b7207a9877268c2a",
+        "android_client_info": {
+          "package_name": "com.fastshiphu.customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr1H8EmQFxGogHh029GQf-MIl9jzM_aO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938800403743:android:5560b69b280a735f268c2a",
+        "android_client_info": {
+          "package_name": "com.fastshiphu.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr1H8EmQFxGogHh029GQf-MIl9jzM_aO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938800403743:android:b1b2a847f7800a63268c2a",
+        "android_client_info": {
+          "package_name": "com.fastshiphu.partner"
         }
       },
       "oauth_client": [],

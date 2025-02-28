@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBr1H8EmQFxGogHh029GQf-MIl9jzM_aO8',
-    appId: '1:938800403743:android:b1b2a847f7800a63268c2a',
+    appId: '1:938800403743:android:781f7380826a831c268c2a',
     messagingSenderId: '938800403743',
     projectId: 'fastshiphu-1ac6c',
     storageBucket: 'fastshiphu-1ac6c.firebasestorage.app',
@@ -59,10 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA4hIlnllM8uHdn_MF6BwmmRiNtL5q49vM',
-    appId: '1:938800403743:ios:edb8ed6c6cad2a04268c2a',
+    appId: '1:938800403743:ios:24a1cd261c99327d268c2a',
     messagingSenderId: '938800403743',
     projectId: 'fastshiphu-1ac6c',
     storageBucket: 'fastshiphu-1ac6c.firebasestorage.app',
     iosBundleId: 'com.devfastshiphu.partner',
   );
+
 }
