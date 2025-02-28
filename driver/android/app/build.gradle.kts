@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.fastshiphu.driver"
+    namespace = "com.devfastshiphu.driver"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -26,7 +26,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.fastshiphu.driver"
+        applicationId = "com.devfastshiphu.driver"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

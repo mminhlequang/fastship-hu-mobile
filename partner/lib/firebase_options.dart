@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '938800403743',
     projectId: 'fastshiphu-1ac6c',
     storageBucket: 'fastshiphu-1ac6c.firebasestorage.app',
-    iosBundleId: 'com.fastshiphu.partner',
+    iosBundleId: 'com.devfastshiphu.partner',
   );
 }

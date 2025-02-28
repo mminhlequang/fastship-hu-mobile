@@ -2,7 +2,7 @@
 
 ## 🎀 App Configuration Details 🎀
 - **App Name**: FastshipHu
-- **App ID**: com.fastshiphu.customer
+- **App ID**: com.devfastshiphu.customer
 - **Package Name**: app
 - **Package Description**: Customer mobile app
 

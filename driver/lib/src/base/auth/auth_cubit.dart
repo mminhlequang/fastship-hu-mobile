@@ -49,6 +49,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
+    appContext.pushReplacement('/auth');
+    return;
     if (state.stateType == AuthStateType.logged) {
       appContext.pushReplacement('/home');
     } else {

@@ -2,7 +2,7 @@
 
 ## 🎀 App Configuration Details 🎀
 - **App Name**: Driver-FastshipHu
-- **App ID**: com.fastshiphu.driver
+- **App ID**: com.devfastshiphu.driver
 - **Package Name**: app
 - **Package Description**: Driver mobile app
 

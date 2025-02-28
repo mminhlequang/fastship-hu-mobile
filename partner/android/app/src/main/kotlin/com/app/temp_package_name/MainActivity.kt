@@ -1,4 +1,4 @@
-package com.fastshiphu.partner
+package com.devfastshiphu.partner
 
 import io.flutter.embedding.android.FlutterActivity
 
