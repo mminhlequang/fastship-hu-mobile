@@ -1,12 +1,14 @@
+import 'dart:developer';
+
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:internal_network/network_resources/resources.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _otpController = TextEditingController();
   final _otpTextEditingController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _authRepo = AuthRepo();
   bool _isLoading = false;
   bool _showOtpField = false;
   String? _verificationId;
@@ -55,27 +58,18 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
 
     try {
-      final response = await http.post(
-        Uri.parse('https://zennail23.com/api/v1/login'),
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': '*/*',
-          'X-CSRF-TOKEN': '',
-        },
-        body: jsonEncode({
-          'phone': phoneNumber,
-          'password': password,
-          'type': 1,
-        }),
-      );
+      final response = await _authRepo.login({
+        'phone': phoneNumber,
+        'password': password,
+        'type': 1,
+      });
 
       setState(() {
         _isLoading = false;
       });
 
-      if (response.statusCode == 200) {
+      if (response.isSuccess) {
         // Xử lý đăng nhập thành công
-        final data = jsonDecode(response.body);
         // TODO: Lưu token và thông tin người dùng
 
         // Chuyển hướng đến màn hình chính
@@ -83,14 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
         _showMessage('Đăng nhập thành công');
       } else {
         // Xử lý lỗi
-        final data = jsonDecode(response.body);
-        _showError(data['message'] ?? 'Đăng nhập thất bại');
+        _showError(response.msg ?? 'Đăng nhập thất bại');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() {
         _isLoading = false;
       });
       _showError('Lỗi kết nối: $e');
+      log("_login: $stackTrace");
     }
   }
 
@@ -170,29 +164,20 @@ class _LoginScreenState extends State<LoginScreen> {
     print("_proceedWithRegistration: $idToken");
 
     try {
-      final response = await http.post(
-        Uri.parse('https://zennail23.com/api/v1/register'),
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': '*/*',
-          'X-CSRF-TOKEN': '',
-        },
-        body: jsonEncode({
-          'id_token': idToken,
-          'name': phoneNumber,
-          'phone': phoneNumber,
-          'password':
-              '123456', // Mặc định hoặc có thể thêm trường nhập mật khẩu
-          'type': 1,
-        }),
-      );
-      print("_proceedWithRegistration: ${utf8.decode(response.bodyBytes)}");
+      final response = await _authRepo.register({
+        'id_token': idToken,
+        'name': phoneNumber,
+        'phone': phoneNumber,
+        'password': '123456', // Mặc định hoặc có thể thêm trường nhập mật khẩu
+        'type': 1,
+      });
+      print("_proceedWithRegistration: ${response.data}");
 
       setState(() {
         _isLoading = false;
       });
 
-      if (response.statusCode == 200) {
+      if (response.isSuccess) {
         // Xử lý đăng ký thành công
         _showMessage('Đăng ký thành công');
         // Chuyển về form đăng nhập
@@ -202,8 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       } else {
         // Xử lý lỗi
-        final data = jsonDecode(response.body);
-        _showError(data['message'] ?? 'Đăng ký thất bại');
+        _showError(response.msg ?? 'Đăng ký thất bại');
       }
     } catch (e) {
       setState(() {

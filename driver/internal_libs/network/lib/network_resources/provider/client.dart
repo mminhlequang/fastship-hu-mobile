@@ -6,15 +6,6 @@ import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-
-_parseAndDecode(String response) {
-  return jsonDecode(response);
-}
-
-parseJson(String text) {
-  return compute(_parseAndDecode, text);
-}
-
 class AppClient extends DioForNative {
   static AppClient? _instance;
   static bool _enableErrorHandler = true;
@@ -37,8 +28,7 @@ class AppClient extends DioForNative {
     );
     if (options != null) _instance!.options = options;
     if (appBaseUrl != null) _instance!.options.baseUrl = appBaseUrl!;
-    (_instance!.transformer as BackgroundTransformer).jsonDecodeCallback =
-        parseJson;
+
     if ((token == null || token.isEmpty)) {
       _instance!.options.headers.remove(r'Authorization');
     } else {
