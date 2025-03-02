@@ -1,4 +1,3 @@
-import 'package:app/src/presentation/auth/otp_screen.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -187,8 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'type': 1,
         }),
       );
-
-      print("_proceedWithRegistration: ${response.body}");
+      print("_proceedWithRegistration: ${utf8.decode(response.bodyBytes)}");
 
       setState(() {
         _isLoading = false;

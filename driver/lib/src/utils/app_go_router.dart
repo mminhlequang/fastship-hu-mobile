@@ -1,5 +1,4 @@
 import 'package:app/src/presentation/auth/auth_screen.dart';
-import 'package:app/src/presentation/auth/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,10 +23,6 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/auth',
       builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/otp',
-      builder: (context, state) => OtpScreen(args: state.extra as OtpArgs),
     ),
     GoRoute(
       path: '/home',
