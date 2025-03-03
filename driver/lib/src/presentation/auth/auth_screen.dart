@@ -31,6 +31,9 @@ enum AuthFormType { login, register, forgotPassword }
 class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
+  final _phoneFocusNode = FocusNode();
   PhoneNumber? _phoneNumber = kDebugMode
       ? PhoneNumber(isoCode: 'VN', phoneNumber: '0979797979', dialCode: '+84')
       : null;
@@ -51,6 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     _otpController.dispose();
     _otpTextEditingController.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
+    _phoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -269,61 +275,83 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginForm() {
     return Column(
       children: [
-        WidgetTextFieldPhone(
-          initialValue: _phoneNumber?.phoneNumber,
-          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
-          onPhoneNumberChanged: (phoneNumber) {
-            setState(() {
-              _phoneNumber = phoneNumber;
-            });
-          },
-          onInputValidated: (isValid) {
-            setState(() {
-              _isValidPhoneNumber = isValid;
-            });
-          },
-          hint: "Input your phone".tr(),
-          label: "Phone number".tr(),
-        ),
-        Gap(20.sw),
-        WidgetTextField(
-          controller: _passwordController,
-          hint: "Input your password".tr(),
-          label: "Password".tr(),
-          isPassword: true,
-          actionWidget: GestureDetector(
-            onTap: () {
+        WidgetAnimationStaggeredItem(
+          index: 1,
+          type: AnimationStaggeredType.bottomToTop,
+          child: WidgetTextFieldPhone(
+            initialValue: _phoneNumber?.phoneNumber,
+            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+            focusNode: _phoneFocusNode,
+            onPhoneNumberChanged: (phoneNumber) {
               setState(() {
-                _currentForm = AuthFormType.forgotPassword;
-                _showOtpField = false;
-                _isLoading = false;
-                _showEnterPasswordField = false;
+                _phoneNumber = phoneNumber;
               });
             },
-            child: Container(
-              color: Colors.transparent,
-              padding: EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 2,
-              ),
-              child: Text(
-                "Forgot password?".tr(),
-                style: w300TextStyle(
-                  fontSize: 14.sw,
-                  fontStyle: FontStyle.italic,
-                  decoration: TextDecoration.underline,
-                  decorationColor: appColorText.withOpacity(0.35),
+            onInputValidated: (isValid) {
+              setState(() {
+                _isValidPhoneNumber = isValid;
+                if (isValid) {
+                  _passwordFocusNode.requestFocus();
+                }
+              });
+            },
+            hint: "Input your phone".tr(),
+            label: "Phone number".tr(),
+          ),
+        ),
+        Gap(20.sw),
+        WidgetAnimationStaggeredItem(
+          index: 2,
+          type: AnimationStaggeredType.bottomToTop,
+          child: WidgetTextField(
+            controller: _passwordController,
+            focusNode: _passwordFocusNode,
+            hint: "Input your password".tr(),
+            label: "Password".tr(),
+            isPassword: true,
+            onSubmitted: (_) {
+              if (_isValidPhoneNumber && _passwordController.text.length > 4) {
+                _login();
+              }
+            },
+            actionWidget: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _currentForm = AuthFormType.forgotPassword;
+                  _showOtpField = false;
+                  _isLoading = false;
+                  _showEnterPasswordField = false;
+                });
+              },
+              child: Container(
+                color: Colors.transparent,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                child: Text(
+                  "Forgot password?".tr(),
+                  style: w300TextStyle(
+                    fontSize: 14.sw,
+                    fontStyle: FontStyle.italic,
+                    decoration: TextDecoration.underline,
+                    decorationColor: appColorText.withOpacity(0.35),
+                  ),
                 ),
               ),
             ),
           ),
         ),
         Gap(24),
-        WidgetAppButtonOK(
-          loading: _isLoading,
-          enable: _isValidPhoneNumber && _passwordController.text.length > 4,
-          label: 'Sign in',
-          onTap: _login,
+        WidgetAnimationStaggeredItem(
+          index: 3,
+          type: AnimationStaggeredType.bottomToTop,
+          child: WidgetAppButtonOK(
+            loading: _isLoading,
+            enable: _isValidPhoneNumber && _passwordController.text.length > 4,
+            label: 'Sign in',
+            onTap: _login,
+          ),
         ),
         Gap(8.sw),
         TextButton(
@@ -344,128 +372,168 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildRegisterForm() {
     return Column(
       children: [
-        WidgetTextFieldPhone(
-          initialValue: _phoneNumber?.phoneNumber,
-          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
-          onPhoneNumberChanged: (phoneNumber) {
-            setState(() {
-              _showOtpField = false;
-              _showEnterPasswordField = false;
-              _phoneNumber = phoneNumber;
-            });
-          },
-          onInputValidated: (isValid) {
-            setState(() {
-              _isValidPhoneNumber = isValid;
-            });
-          },
-          hint: "Input your phone".tr(),
-          label: "Phone number".tr(),
+        WidgetAnimationStaggeredItem(
+          index: 1,
+          type: AnimationStaggeredType.bottomToTop,
+          child: WidgetTextFieldPhone(
+            initialValue: _phoneNumber?.phoneNumber,
+            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+            focusNode: _phoneFocusNode,
+            onPhoneNumberChanged: (phoneNumber) {
+              setState(() {
+                _showOtpField = false;
+                _showEnterPasswordField = false;
+                _phoneNumber = phoneNumber;
+              });
+            },
+            onInputValidated: (isValid) {
+              setState(() {
+                _isValidPhoneNumber = isValid;
+                if (isValid && _showEnterPasswordField) {
+                  _passwordFocusNode.requestFocus();
+                }
+              });
+            },
+            hint: "Input your phone".tr(),
+            label: "Phone number".tr(),
+          ),
         ),
         if (_showOtpField) ...[
           Gap(20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Enter Code'.tr(),
-                style: w500TextStyle(fontSize: 14.sw),
-              ),
-              Gap(2),
-              Text(
-                'We sent a verification code to your phone number'.tr(),
-                style: w300TextStyle(fontSize: 12.sw),
-              ),
-              Gap(12),
-              PinCodeTextField(
-                appContext: context,
-                length: 6,
-                obscureText: false,
-                animationType: AnimationType.fade,
-                textStyle: w600TextStyle(fontSize: 24.sw),
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(5),
-                  fieldHeight: 50,
-                  fieldWidth: 46,
-                  activeFillColor: Colors.white,
-                  inactiveFillColor: Colors.white,
-                  selectedFillColor: Colors.white,
-                  activeColor: appColorPrimary,
-                  inactiveColor: appColorText.withOpacity(0.25),
-                  selectedColor: appColorPrimary,
+          WidgetAnimationStaggeredItem(
+            index: 2,
+            type: AnimationStaggeredType.bottomToTop,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Enter Code'.tr(),
+                  style: w500TextStyle(fontSize: 14.sw),
                 ),
-                animationDuration: Duration(milliseconds: 300),
-                enableActiveFill: true,
-                onCompleted: (v) {
-                  _otpController.text = v;
-                  setState(() {});
-                },
-                onChanged: (value) {
-                  _otpController.text = value;
-                  setState(() {});
-                },
-                beforeTextPaste: (text) {
-                  // Kiểm tra nếu text chỉ chứa các số
-                  return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
-                },
-                keyboardType: TextInputType.number,
-              ),
-            ],
+                Gap(2),
+                Text(
+                  'We sent a verification code to your phone number'.tr(),
+                  style: w300TextStyle(fontSize: 12.sw),
+                ),
+                Gap(12),
+                PinCodeTextField(
+                  appContext: context,
+                  length: 6,
+                  obscureText: false,
+                  animationType: AnimationType.fade,
+                  textStyle: w600TextStyle(fontSize: 24.sw),
+                  pinTheme: PinTheme(
+                    shape: PinCodeFieldShape.box,
+                    borderRadius: BorderRadius.circular(5),
+                    fieldHeight: 50,
+                    fieldWidth: 46,
+                    activeFillColor: Colors.white,
+                    inactiveFillColor: Colors.white,
+                    selectedFillColor: Colors.white,
+                    activeColor: appColorPrimary,
+                    inactiveColor: appColorText.withOpacity(0.25),
+                    selectedColor: appColorPrimary,
+                  ),
+                  animationDuration: Duration(milliseconds: 300),
+                  enableActiveFill: true,
+                  onCompleted: (v) {
+                    _otpController.text = v;
+                    setState(() {});
+                  },
+                  onChanged: (value) {
+                    _otpController.text = value;
+                    setState(() {});
+                  },
+                  beforeTextPaste: (text) {
+                    // Kiểm tra nếu text chỉ chứa các số
+                    return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
           ),
         ] else if (_showEnterPasswordField) ...[
           Gap(20),
-          WidgetTextField(
-            controller: _passwordController,
-            hint: "Input new password".tr(),
-            label: "New Password".tr(),
-            isPassword: true,
-            onChanged: (value) {
-              setState(() {});
-            },
+          WidgetAnimationStaggeredItem(
+            index: 2,
+            type: AnimationStaggeredType.bottomToTop,
+            child: WidgetTextField(
+              controller: _passwordController,
+              focusNode: _passwordFocusNode,
+              hint: "Input new password".tr(),
+              label: "New Password".tr(),
+              isPassword: true,
+              onSubmitted: (_) {
+                _confirmPasswordFocusNode.requestFocus();
+              },
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ),
           Gap(20),
-          WidgetTextField(
-            controller: _confirmPasswordController,
-            hint: "Re-input new password".tr(),
-            label: "Confirm password".tr(),
-            isPassword: true,
-            onChanged: (value) {
-              setState(() {});
-            },
+          WidgetAnimationStaggeredItem(
+            index: 3,
+            type: AnimationStaggeredType.bottomToTop,
+            child: WidgetTextField(
+              controller: _confirmPasswordController,
+              focusNode: _confirmPasswordFocusNode,
+              hint: "Re-input new password".tr(),
+              label: "Confirm password".tr(),
+              isPassword: true,
+              onSubmitted: (_) {
+                if (_passwordController.text.length > 4 &&
+                    _confirmPasswordController.text ==
+                        _passwordController.text) {
+                  _register();
+                }
+              },
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ),
         ],
         Gap(24),
-        WidgetAppButtonOK(
-          loading: _isLoading,
-          enable: _showOtpField
-              ? _otpController.text.length == 6
-              : _showEnterPasswordField
-                  ? _passwordController.text.length > 4 &&
-                      _confirmPasswordController.text ==
-                          _passwordController.text
-                  : _isValidPhoneNumber,
-          label: _showOtpField
-              ? 'Verify OTP'
-              : _showEnterPasswordField
-                  ? 'Register'
-                  : 'Send OTP',
-          onTap: _showOtpField
-              ? _verifyOtp
-              : _showEnterPasswordField
-                  ? _register
-                  : _verifyPhoneNumber,
-        ),
-        Gap(8.sw),
-        TextButton(
-          onPressed: _toggleFormType,
-          child: Text(
-            'Already have an account? Sign in'.tr(),
-            style: w300TextStyle(
-              fontSize: 14.sw,
-              decoration: TextDecoration.underline,
-              decorationColor: appColorText.withOpacity(0.5),
-            ),
+        WidgetAnimationStaggeredItem(
+          index: 4,
+          type: AnimationStaggeredType.bottomToTop,
+          child: Column(
+            children: [
+              WidgetAppButtonOK(
+                loading: _isLoading,
+                enable: _showOtpField
+                    ? _otpController.text.length == 6
+                    : _showEnterPasswordField
+                        ? _passwordController.text.length > 4 &&
+                            _confirmPasswordController.text ==
+                                _passwordController.text
+                        : _isValidPhoneNumber,
+                label: _showOtpField
+                    ? 'Verify OTP'
+                    : _showEnterPasswordField
+                        ? 'Register'
+                        : 'Send OTP',
+                onTap: _showOtpField
+                    ? _verifyOtp
+                    : _showEnterPasswordField
+                        ? _register
+                        : _verifyPhoneNumber,
+              ),
+              Gap(8.sw),
+              TextButton(
+                onPressed: _toggleFormType,
+                child: Text(
+                  'Already have an account? Sign in'.tr(),
+                  style: w300TextStyle(
+                    fontSize: 14.sw,
+                    decoration: TextDecoration.underline,
+                    decorationColor: appColorText.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -475,132 +543,172 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildForgotPasswordForm() {
     return Column(
       children: [
-        WidgetTextFieldPhone(
-          initialValue: _phoneNumber?.phoneNumber,
-          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
-          onPhoneNumberChanged: (phoneNumber) {
-            setState(() {
-              _showOtpField = false;
-              _showEnterPasswordField = false;
-              _phoneNumber = phoneNumber;
-            });
-          },
-          onInputValidated: (isValid) {
-            setState(() {
-              _isValidPhoneNumber = isValid;
-            });
-          },
-          hint: "Input your phone".tr(),
-          label: "Phone number".tr(),
+        WidgetAnimationStaggeredItem(
+          index: 1,
+          type: AnimationStaggeredType.bottomToTop,
+          child: WidgetTextFieldPhone(
+            initialValue: _phoneNumber?.phoneNumber,
+            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+            focusNode: _phoneFocusNode,
+            onPhoneNumberChanged: (phoneNumber) {
+              setState(() {
+                _showOtpField = false;
+                _showEnterPasswordField = false;
+                _phoneNumber = phoneNumber;
+              });
+            },
+            onInputValidated: (isValid) {
+              setState(() {
+                _isValidPhoneNumber = isValid;
+                if (isValid && _showEnterPasswordField) {
+                  _passwordFocusNode.requestFocus();
+                }
+              });
+            },
+            hint: "Input your phone".tr(),
+            label: "Phone number".tr(),
+          ),
         ),
         if (_showOtpField) ...[
           Gap(20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Enter Code'.tr(),
-                style: w500TextStyle(fontSize: 14.sw),
-              ),
-              Gap(2),
-              Text(
-                'We sent a verification code to your phone number'.tr(),
-                style: w300TextStyle(fontSize: 12.sw),
-              ),
-              Gap(12),
-              PinCodeTextField(
-                appContext: context,
-                length: 6,
-                obscureText: false,
-                animationType: AnimationType.fade,
-                textStyle: w600TextStyle(fontSize: 24.sw),
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(5),
-                  fieldHeight: 50,
-                  fieldWidth: 46,
-                  activeFillColor: Colors.white,
-                  inactiveFillColor: Colors.white,
-                  selectedFillColor: Colors.white,
-                  activeColor: appColorPrimary,
-                  inactiveColor: appColorText.withOpacity(0.25),
-                  selectedColor: appColorPrimary,
+          WidgetAnimationStaggeredItem(
+            index: 2,
+            type: AnimationStaggeredType.bottomToTop,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Enter Code'.tr(),
+                  style: w500TextStyle(fontSize: 14.sw),
                 ),
-                animationDuration: Duration(milliseconds: 300),
-                enableActiveFill: true,
-                onCompleted: (v) {
-                  _otpController.text = v;
-                  setState(() {});
-                },
-                onChanged: (value) {
-                  _otpController.text = value;
-                  setState(() {});
-                },
-                beforeTextPaste: (text) {
-                  return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
-                },
-                keyboardType: TextInputType.number,
-              ),
-            ],
+                Gap(2),
+                Text(
+                  'We sent a verification code to your phone number'.tr(),
+                  style: w300TextStyle(fontSize: 12.sw),
+                ),
+                Gap(12),
+                PinCodeTextField(
+                  appContext: context,
+                  length: 6,
+                  obscureText: false,
+                  animationType: AnimationType.fade,
+                  textStyle: w600TextStyle(fontSize: 24.sw),
+                  pinTheme: PinTheme(
+                    shape: PinCodeFieldShape.box,
+                    borderRadius: BorderRadius.circular(5),
+                    fieldHeight: 50,
+                    fieldWidth: 46,
+                    activeFillColor: Colors.white,
+                    inactiveFillColor: Colors.white,
+                    selectedFillColor: Colors.white,
+                    activeColor: appColorPrimary,
+                    inactiveColor: appColorText.withOpacity(0.25),
+                    selectedColor: appColorPrimary,
+                  ),
+                  animationDuration: Duration(milliseconds: 300),
+                  enableActiveFill: true,
+                  onCompleted: (v) {
+                    _otpController.text = v;
+                    setState(() {});
+                  },
+                  onChanged: (value) {
+                    _otpController.text = value;
+                    setState(() {});
+                  },
+                  beforeTextPaste: (text) {
+                    return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
           ),
         ] else if (_showEnterPasswordField) ...[
           Gap(20),
-          WidgetTextField(
-            controller: _passwordController,
-            hint: "Input new password".tr(),
-            label: "New Password".tr(),
-            isPassword: true,
-            onChanged: (value) {
-              setState(() {});
-            },
+          WidgetAnimationStaggeredItem(
+            index: 2,
+            type: AnimationStaggeredType.bottomToTop,
+            child: WidgetTextField(
+              controller: _passwordController,
+              focusNode: _passwordFocusNode,
+              hint: "Input new password".tr(),
+              label: "New Password".tr(),
+              isPassword: true,
+              onSubmitted: (_) {
+                _confirmPasswordFocusNode.requestFocus();
+              },
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ),
           Gap(20),
-          WidgetTextField(
-            controller: _confirmPasswordController,
-            hint: "Re-input new password".tr(),
-            label: "Confirm password".tr(),
-            isPassword: true,
-            onChanged: (value) {
-              setState(() {});
-            },
+          WidgetAnimationStaggeredItem(
+            index: 3,
+            type: AnimationStaggeredType.bottomToTop,
+            child: WidgetTextField(
+              controller: _confirmPasswordController,
+              focusNode: _confirmPasswordFocusNode,
+              hint: "Re-input new password".tr(),
+              label: "Confirm password".tr(),
+              isPassword: true,
+              onSubmitted: (_) {
+                if (_passwordController.text.length > 4 &&
+                    _confirmPasswordController.text ==
+                        _passwordController.text) {
+                  _resetPassword();
+                }
+              },
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ),
         ],
         Gap(24),
-        WidgetAppButtonOK(
-          loading: _isLoading,
-          enable: _showOtpField
-              ? _otpController.text.length == 6
-              : _showEnterPasswordField
-                  ? _passwordController.text.length > 4 &&
-                      _confirmPasswordController.text ==
-                          _passwordController.text
-                  : _isValidPhoneNumber,
-          label: _showOtpField
-              ? 'Verify OTP'
-              : _showEnterPasswordField
-                  ? 'Reset Password'
-                  : 'Send OTP',
-          onTap: _showOtpField
-              ? _verifyOtp
-              : _showEnterPasswordField
-                  ? _resetPassword
-                  : _verifyPhoneNumber,
-        ),
-        Gap(8.sw),
-        TextButton(
-          onPressed: () {
-            setState(() {
-              _currentForm = AuthFormType.login;
-              _showOtpField = false;
-            });
-          },
-          child: Text(
-            'Back to Sign in'.tr(),
-            style: w300TextStyle(
-              fontSize: 14.sw,
-              decoration: TextDecoration.underline,
-              decorationColor: appColorText.withOpacity(0.5),
-            ),
+        WidgetAnimationStaggeredItem(
+          index: 4,
+          type: AnimationStaggeredType.bottomToTop,
+          child: Column(
+            children: [
+              WidgetAppButtonOK(
+                loading: _isLoading,
+                enable: _showOtpField
+                    ? _otpController.text.length == 6
+                    : _showEnterPasswordField
+                        ? _passwordController.text.length > 4 &&
+                            _confirmPasswordController.text ==
+                                _passwordController.text
+                        : _isValidPhoneNumber,
+                label: _showOtpField
+                    ? 'Verify OTP'
+                    : _showEnterPasswordField
+                        ? 'Reset Password'
+                        : 'Send OTP',
+                onTap: _showOtpField
+                    ? _verifyOtp
+                    : _showEnterPasswordField
+                        ? _resetPassword
+                        : _verifyPhoneNumber,
+              ),
+              Gap(8.sw),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _currentForm = AuthFormType.login;
+                    _showOtpField = false;
+                  });
+                },
+                child: Text(
+                  'Back to Sign in'.tr(),
+                  style: w300TextStyle(
+                    fontSize: 14.sw,
+                    decoration: TextDecoration.underline,
+                    decorationColor: appColorText.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -643,11 +751,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 Gap(40.sw),
-                _currentForm == AuthFormType.login
-                    ? _buildLoginForm()
-                    : _currentForm == AuthFormType.register
-                        ? _buildRegisterForm()
-                        : _buildForgotPasswordForm(),
+                Builder(
+                  key: ValueKey(_currentForm),
+                  builder: (_) {
+                    return _currentForm == AuthFormType.login
+                        ? _buildLoginForm()
+                        : _currentForm == AuthFormType.register
+                            ? _buildRegisterForm()
+                            : _buildForgotPasswordForm();
+                  },
+                ),
               ],
             ),
           ),
