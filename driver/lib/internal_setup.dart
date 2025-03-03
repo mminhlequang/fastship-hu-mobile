@@ -19,8 +19,6 @@ internalSetup() {
         baseUrl: 'https://zennail23.com',
         baseUrlAsset: '',
         responsePrefixData: 'data',
-        responseIsSuccess: (response) =>
-            response.statusCode == 200 || response.statusCode == 201,
         // errorInterceptor: (e) {
         //   print(e);
         // },

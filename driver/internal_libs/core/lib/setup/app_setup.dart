@@ -4,12 +4,7 @@ import 'app_base.dart';
 
 AppSetup? get appSetup => AppSetup._instance;
 AppColorsBase? get appColors => appSetup?.appColors;
-AppPrefsBase? get appPrefs => appSetup?.appPrefs;
-
-Color get appColorPrimary => appSetup?.appColors.primary ?? Colors.white;
-Color get appColorBackground => appSetup?.appColors.background ?? Colors.white;
-Color get appColorElement => appSetup?.appColors.element ?? Colors.white;
-Color get appColorText => appSetup?.appColors.text ?? Colors.white;
+AppPrefsBase? get appPrefs => appSetup?.appPrefs; 
 
 BuildContext? get findAppContext => appSetup?.findAppContext?.call();
 

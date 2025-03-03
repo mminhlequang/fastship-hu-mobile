@@ -114,7 +114,6 @@ class _TestSearchPlaceState extends State<TestSearchPlace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appColorBackground,
       body: SafeArea(
         bottom: false,
         child: Column(

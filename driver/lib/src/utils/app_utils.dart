@@ -1,3 +1,4 @@
+import 'package:app/src/constants/constants.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -76,15 +77,36 @@ appCatchLog(e) {
 
 enum AppSnackBarType { error, success, notitfication }
 
-appShowSnackBar({context, required msg, Duration? duration}) {
+appShowSnackBar(
+    {context,
+    required msg,
+    Duration? duration,
+    AppSnackBarType type = AppSnackBarType.notitfication}) {
+  Color color;
+  Duration duration;
+  switch (type) {
+    case AppSnackBarType.error:
+      color = Colors.red;
+      duration = const Duration(seconds: 5);
+      break;
+    case AppSnackBarType.success:
+      color = Colors.green;
+      duration = const Duration(seconds: 3);
+      break;
+    case AppSnackBarType.notitfication:
+      color = Colors.blue;
+      duration = const Duration(seconds: 4);
+      break;
+  }
+
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
         msg,
-        style: w300TextStyle(color: appColorBackground),
+        style: w400TextStyle(color: Colors.white, fontSize: 16.sw),
       ),
-      duration: duration ?? const Duration(seconds: 1),
-      backgroundColor: appColorText,
+      duration: duration,
+      backgroundColor: color,
     ),
   );
 }

@@ -13,6 +13,7 @@ import 'package:flutter_portal/flutter_portal.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
+import 'src/constants/constants.dart';
 import 'src/utils/utils.dart';
 
 void main() async {
@@ -79,9 +80,12 @@ class _AppState extends State<_App> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        theme: AppPrefs.instance.isDarkTheme
-            ? ThemeData.dark()
-            : ThemeData.light(),
+        theme: (AppPrefs.instance.isDarkTheme
+                ? ThemeData.dark()
+                : ThemeData.light())
+            .copyWith(
+          scaffoldBackgroundColor: appColorBackground,
+        ),
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       ),

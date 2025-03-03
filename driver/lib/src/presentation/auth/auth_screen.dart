@@ -1,14 +1,23 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
-import 'package:app/src/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/widgets/intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:internal_core/widgets/widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+
+import 'package:app/src/base/auth/auth_cubit.dart';
+import 'package:app/src/constants/constants.dart';
 import 'package:app/src/network_resources/auth/repo.dart';
-import 'package:internal_network/network_resources/resources.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,23 +26,28 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-enum AuthFormType { login, register }
+enum AuthFormType { login, register, forgotPassword }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  PhoneNumber? _phoneNumber = kDebugMode
+      ? PhoneNumber(isoCode: 'VN', phoneNumber: '0979797979', dialCode: '+84')
+      : null;
+  bool _isValidPhoneNumber = false;
+
   final _otpController = TextEditingController();
   final _otpTextEditingController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _authRepo = AuthRepo();
   bool _isLoading = false;
   bool _showOtpField = false;
+  bool _showEnterPasswordField = false;
   String? _verificationId;
   AuthFormType _currentForm = AuthFormType.login;
 
   @override
   void dispose() {
-    _phoneController.dispose();
     _passwordController.dispose();
     _otpController.dispose();
     _otpTextEditingController.dispose();
@@ -54,14 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final phoneNumber = _phoneController.text.trim();
-    final password = _passwordController.text;
-
     try {
       final response = await _authRepo.login({
-        'phone': phoneNumber,
-        'password': password,
-        'type': 1,
+        'phone': _phoneNumber?.phoneNumber,
+        'password': _passwordController.text,
+        'type': AccountType.driver.value,
       });
 
       setState(() {
@@ -70,14 +81,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.isSuccess) {
         // Xử lý đăng nhập thành công
-        // TODO: Lưu token và thông tin người dùng
+        await AppPrefs.instance.saveAccountToken(response.data!);
 
         // Chuyển hướng đến màn hình chính
-        // appContext.go('/home');
-        _showMessage('Đăng nhập thành công');
+        authCubit.load(
+          user: response.data!.user,
+          delayRedirect: const Duration(seconds: 2),
+        );
+        appShowSnackBar(
+            msg: 'Login success, redirecting to home...'.tr(),
+            context: context,
+            type: AppSnackBarType.success);
       } else {
         // Xử lý lỗi
-        _showError(response.msg ?? 'Đăng nhập thất bại');
+        _showError(response.msg ?? 'Login failed, please try again!');
       }
     } catch (e, stackTrace) {
       setState(() {
@@ -88,32 +105,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  String? _idToken;
   Future<void> _verifyPhoneNumber() async {
     setState(() {
       _isLoading = true;
     });
-    final phoneNumber = _phoneController.text.trim();
     await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
+      phoneNumber: _phoneNumber!.phoneNumber!,
       timeout: const Duration(seconds: 60),
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
         print(
             'Phone number automatically verified and signed in: ${_auth.currentUser?.phoneNumber}');
-        _proceedWithRegistration(_auth.currentUser!.uid);
+
+        _idToken = await userCredential.user!.getIdToken();
+        _showEnterPasswordField = true;
+        _showOtpField = false;
+        _isLoading = false;
+        setState(() {});
       },
       verificationFailed: (FirebaseAuthException e) {
         setState(() {
           _isLoading = false;
         });
         if (e.code == 'invalid-phone-number') {
-          _showError('Số điện thoại không hợp lệ.');
+          _showError('Invalid phone number.');
         } else if (e.code == 'missing-client-identifier') {
-          _showError('Thiếu mã định danh của khách hàng.');
+          _showError('Missing client identifier.');
         } else if (e.code == 'too-many-requests') {
-          _showError('Quá nhiều yêu cầu. Vui lòng thử lại sau.');
+          _showError('Too many requests. Please try again later.');
         } else {
-          _showError('Xác thực thất bại: ${e.message}');
+          _showError('Verification failed: ${e.message}');
         }
       },
       codeSent: (String verificationId, int? resendToken) {
@@ -122,7 +145,10 @@ class _LoginScreenState extends State<LoginScreen> {
           _showOtpField = true;
           _verificationId = verificationId;
         });
-        _showMessage('Mã OTP đã được gửi đến số điện thoại của bạn');
+        appShowSnackBar(
+            msg: 'OTP sent to your phone number',
+            context: context,
+            type: AppSnackBarType.notitfication);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
         print('Timeout: Mã OTP hết hạn.');
@@ -138,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final verificationId = _verificationId;
       if (verificationId == null) {
-        throw Exception('Mã xác thực không hợp lệ hoặc đã hết hạn');
+        throw Exception('Invalid verification ID or expired');
       }
 
       final credential = PhoneAuthProvider.credential(
@@ -147,107 +173,169 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final userCredential = await _auth.signInWithCredential(credential);
-      final idToken = await userCredential.user!.getIdToken();
+      _idToken = await userCredential.user!.getIdToken();
 
-      _proceedWithRegistration(idToken!);
+      _showEnterPasswordField = true;
+      _showOtpField = false;
+      _isLoading = false;
+      setState(() {});
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showError('Xác thực OTP thất bại: $e');
+      _showError('OTP verification failed: $e');
     }
   }
 
-  Future<void> _proceedWithRegistration(String idToken) async {
-    final phoneNumber = _phoneController.text.trim();
-    print("_proceedWithRegistration: $phoneNumber");
-    print("_proceedWithRegistration: $idToken");
+  Future<void> _register() async {
+    setState(() {
+      _isLoading = true;
+    });
+    print("call register");
+    final response = await _authRepo.register({
+      // 'id_token': _idToken,
+      'name': AccountType.driver.name,
+      // 'phone': _phoneNumber?.phoneNumber,
+      'password': _passwordController.text.tr(),
+      'type': AccountType.driver.value,
+    });
 
-    try {
-      final response = await _authRepo.register({
-        'id_token': idToken,
-        'name': phoneNumber,
-        'phone': phoneNumber,
-        'password': '123456', // Mặc định hoặc có thể thêm trường nhập mật khẩu
-        'type': 1,
-      });
-      print("_proceedWithRegistration: ${response.data}");
+    setState(() {
+      _isLoading = false;
+    });
 
+    if (response.isSuccess) {
+      await AppPrefs.instance.saveAccountToken(response.data!);
+      authCubit.load(
+        user: response.data!.user,
+        delayRedirect: const Duration(seconds: 2),
+      );
+
+      // Xử lý đăng ký thành công
+      appShowSnackBar(
+          msg: 'Register success, redirecting to home...',
+          context: context,
+          type: AppSnackBarType.success);
+    } else {
       setState(() {
         _isLoading = false;
       });
+      // Xử lý lỗi
+      _showError(response.msg ?? 'Register failed, please try again!');
+    }
+  }
 
-      if (response.isSuccess) {
-        // Xử lý đăng ký thành công
-        _showMessage('Đăng ký thành công');
-        // Chuyển về form đăng nhập
-        setState(() {
-          _currentForm = AuthFormType.login;
-          _showOtpField = false;
-        });
-      } else {
-        // Xử lý lỗi
-        _showError(response.msg ?? 'Đăng ký thất bại');
-      }
-    } catch (e) {
+  Future<void> _resetPassword() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Gọi API reset mật khẩu
+    final response = await _authRepo.resetPassword({
+      "id_token": _idToken,
+      "phone": _phoneNumber?.phoneNumber,
+      "new_password": _passwordController.text,
+      "confirm_password": _passwordController.text
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.isSuccess) {
+      appShowSnackBar(
+          msg: 'Reset password success',
+          context: context,
+          type: AppSnackBarType.success);
+      // Chuyển về form đăng nhập
       setState(() {
-        _isLoading = false;
+        _currentForm = AuthFormType.login;
+        _showOtpField = false;
       });
-      _showError('Lỗi kết nối: $e');
+    } else {
+      _showError(response.msg ?? 'Reset password failed');
     }
   }
 
   _showError(String message) {
     print("_showError: $message");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    appShowSnackBar(
+      msg: message,
+      context: context,
+      type: AppSnackBarType.error,
     );
   }
 
   Widget _buildLoginForm() {
     return Column(
       children: [
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: 'Số điện thoại',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.phone),
-          ),
+        WidgetTextFieldPhone(
+          initialValue: _phoneNumber?.phoneNumber,
+          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+          onPhoneNumberChanged: (phoneNumber) {
+            setState(() {
+              _phoneNumber = phoneNumber;
+            });
+          },
+          onInputValidated: (isValid) {
+            setState(() {
+              _isValidPhoneNumber = isValid;
+            });
+          },
+          hint: "Input your phone".tr(),
+          label: "Phone number".tr(),
         ),
-        Gap(16),
-        TextFormField(
+        Gap(20.sw),
+        WidgetTextField(
           controller: _passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Mật khẩu',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.lock),
+          hint: "Input your password".tr(),
+          label: "Password".tr(),
+          isPassword: true,
+          actionWidget: GestureDetector(
+            onTap: () {
+              setState(() {
+                _currentForm = AuthFormType.forgotPassword;
+                _showOtpField = false;
+                _isLoading = false;
+                _showEnterPasswordField = false;
+              });
+            },
+            child: Container(
+              color: Colors.transparent,
+              padding: EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 2,
+              ),
+              child: Text(
+                "Forgot password?".tr(),
+                style: w300TextStyle(
+                  fontSize: 14.sw,
+                  fontStyle: FontStyle.italic,
+                  decoration: TextDecoration.underline,
+                  decorationColor: appColorText.withOpacity(0.35),
+                ),
+              ),
+            ),
           ),
         ),
-        Gap(20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _login,
-            child:
-                _isLoading ? CupertinoActivityIndicator() : Text('Đăng nhập'),
-          ),
+        Gap(24),
+        WidgetAppButtonOK(
+          loading: _isLoading,
+          enable: _isValidPhoneNumber && _passwordController.text.length > 4,
+          label: 'Sign in',
+          onTap: _login,
         ),
-        Gap(16),
+        Gap(8.sw),
         TextButton(
           onPressed: _toggleFormType,
-          child: Text('Chưa có tài khoản? Đăng ký ngay'),
+          child: Text(
+            'Don\'t have an account? Sign up'.tr(),
+            style: w300TextStyle(
+              fontSize: 14.sw,
+              decoration: TextDecoration.underline,
+              decorationColor: appColorText.withOpacity(0.5),
+            ),
+          ),
         ),
       ],
     );
@@ -256,52 +344,66 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildRegisterForm() {
     return Column(
       children: [
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: 'Số điện thoại',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.phone),
-          ),
+        WidgetTextFieldPhone(
+          initialValue: _phoneNumber?.phoneNumber,
+          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+          onPhoneNumberChanged: (phoneNumber) {
+            setState(() {
+              _showOtpField = false;
+              _showEnterPasswordField = false;
+              _phoneNumber = phoneNumber;
+            });
+          },
+          onInputValidated: (isValid) {
+            setState(() {
+              _isValidPhoneNumber = isValid;
+            });
+          },
+          hint: "Input your phone".tr(),
+          label: "Phone number".tr(),
         ),
         if (_showOtpField) ...[
-          Gap(16),
+          Gap(20),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Nhập mã xác thực',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                'Enter Code'.tr(),
+                style: w500TextStyle(fontSize: 14.sw),
               ),
-              Gap(8),
+              Gap(2),
+              Text(
+                'We sent a verification code to your phone number'.tr(),
+                style: w300TextStyle(fontSize: 12.sw),
+              ),
+              Gap(12),
               PinCodeTextField(
                 appContext: context,
                 length: 6,
                 obscureText: false,
                 animationType: AnimationType.fade,
+                textStyle: w600TextStyle(fontSize: 24.sw),
                 pinTheme: PinTheme(
                   shape: PinCodeFieldShape.box,
                   borderRadius: BorderRadius.circular(5),
                   fieldHeight: 50,
-                  fieldWidth: 40,
+                  fieldWidth: 46,
                   activeFillColor: Colors.white,
                   inactiveFillColor: Colors.white,
                   selectedFillColor: Colors.white,
-                  activeColor: Theme.of(context).primaryColor,
-                  inactiveColor: Colors.grey.shade300,
-                  selectedColor: Theme.of(context).primaryColor,
+                  activeColor: appColorPrimary,
+                  inactiveColor: appColorText.withOpacity(0.25),
+                  selectedColor: appColorPrimary,
                 ),
                 animationDuration: Duration(milliseconds: 300),
                 enableActiveFill: true,
-                controller: _otpTextEditingController,
                 onCompleted: (v) {
                   _otpController.text = v;
+                  setState(() {});
                 },
                 onChanged: (value) {
                   _otpController.text = value;
+                  setState(() {});
                 },
                 beforeTextPaste: (text) {
                   // Kiểm tra nếu text chỉ chứa các số
@@ -311,23 +413,195 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-        ],
-        Gap(20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _isLoading
-                ? null
-                : (_showOtpField ? _verifyOtp : _verifyPhoneNumber),
-            child: _isLoading
-                ? CupertinoActivityIndicator()
-                : Text(_showOtpField ? 'Xác nhận OTP' : 'Gửi mã OTP'),
+        ] else if (_showEnterPasswordField) ...[
+          Gap(20),
+          WidgetTextField(
+            controller: _passwordController,
+            hint: "Input new password".tr(),
+            label: "New Password".tr(),
+            isPassword: true,
+            onChanged: (value) {
+              setState(() {});
+            },
           ),
+          Gap(20),
+          WidgetTextField(
+            controller: _confirmPasswordController,
+            hint: "Re-input new password".tr(),
+            label: "Confirm password".tr(),
+            isPassword: true,
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+        ],
+        Gap(24),
+        WidgetAppButtonOK(
+          loading: _isLoading,
+          enable: _showOtpField
+              ? _otpController.text.length == 6
+              : _showEnterPasswordField
+                  ? _passwordController.text.length > 4 &&
+                      _confirmPasswordController.text ==
+                          _passwordController.text
+                  : _isValidPhoneNumber,
+          label: _showOtpField
+              ? 'Verify OTP'
+              : _showEnterPasswordField
+                  ? 'Register'
+                  : 'Send OTP',
+          onTap: _showOtpField
+              ? _verifyOtp
+              : _showEnterPasswordField
+                  ? _register
+                  : _verifyPhoneNumber,
         ),
-        Gap(16),
+        Gap(8.sw),
         TextButton(
           onPressed: _toggleFormType,
-          child: Text('Đã có tài khoản? Đăng nhập ngay'),
+          child: Text(
+            'Already have an account? Sign in'.tr(),
+            style: w300TextStyle(
+              fontSize: 14.sw,
+              decoration: TextDecoration.underline,
+              decorationColor: appColorText.withOpacity(0.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildForgotPasswordForm() {
+    return Column(
+      children: [
+        WidgetTextFieldPhone(
+          initialValue: _phoneNumber?.phoneNumber,
+          initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
+          onPhoneNumberChanged: (phoneNumber) {
+            setState(() {
+              _showOtpField = false;
+              _showEnterPasswordField = false;
+              _phoneNumber = phoneNumber;
+            });
+          },
+          onInputValidated: (isValid) {
+            setState(() {
+              _isValidPhoneNumber = isValid;
+            });
+          },
+          hint: "Input your phone".tr(),
+          label: "Phone number".tr(),
+        ),
+        if (_showOtpField) ...[
+          Gap(20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter Code'.tr(),
+                style: w500TextStyle(fontSize: 14.sw),
+              ),
+              Gap(2),
+              Text(
+                'We sent a verification code to your phone number'.tr(),
+                style: w300TextStyle(fontSize: 12.sw),
+              ),
+              Gap(12),
+              PinCodeTextField(
+                appContext: context,
+                length: 6,
+                obscureText: false,
+                animationType: AnimationType.fade,
+                textStyle: w600TextStyle(fontSize: 24.sw),
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(5),
+                  fieldHeight: 50,
+                  fieldWidth: 46,
+                  activeFillColor: Colors.white,
+                  inactiveFillColor: Colors.white,
+                  selectedFillColor: Colors.white,
+                  activeColor: appColorPrimary,
+                  inactiveColor: appColorText.withOpacity(0.25),
+                  selectedColor: appColorPrimary,
+                ),
+                animationDuration: Duration(milliseconds: 300),
+                enableActiveFill: true,
+                onCompleted: (v) {
+                  _otpController.text = v;
+                  setState(() {});
+                },
+                onChanged: (value) {
+                  _otpController.text = value;
+                  setState(() {});
+                },
+                beforeTextPaste: (text) {
+                  return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
+                },
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ] else if (_showEnterPasswordField) ...[
+          Gap(20),
+          WidgetTextField(
+            controller: _passwordController,
+            hint: "Input new password".tr(),
+            label: "New Password".tr(),
+            isPassword: true,
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+          Gap(20),
+          WidgetTextField(
+            controller: _confirmPasswordController,
+            hint: "Re-input new password".tr(),
+            label: "Confirm password".tr(),
+            isPassword: true,
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+        ],
+        Gap(24),
+        WidgetAppButtonOK(
+          loading: _isLoading,
+          enable: _showOtpField
+              ? _otpController.text.length == 6
+              : _showEnterPasswordField
+                  ? _passwordController.text.length > 4 &&
+                      _confirmPasswordController.text ==
+                          _passwordController.text
+                  : _isValidPhoneNumber,
+          label: _showOtpField
+              ? 'Verify OTP'
+              : _showEnterPasswordField
+                  ? 'Reset Password'
+                  : 'Send OTP',
+          onTap: _showOtpField
+              ? _verifyOtp
+              : _showEnterPasswordField
+                  ? _resetPassword
+                  : _verifyPhoneNumber,
+        ),
+        Gap(8.sw),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _currentForm = AuthFormType.login;
+              _showOtpField = false;
+            });
+          },
+          child: Text(
+            'Back to Sign in'.tr(),
+            style: w300TextStyle(
+              fontSize: 14.sw,
+              decoration: TextDecoration.underline,
+              decorationColor: appColorText.withOpacity(0.5),
+            ),
+          ),
         ),
       ],
     );
@@ -336,23 +610,46 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const FlutterLogo(size: 100),
-              const Gap(40),
-              Text(
-                _currentForm == AuthFormType.login ? 'Đăng nhập' : 'Đăng ký',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const Gap(24),
-              _currentForm == AuthFormType.login
-                  ? _buildLoginForm()
-                  : _buildRegisterForm(),
-            ],
+          padding: EdgeInsets.symmetric(horizontal: 20.sw),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                WidgetAnimationStaggeredItem(
+                  index: 2,
+                  type: AnimationStaggeredType.topToBottom,
+                  child: Column(
+                    children: [
+                      Hero(
+                        tag: 'app_logo',
+                        child: WidgetAppSVG(
+                          assetsvg('ic_logo_white'),
+                          width: 160.sw,
+                          color: appColorPrimaryDark,
+                        ),
+                      ),
+                      Text(
+                        _currentForm == AuthFormType.login
+                            ? 'Welcome back'.tr()
+                            : _currentForm == AuthFormType.register
+                                ? 'Create an account'.tr()
+                                : 'Forgot Password'.tr(),
+                        style: w400TextStyle(fontSize: 24.sw),
+                      ),
+                    ],
+                  ),
+                ),
+                Gap(40.sw),
+                _currentForm == AuthFormType.login
+                    ? _buildLoginForm()
+                    : _currentForm == AuthFormType.register
+                        ? _buildRegisterForm()
+                        : _buildForgotPasswordForm(),
+              ],
+            ),
           ),
         ),
       ),

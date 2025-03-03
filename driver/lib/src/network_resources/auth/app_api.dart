@@ -1,3 +1,4 @@
+import 'package:app/src/utils/utils.dart';
 import 'package:internal_network/internal_network.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:dio/dio.dart';
@@ -86,8 +87,13 @@ class MyAppApiImp extends MyAppApi {
   Future<NetworkResponse> getProfile() async {
     return await handleNetworkError(
       proccess: () async {
-        Response response = await AppClient().get(_MyAppEndpoint.profile());
-        return NetworkResponse.fromResponse(response);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.profile());
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AccountModel.fromJson(json),
+        );
       },
     );
   }
