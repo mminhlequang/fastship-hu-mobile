@@ -66,9 +66,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
-    appContext.pushReplacement('/driver-register');
-    return;
     if (state.stateType == AuthStateType.logged) {
+
+    appContext.pushReplacement('/driver-register');
+      return;
       appContext.pushReplacement('/home');
     } else {
       appContext.pushReplacement('/auth');

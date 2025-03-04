@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   PhoneNumber? _phoneNumber = kDebugMode
       ? PhoneNumber(isoCode: 'VN', phoneNumber: '0979797979', dialCode: '+84')
       : null;
-  bool _isValidPhoneNumber = false;
+  bool _isValidPhoneNumber = kDebugMode ? true : false;
 
   final _otpController = TextEditingController();
   final _otpTextEditingController = TextEditingController();
@@ -91,7 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Chuyển hướng đến màn hình chính
         authCubit.load(
-          user: response.data!.user,
           delayRedirect: const Duration(seconds: 2),
         );
         appShowSnackBar(
@@ -199,9 +198,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     print("call register");
     final response = await _authRepo.register({
-      // 'id_token': _idToken,
+      'id_token': _idToken,
       'name': AccountType.driver.name,
-      // 'phone': _phoneNumber?.phoneNumber,
+      'phone': _phoneNumber?.phoneNumber,
       'password': _passwordController.text.tr(),
       'type': AccountType.driver.value,
     });
@@ -213,7 +212,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.isSuccess) {
       await AppPrefs.instance.saveAccountToken(response.data!);
       authCubit.load(
-        user: response.data!.user,
         delayRedirect: const Duration(seconds: 2),
       );
 

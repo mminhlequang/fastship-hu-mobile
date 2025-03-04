@@ -122,13 +122,12 @@ bool isImageByMime(type) {
 }
 
 void appOpenDateTimePicker(DateTime? date, Function(DateTime date) onConfirm,
-    {title}) async {
+    {title, type = DateTimePickerType.date}) async {
   date ??= DateTime.now();
   final rs = await appOpenBottomSheet(
       WidgetDateTimePicker(
-        pickerModel: DateTimePickerModel(
-          currentTime: date,
-        ),
+        type: type,
+        initialDateTime: date,
       ),
       // isDismissible: false,
       enableDrag: false,

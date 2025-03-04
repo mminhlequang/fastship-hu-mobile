@@ -23,18 +23,16 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
 
-  String? _selectedGender;
+  Gender? _selectedGender;
   DateTime? _birthday;
   HereSearchResult? _selectedAddress;
 
   void _onChanged() {
     widget.onChanged({
       'fullName': _fullNameController.text,
-      'birthday': toTimestamp(_birthday!),
-      'gender': _selectedGender,
-      'address': _selectedAddress?.address ?? _addressController.text,
-      'latitude': _selectedAddress?.lat,
-      'longitude': _selectedAddress?.lng,
+      'birthday': _birthday != null ? toTimestamp(_birthday!) : null,
+      'gender': _selectedGender?.value,
+      'address': _selectedAddress,
     });
   }
 
@@ -56,9 +54,9 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
         ),
         Gap(16.sw),
         WidgetDropSelectorBuilder(
-          items: ["Male", "Female"],
+          items: Gender.values,
           selectedItem: _selectedGender,
-          titleBuilder: (item) => item,
+          titleBuilder: (item) => item.name,
           onChanged: (item) {
             setState(() {
               _selectedGender = item;
@@ -68,7 +66,7 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
             ignoring: true,
             child: WidgetTextField(
               controller: TextEditingController(
-                text: _selectedGender,
+                text: _selectedGender?.name,
               ),
               label: "Gender*".tr(),
               hint: "Select".tr(),
@@ -85,19 +83,27 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
             appHaptic();
             appOpenDateTimePicker(
               DateTime(DateTime.now().year - 18),
-              (date) => _birthday = date,
+              (date) {
+                setState(() {
+                  _birthday = date;
+                });
+                _onChanged();
+              },
             );
           },
-          child: IgnorePointer(
-            ignoring: true,
-            child: WidgetTextField(
-              controller: TextEditingController(
-                text: _birthday?.formatDate(),
+          child: ColoredBox(
+            color: Colors.transparent,
+            child: IgnorePointer(
+              child: WidgetTextField(
+                isReadOnly: true,
+                controller: TextEditingController(
+                  text: _birthday?.formatDate(),
+                ),
+                label: "Date of birth*".tr(),
+                hint: "dd/mm/yyyy",
+                sufixIconWidget: Icon(CupertinoIcons.calendar,
+                    color: AppColors.instance.grey1),
               ),
-              label: "Date of birth*".tr(),
-              hint: "dd/mm/yyyy",
-              sufixIconWidget: Icon(CupertinoIcons.calendar,
-                  color: AppColors.instance.grey1),
             ),
           ),
         ),

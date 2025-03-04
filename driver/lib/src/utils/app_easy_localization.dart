@@ -18,7 +18,6 @@ Widget wrapEasyLocalization({required child}) => EasyLocalization(
     );
 
 const List<Locale> appSupportedLocales = [
-  Locale('vi'),
   Locale('en'),
   Locale('fr')
 ];

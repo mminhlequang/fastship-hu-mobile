@@ -1,4 +1,5 @@
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 
 const String appName = "Driver-FastshipHu";
@@ -13,7 +14,6 @@ String get appMapUrlTemplateHERE =>
     "https://maps.hereapi.com/v3/base/mc/{z}/{x}/{y}/png8?lang=${AppPrefs.instance.languageCode}&size=256&style=lite.day&apiKey=$hereMapApiKey";
 const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
-
 
 // Các loại tài khoản trong hệ thống
 enum AccountType {
@@ -34,11 +34,68 @@ enum AccountType {
   String get name {
     switch (this) {
       case AccountType.customer:
-        return 'Customer';
+        return 'Customer'.tr();
       case AccountType.driver:
-        return 'Driver';
+        return 'Driver'.tr();
       case AccountType.partner:
-        return 'Partner';
+        return 'Partner'.tr();
+    }
+  }
+}
+
+enum Gender {
+  male(1),
+  female(2),
+  other(3);
+
+  final int value;
+  const Gender(this.value);
+
+  static Gender fromValue(int value) {
+    return Gender.values.firstWhere(
+      (type) => type.value == value,
+      orElse: () => Gender.other,
+    );
+  }
+
+  String get name {
+    switch (this) {
+      case Gender.male:
+        return 'Male'.tr();
+      case Gender.female:
+        return 'Female'.tr();
+      case Gender.other:
+        return 'Other'.tr();
+    }
+  }
+}
+
+enum EmergencyContactType {
+  family(1),
+  friend(2),
+  colleague(3),
+  other(4);
+
+  final int value;
+  const EmergencyContactType(this.value);
+
+  static EmergencyContactType fromValue(int value) {
+    return EmergencyContactType.values.firstWhere(
+      (type) => type.value == value,
+      orElse: () => EmergencyContactType.other,
+    );
+  }
+
+  String get name {
+    switch (this) {
+      case EmergencyContactType.family:
+        return 'Family'.tr();
+      case EmergencyContactType.friend:
+        return 'Friend'.tr();
+      case EmergencyContactType.colleague:
+        return 'Colleague'.tr();
+      case EmergencyContactType.other:
+        return 'Other'.tr();
     }
   }
 }

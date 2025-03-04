@@ -5,7 +5,6 @@ import 'package:app/src/utils/utils.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:internal_core/internal_core.dart';
 
-
 class WidgetAppBaseSheet extends StatelessWidget {
   static double get maxHeight =>
       appContext.height -
@@ -88,7 +87,7 @@ class WidgetAppBaseSheet extends StatelessWidget {
                   Divider(
                     height: 1,
                     thickness: 1,
-                    color: AppColors.instance.grey1,
+                    color: AppColors.instance.grey8,
                   ),
                   Container(
                     height: height,
@@ -113,4 +112,3 @@ class WidgetAppBaseSheet extends StatelessWidget {
     );
   }
 }
- 

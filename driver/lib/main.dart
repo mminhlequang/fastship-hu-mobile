@@ -45,7 +45,7 @@ void main() async {
   internalSetup();
   getItSetup();
 
-  if (kDebugMode) {
+  if (kDebugMode || true) {
     runApp(wrapEasyLocalization(child: const _App()));
   } else {
     // await SentryFlutter.init((options) {

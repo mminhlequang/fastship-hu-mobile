@@ -16,23 +16,26 @@ import 'package:internal_core/internal_core.dart';
 import 'widget_time_picker_spinner.dart';
 import 'widgets.dart';
 
+enum DateTimePickerType {
+  date,
+  time,
+  dateTime,
+}
 
 class WidgetDateTimePicker extends StatefulWidget {
-  final picker.BasePickerModel pickerModel;
-  final picker.DateChangedCallback? onChanged;
-  final picker.DateChangedCallback? onConfirm;
-  final picker.DateCancelledCallback? onCancel;
-  final picker.LocaleType locale;
-  final picker_theme.DatePickerTheme theme;
+  final DateTimePickerType type;
+  final DateTime? initialDateTime;
+  final Function(DateTime)? onConfirm;
+  final Function()? onCancel;
+  final String? title;
 
-  WidgetDateTimePicker({
+  const WidgetDateTimePicker({
     Key? key,
-    required this.pickerModel,
-    this.onChanged,
+    required this.type,
+    this.initialDateTime,
     this.onConfirm,
     this.onCancel,
-    this.locale = picker.LocaleType.en,
-    this.theme = const picker_theme.DatePickerTheme(),
+    this.title,
   }) : super(key: key);
 
   @override
@@ -40,34 +43,24 @@ class WidgetDateTimePicker extends StatefulWidget {
 }
 
 class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
-  late FixedExtentScrollController leftScrollCtrl,
-      middleScrollCtrl,
-      rightScrollCtrl;
+  late DateTime _selectedDateTime;
 
   @override
   void initState() {
     super.initState();
-    refreshScrollOffset();
-  }
-
-  void refreshScrollOffset() {
-    leftScrollCtrl = FixedExtentScrollController(
-        initialItem: widget.pickerModel.currentLeftIndex());
-    middleScrollCtrl = FixedExtentScrollController(
-        initialItem: widget.pickerModel.currentMiddleIndex());
-    rightScrollCtrl = FixedExtentScrollController(
-        initialItem: widget.pickerModel.currentRightIndex());
+    _selectedDateTime = widget.initialDateTime ?? DateTime.now();
   }
 
   @override
   Widget build(BuildContext context) {
     return WidgetAppBaseSheet(
-      title: "Please choose date time".tr(),
+      title: widget.title ?? "Please select date time".tr(),
       enableSafeArea: true,
       actions: [
         WidgetInkWellTransparent(
           onTap: () {
             appHaptic();
+            widget.onCancel?.call();
             appContext.pop();
           },
           enableInkWell: false,
@@ -75,14 +68,15 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
             child: Text(
               'Cancel'.tr(),
-              style: w400TextStyle(color: appColorPrimaryRed),
+              style: w400TextStyle(color: appColorText),
             ),
           ),
         ),
         WidgetInkWellTransparent(
           onTap: () {
             appHaptic();
-            appContext.pop(widget.pickerModel.finalTime()!);
+            widget.onConfirm?.call(_selectedDateTime);
+            appContext.pop(_selectedDateTime);
           },
           enableInkWell: false,
           child: Padding(
@@ -101,97 +95,63 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
           color: appColorElement,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: _renderPickerView(),
+        child: _buildPickerContent(),
       ),
     );
-    // return Container(
-    //   color: widget.theme.backgroundColor,
-    //   child: Column(
-    //     children: <Widget>[
-    //       if (widget.theme.titleHeight > 0) _renderTitleActionsView(),
-    //       _renderPickerView(),
-    //     ],
-    //   ),
-    // );
   }
 
-  Widget _renderPickerView() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        _renderColumnView(
-          widget.pickerModel.leftStringAtIndex,
-          leftScrollCtrl,
-          widget.pickerModel.layoutProportions()[0],
-          (index) {
-            widget.pickerModel.setLeftIndex(index);
-          },
-        ),
-        Text(
-          widget.pickerModel.leftDivider(),
-          style: w400TextStyle(color: appColorTextLabel),
-        ),
-        _renderColumnView(
-          widget.pickerModel.middleStringAtIndex,
-          middleScrollCtrl,
-          widget.pickerModel.layoutProportions()[1],
-          (index) {
-            widget.pickerModel.setMiddleIndex(index);
-          },
-        ),
-        Text(
-          widget.pickerModel.rightDivider(),
-          style: w400TextStyle(color: appColorTextLabel),
-        ),
-        _renderColumnView(
-          widget.pickerModel.rightStringAtIndex,
-          rightScrollCtrl,
-          widget.pickerModel.layoutProportions()[2],
-          (index) {
-            widget.pickerModel.setRightIndex(index);
-          },
-        ),
-      ],
+  Widget _buildPickerContent() {
+    switch (widget.type) {
+      case DateTimePickerType.date:
+        return _buildDatePicker();
+      case DateTimePickerType.time:
+        return _buildTimePicker();
+      case DateTimePickerType.dateTime:
+        return _buildDateTimePicker();
+    }
+  }
+
+  Widget _buildDatePicker() {
+    return Container(
+      height: 200,
+      child: CupertinoDatePicker(
+        mode: CupertinoDatePickerMode.date,
+        initialDateTime: _selectedDateTime,
+        onDateTimeChanged: (DateTime newDateTime) {
+          setState(() {
+            _selectedDateTime = newDateTime;
+          });
+        },
+      ),
     );
   }
 
-  Widget _renderColumnView(
-    picker.StringAtIndexCallBack stringAtIndexCB,
-    ScrollController scrollController,
-    int layoutProportion,
-    ValueChanged<int> selectedChangedWhenScrolling,
-  ) {
-    return Expanded(
-      flex: layoutProportion,
-      child: Container(
-        padding: EdgeInsets.all(8.0),
-        height: widget.theme.containerHeight,
-        // decoration: BoxDecoration(color: widget.theme.backgroundColor),
-        child: CupertinoPicker.builder(
-          // backgroundColor: widget.theme.backgroundColor,
-          backgroundColor: Colors.transparent,
-          scrollController: scrollController as FixedExtentScrollController,
-          itemExtent: widget.theme.itemHeight,
-          onSelectedItemChanged: (int index) {
-            selectedChangedWhenScrolling(index);
-          },
-          useMagnifier: true,
-          itemBuilder: (BuildContext context, int index) {
-            final content = stringAtIndexCB(index);
-            if (content == null) {
-              return null;
-            }
-            return Container(
-              height: widget.theme.itemHeight,
-              alignment: Alignment.center,
-              child: Text(
-                content,
-                style: w400TextStyle(color: appColorTextLabel),
-                textAlign: TextAlign.start,
-              ),
-            );
-          },
-        ),
+  Widget _buildTimePicker() {
+    return Container(
+      height: 200,
+      child: CupertinoDatePicker(
+        mode: CupertinoDatePickerMode.time,
+        initialDateTime: _selectedDateTime,
+        onDateTimeChanged: (DateTime newDateTime) {
+          setState(() {
+            _selectedDateTime = newDateTime;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateTimePicker() {
+    return Container(
+      height: 200,
+      child: CupertinoDatePicker(
+        mode: CupertinoDatePickerMode.dateAndTime,
+        initialDateTime: _selectedDateTime,
+        onDateTimeChanged: (DateTime newDateTime) {
+          setState(() {
+            _selectedDateTime = newDateTime;
+          });
+        },
       ),
     );
   }

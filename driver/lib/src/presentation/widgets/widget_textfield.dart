@@ -25,11 +25,10 @@ class WidgetTextField extends StatefulWidget {
   final dynamic formatters;
   final int? maxLines;
   final Widget? actionWidget;
-
   final Widget? prefixW;
-
   final String? error;
   final TextFieldErrorType errorType;
+  final bool isReadOnly;
 
   const WidgetTextField({
     super.key,
@@ -50,6 +49,7 @@ class WidgetTextField extends StatefulWidget {
     this.sufixIconWidget,
     this.maxLines,
     this.actionWidget,
+    this.isReadOnly = false,
   });
 
   @override
@@ -108,10 +108,12 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
           SizedBox(height: 12.sw),
         ],
         GestureDetector(
-          onTap: () {
-            _focusNode?.requestFocus();
-            setState(() {});
-          },
+          onTap: widget.isReadOnly
+              ? null
+              : () {
+                  _focusNode?.requestFocus();
+                  setState(() {});
+                },
           child: Container(
             height: widget.maxLines != null
                 ? _fontSize * 1.4 * widget.maxLines! + 46 - _fontSize * 1.2
@@ -140,6 +142,7 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
                               .copyWith(overflow: TextOverflow.ellipsis),
                         )
                       : TextField(
+                          readOnly: widget.isReadOnly,
                           maxLines: widget.isPassword ? 1 : widget.maxLines,
                           inputFormatters: widget.formatters,
                           autofocus: widget.autoFocus,
@@ -285,6 +288,7 @@ class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
             setState(() {});
           },
           child: InternationalPhoneNumberInput(
+            textFieldController: _controller,
             onInputValidated: widget.onInputValidated,
             spaceBetweenSelectorAndTextField: 12.sw,
             initialValue: PhoneNumber(isoCode: widget.initialCountryCode),
