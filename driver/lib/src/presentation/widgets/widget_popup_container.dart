@@ -22,16 +22,6 @@ class WidgetPopupContainer extends StatelessWidget {
     return Stack(
       alignment: alignmentTail ?? Alignment.topRight,
       children: [
-        Container(
-          margin: const EdgeInsets.only(top: 8),
-          decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(color: appColorText.withOpacity(.1), blurRadius: 12)
-              ],
-              color: appColorBackground,
-              borderRadius: BorderRadius.circular(16)),
-          child: child,
-        ),
         Padding(
           padding: paddingTail ?? const EdgeInsets.only(right: 28),
           child: Transform.rotate(
@@ -42,7 +32,17 @@ class WidgetPopupContainer extends StatelessWidget {
               color: appColorBackground,
             ),
           ),
-        )
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(color: appColorText.withOpacity(.1), blurRadius: 12)
+              ],
+              color: appColorBackground,
+              borderRadius: BorderRadius.circular(16)),
+          child: child,
+        ),
       ],
     );
   }

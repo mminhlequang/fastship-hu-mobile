@@ -164,6 +164,8 @@ class WidgetOverlayActionsState extends State<WidgetOverlayActions>
           onTapDown: (details) {
             pointerPosition = details.globalPosition;
           },
+          splashColor: Colors.transparent,
+          overlayColor: MaterialStateProperty.all(Colors.transparent),
           borderRadius: BorderRadius.circular(widget.inkwellBorderRadius),
           child: _child,
         );

@@ -1,8 +1,11 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
+import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
 // import 'dart:html' as html;
 
@@ -16,6 +19,7 @@ appOpenBottomSheet(
   Widget child, {
   bool isDismissible = true,
   bool enableDrag = true,
+  Color? backgroundColor,
 }) async {
   appIsBottomSheetOpen = true;
   var r = await showMaterialModalBottomSheet(
@@ -29,7 +33,7 @@ appOpenBottomSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     isDismissible: isDismissible,
-    backgroundColor: Colors.white,
+    backgroundColor: backgroundColor ?? Colors.white,
     useRootNavigator: true,
   );
   appIsBottomSheetOpen = false;
@@ -69,10 +73,6 @@ appChangedTheme() {
       ? AppPrefsBase.themeModeLightKey
       : AppPrefsBase.themeModeDarkKey;
   WidgetsBinding.instance.performReassemble();
-}
-
-appCatchLog(e) {
-  appDebugPrint('[catchLog] $e');
 }
 
 enum AppSnackBarType { error, success, notitfication }
@@ -118,5 +118,38 @@ bool isImageByMime(type) {
       return true;
     default:
       return false;
+  }
+}
+
+void appOpenDateTimePicker(DateTime? date, Function(DateTime date) onConfirm,
+    {title}) async {
+  date ??= DateTime.now();
+  final rs = await appOpenBottomSheet(
+      WidgetDateTimePicker(
+        pickerModel: DateTimePickerModel(
+          currentTime: date,
+        ),
+      ),
+      // isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent);
+  if (rs is DateTime) {
+    onConfirm(rs);
+  }
+}
+
+void appOpenTimePicker(DateTime? date, Function(DateTime date) onConfirm,
+    {title}) async {
+  date ??= DateTime.now();
+  final rs = await appOpenBottomSheet(
+      WidgetBottomPickTime(
+        title: title ?? 'Please choose time'.tr(),
+        time: date,
+      ),
+      // isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent);
+  if (rs is DateTime) {
+    onConfirm(rs);
   }
 }

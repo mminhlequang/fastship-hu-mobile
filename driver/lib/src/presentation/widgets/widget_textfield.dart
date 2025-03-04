@@ -90,7 +90,8 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
               Expanded(
                 child: Text(
                   widget.label!,
-                  style: widget.labelTextStyle ?? w500TextStyle(fontSize: 14.sw),
+                  style:
+                      widget.labelTextStyle ?? w500TextStyle(fontSize: 14.sw),
                 ),
               ),
               if (widget.actionWidget != null) widget.actionWidget!,
@@ -164,10 +165,7 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
                         ),
                 ),
                 if (widget.sufixIconWidget != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: widget.sufixIconWidget,
-                  )
+                  widget.sufixIconWidget!
                 else if (widget.isPassword)
                   GestureDetector(
                     onTap: () {
