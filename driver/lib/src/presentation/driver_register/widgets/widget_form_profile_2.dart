@@ -11,7 +11,12 @@ import 'package:image_picker/image_picker.dart';
 
 class WidgetFormProfile2 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
-  const WidgetFormProfile2({super.key, required this.onChanged});
+  final Map<String, dynamic>? initialData;
+  const WidgetFormProfile2({
+    super.key,
+    required this.onChanged,
+    this.initialData,
+  });
 
   @override
   State<WidgetFormProfile2> createState() => _WidgetFormProfile2State();
@@ -23,6 +28,20 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   XFile? _imageDrivingLicenseFront;
   XFile? _imageDrivingLicenseBack;
   XFile? _imageVehicleRegistration;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialData != null) {
+      _imageIDCardFront = widget.initialData!['imageIDCardFront'];
+      _imageIDCardBack = widget.initialData!['imageIDCardBack'];
+      _imageDrivingLicenseFront =
+          widget.initialData!['imageDrivingLicenseFront'];
+      _imageDrivingLicenseBack = widget.initialData!['imageDrivingLicenseBack'];
+      _imageVehicleRegistration =
+          widget.initialData!['imageVehicleRegistration'];
+    }
+  }
 
   void _onChanged() {
     widget.onChanged({

@@ -1,6 +1,7 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class DriverRegisterScreen extends StatefulWidget {
 }
 
 class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
-  var currentStep = 1;
+  int get currentStep => AppPrefs.instance.user?.profile?.stepId ?? 1;
   late int totalSteps = stepsData.length;
   List<StepperData> get stepsData => [
         StepperData(
@@ -62,14 +63,16 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                   ],
                 ),
                 Gap(12.sw),
-                WidgetAppButtonOK(
-                  label: "Send profile".tr(),
-                  height: 44.sw,
-                  onTap: () {
-                    appHaptic();
-                    context.push('/driver-register/profile');
-                  },
-                ),
+                if (currentStep == 1)
+                  WidgetAppButtonOK(
+                    label: "Send profile".tr(),
+                    height: 44.sw,
+                    onTap: () async {
+                      appHaptic();
+                      await context.push('/driver-register/profile');
+                      setState(() {});
+                    },
+                  ),
               ],
             ),
           ),
@@ -241,6 +244,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                     GestureDetector(
                       onTap: () {
                         appHaptic();
+                        context.push('/help-center');
                       },
                       child: Row(
                         children: [
@@ -278,7 +282,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                     currentStep: currentStep,
                     stepBarStyle: StepperStyle(
                       activeColor: appColorPrimary,
-                      inactiveColor: appColorPrimary.withOpacity(0.5),
+                      inactiveColor: appColorPrimary.withOpacity(0.35),
                       activeBorderColor: appColorPrimary.withOpacity(0.5),
                       maxLineLabel: 2,
                     ),

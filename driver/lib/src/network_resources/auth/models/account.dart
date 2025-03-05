@@ -1,14 +1,15 @@
 class ResponseLogin {
-  String? token;
+  String? accessToken;
   String? refreshToken;
   String? expiresIn;
   AccountModel? user;
 
-  ResponseLogin({this.token, this.refreshToken, this.expiresIn, this.user});
+  ResponseLogin(
+      {this.accessToken, this.refreshToken, this.expiresIn, this.user});
 
   ResponseLogin.fromJson(Map<String, dynamic> json) {
-    if (json["token"] is String) {
-      token = json["token"];
+    if (json["access_token"] is String) {
+      accessToken = json["access_token"];
     }
     if (json["refresh_token"] is String) {
       refreshToken = json["refresh_token"];
@@ -27,12 +28,128 @@ class ResponseLogin {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["token"] = token;
+    _data["access_token"] = accessToken;
     _data["refresh_token"] = refreshToken;
     _data["expires_in"] = expiresIn;
     if (user != null) {
       _data["user"] = user?.toJson();
     }
+    return _data;
+  }
+}
+
+class ProfileModel {
+  int? id;
+  String? name;
+  int? sex;
+  dynamic birthday;
+  dynamic codeIntroduce;
+  String? address;
+  dynamic cccd;
+  dynamic cccdDate;
+  dynamic imageCccdBefore;
+  dynamic imageCccdAfter;
+  dynamic addressTemp;
+  dynamic isTaxCode;
+  dynamic taxCode;
+  dynamic paymentMethod;
+  dynamic cardNumber;
+  dynamic cardExpires;
+  dynamic cardCvv;
+  dynamic contacts;
+  dynamic carId;
+  dynamic license;
+  dynamic imageLicenseBefore;
+  dynamic imageLicenseAfter;
+  int? stepId;
+
+  ProfileModel({
+    this.id,
+    this.name,
+    this.sex,
+    this.birthday,
+    this.codeIntroduce,
+    this.address,
+    this.cccd,
+    this.cccdDate,
+    this.imageCccdBefore,
+    this.imageCccdAfter,
+    this.addressTemp,
+    this.isTaxCode,
+    this.taxCode,
+    this.paymentMethod,
+    this.cardNumber,
+    this.cardExpires,
+    this.cardCvv,
+    this.contacts,
+    this.carId,
+    this.license,
+    this.imageLicenseBefore,
+    this.imageLicenseAfter,
+    this.stepId,
+  });
+
+  ProfileModel.fromJson(Map<String, dynamic> json) {
+    if (json["id"] is int) {
+      id = json["id"];
+    }
+    if (json["name"] is String) {
+      name = json["name"];
+    }
+    if (json["sex"] is int) {
+      sex = json["sex"];
+    }
+    birthday = json["birthday"];
+    codeIntroduce = json["code_introduce"];
+    if (json["address"] is String) {
+      address = json["address"];
+    }
+    cccd = json["cccd"];
+    cccdDate = json["cccd_date"];
+    imageCccdBefore = json["image_cccd_before"];
+    imageCccdAfter = json["image_cccd_after"];
+    addressTemp = json["address_temp"];
+    isTaxCode = json["is_tax_code"];
+    taxCode = json["tax_code"];
+    paymentMethod = json["payment_method"];
+    cardNumber = json["card_number"];
+    cardExpires = json["card_expires"];
+    cardCvv = json["card_cvv"];
+    contacts = json["contacts"];
+    carId = json["car_id"];
+    license = json["license"];
+    imageLicenseBefore = json["image_license_before"];
+    imageLicenseAfter = json["image_license_after"];
+    if (json["step_id"] is int) {
+      stepId = json["step_id"];
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["name"] = name;
+    _data["sex"] = sex;
+    _data["birthday"] = birthday;
+    _data["code_introduce"] = codeIntroduce;
+    _data["address"] = address;
+    _data["cccd"] = cccd;
+    _data["cccd_date"] = cccdDate;
+    _data["image_cccd_before"] = imageCccdBefore;
+    _data["image_cccd_after"] = imageCccdAfter;
+    _data["address_temp"] = addressTemp;
+    _data["is_tax_code"] = isTaxCode;
+    _data["tax_code"] = taxCode;
+    _data["payment_method"] = paymentMethod;
+    _data["card_number"] = cardNumber;
+    _data["card_expires"] = cardExpires;
+    _data["card_cvv"] = cardCvv;
+    _data["contacts"] = contacts;
+    _data["car_id"] = carId;
+    _data["license"] = license;
+    _data["image_license_before"] = imageLicenseBefore;
+    _data["image_license_after"] = imageLicenseAfter;
+    _data["step_id"] = stepId;
     return _data;
   }
 }
@@ -71,6 +188,7 @@ class AccountModel {
   dynamic deletedAt;
   dynamic deletedRequestAt;
   String? createdAt;
+  ProfileModel? profile;
 
   AccountModel(
       {this.id,
@@ -105,7 +223,8 @@ class AccountModel {
       this.car,
       this.deletedAt,
       this.deletedRequestAt,
-      this.createdAt});
+      this.createdAt,
+      this.profile});
 
   AccountModel.fromJson(Map<String, dynamic> json) {
     if (json["id"] is int) {
@@ -169,10 +288,11 @@ class AccountModel {
     if (json["created_at"] is String) {
       createdAt = json["created_at"];
     }
-  }
-
-  static List<AccountModel> fromList(List<Map<String, dynamic>> list) {
-    return list.map(AccountModel.fromJson).toList();
+    if (json["profile"] is Map) {
+      profile = json["profile"] == null
+          ? null
+          : ProfileModel.fromJson(json["profile"]);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -210,6 +330,9 @@ class AccountModel {
     _data["deleted_at"] = deletedAt;
     _data["deleted_request_at"] = deletedRequestAt;
     _data["created_at"] = createdAt;
+    if (profile != null) {
+      _data["profile"] = profile?.toJson();
+    }
     return _data;
   }
 }

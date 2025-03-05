@@ -104,7 +104,10 @@ class MyAppApiImp extends MyAppApi {
       proccess: () async {
         Response response =
             await AppClient().post(_MyAppEndpoint.updateProfile(), data: data);
-        return NetworkResponse.fromResponse(response);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AccountModel.fromJson(json),
+        );
       },
     );
   }
@@ -137,7 +140,10 @@ class MyAppApiImp extends MyAppApi {
       proccess: () async {
         Response response =
             await AppClient().post(_MyAppEndpoint.refreshToken(), data: data);
-        return NetworkResponse.fromResponse(response);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => ResponseLogin.fromJson(json),
+        );
       },
     );
   }

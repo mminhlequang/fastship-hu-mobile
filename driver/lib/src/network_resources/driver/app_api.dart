@@ -3,6 +3,7 @@ import 'package:internal_network/internal_network.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:dio/dio.dart';
 
+import '../auth/models/models.dart';
 import 'models/models.dart';
 
 class _MyAppEndpoint {
@@ -24,7 +25,10 @@ class MyAppApiImp extends MyAppApi {
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
         ).post(_MyAppEndpoint.updateProfile(), data: data);
-        return NetworkResponse.fromResponse(response);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AccountModel.fromJson(json),
+        );
       },
     );
   }

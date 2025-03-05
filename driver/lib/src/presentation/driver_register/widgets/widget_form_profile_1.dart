@@ -13,7 +13,12 @@ import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
 
 class WidgetFormProfile1 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
-  const WidgetFormProfile1({super.key, required this.onChanged});
+  final Map<String, dynamic>? initialData;
+  const WidgetFormProfile1({
+    super.key,
+    required this.onChanged,
+    this.initialData,
+  });
 
   @override
   State<WidgetFormProfile1> createState() => _WidgetFormProfile1State();
@@ -27,10 +32,25 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   DateTime? _birthday;
   HereSearchResult? _selectedAddress;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialData != null) {
+      _fullNameController.text = widget.initialData!['fullName'] ?? '';
+      _selectedGender = widget.initialData!['gender'] != null
+          ? Gender.values
+              .firstWhere((e) => e.value == widget.initialData!['gender'])
+          : null;
+      _birthday = widget.initialData!['birthday'];
+      _selectedAddress = widget.initialData!['address'];
+      _addressController.text = _selectedAddress?.address ?? '';
+    }
+  }
+
   void _onChanged() {
     widget.onChanged({
       'fullName': _fullNameController.text,
-      'birthday': _birthday != null ? toTimestamp(_birthday!) : null,
+      'birthday': _birthday,
       'gender': _selectedGender?.value,
       'address': _selectedAddress,
     });

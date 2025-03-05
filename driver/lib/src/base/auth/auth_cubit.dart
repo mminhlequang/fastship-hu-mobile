@@ -30,11 +30,13 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       if (user != null) {
         state.user = user;
+        AppPrefs.instance.user = user;
         emit(state.update(stateType: AuthStateType.logged));
       } else {
         NetworkResponse response = await AuthRepo().getProfile();
         if (response.isSuccess) {
           state.user = response.data;
+          AppPrefs.instance.user = response.data;
           emit(state.update(stateType: AuthStateType.logged));
         } else {
           emit(state.update(stateType: AuthStateType.none));
@@ -67,10 +69,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   _redirect() {
     if (state.stateType == AuthStateType.logged) {
-
-    appContext.pushReplacement('/driver-register');
-      return;
       appContext.pushReplacement('/home');
+      return;
+      if ((AppPrefs.instance.user!.profile!.stepId ?? 1) < 5) {
+        appContext.pushReplacement('/driver-register');
+      } else {
+        appContext.pushReplacement('/home');
+      }
     } else {
       appContext.pushReplacement('/auth');
     }

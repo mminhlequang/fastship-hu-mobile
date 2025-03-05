@@ -84,7 +84,7 @@ class AppPrefs extends AppPrefsBase {
 
   Future saveAccountToken(ResponseLogin response) async {
     await Future.wait([
-      _boxAuth.put(AppPrefsBase.accessTokenKey, response.token),
+      _boxAuth.put(AppPrefsBase.accessTokenKey, response.accessToken),
       _boxAuth.put(AppPrefsBase.refreshTokenKey, response.refreshToken)
     ]);
   }

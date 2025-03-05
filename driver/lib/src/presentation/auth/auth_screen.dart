@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _confirmPasswordFocusNode = FocusNode();
   final _phoneFocusNode = FocusNode();
   PhoneNumber? _phoneNumber = kDebugMode
-      ? PhoneNumber(isoCode: 'VN', phoneNumber: '0979797979', dialCode: '+84')
+      ? PhoneNumber(isoCode: 'VN', phoneNumber: '979797979', dialCode: '+84')
       : null;
   bool _isValidPhoneNumber = kDebugMode ? true : false;
 

@@ -32,7 +32,12 @@ class EmergencyContact {
 
 class WidgetFormProfile3 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
-  const WidgetFormProfile3({super.key, required this.onChanged});
+  final Map<String, dynamic>? initialData;
+  const WidgetFormProfile3({
+    super.key,
+    required this.onChanged,
+    this.initialData,
+  });
 
   @override
   State<WidgetFormProfile3> createState() => _WidgetFormProfile3State();
@@ -45,6 +50,24 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   EmergencyContactType _selectedRelationship = EmergencyContactType.family;
   PhoneNumber? _phoneNumber;
   bool _isValidPhoneNumber = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialData != null &&
+        widget.initialData!['emergencyContacts'] != null) {
+      final List<dynamic> contacts = widget.initialData!['emergencyContacts'];
+      _emergencyContacts.addAll(
+        contacts.map((contact) => EmergencyContact(
+              name: contact['name'],
+              relationship: EmergencyContactType.values.firstWhere(
+                (e) => e.value == contact['relationship'],
+              ),
+              phoneNumber: contact['phoneNumber'],
+            )),
+      );
+    }
+  }
 
   void _onChanged() {
     widget.onChanged({
@@ -106,6 +129,60 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                 style: w300TextStyle(
                   fontSize: 14.sw,
                 ),
+              ),
+              Gap(12.sw),
+              ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _emergencyContacts.length,
+                itemBuilder: (context, index) {
+                  final contact = _emergencyContacts[index];
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 8.sw),
+                    padding: EdgeInsets.all(12.sw),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.instance.grey5),
+                      borderRadius: BorderRadius.circular(8.sw),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                contact.name,
+                                style: w500TextStyle(fontSize: 16.sw),
+                              ),
+                              Gap(4.sw),
+                              Text(
+                                contact.relationship.name,
+                                style: w300TextStyle(
+                                  fontSize: 12.sw,
+                                  color: appColorText.withOpacity(0.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          contact.phoneNumber,
+                          style: w500TextStyle(fontSize: 14.sw),
+                        ),
+                        Gap(12.sw),
+                        GestureDetector(
+                          onTap: () => _removeEmergencyContact(index),
+                          child: Icon(
+                            CupertinoIcons.delete,
+                            color: Colors.red,
+                            size: 20.sw,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
               Gap(12.sw),
               WidgetTextField(
@@ -178,58 +255,6 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                 ],
               ),
               Gap(12.sw),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _emergencyContacts.length,
-                itemBuilder: (context, index) {
-                  final contact = _emergencyContacts[index];
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 8.sw),
-                    padding: EdgeInsets.all(12.sw),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.instance.grey5),
-                      borderRadius: BorderRadius.circular(8.sw),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                contact.name,
-                                style: w500TextStyle(fontSize: 16.sw),
-                              ),
-                              Gap(4.sw),
-                              Text(
-                                contact.relationship.name,
-                                style: w300TextStyle(
-                                  fontSize: 12.sw,
-                                  color: appColorText.withOpacity(0.5),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          contact.phoneNumber,
-                          style: w500TextStyle(fontSize: 14.sw),
-                        ),
-                        Gap(12.sw),
-                        GestureDetector(
-                          onTap: () => _removeEmergencyContact(index),
-                          child: Icon(
-                            CupertinoIcons.delete,
-                            color: Colors.red,
-                            size: 20.sw,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/auth/models/models.dart';
 import 'package:app/src/network_resources/driver/repo.dart';
 import 'package:app/src/presentation/driver_register/widgets/widget_form_profile_3.dart';
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
@@ -8,6 +9,7 @@ import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +20,7 @@ import 'package:app/src/constants/app_colors.dart';
 
 import 'widget_form_profile_1.dart';
 import 'widget_form_profile_2.dart';
-import 'widget_form_profile_4.dart';
+import 'widget_bottomsheets.dart';
 
 class WidgetFormProfile extends StatefulWidget {
   const WidgetFormProfile({super.key});
@@ -43,12 +45,24 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
       };
 
   Widget? get actionButton => switch (step) {
-        1 => Text(
-            "See the guide".tr(),
-            style: w300TextStyle(
-              fontSize: 14.sw,
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
+        1 => GestureDetector(
+            onTap: () {
+              appHaptic();
+              appOpenBottomSheet(
+                WidgetBottomSheetGuideTakePhoto(),
+              );
+            },
+            child: Container(
+              color: Colors.transparent,
+              padding: EdgeInsets.symmetric(horizontal: 8.sw, vertical: 2.sw),
+              child: Text(
+                "See the guide".tr(),
+                style: w300TextStyle(
+                  fontSize: 14.sw,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
         _ => null,
@@ -62,17 +76,38 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
             personalInfo['birthday'] != null &&
             personalInfo['gender'] != null &&
             personalInfo['address'] != null,
-        1 => idCardImages['imageIDCardFront'] != null &&
-            idCardImages['imageIDCardBack'] != null,
-        2 => emergencyContact.isNotEmpty,
+        1 => kDebugMode
+            ? true
+            : (idCardImages['imageIDCardFront'] != null &&
+                idCardImages['imageIDCardBack'] != null),
+        2 =>
+          ((emergencyContact['emergencyContacts'] ?? []) as List).isNotEmpty ==
+              true,
         _ => true,
       };
 
-  bool _loading = false;
-  _updateProfile() async {
-    setState(() {
-      _loading = true;
-    });
+  ValueNotifier<String> _processor = ValueNotifier('no');
+
+  _updateProfile({bool showBottomSheet = true}) async {
+    _processor.value = 'loading';
+    if (showBottomSheet) {
+      appOpenBottomSheet(
+        WidgetBottomSheetProcess(
+          processer: _processor,
+          onTryAgain: () {
+            _updateProfile(showBottomSheet: false);
+          },
+        ),
+        isDismissible: false,
+      ).then((r) {
+        if (r == true) {
+          AccountModel user = AppPrefs.instance.user!;
+          user.profile!.stepId = 2;
+          AppPrefs.instance.user = user;
+          if (mounted) context.pop();
+        }
+      });
+    }
 
     String? urlImage_cccd_before;
     String? urlImage_cccd_after;
@@ -122,8 +157,7 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
         }
       }
     } catch (e, trace) {
-      _loading = false;
-      setState(() {});
+      _processor.value = 'error';
       print("Error uploading image: $e");
       print("Error uploading image: $trace");
       appShowSnackBar(
@@ -139,7 +173,8 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
         // Thông tin cá nhân
         "name": personalInfo['fullName'],
         "sex": personalInfo['gender'],
-        "birthday": personalInfo['birthday'],
+        "birthday": (personalInfo['birthday'] as DateTime)
+            .formatDate(formatType: "yyyy-MM-dd"),
         "address": (personalInfo['address'] as HereSearchResult).address,
 
         // Thông tin CCCD
@@ -149,59 +184,26 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
         // Thông tin giấy phép lái xe
         "image_license_before": urlImage_license_before,
         "image_license_after": urlImage_license_after,
-        // "license": personalInfo['drivingLicenseNumber']  ,
-
-        // Địa chỉ tạm trú
-        // "address_temp":
-        //     personalInfo['temporaryAddress'] ?? personalInfo['address']  ,
-
-        // Thông tin thuế
-        // "is_tax_code": personalInfo['hasTaxCode'] == true ? 1 : 0,
-        // "tax_code": personalInfo['taxCode']  ,
-
-        // Thông tin xe
-        // "car_id": personalInfo['carId'] ?? 1,
-
-        // Phương thức thanh toán
-        // "payment_method": 1,
-        // "card_number": "",
-        // "card_expires": "",
-        // "card_cvv": "",
 
         // Liên hệ khẩn cấp
         "contacts": jsonEncode(emergencyContact["emergencyContacts"]),
+
+        "step_id": 2,
       };
 
       // Gọi API cập nhật thông tin
       final response = await DriverRepo().updateProfile(requestData);
 
       if (response.isSuccess) {
-        appShowSnackBar(
-            msg: "Cập nhật thông tin thành công".tr(),
-            context: context,
-            type: AppSnackBarType.success);
-
-        // Cập nhật thông tin người dùng trong AuthCubit
-        // await authCubit.load(delayRedirect: Duration.zero);
+        _processor.value = 'success';
       } else {
-        appShowSnackBar(
-            msg: response.msg ?? "Cập nhật thông tin thất bại".tr(),
-            context: context,
-            type: AppSnackBarType.error);
+        _processor.value = 'error';
+        print(response.msg);
       }
     } catch (e, trace) {
-      _loading = false;
-      setState(() {});
-      appShowSnackBar(
-          msg: "Error updating profile: $e".tr(),
-          context: context,
-          type: AppSnackBarType.error);
-      print("Error updating profile: $e");
-      print("Error updating profile: $trace");
-    } finally {
-      setState(() {
-        _loading = false;
-      });
+      _processor.value = 'error';
+
+      print("Error updating profile: $e, $trace");
     }
   }
 
@@ -228,7 +230,7 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
               Expanded(
                 child: Row(
                   spacing: 6.sw,
-                  children: List.generate(4, (index) {
+                  children: List.generate(3, (index) {
                     return Expanded(
                       child: Container(
                         decoration: BoxDecoration(
@@ -314,7 +316,7 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
           Gap(16.sw),
           Expanded(
             child: WidgetAppButtonOK(
-              loading: _loading,
+              loading: _processor.value == 'loading',
               onTap: () {
                 appHaptic();
                 if (step < 2) {
@@ -351,25 +353,31 @@ class _WidgetFormProfileState extends State<WidgetFormProfile> {
                   child: switch (step) {
                     0 => Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.sw),
-                        child: WidgetFormProfile1(onChanged: (data) {
-                          setState(() {
-                            personalInfo = data;
-                          });
-                        }),
+                        child: WidgetFormProfile1(
+                          initialData: personalInfo,
+                          onChanged: (data) {
+                            setState(() {
+                              personalInfo = data;
+                            });
+                          },
+                        ),
                       ),
-                    1 => WidgetFormProfile2(onChanged: (data) {
-                        setState(() {
-                          idCardImages = data;
-                        });
-                      }),
-                    2 => WidgetFormProfile3(onChanged: (data) {
-                        setState(() {
-                          emergencyContact = data;
-                        });
-                      }),
-                    3 => WidgetFormProfile4(onChanged: (data) {
-                        (() {});
-                      }),
+                    1 => WidgetFormProfile2(
+                        initialData: idCardImages,
+                        onChanged: (data) {
+                          setState(() {
+                            idCardImages = data;
+                          });
+                        },
+                      ),
+                    2 => WidgetFormProfile3(
+                        initialData: emergencyContact,
+                        onChanged: (data) {
+                          setState(() {
+                            emergencyContact = data;
+                          });
+                        },
+                      ),
                     _ => SizedBox.shrink(),
                   },
                 ),

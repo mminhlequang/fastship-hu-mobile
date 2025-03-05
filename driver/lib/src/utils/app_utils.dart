@@ -15,7 +15,7 @@ import 'utils.dart';
 // }
 
 bool appIsBottomSheetOpen = false;
-appOpenBottomSheet(
+Future<T> appOpenBottomSheet<T>(
   Widget child, {
   bool isDismissible = true,
   bool enableDrag = true,
@@ -33,7 +33,7 @@ appOpenBottomSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     isDismissible: isDismissible,
-    backgroundColor: backgroundColor ?? Colors.white,
+    backgroundColor: backgroundColor ?? Colors.transparent,
     useRootNavigator: true,
   );
   appIsBottomSheetOpen = false;
