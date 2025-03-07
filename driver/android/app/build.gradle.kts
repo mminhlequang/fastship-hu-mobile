@@ -13,8 +13,8 @@ plugins {
 
 android {
     namespace = "com.devfastshiphu.driver"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "com.devfastshiphu.driver"
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

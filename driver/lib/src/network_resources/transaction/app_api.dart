@@ -9,17 +9,15 @@ class _MyAppEndpoint {
   _MyAppEndpoint._();
   static String transaction() => "/api/v1/transaction";
   static String transactionDetail() => "/api/v1/transaction/detail";
-  static String createPayment() => "/api/v1/transaction/create_payment";
-  static String withdrawal() => "/api/v1/transaction/withdrawal";
-  static String confirmPayment() => "/api/v1/transaction/confirm_payment";
+  static String requestTopUp() => "/api/v1/transaction/request_topup";
+  static String requestWithdraw() => "/api/v1/transaction/request_withdraw";
 }
 
 abstract class MyAppApi {
   Future<NetworkResponse> getTransactions();
   Future<NetworkResponse> getTransactionDetail(String id);
-  Future<NetworkResponse> createPayment(Map<String, dynamic> data);
-  Future<NetworkResponse> withdrawal(Map<String, dynamic> data);
-  Future<NetworkResponse> confirmPayment(Map<String, dynamic> data);
+  Future<NetworkResponse> requestTopUp(Map<String, dynamic> data);
+  Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data);
 }
 
 class MyAppApiImp extends MyAppApi {
@@ -32,7 +30,9 @@ class MyAppApiImp extends MyAppApi {
         ).get(_MyAppEndpoint.transaction());
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => TransactionModel.fromJson(json),
+          converter: (json) => (json as List)
+              .map((e) => TransactionModel.fromJson(e))
+              .toList(),
         );
       },
     );
@@ -54,42 +54,26 @@ class MyAppApiImp extends MyAppApi {
   }
 
   @override
-  Future<NetworkResponse> createPayment(Map<String, dynamic> data) async {
+  Future<NetworkResponse> requestTopUp(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
-        ).post(_MyAppEndpoint.createPayment(), data: data);
+        ).post(_MyAppEndpoint.requestTopUp(), data: data);
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => TransactionModel.fromJson(json),
         );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> withdrawal(Map<String, dynamic> data) async {
+  Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
-        ).post(_MyAppEndpoint.withdrawal(), data: data);
-        return NetworkResponse.fromResponse(
-          response,
-          converter: (json) => TransactionModel.fromJson(json),
-        );
-      },
-    );
-  }
-
-  @override
-  Future<NetworkResponse> confirmPayment(Map<String, dynamic> data) async {
-    return await handleNetworkError(
-      proccess: () async {
-        Response response = await AppClient(
-          token: await AppPrefs.instance.getNormalToken(),
-        ).post(_MyAppEndpoint.confirmPayment(), data: data);
+        ).post(_MyAppEndpoint.requestWithdraw(), data: data);
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => TransactionModel.fromJson(json),

@@ -99,7 +99,7 @@ appShowSnackBar(
       break;
   }
 
-  ScaffoldMessenger.of(context).showSnackBar(
+  ScaffoldMessenger.of(context ?? appContext).showSnackBar(
     SnackBar(
       content: Text(
         msg,

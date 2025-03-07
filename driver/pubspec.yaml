@@ -61,6 +61,7 @@ dependencies:
   flutter_datetime_picker_plus: ^2.2.0
   fl_chart: ^0.70.2
   url_launcher: ^6.2.5
+  currency_text_input_formatter: ^2.2.9
   
 
   internal_core: 

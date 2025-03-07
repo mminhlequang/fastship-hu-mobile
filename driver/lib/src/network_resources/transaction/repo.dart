@@ -23,15 +23,11 @@ class TransactionRepo {
     return await _api.getTransactionDetail(id);
   }
 
-  Future<NetworkResponse> createPayment(Map<String, dynamic> data) async {
-    return await _api.createPayment(data);
+  Future<NetworkResponse> requestTopUp(Map<String, dynamic> data) async {
+    return await _api.requestTopUp(data);
   }
 
-  Future<NetworkResponse> withdrawal(Map<String, dynamic> data) async {
-    return await _api.withdrawal(data);
-  }
-
-  Future<NetworkResponse> confirmPayment(Map<String, dynamic> data) async {
-    return await _api.confirmPayment(data);
+  Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data) async {
+    return await _api.requestWithdraw(data);
   }
 }

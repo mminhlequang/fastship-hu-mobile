@@ -89,10 +89,10 @@ class AppColors extends AppColorsBase {
       appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
 
   @override
-  Color get shimmerHighlightColor => appValueByTheme(hexColor('#1C222C'));
+  Color get shimmerHighlightColor => appValueByTheme(hexColor('#fafafa'));
 
   @override
-  Color get shimmerBaseColor => appValueByTheme(hexColor('#1C222C'));
+  Color get shimmerBaseColor => appValueByTheme(Colors.grey[200]!);
 }
 
 appValueByTheme(klight, {kdark}) {
