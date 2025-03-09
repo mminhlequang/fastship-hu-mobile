@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widget_app_map.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -27,8 +28,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Completer<AnimatedMapController> mapController =
       Completer<AnimatedMapController>();
-
-  bool isOnline = false;
 
   @override
   void initState() {
@@ -106,82 +105,86 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          Container(
-            key: ValueKey(isOnline),
-            decoration: BoxDecoration(
-              color: appColorBackground,
-              boxShadow: [],
-            ),
-            padding: EdgeInsets.fromLTRB(20.sw, 16.sw, 20.sw,
-                12.sw + MediaQuery.paddingOf(context).bottom),
-            child: isOnline
-                ? SliderButton(
-                    direction: DismissDirection.endToStart,
-                    action: () async {
-                      setState(() {
-                        isOnline = false;
-                      });
-                      return true;
-                    },
-
-                    ///Put label over here
-                    label: Text(
-                      "Go offline".tr(),
-                      style: w400TextStyle(fontSize: 20.sw),
-                    ),
-                    icon: Center(
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: hexColor('F58737'),
-                        size: 32.sw,
-                      ),
-                    ),
-
-                    ///Change All the color and size from here.
-                    height: 56.sw,
-                    buttonSize: 48.sw,
-                    width: context.width - 40.sw,
-                    radius: 12.sw,
-                    alignLabel: Alignment.center,
-                    buttonColor: Colors.white,
-                    backgroundColor: hexColor('F58737'),
-                    highlightedColor: hexColor('F58737'),
-                    baseColor: Colors.white,
-                  )
-                : SliderButton(
-                    action: () async {
-                      appHaptic();
-                      setState(() {
-                        isOnline = true;
-                      });
-                      return true;
-                    },
-
-                    ///Put label over here
-                    label: Text(
-                      "Go online".tr(),
-                      style: w400TextStyle(fontSize: 20.sw),
-                    ),
-                    icon: Center(
-                      child: Icon(
-                        Icons.arrow_forward_rounded,
-                        color: appColorPrimary,
-                        size: 32.sw,
-                      ),
-                    ),
-
-                    ///Change All the color and size from here.
-                    height: 56.sw,
-                    buttonSize: 48.sw,
-                    width: context.width - 40.sw,
-                    radius: 12.sw,
-                    alignLabel: Alignment.center,
-                    buttonColor: Colors.white,
-                    backgroundColor: appColorPrimary,
-                    highlightedColor: appColorPrimary,
-                    baseColor: Colors.white,
+          ValueListenableBuilder(
+              valueListenable: socketController.socketConnected,
+              builder: (context, isConnected, child) {
+                bool isOnline = socketController.isOnline;
+                return Container(
+                  key: ValueKey(isOnline),
+                  decoration: BoxDecoration(
+                    color: appColorBackground,
+                    boxShadow: [],
                   ),
-          )
+                  padding: EdgeInsets.fromLTRB(20.sw, 16.sw, 20.sw,
+                      12.sw + MediaQuery.paddingOf(context).bottom),
+                  child: isOnline
+                      ? SliderButton(
+                          direction: DismissDirection.endToStart,
+                          action: () async {
+                            appHaptic();
+                            socketController.setOnlineStatus(false);
+                            setState(() {});
+                            return true;
+                          },
+
+                          ///Put label over here
+                          label: Text(
+                            "Go offline".tr(),
+                            style: w400TextStyle(fontSize: 20.sw),
+                          ),
+                          icon: Center(
+                            child: Icon(
+                              Icons.arrow_back_rounded,
+                              color: hexColor('F58737'),
+                              size: 32.sw,
+                            ),
+                          ),
+
+                          ///Change All the color and size from here.
+                          height: 56.sw,
+                          buttonSize: 48.sw,
+                          width: context.width - 40.sw,
+                          radius: 12.sw,
+                          alignLabel: Alignment.center,
+                          buttonColor: Colors.white,
+                          backgroundColor: hexColor('F58737'),
+                          highlightedColor: hexColor('F58737'),
+                          baseColor: Colors.white,
+                        )
+                      : SliderButton(
+                          action: () async {
+                            appHaptic();
+                            socketController.setOnlineStatus(true);
+                            setState(() {});
+                            return true;
+                          },
+
+                          ///Put label over here
+                          label: Text(
+                            "Go online".tr(),
+                            style: w400TextStyle(fontSize: 20.sw),
+                          ),
+                          icon: Center(
+                            child: Icon(
+                              Icons.arrow_forward_rounded,
+                              color: appColorPrimary,
+                              size: 32.sw,
+                            ),
+                          ),
+
+                          ///Change All the color and size from here.
+                          height: 56.sw,
+                          buttonSize: 48.sw,
+                          width: context.width - 40.sw,
+                          radius: 12.sw,
+                          alignLabel: Alignment.center,
+                          buttonColor: Colors.white,
+                          backgroundColor: appColorPrimary,
+                          highlightedColor: appColorPrimary,
+                          baseColor: Colors.white,
+                        ),
+                );
+              })
         ],
       ),
     );

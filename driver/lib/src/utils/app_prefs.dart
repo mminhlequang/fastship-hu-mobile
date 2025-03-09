@@ -135,4 +135,8 @@ class AppPrefs extends AppPrefsBase {
   String? get currencySymbol => _boxData.get('currency_symbol') ?? "€";
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
+
+  bool get isDriverOnline => _boxData.get('is_driver_online') ?? false;
+
+  set isDriverOnline(bool value) => _boxData.put('is_driver_online', value);
 }

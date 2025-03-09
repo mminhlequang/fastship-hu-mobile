@@ -34,7 +34,7 @@ class WidgetTextField extends StatefulWidget {
     super.key,
     this.prefixW,
     this.formatters,
-    this.autoFocus = true,
+    this.autoFocus = false,
     this.controller,
     this.error,
     this.errorType = TextFieldErrorType.normal,

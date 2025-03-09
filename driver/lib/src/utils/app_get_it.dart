@@ -1,3 +1,4 @@
+import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -12,5 +13,6 @@ final getIt = GetIt.instance;
 void getItSetup() {
   getIt.registerSingleton<GlobalKey<NavigatorState>>(
       GlobalKey<NavigatorState>());
-  getIt.registerSingleton<AuthCubit>(AuthCubit()); 
+  getIt.registerSingleton<AuthCubit>(AuthCubit());
+  getIt.registerSingleton<SocketController>(SocketController());
 }

@@ -15,6 +15,12 @@ String get appMapUrlTemplateHERE =>
 const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
+const String socketIOUrl = "http://138.197.136.45:3000";
+
+const String supportPhoneNumber = "+84909090909";
+const String supportEmail = "support@fastship.vn";
+const String supportAddress = "123 Main St, Anytown, USA";
+
 // Các loại tài khoản trong hệ thống
 enum AccountType {
   customer(1),

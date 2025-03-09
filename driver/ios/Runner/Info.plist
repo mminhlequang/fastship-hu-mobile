@@ -45,6 +45,7 @@
 	<array>
 		<string>remote-notification</string>
 		<string>fetch</string>
+		<string>processing</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -66,11 +67,11 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Allow access to authentication using face id</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Allow access to your location</string>
+	<string>The app needs location access to update your position and receive nearby orders.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Allow access to your location</string>
+	<string>The app needs location access to update your position and receive nearby orders.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allow access to your location</string>
+	<string>The app needs location access to update your position and receive nearby orders.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow access to microphone</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -83,6 +84,8 @@
 	<string>Allow access to tts</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Allow access to device's accelerometer for shake phone detection</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>The app needs permission to send notifications so you don't miss new orders and important updates.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
