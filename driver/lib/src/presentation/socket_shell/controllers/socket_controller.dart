@@ -36,6 +36,17 @@ class SocketController {
   Function(OrderStatus)? onOrderStatusChanged;
   Function()? onPlayNotification;
 
+  // Thêm callback cho phần profile và ví
+  Function(Map<String, dynamic>)? onProfileUpdated;
+  Function(Map<String, dynamic>)? onWalletUpdated;
+
+  // Thêm biến lưu thông tin profile và wallet
+  Map<String, dynamic>? _profile;
+  Map<String, dynamic>? _wallet;
+
+  Map<String, dynamic>? get profile => _profile;
+  Map<String, dynamic>? get wallet => _wallet;
+
   bool get isOnline => _isOnline;
   OrderStatus get orderStatus => _orderStatus;
   Map<String, dynamic>? get currentOrder => _currentOrder;
@@ -92,6 +103,44 @@ class SocketController {
         _handleOrderStatusUpdate(data);
       });
 
+      // Thêm xử lý event nhận phản hồi xác thực thành công
+      socket?.on('authentication_success', (data) {
+        debugPrint('Debug socket: Xác thực thành công');
+        final responseData = data is String ? jsonDecode(data) : data;
+
+        // Lưu thông tin profile và wallet
+        if (responseData['profile'] != null) {
+          _profile = Map<String, dynamic>.from(responseData['profile']);
+          onProfileUpdated?.call(_profile!);
+          debugPrint('Debug socket: Đã nhận thông tin profile');
+        }
+
+        if (responseData['wallet'] != null) {
+          _wallet = Map<String, dynamic>.from(responseData['wallet']);
+          onWalletUpdated?.call(_wallet!);
+          debugPrint('Debug socket: Đã nhận thông tin wallet');
+        }
+
+        // Khôi phục trạng thái online/offline
+        if (_isOnline) {
+          debugPrint('Debug socket: Khôi phục trạng thái online');
+          _emitDriverStatus(true);
+        }
+      });
+
+      // Thêm xử lý event lỗi xác thực
+      socket?.on('authentication_error', (data) {
+        final errorData = data is String ? jsonDecode(data) : data;
+        debugPrint('Debug socket: Lỗi xác thực: ${errorData['message']}');
+        // Có thể thêm xử lý khi xác thực thất bại
+      });
+
+      socket?.on('error', (data) {
+        debugPrint('Debug socket: on error=$data');
+      });
+
+      
+
       socket?.connect();
       debugPrint('Debug socket: Đã gọi lệnh kết nối');
     } catch (e) {
@@ -105,14 +154,9 @@ class SocketController {
     debugPrint(
         'Debug socket: Đã lấy token: ${token != null ? 'có token' : 'không có token'}');
     if (token != null && socket?.connected == true) {
-      debugPrint('Debug socket: Gửi token xác thực');
-      socket?.emit('authenticate', {'token': token});
-
-      // Khôi phục trạng thái online/offline
-      if (_isOnline) {
-        debugPrint('Debug socket: Khôi phục trạng thái online');
-        _emitDriverStatus(true);
-      }
+      debugPrint(
+          'Debug socket: Gửi token xác thực với event authenticate_driver');
+      socket?.emit('authenticate_driver', {'token': token});
     }
   }
 
@@ -138,8 +182,15 @@ class SocketController {
     debugPrint(
         'Debug socket: Gửi trạng thái tài xế: ${isOnline ? 'online' : 'offline'}');
     if (socket?.connected == true) {
-      socket
-          ?.emit('driver_status', {'status': isOnline ? 'online' : 'offline'});
+      socket?.emit(
+          'driver_status_update', {'status': isOnline ? 'online' : 'offline'});
+
+      // Thêm xử lý phản hồi từ server
+      socket?.once('driver_status_updated', (data) {
+        final responseData = data is String ? jsonDecode(data) : data;
+        debugPrint(
+            'Debug socket: Trạng thái đã được cập nhật: ${responseData['status']}');
+      });
     } else {
       debugPrint(
           'Debug socket: Không thể gửi trạng thái vì socket chưa kết nối');
@@ -179,6 +230,14 @@ class SocketController {
         socket?.emit('update_location', {
           'latitude': position.latitude,
           'longitude': position.longitude,
+        });
+
+        // Đăng ký lắng nghe phản hồi từ server
+        socket?.once('location_updated', (data) {
+          final responseData = data is String ? jsonDecode(data) : data;
+          debugPrint(
+              'Debug socket: Vị trí đã được cập nhật: ${responseData['status']}');
+          // Có thể thêm xử lý khi nhận được phản hồi thành công
         });
       } else {
         debugPrint(

@@ -25,6 +25,7 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
   SocketController get _socketController => findInstance<SocketController>();
   bool _isBlinking = false;
   Map<String, dynamic>? get _currentOrder => _socketController.currentOrder;
+  OrderStatus? _currentStatus;
 
   // Controller để chơi âm thanh thông báo
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -124,22 +125,41 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
   }
 
   void _initSocketController() {
-    // Đăng ký callbacks
-    _socketController.onBlinkingChanged = (isBlinking) {
-      setState(() {
-        _isBlinking = isBlinking;
-      });
-    };
+    try {
+      _socketController.onBlinkingChanged = (isBlinking) {
+        setState(() {
+          _isBlinking = isBlinking;
+        });
+      };
 
-    _socketController.onOrderStatusChanged = (status) {
-      setState(() {
-        // Cập nhật UI khi trạng thái đơn hàng thay đổi
-      });
-    };
+      _socketController.onOrderStatusChanged = (status) {
+        setState(() {
+          _currentStatus = status;
+        });
+      };
 
-    _socketController.onPlayNotification = () {
-      _playNotificationSound();
-    };
+      _socketController.onPlayNotification = () {
+        _playNotificationSound();
+      };
+
+      // Thêm xử lý cho profile được cập nhật
+      _socketController.onProfileUpdated = (profileData) {
+        setState(() {
+          // Có thể lưu profile vào state hoặc provider nếu cần
+          debugPrint('Đã nhận profile: ${profileData['name']}');
+        });
+      };
+
+      // Thêm xử lý cho wallet được cập nhật
+      _socketController.onWalletUpdated = (walletData) {
+        setState(() {
+          // Có thể lưu wallet vào state hoặc provider nếu cần
+          debugPrint('Đã nhận wallet: ${walletData['balance']}');
+        });
+      };
+    } catch (e) {
+      debugPrint('Lỗi khi khởi tạo SocketController: $e');
+    }
   }
 
   Future<void> _playNotificationSound() async {
