@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:app/src/network_resources/auth/models/models.dart';
 import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:app/src/network_resources/transaction/models/models.dart';
+import 'package:app/src/network_resources/transaction/repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:app/src/utils/utils.dart';
@@ -46,6 +48,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(state.update(stateType: AuthStateType.none));
     }
     if (state.stateType == AuthStateType.logged) {
+      fetchWallet();
       // state.user = user;
       // _subscription?.cancel();
       // _subscription =
@@ -56,6 +59,16 @@ class AuthCubit extends Cubit<AuthState> {
 
     await Future.delayed(delayRedirect);
     _redirect();
+  }
+
+  fetchWallet() async {
+    NetworkResponse response = await TransactionRepo().getMyWallet({
+      "currency": AppPrefs.instance.currency,
+    });
+    if (response.isSuccess) {
+      state.wallet = response.data;
+      emit(state.update());
+    }
   }
 
   logout() async {
@@ -86,15 +99,23 @@ class AuthState {
   AuthStateType stateType;
   AccountModel? user;
 
+  MyWallet? wallet;
+
   AuthState({
     this.stateType = AuthStateType.none,
     this.user,
+    this.wallet,
   });
 
-  AuthState update({AuthStateType? stateType, AccountModel? user}) {
+  AuthState update({
+    AuthStateType? stateType,
+    AccountModel? user,
+    MyWallet? wallet,
+  }) {
     return AuthState(
       stateType: stateType ?? this.stateType,
       user: user ?? this.user,
+      wallet: wallet ?? this.wallet,
     );
   }
 }

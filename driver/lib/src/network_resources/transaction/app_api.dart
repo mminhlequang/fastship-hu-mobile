@@ -11,6 +11,7 @@ class _MyAppEndpoint {
   static String transactionDetail() => "/api/v1/transaction/detail";
   static String requestTopUp() => "/api/v1/transaction/request_topup";
   static String requestWithdraw() => "/api/v1/transaction/request_withdraw";
+  static String getMyWallet() => "/api/v1/transaction/get_my_wallet";
 }
 
 abstract class MyAppApi {
@@ -18,6 +19,7 @@ abstract class MyAppApi {
   Future<NetworkResponse> getTransactionDetail(String id);
   Future<NetworkResponse> requestTopUp(Map<String, dynamic> data);
   Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data);
+  Future<NetworkResponse> getMyWallet(Map<String, dynamic> data);
 }
 
 class MyAppApiImp extends MyAppApi {
@@ -30,9 +32,8 @@ class MyAppApiImp extends MyAppApi {
         ).get(_MyAppEndpoint.transaction());
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => (json as List)
-              .map((e) => TransactionModel.fromJson(e))
-              .toList(),
+          converter: (json) =>
+              (json as List).map((e) => TransactionModel.fromJson(e)).toList(),
         );
       },
     );
@@ -77,6 +78,21 @@ class MyAppApiImp extends MyAppApi {
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => TransactionModel.fromJson(json),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> getMyWallet(Map<String, dynamic> data) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.getMyWallet(), queryParameters: data);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => MyWallet.fromJson(json),
         );
       },
     );

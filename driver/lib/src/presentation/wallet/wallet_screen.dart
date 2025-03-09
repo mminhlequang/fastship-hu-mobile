@@ -1,3 +1,4 @@
+import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/network_resources/transaction/models/models.dart';
 import 'package:app/src/network_resources/transaction/repo.dart';
@@ -5,6 +6,7 @@ import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
 
@@ -73,13 +75,15 @@ class _WalletScreenState extends State<WalletScreen> {
         // Mở Payment Sheet
         await Stripe.instance.presentPaymentSheet();
 
-        await appShowSnackBar(context: context,
+        await appShowSnackBar(
+          context: context,
           msg: "We received your payment!",
           type: AppSnackBarType.success,
         );
         _fetchTransactions();
       } else {
-        await appShowSnackBar(context: context,
+        await appShowSnackBar(
+          context: context,
           msg: "Oops! Something went wrong, please try again!",
           type: AppSnackBarType.error,
         );
@@ -87,7 +91,8 @@ class _WalletScreenState extends State<WalletScreen> {
     } catch (e) {
       print("Lỗi thanh toán: $e");
       //TODO: error
-      await appShowSnackBar(context: context,
+      await appShowSnackBar(
+        context: context,
         msg: "Oops! Something went wrong: $e",
         type: AppSnackBarType.error,
       );
@@ -102,17 +107,19 @@ class _WalletScreenState extends State<WalletScreen> {
     final response = await TransactionRepo()
         .requestWithdraw({'amount': amount, 'currency': 'eur'});
     if (response.isSuccess) {
-      await appShowSnackBar(context: context,
+      await appShowSnackBar(
+        context: context,
         msg: "Withdrawal request sent successfully!",
         type: AppSnackBarType.success,
       );
+      _fetchTransactions();
     } else {
-      await appShowSnackBar(context: context,
+      await appShowSnackBar(
+        context: context,
         msg: "Oops! Something went wrong, please try again!",
         type: AppSnackBarType.error,
       );
     }
-    _fetchTransactions();
   }
 
   @override
@@ -122,6 +129,7 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   _fetchTransactions() async {
+    authCubit.fetchWallet();
     setState(() {
       _isLoadingTransactions = true;
     });
@@ -174,13 +182,41 @@ class _WalletScreenState extends State<WalletScreen> {
             children: [
               const SizedBox(height: 32),
               // Balance Section
-              Text(
-                '\$255.06',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              BlocBuilder<AuthCubit, AuthState>(
+                bloc: authCubit,
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      Text(
+                        NumberFormat.currency(
+                          symbol: AppPrefs.instance.currencySymbol,
+                          decimalDigits: 2,
+                        ).format(state.wallet?.availableBalance ?? 0),
+                        style: w700TextStyle(
+                          fontSize: 48,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        "Frozen Balance",
+                        style: w400TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        NumberFormat.currency(
+                          symbol: AppPrefs.instance.currencySymbol,
+                          decimalDigits: 2,
+                        ).format(state.wallet?.frozenBalance ?? 0),
+                        style: w400TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 30),
               // Buttons Section

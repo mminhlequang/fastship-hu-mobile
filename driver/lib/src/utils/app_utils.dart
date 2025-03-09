@@ -87,7 +87,7 @@ appShowSnackBar(
   switch (type) {
     case AppSnackBarType.error:
       color = Colors.red;
-      duration = const Duration(seconds: 5);
+      duration = const Duration(seconds: 6);
       break;
     case AppSnackBarType.success:
       color = Colors.green;

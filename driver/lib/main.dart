@@ -19,11 +19,11 @@ import 'src/utils/utils.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Stripe.publishableKey = !kDebugMode
+  Stripe.publishableKey = !kDebugMode && false
       ? "pk_live_51FdoD5FOB1XEXlZFImtB8bzWGoYDGYA6aZn5v2a9QrBQsdDmbxze6RExqKymtuT19uNY5pqZ1vth13WwSdNmQs0Z00ywRf7YmF"
       : 'pk_test_51QwQfYGbnQCWi1BqsVDBmUNXwsA6ye6daczJ5E7j8zgGTjuVAWjLluexegaACZTaHP14XUtrGxDLHwxWzMksUVod00p0ZXsyPd';
-  Stripe.merchantIdentifier = kDebugMode
-      ? 'merchant.flutter.stripe.test'
+  Stripe.merchantIdentifier = !kDebugMode && false
+      ? 'merchant.flutter.stripe'
       : 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
 

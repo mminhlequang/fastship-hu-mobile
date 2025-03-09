@@ -127,4 +127,12 @@ class AppPrefs extends AppPrefsBase {
       _boxData.delete('user_info');
     }
   }
+
+  String? get currency => _boxData.get('currency') ?? "EUR";
+
+  set currency(String? value) => _boxData.put('currency', value);
+
+  String? get currencySymbol => _boxData.get('currency_symbol') ?? "€";
+
+  set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 }

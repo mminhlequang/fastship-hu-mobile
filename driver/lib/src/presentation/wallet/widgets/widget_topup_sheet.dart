@@ -1,6 +1,7 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_bottom_sheet_base.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class _WidgetTopUpSheetState extends State<WidgetTopUpSheet> {
               ),
             ],
             decoration: InputDecoration(
-              prefixText: '€ ',
+              prefixText: '${AppPrefs.instance.currencySymbol} ',
               hintText: '0.00',
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
@@ -129,7 +130,7 @@ class _WidgetWithDrawSheetState extends State<WidgetWithDrawSheet> {
               ),
             ],
             decoration: InputDecoration(
-              prefixText: '€ ',
+              prefixText: '${AppPrefs.instance.currencySymbol} ',
               hintText: '0.00',
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(

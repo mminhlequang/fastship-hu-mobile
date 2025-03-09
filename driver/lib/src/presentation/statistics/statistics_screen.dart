@@ -1,5 +1,9 @@
+import 'package:app/src/base/auth/auth_cubit.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -61,12 +65,20 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '\$255.06',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+              BlocBuilder<AuthCubit, AuthState>(
+                bloc: authCubit,
+                builder: (context, state) {
+                  return Text(
+                    NumberFormat.currency(
+                      symbol: AppPrefs.instance.currencySymbol,
+                      decimalDigits: 2,
+                    ).format(state.wallet?.availableBalance ?? 0),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 24),
               SizedBox(

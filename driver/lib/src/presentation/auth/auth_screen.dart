@@ -34,10 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
   final _phoneFocusNode = FocusNode();
-  PhoneNumber? _phoneNumber = kDebugMode
-      ? PhoneNumber(isoCode: 'VN', phoneNumber: '979797979', dialCode: '+84')
-      : null;
-  bool _isValidPhoneNumber = kDebugMode ? true : false;
+  PhoneNumber? _phoneNumber;
+  bool _isValidPhoneNumber = false;
 
   final _otpController = TextEditingController();
   final _otpTextEditingController = TextEditingController();
@@ -69,15 +67,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<void> _login() async {
+  Future<void> _login({phone, password}) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       final response = await _authRepo.login({
-        'phone': _phoneNumber?.phoneNumber,
-        'password': _passwordController.text,
+        'phone': phone ?? _phoneNumber?.phoneNumber,
+        'password': password ?? _passwordController.text,
         'type': AccountType.driver.value,
       });
 
@@ -729,12 +727,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   type: AnimationStaggeredType.topToBottom,
                   child: Column(
                     children: [
-                      Hero(
-                        tag: 'app_logo',
-                        child: WidgetAppSVG(
-                          assetsvg('ic_logo_white'),
-                          width: 160.sw,
-                          color: appColorPrimaryDark,
+                      GestureDetector(
+                        onDoubleTap: kReleaseMode
+                            ? null
+                            : () {
+                                _login(
+                                    phone: '+84979797979', password: '123456');
+                              },
+                        child: Hero(
+                          tag: 'app_logo',
+                          child: WidgetAppSVG(
+                            assetsvg('ic_logo_white'),
+                            width: 160.sw,
+                            color: appColorPrimaryDark,
+                          ),
                         ),
                       ),
                       Text(

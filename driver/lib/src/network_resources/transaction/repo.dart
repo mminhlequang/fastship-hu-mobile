@@ -30,4 +30,8 @@ class TransactionRepo {
   Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data) async {
     return await _api.requestWithdraw(data);
   }
+
+  Future<NetworkResponse> getMyWallet(Map<String, dynamic> data) async {
+    return await _api.getMyWallet(data);
+  }
 }
