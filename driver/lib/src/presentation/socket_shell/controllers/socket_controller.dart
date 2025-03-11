@@ -9,6 +9,7 @@ import 'package:vibration/vibration.dart';
 
 import '../../../constants/app_constants.dart';
 import '../../../utils/app_prefs.dart';
+import '../models/socket_response.dart';
 
 enum OrderStatus {
   waiting, // 0
@@ -106,40 +107,49 @@ class SocketController {
       // Thêm xử lý event nhận phản hồi xác thực thành công
       socket?.on('authentication_success', (data) {
         debugPrint('Debug socket: Xác thực thành công');
-        final responseData = data is String ? jsonDecode(data) : data;
+        final socketResponse = _parseSocketResponse(data);
 
-        // Lưu thông tin profile và wallet
-        if (responseData['profile'] != null) {
-          _profile = Map<String, dynamic>.from(responseData['profile']);
-          onProfileUpdated?.call(_profile!);
-          debugPrint('Debug socket: Đã nhận thông tin profile');
-        }
+        if (socketResponse.isSuccess) {
+          // Lưu thông tin profile và wallet
+          if (socketResponse.data != null &&
+              socketResponse.data['profile'] != null) {
+            _profile =
+                Map<String, dynamic>.from(socketResponse.data['profile']);
+            onProfileUpdated?.call(_profile!);
+            debugPrint('Debug socket: Đã nhận thông tin profile');
+          }
 
-        if (responseData['wallet'] != null) {
-          _wallet = Map<String, dynamic>.from(responseData['wallet']);
-          onWalletUpdated?.call(_wallet!);
-          debugPrint('Debug socket: Đã nhận thông tin wallet');
-        }
+          if (socketResponse.data != null &&
+              socketResponse.data['wallet'] != null) {
+            _wallet = Map<String, dynamic>.from(socketResponse.data['wallet']);
+            onWalletUpdated?.call(_wallet!);
+            debugPrint('Debug socket: Đã nhận thông tin wallet');
+          }
 
-        // Khôi phục trạng thái online/offline
-        if (_isOnline) {
-          debugPrint('Debug socket: Khôi phục trạng thái online');
-          _emitDriverStatus(true);
+          // Khôi phục trạng thái online/offline
+          if (_isOnline) {
+            debugPrint('Debug socket: Khôi phục trạng thái online');
+            _emitDriverStatus(true);
+          }
+        } else {
+          debugPrint(
+              'Debug socket: Xác thực không thành công: ${socketResponse.messageCode}');
         }
       });
 
       // Thêm xử lý event lỗi xác thực
       socket?.on('authentication_error', (data) {
-        final errorData = data is String ? jsonDecode(data) : data;
-        debugPrint('Debug socket: Lỗi xác thực: ${errorData['message']}');
+        final socketResponse = _parseSocketResponse(data);
+        debugPrint(
+            'Debug socket: Lỗi xác thực: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}');
         // Có thể thêm xử lý khi xác thực thất bại
       });
 
       socket?.on('error', (data) {
-        debugPrint('Debug socket: on error=$data');
+        final socketResponse = _parseSocketResponse(data);
+        debugPrint(
+            'Debug socket: Lỗi: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}');
       });
-
-      
 
       socket?.connect();
       debugPrint('Debug socket: Đã gọi lệnh kết nối');
@@ -187,9 +197,14 @@ class SocketController {
 
       // Thêm xử lý phản hồi từ server
       socket?.once('driver_status_updated', (data) {
-        final responseData = data is String ? jsonDecode(data) : data;
-        debugPrint(
-            'Debug socket: Trạng thái đã được cập nhật: ${responseData['status']}');
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          debugPrint(
+              'Debug socket: Trạng thái đã được cập nhật: ${socketResponse.data?['status']}');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi cập nhật trạng thái: ${socketResponse.messageCode}');
+        }
       });
     } else {
       debugPrint(
@@ -234,10 +249,13 @@ class SocketController {
 
         // Đăng ký lắng nghe phản hồi từ server
         socket?.once('location_updated', (data) {
-          final responseData = data is String ? jsonDecode(data) : data;
-          debugPrint(
-              'Debug socket: Vị trí đã được cập nhật: ${responseData['status']}');
-          // Có thể thêm xử lý khi nhận được phản hồi thành công
+          final socketResponse = _parseSocketResponse(data);
+          if (socketResponse.isSuccess) {
+            debugPrint('Debug socket: Vị trí đã được cập nhật thành công');
+          } else {
+            debugPrint(
+                'Debug socket: Lỗi cập nhật vị trí: ${socketResponse.messageCode}');
+          }
         });
       } else {
         debugPrint(
@@ -250,45 +268,57 @@ class SocketController {
 
   void _handleNewOrder(dynamic data) {
     debugPrint('Debug socket: Xử lý đơn hàng mới');
-    final orderData = data is String ? jsonDecode(data) : data;
-    _currentOrder = Map<String, dynamic>.from(orderData);
-    _orderStatus = OrderStatus.newOrder;
-    debugPrint(
-        'Debug socket: Thông tin đơn hàng mới: ${jsonEncode(_currentOrder)}');
+    final socketResponse = _parseSocketResponse(data);
 
-    // Thông báo cho UI
-    debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
-    onOrderStatusChanged?.call(_orderStatus);
-    onNewOrder?.call(_currentOrder!);
-    onPlayNotification?.call();
+    if (socketResponse.isSuccess && socketResponse.data != null) {
+      _currentOrder = Map<String, dynamic>.from(socketResponse.data);
+      _orderStatus = OrderStatus.newOrder;
+      debugPrint(
+          'Debug socket: Thông tin đơn hàng mới: ${jsonEncode(_currentOrder)}');
 
-    // Bắt đầu nhấp nháy (thông qua callback)
-    debugPrint('Debug socket: Bắt đầu hiệu ứng nhấp nháy');
-    _startBlinking();
+      // Thông báo cho UI
+      debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
+      onOrderStatusChanged?.call(_orderStatus);
+      onNewOrder?.call(_currentOrder!);
+      onPlayNotification?.call();
 
-    // Rung điện thoại
-    debugPrint('Debug socket: Kích hoạt rung');
-    Vibration.vibrate(pattern: [500, 1000, 500, 1000]);
+      // Bắt đầu nhấp nháy (thông qua callback)
+      debugPrint('Debug socket: Bắt đầu hiệu ứng nhấp nháy');
+      _startBlinking();
+
+      // Rung điện thoại
+      debugPrint('Debug socket: Kích hoạt rung');
+      Vibration.vibrate(pattern: [500, 1000, 500, 1000]);
+    } else {
+      debugPrint(
+          'Debug socket: Lỗi khi nhận đơn hàng mới: ${socketResponse.messageCode}');
+    }
   }
 
   void _handleOrderCanceled(dynamic data) {
     debugPrint('Debug socket: Xử lý đơn hàng bị hủy');
     if (_orderStatus == OrderStatus.inProgress) {
-      final orderData = data is String ? jsonDecode(data) : data;
-      _currentOrder = Map<String, dynamic>.from(orderData);
-      _orderStatus = OrderStatus.canceled;
-      debugPrint(
-          'Debug socket: Thông tin đơn hàng bị hủy: ${jsonEncode(_currentOrder)}');
+      final socketResponse = _parseSocketResponse(data);
 
-      // Thông báo cho UI
-      debugPrint('Debug socket: Gọi callback cho đơn hàng bị hủy');
-      onOrderStatusChanged?.call(_orderStatus);
-      onOrderCanceled?.call(_currentOrder!);
-      onPlayNotification?.call();
+      if (socketResponse.isSuccess && socketResponse.data != null) {
+        _currentOrder = Map<String, dynamic>.from(socketResponse.data);
+        _orderStatus = OrderStatus.canceled;
+        debugPrint(
+            'Debug socket: Thông tin đơn hàng bị hủy: ${jsonEncode(_currentOrder)}');
 
-      // Rung điện thoại
-      debugPrint('Debug socket: Kích hoạt rung cho đơn hủy');
-      Vibration.vibrate(pattern: [300, 300, 300, 300]);
+        // Thông báo cho UI
+        debugPrint('Debug socket: Gọi callback cho đơn hàng bị hủy');
+        onOrderStatusChanged?.call(_orderStatus);
+        onOrderCanceled?.call(_currentOrder!);
+        onPlayNotification?.call();
+
+        // Rung điện thoại
+        debugPrint('Debug socket: Kích hoạt rung cho đơn hủy');
+        Vibration.vibrate(pattern: [300, 300, 300, 300]);
+      } else {
+        debugPrint(
+            'Debug socket: Lỗi khi xử lý đơn hàng bị hủy: ${socketResponse.messageCode}');
+      }
     } else {
       debugPrint(
           'Debug socket: Bỏ qua sự kiện hủy đơn vì trạng thái hiện tại không phải đang tiến hành: $_orderStatus');
@@ -297,14 +327,20 @@ class SocketController {
 
   void _handleOrderStatusUpdate(dynamic data) {
     debugPrint('Debug socket: Xử lý cập nhật trạng thái đơn hàng');
-    final orderData = data is String ? jsonDecode(data) : data;
-    _currentOrder = Map<String, dynamic>.from(orderData);
-    debugPrint(
-        'Debug socket: Thông tin đơn hàng cập nhật: ${jsonEncode(_currentOrder)}');
+    final socketResponse = _parseSocketResponse(data);
 
-    // Thông báo cho UI
-    debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
-    onOrderStatusUpdated?.call(_currentOrder!);
+    if (socketResponse.isSuccess && socketResponse.data != null) {
+      _currentOrder = Map<String, dynamic>.from(socketResponse.data);
+      debugPrint(
+          'Debug socket: Thông tin đơn hàng cập nhật: ${jsonEncode(_currentOrder)}');
+
+      // Thông báo cho UI
+      debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
+      onOrderStatusUpdated?.call(_currentOrder!);
+    } else {
+      debugPrint(
+          'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
+    }
   }
 
   // Xử lý nhấp nháy thông qua callback
@@ -331,8 +367,19 @@ class SocketController {
       debugPrint(
           'Debug socket: Gửi yêu cầu chấp nhận đơn hàng ID: ${_currentOrder!['id']}');
       socket?.emit('accept_order', {'order_id': _currentOrder!['id']});
-      _orderStatus = OrderStatus.inProgress;
-      onOrderStatusChanged?.call(_orderStatus);
+
+      // Lắng nghe phản hồi
+      socket?.once('order_response_confirmed', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          _orderStatus = OrderStatus.inProgress;
+          onOrderStatusChanged?.call(_orderStatus);
+          debugPrint('Debug socket: Đơn hàng đã được chấp nhận thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi chấp nhận đơn hàng: ${socketResponse.messageCode}');
+        }
+      });
     } else {
       debugPrint(
           'Debug socket: Không thể chấp nhận đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
@@ -345,9 +392,20 @@ class SocketController {
       debugPrint(
           'Debug socket: Gửi yêu cầu từ chối đơn hàng ID: ${_currentOrder!['id']}');
       socket?.emit('reject_order', {'order_id': _currentOrder!['id']});
-      _orderStatus = OrderStatus.waiting;
-      _currentOrder = null;
-      onOrderStatusChanged?.call(_orderStatus);
+
+      // Lắng nghe phản hồi
+      socket?.once('order_response_confirmed', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          _orderStatus = OrderStatus.waiting;
+          _currentOrder = null;
+          onOrderStatusChanged?.call(_orderStatus);
+          debugPrint('Debug socket: Đơn hàng đã được từ chối thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi từ chối đơn hàng: ${socketResponse.messageCode}');
+        }
+      });
     } else {
       debugPrint(
           'Debug socket: Không thể từ chối đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
@@ -363,6 +421,18 @@ class SocketController {
         'order_id': _currentOrder!['id'],
         'status': status,
       });
+
+      // Lắng nghe phản hồi
+      socket?.once('order_status_updated_confirmation', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          debugPrint(
+              'Debug socket: Trạng thái đơn hàng đã được cập nhật thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
+        }
+      });
     } else {
       debugPrint(
           'Debug socket: Không thể cập nhật trạng thái - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
@@ -375,8 +445,19 @@ class SocketController {
       debugPrint(
           'Debug socket: Gửi yêu cầu hoàn thành đơn hàng ID: ${_currentOrder!['id']}');
       socket?.emit('complete_order', {'order_id': _currentOrder!['id']});
-      _orderStatus = OrderStatus.completed;
-      onOrderStatusChanged?.call(_orderStatus);
+
+      // Lắng nghe phản hồi
+      socket?.once('order_status_updated_confirmation', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          _orderStatus = OrderStatus.completed;
+          onOrderStatusChanged?.call(_orderStatus);
+          debugPrint('Debug socket: Đơn hàng đã được hoàn thành thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi hoàn thành đơn hàng: ${socketResponse.messageCode}');
+        }
+      });
     } else {
       debugPrint(
           'Debug socket: Không thể hoàn thành đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
@@ -403,5 +484,23 @@ class SocketController {
     socket?.dispose();
     _locationTimer?.cancel();
     socketConnected.dispose();
+  }
+
+  // Phương thức trợ giúp phân tích phản hồi từ socket
+  SocketResponse _parseSocketResponse(dynamic data) {
+    try {
+      final Map<String, dynamic> jsonData =
+          data is String ? jsonDecode(data) : Map<String, dynamic>.from(data);
+      return SocketResponse.fromJson(jsonData);
+    } catch (e) {
+      debugPrint('Debug socket: Lỗi phân tích dữ liệu socket: $e');
+      // Trả về phản hồi mặc định trong trường hợp có lỗi
+      return SocketResponse(
+        isSuccess: false,
+        timestamp: DateTime.now().toIso8601String(),
+        messageCode: 'PARSE_ERROR',
+        data: {'message': 'Lỗi phân tích dữ liệu', 'original': data},
+      );
+    }
   }
 }
