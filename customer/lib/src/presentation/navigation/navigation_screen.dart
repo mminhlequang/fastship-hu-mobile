@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../home/home_screen.dart';
 import 'cubit/navigation_cubit.dart';
 import 'widgets/custom_bottom_bar.dart';
 
@@ -20,7 +21,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         return Scaffold(
           body: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: SizedBox(),
+            child: state.currentIndex == 0 ? HomeScreen() : SizedBox(),
           ),
           bottomNavigationBar: CustomBottomBar(
             currentIndex: navigationCubit.state.currentIndex,

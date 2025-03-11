@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            _buildBottomNavBar(),
           ],
         ),
       ),
@@ -962,42 +961,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.home, true),
-          _buildNavItem(Icons.shopping_cart_outlined, false),
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.shopping_bag, color: Colors.white),
-          ),
-          _buildNavItem(Icons.receipt_long_outlined, false),
-          _buildNavItem(Icons.person_outline, false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isActive) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Icon(
-        icon,
-        color: isActive ? Colors.green : Colors.grey,
       ),
     );
   }
