@@ -1,8 +1,10 @@
-import 'package:app/src/presentation/login/login_screen.dart';
-import 'package:app/src/presentation/otp/otp_screen.dart';
+import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/socket_shell/socket_shell_wrapper.dart';
+import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -15,18 +17,26 @@ final goRouter = GoRouter(
   navigatorKey: appNavigatorKey,
   routes: [
     GoRoute(
-      name: '/',
       path: '/',
-      // builder: (context, state) => BlocProvider(
-      //   create: (context) => HomeCubit(),
-      //   child: const HomeScreen(),
-      // ),
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const SplashScreen(),
     ),
-    GoRoute(
-      name: 'otp',
-      path: '/otp',
-      builder: (context, state) => OtpScreen(args: state.extra as OtpArgs),
+    ShellRoute(
+      parentNavigatorKey: appNavigatorKey,
+      pageBuilder: (context, state, child) {
+        return NoTransitionPage(
+          child: LocationPermissionWrapper(
+            child: SocketShellWrapper(
+              child: child,
+            ),
+          ),
+        );
+      },
+      routes: [
+        GoRoute(
+          path: '/navigation',
+          builder: (context, state) => const NavigationScreen(),
+        ),
+      ],
     ),
   ],
 );

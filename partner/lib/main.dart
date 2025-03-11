@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
-import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 
 import 'internal_setup.dart';
@@ -15,10 +14,7 @@ import 'src/base/bloc.dart';
 import 'src/utils/utils.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    setPathUrlStrategy();
-  }
+  WidgetsFlutterBinding.ensureInitialized(); 
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),

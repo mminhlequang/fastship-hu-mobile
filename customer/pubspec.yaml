@@ -59,6 +59,7 @@ dependencies:
   fl_chart: ^0.70.2
   url_launcher: ^6.2.5
   currency_text_input_formatter: ^2.2.9
+  carousel_slider: ^5.0.0
 
   internal_core: 
     path: internal_libs/core
