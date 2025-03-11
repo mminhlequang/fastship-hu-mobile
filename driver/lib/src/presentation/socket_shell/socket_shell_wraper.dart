@@ -13,19 +13,18 @@ import 'widgets/order_notification_widget.dart';
 import 'widgets/order_complete_widget.dart';
 import 'widgets/order_canceled_widget.dart';
 
-class SocketShellWraper extends StatefulWidget {
+class SocketShellWrapper extends StatefulWidget {
   final Widget child;
-  const SocketShellWraper({super.key, required this.child});
+  const SocketShellWrapper({super.key, required this.child});
 
   @override
-  State<SocketShellWraper> createState() => _SocketShellWraperState();
+  State<SocketShellWrapper> createState() => _SocketShellWrapperState();
 }
 
-class _SocketShellWraperState extends State<SocketShellWraper> {
+class _SocketShellWrapperState extends State<SocketShellWrapper> {
   SocketController get _socketController => findInstance<SocketController>();
   bool _isBlinking = false;
   Map<String, dynamic>? get _currentOrder => _socketController.currentOrder;
-  OrderStatus? _currentStatus;
 
   // Controller để chơi âm thanh thông báo
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -133,9 +132,7 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
       };
 
       _socketController.onOrderStatusChanged = (status) {
-        setState(() {
-          _currentStatus = status;
-        });
+        setState(() {});
       };
 
       _socketController.onPlayNotification = () {
@@ -261,10 +258,10 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
 
   Widget _buildOrderStatusWidget() {
     switch (_socketController.orderStatus) {
-      case OrderStatus.waiting:
+      case DriverOrderStatus.waiting:
         return const SizedBox(); // Không hiển thị gì
 
-      case OrderStatus.newOrder:
+      case DriverOrderStatus.newOrder:
         return OrderNotificationWidget(
           order: _currentOrder!,
           isBlinking: _isBlinking,
@@ -272,7 +269,39 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
           onReject: _socketController.rejectOrder,
         );
 
-      case OrderStatus.inProgress:
+      case DriverOrderStatus.accepted:
+        // Sau khi chấp nhận đơn hàng, hiển thị widget cho phép tài xế xác nhận đã lấy hàng
+        return OrderActionWidget(
+          order: _currentOrder!,
+          onUpdateStatus: (status) {
+            if (status == 'picked_up') {
+              _socketController.pickOrder();
+            } else {
+              _socketController.updateOrderStatus(status);
+            }
+          },
+          onComplete: _socketController.completeOrder,
+          onCall: _callCustomer,
+          onSendSms: _sendSms,
+        );
+
+      case DriverOrderStatus.picked:
+        // Tài xế đã lấy hàng, hiển thị các tùy chọn cho việc giao hàng
+        return OrderActionWidget(
+          order: _currentOrder!,
+          onUpdateStatus: (status) {
+            if (status == 'arrived_at_customer') {
+              _socketController.startDelivery();
+            } else {
+              _socketController.updateOrderStatus(status);
+            }
+          },
+          onComplete: _socketController.completeOrder,
+          onCall: _callCustomer,
+          onSendSms: _sendSms,
+        );
+
+      case DriverOrderStatus.inProgress:
         return OrderActionWidget(
           order: _currentOrder!,
           onUpdateStatus: _socketController.updateOrderStatus,
@@ -281,13 +310,13 @@ class _SocketShellWraperState extends State<SocketShellWraper> {
           onSendSms: _sendSms,
         );
 
-      case OrderStatus.completed:
+      case DriverOrderStatus.completed:
         return OrderCompleteWidget(
           order: _currentOrder!,
           onClose: _socketController.closeOrderComplete,
         );
 
-      case OrderStatus.canceled:
+      case DriverOrderStatus.canceled:
         return OrderCanceledWidget(
           order: _currentOrder!,
           onClose: _socketController.closeOrderCanceled,

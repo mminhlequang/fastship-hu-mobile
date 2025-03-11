@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_sizes.dart';
+import 'package:intl/intl.dart';
 
 class OrderActionWidget extends StatelessWidget {
   final Map<String, dynamic> order;
@@ -20,6 +21,52 @@ class OrderActionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Xác định đây là trạng thái nào để hiển thị title và các nút thích hợp
+    String title = 'Đang giao hàng';
+    List<Widget> statusButtons = [];
+
+    // Xác định các nút trạng thái dựa trên trạng thái hiện tại của đơn hàng
+    if (order['status'] == 'accepted') {
+      title = 'Đã nhận đơn hàng';
+      statusButtons = [
+        _buildStatusButton(
+          context: context,
+          status: 'arrived_at_restaurant',
+          label: 'Đã đến quán',
+          icon: Icons.storefront,
+        ),
+        _buildStatusButton(
+          context: context,
+          status: 'picked_up',
+          label: 'Đã lấy hàng',
+          icon: Icons.shopping_bag,
+          isPrimary: true,
+        ),
+      ];
+    } else if (order['status'] == 'picked') {
+      title = 'Đã lấy hàng';
+      statusButtons = [
+        _buildStatusButton(
+          context: context,
+          status: 'arrived_at_customer',
+          label: 'Đã đến nơi giao',
+          icon: Icons.location_on,
+          isPrimary: true,
+        ),
+      ];
+    } else if (order['status'] == 'in_progress') {
+      title = 'Đang giao hàng';
+      statusButtons = [
+        _buildStatusButton(
+          context: context,
+          status: 'completed',
+          label: 'Hoàn thành giao hàng',
+          icon: Icons.check_circle,
+          isPrimary: true,
+        ),
+      ];
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -50,7 +97,7 @@ class OrderActionWidget extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Đang giao hàng',
+                  title,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -176,33 +223,7 @@ class OrderActionWidget extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             alignment: WrapAlignment.center,
-            children: [
-              _buildStatusButton(
-                context: context,
-                status: 'arrived_at_restaurant',
-                label: 'Đã đến quán',
-                icon: Icons.storefront,
-              ),
-              _buildStatusButton(
-                context: context,
-                status: 'picked_up',
-                label: 'Đã lấy hàng',
-                icon: Icons.shopping_bag,
-              ),
-              _buildStatusButton(
-                context: context,
-                status: 'arrived_at_customer',
-                label: 'Đã đến nơi',
-                icon: Icons.location_on,
-              ),
-              _buildStatusButton(
-                context: context,
-                status: 'completed',
-                label: 'Hoàn thành',
-                icon: Icons.check_circle,
-                isPrimary: true,
-              ),
-            ],
+            children: statusButtons,
           ),
         ],
       ),
@@ -352,15 +373,17 @@ class OrderActionWidget extends StatelessWidget {
 
   String _formatCurrency(dynamic amount) {
     if (amount == null) return '0đ';
-    final value = amount is int
-        ? amount
-        : (amount is String ? int.tryParse(amount) ?? 0 : 0);
-    final formatter = StringBuffer();
-    formatter.write(value.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (match) => '${match[1]}.',
-        ));
-    formatter.write('đ');
-    return formatter.toString();
+
+    // Chuyển đổi amount thành số nếu nó là string
+    double numAmount = 0;
+    if (amount is String) {
+      numAmount = double.tryParse(amount) ?? 0;
+    } else if (amount is num) {
+      numAmount = amount.toDouble();
+    }
+
+    // Định dạng số theo chuẩn tiền tệ VN
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return '${formatter.format(numAmount)}đ';
   }
 }

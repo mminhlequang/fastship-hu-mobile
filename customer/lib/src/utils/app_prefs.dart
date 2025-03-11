@@ -46,6 +46,7 @@ class AppPrefs extends AppPrefsBase {
       AppPrefsBase.themeModeKey,
       AppPrefsBase.languageCodeKey,
       "user_info",
+      "customer_id",
     ]);
   }
 
@@ -121,4 +122,12 @@ class AppPrefs extends AppPrefsBase {
   //     _box.delete('user_info');
   //   }
   // }
+
+  Future<void> setCustomerId(String customerId) async {
+    await _boxAuth.put("customer_id", customerId);
+  }
+
+  Future<String?> getCustomerId() async {
+    return _boxAuth.get("customer_id");
+  }
 }

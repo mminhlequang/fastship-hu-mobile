@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'utils.dart';
 
 Future initEasyLocalization() async {
+  EasyLocalization.logger.enableLevels = [];
   await EasyLocalization.ensureInitialized();
 }
 
@@ -21,7 +22,6 @@ const List<Locale> appSupportedLocales = [
   Locale('en'),
   Locale('fr')
 ];
-
 
 ///////
 

@@ -1,4 +1,3 @@
-export 'app_ads.dart';
 export 'app_easy_localization.dart';
 export 'app_firebase_messaging.dart';
 export 'app_get.dart';

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_sizes.dart';
+import 'package:intl/intl.dart';
 
 class OrderCompleteWidget extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -200,16 +201,18 @@ class _OrderCompleteWidgetState extends State<OrderCompleteWidget>
 
   String _formatCurrency(dynamic amount) {
     if (amount == null) return '0đ';
-    final value = amount is int
-        ? amount
-        : (amount is String ? int.tryParse(amount) ?? 0 : 0);
-    final formatter = StringBuffer();
-    formatter.write(value.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (match) => '${match[1]}.',
-        ));
-    formatter.write('đ');
-    return formatter.toString();
+
+    // Chuyển đổi amount thành số nếu nó là string
+    double numAmount = 0;
+    if (amount is String) {
+      numAmount = double.tryParse(amount) ?? 0;
+    } else if (amount is num) {
+      numAmount = amount.toDouble();
+    }
+
+    // Định dạng số theo chuẩn tiền tệ VN
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return '${formatter.format(numAmount)}đ';
   }
 }
 

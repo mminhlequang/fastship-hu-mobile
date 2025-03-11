@@ -86,7 +86,7 @@ final goRouter = GoRouter(
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
           child: LocationPermissionWrapper(
-            child: SocketShellWraper(
+            child: SocketShellWrapper(
               child: child,
             ),
           ),
