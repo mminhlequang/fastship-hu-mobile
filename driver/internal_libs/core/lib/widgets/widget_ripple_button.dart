@@ -1,36 +1,41 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import '../setup/index.dart';
 
 class WidgetRippleButton extends StatelessWidget {
   const WidgetRippleButton({
     super.key,
     this.color,
-    this.borderRadius = const BorderRadius.only(),
     this.elevation = 0,
     this.onTap,
     this.child,
     this.shadowColor,
     this.enable = true,
+    this.radius = 99,
+    this.borderSide = BorderSide.none,
   });
 
   final bool enable;
   final Color? color;
   final Color? shadowColor;
   final double elevation;
-  final BorderRadius borderRadius;
   final VoidCallback? onTap;
   final Widget? child;
+  final double radius;
+  final BorderSide borderSide;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       elevation: elevation,
-      shadowColor: shadowColor ?? appColors?.text?.withOpacity(.1),
-      color: color ?? hexColor('#F0F1F6'),
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      shadowColor: shadowColor ?? appColors?.text.withValues(alpha: .1),
+      color: color ?? Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius),
+        side: borderSide,
+      ),
       clipBehavior: Clip.none,
       child: InkWell(
-        borderRadius: borderRadius,
+        borderRadius: BorderRadius.circular(radius),
         onTap: enable && onTap != null
             ? () {
                 appHaptic();

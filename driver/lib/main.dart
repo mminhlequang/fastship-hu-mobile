@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 
@@ -85,10 +86,60 @@ class _AppState extends State<_App> {
                 : ThemeData.light())
             .copyWith(
           scaffoldBackgroundColor: appColorBackground,
+          appBarTheme: AppBarTheme(
+            backgroundColor: appColorPrimary,
+            centerTitle: true,
+            titleTextStyle: w500TextStyle(fontSize: 18.sw, color: Colors.white),
+            iconTheme: IconThemeData(color: Colors.white),
+            actionsIconTheme: IconThemeData(color: Colors.white),
+          ),
+          tabBarTheme: TabBarTheme(
+            dividerHeight: 1.sw,
+            dividerColor: hexColor('#F1F4F6'),
+            indicator: _TabIndicator(),
+            labelColor: appColorText,
+            labelStyle: w400TextStyle(fontSize: 16.sw),
+            unselectedLabelColor: appColorText,
+            unselectedLabelStyle: w400TextStyle(fontSize: 16.sw),
+            indicatorSize: TabBarIndicatorSize.tab,
+          ),
         ),
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       ),
+    );
+  }
+}
+
+class _TabIndicator extends BoxDecoration {
+  final BoxPainter _painter;
+
+  _TabIndicator() : _painter = _TabIndicatorPainter();
+
+  @override
+  BoxPainter createBoxPainter([onChanged]) => _painter;
+}
+
+class _TabIndicatorPainter extends BoxPainter {
+  final Paint _paint;
+
+  _TabIndicatorPainter()
+      : _paint = Paint()
+          ..color = appColorPrimary
+          ..isAntiAlias = true;
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
+    final double xPos = offset.dx + cfg.size!.width;
+    final double yPos = offset.dy + cfg.size!.height;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        // Rect.fromLTRB(offset.dx, 0, xPos, 2),
+        Rect.fromLTRB(offset.dx, yPos - 2, xPos, yPos),
+        const Radius.circular(4),
+      ),
+      _paint,
     );
   }
 }

@@ -18,11 +18,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appColorBackground,
       body: Column(
         children: [
           Container(
-            height: 236.sw + context.mediaQueryPadding.top,
+            height: 244.sw + context.mediaQueryPadding.top,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(assetpng('setting_backgorund')),
@@ -32,72 +31,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: EdgeInsets.symmetric(horizontal: 20.sw),
             child: SafeArea(
               bottom: false,
-              child: Column(
+              child: Stack(
+                alignment: Alignment.topRight,
                 children: [
-                  Row(
+                  Column(
                     children: [
-                      Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          appHaptic();
-                          context.pop();
-                        },
-                        child: Icon(
-                          Icons.close_rounded,
-                          size: 28.sw,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
+                      Gap(context.mediaQueryPadding.top),
+                      Row(
                         children: [
-                          WidgetAppSVG(
-                            assetsvg('avatar_border'),
-                            width: 66.sw,
-                            height: 66.sw,
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              WidgetAppSVG(
+                                assetsvg('avatar_border'),
+                                width: 66.sw,
+                                height: 66.sw,
+                              ),
+                              WidgetAvatar.withoutBorder(
+                                imageUrl: AppPrefs.instance.user?.avatar,
+                                radius: 56.sw / 2,
+                              )
+                            ],
                           ),
-                          WidgetAvatar.withoutBorder(
-                              imageUrl: AppPrefs.instance.user?.avatar,
-                              radius: 56.sw / 2)
+                          Gap(12.sw),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppPrefs.instance.user?.name ?? '',
+                                  style: w500TextStyle(
+                                      fontSize: 18.sw, color: Colors.white),
+                                ),
+                                Gap(4.sw),
+                                Text(
+                                  AppPrefs.instance.user?.phone ?? '',
+                                  style: w300TextStyle(
+                                      fontSize: 16.sw, color: Colors.white),
+                                )
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                      Gap(12.sw),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppPrefs.instance.user?.name ?? '',
-                              style: w500TextStyle(
-                                  fontSize: 18.sw, color: Colors.white),
-                            ),
-                            Gap(4.sw),
-                            Text(
-                              AppPrefs.instance.user?.phone ?? '',
-                              style: w300TextStyle(
-                                  fontSize: 16.sw, color: Colors.white),
-                            )
-                          ],
-                        ),
-                      )
+                      Spacer(),
+                      WidgetWallet(
+                        onTap: () {
+                          appHaptic();
+                          context.push('/wallet');
+                        },
+                      ),
+                      Gap(20.sw),
                     ],
                   ),
-                  Spacer(),
-                  WidgetWallet(
-                    onTap: () {
-                      appHaptic();
-                      context.push('/wallet');
-                    },
-                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16.sw),
+                    child: GestureDetector(
+                      onTap: () {
+                        appHaptic();
+                        context.pop();
+                      },
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 28.sw,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
           ),
-          Gap(12.sw),
           Expanded(
             child: ColoredBox(
               color: AppColors.instance.grey6,

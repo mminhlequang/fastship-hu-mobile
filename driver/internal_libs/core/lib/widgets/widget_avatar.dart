@@ -15,18 +15,18 @@ class WidgetAvatar extends StatelessWidget {
   final bool isWithoutBorder;
   final Widget Function()? placeholderBuilder;
 
-  const WidgetAvatar(
-      {super.key,
-      required this.imageUrl,
-      required this.radius1,
-      required this.radius2,
-      required this.radius3,
-      this.placeholderBuilder,
-      this.onTap,
-      this.backgroundColor,
-      this.errorAsset,
-      this.borderColor})
-      : isWithoutBorder = false;
+  const WidgetAvatar({
+    super.key,
+    required this.imageUrl,
+    required this.radius1,
+    required this.radius2,
+    required this.radius3,
+    this.placeholderBuilder,
+    this.onTap,
+    this.backgroundColor,
+    this.errorAsset,
+    this.borderColor,
+  }) : isWithoutBorder = false;
 
   const WidgetAvatar.withoutBorder({
     super.key,
@@ -76,9 +76,7 @@ class WidgetAvatar extends StatelessWidget {
         width: radius1 * 2,
         height: radius1 * 2,
         padding: EdgeInsets.all(radius2 - radius3),
-        child: Center(
-          child: child,
-        ),
+        child: Center(child: child),
       ),
     );
   }

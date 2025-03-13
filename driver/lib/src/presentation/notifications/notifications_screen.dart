@@ -1,9 +1,8 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_app_tabbar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
-import 'package:internal_core/internal_core.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -31,30 +30,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appColorBackground,
-      appBar: AppBar(
-        backgroundColor: appColorPrimary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'Notifications'.tr(),
-          style: const TextStyle(color: Colors.white),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          tabs: [
-            Tab(text: 'News'.tr()),
-            Tab(text: 'Theo dõi'.tr()),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      appBar: AppBar(title: Text('Notifications'.tr())),
+      body: WidgetAppTabBar(
+        tabController: _tabController,
+        tabs: ['News'.tr(), 'Follow'.tr()],
         children: [
           _buildNewsList(),
           _buildFollowList(),
@@ -64,12 +43,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Widget _buildNewsList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(16.sw),
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
       itemCount: 10,
+      separatorBuilder: (context, index) => Gap(4.sw),
       itemBuilder: (context, index) {
         return Card(
-          margin: EdgeInsets.only(bottom: 12.sw),
+          color: Colors.white,
           child: Padding(
             padding: EdgeInsets.all(16.sw),
             child: Column(
@@ -107,12 +87,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Widget _buildFollowList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(16.sw),
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
       itemCount: 10,
+      separatorBuilder: (context, index) => Gap(4.sw),
       itemBuilder: (context, index) {
         return Card(
-          margin: EdgeInsets.only(bottom: 12.sw),
+          color: Colors.white,
           child: Padding(
             padding: EdgeInsets.all(16.sw),
             child: Column(

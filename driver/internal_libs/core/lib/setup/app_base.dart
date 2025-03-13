@@ -32,6 +32,7 @@ abstract class AppColorsBase {
   /// green
   Color get green1;
   Color get green2;
+  Color get darkGreen;
 
   /// grey
   Color get grey1;

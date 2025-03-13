@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 
 import 'widgets/widget_topup_sheet.dart';
@@ -155,33 +156,20 @@ class _WalletScreenState extends State<WalletScreen> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              'My Wallet'.tr(),
-              style: w500TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-              ),
-            ),
+            title: Text('My Wallet'.tr()),
             actions: [
               IconButton(
-                icon: Icon(
-                  Icons.settings,
-                  color: Colors.white,
-                  size: 24.sw,
-                ),
-                onPressed: () {},
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  // Todo:
+                },
               ),
+              Gap(4.sw),
             ],
           ),
           body: Column(
             children: [
-              const SizedBox(height: 32),
-              // Balance Section
+              Gap(32.sw),
               BlocBuilder<AuthCubit, AuthState>(
                 bloc: authCubit,
                 builder: (context, state) {
@@ -209,17 +197,13 @@ class _WalletScreenState extends State<WalletScreen> {
                           symbol: AppPrefs.instance.currencySymbol,
                           decimalDigits: 2,
                         ).format(state.wallet?.frozenBalance ?? 0),
-                        style: w400TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
+                        style: w400TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ],
                   );
                 },
               ),
-              const SizedBox(height: 30),
-              // Buttons Section
+              Gap(30.sw),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -251,7 +235,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    Gap(20.sw),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
@@ -282,8 +266,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-              // Transactions Section
+              Gap(30.sw),
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -324,7 +307,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
-                                        const SizedBox(width: 16),
+                                        Gap(16.sw),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
@@ -336,7 +319,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(4),
                                               ),
-                                              const SizedBox(height: 8),
+                                              Gap(8.sw),
                                               WidgetAppShimmer(
                                                 height: 14,
                                                 width: 80,
@@ -368,7 +351,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                           size: 64,
                                           color: Colors.grey[400],
                                         ),
-                                        const SizedBox(height: 16),
+                                        Gap(16.sw),
                                         Text(
                                           'Không có giao dịch nào',
                                           style: TextStyle(

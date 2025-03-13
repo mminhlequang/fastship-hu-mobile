@@ -5,7 +5,6 @@ import 'package:app/src/network_resources/auth/repo.dart';
 import 'package:app/src/network_resources/transaction/models/models.dart';
 import 'package:app/src/network_resources/transaction/repo.dart';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_network/network_resources/resources.dart';
@@ -26,9 +25,10 @@ class AuthCubit extends Cubit<AuthState> {
     // }
   }
 
-  load(
-      {Duration delayRedirect = const Duration(seconds: 1),
-      AccountModel? user}) async {
+  load({
+    Duration delayRedirect = const Duration(seconds: 1),
+    AccountModel? user,
+  }) async {
     try {
       if (user != null) {
         state.user = user;
@@ -82,7 +82,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   _redirect() {
     if (state.stateType == AuthStateType.logged) {
-      appContext.pushReplacement('/home');
+      appContext.pushReplacement('/order-detail');
       return;
       if ((AppPrefs.instance.user!.profile!.stepId ?? 1) < 5) {
         appContext.pushReplacement('/driver-register');

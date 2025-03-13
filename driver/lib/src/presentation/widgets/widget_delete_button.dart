@@ -69,7 +69,7 @@ class _WidgetDeleteButtonState extends State<WidgetDeleteButton> {
                           });
                         },
                         color: appColorElement,
-                        borderRadius: BorderRadius.circular(8),
+                        radius: 8,
                         child: Container(
                           width: 80,
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -84,7 +84,7 @@ class _WidgetDeleteButtonState extends State<WidgetDeleteButton> {
                       WidgetRippleButton(
                         onTap: widget.callback,
                         color: appColorText,
-                        borderRadius: BorderRadius.circular(8),
+                        radius: 8,
                         child: Container(
                           width: 80,
                           padding: const EdgeInsets.symmetric(vertical: 8),

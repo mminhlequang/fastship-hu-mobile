@@ -14,6 +14,7 @@ Color get appColorTextLabel => AppColors.instance.text.withOpacity(0.85);
 Color get appColorError => AppColors.instance.error;
 Color get green1 => AppColors.instance.green1;
 Color get green2 => AppColors.instance.green2;
+Color get darkGreen => AppColors.instance.darkGreen;
 Color get grey1 => AppColors.instance.grey1;
 Color get grey2 => AppColors.instance.grey2;
 Color get grey3 => AppColors.instance.grey3;
@@ -37,7 +38,8 @@ class AppColors extends AppColorsBase {
   Color get primary => appValueByTheme(hexColor('#74CA45'));
 
   @override
-  Color get background => appValueByTheme(Colors.white, kdark: Colors.black);
+  Color get background =>
+      appValueByTheme(hexColor('#F1F4F6'), kdark: Colors.black);
 
   @override
   Color get text => appValueByTheme(hexColor('#333333'), kdark: Colors.white);
@@ -50,6 +52,9 @@ class AppColors extends AppColorsBase {
 
   @override
   Color get green2 => appValueByTheme(hexColor('#3EB05C'));
+
+  @override
+  Color get darkGreen => appValueByTheme(hexColor('#4F9C24'));
 
   @override
   Color get grey1 => appValueByTheme(hexColor('#828282'));

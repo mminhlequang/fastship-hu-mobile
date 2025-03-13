@@ -1,4 +1,5 @@
 import 'package:app/src/presentation/auth/auth_screen.dart';
+import 'package:app/src/presentation/order_detail/order_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -187,6 +188,21 @@ final goRouter = GoRouter(
                     end: Offset.zero,
                   ).chain(CurveTween(curve: Curves.easeInOut)),
                 ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/order-detail',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const OrderDetailScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
                 child: child,
               );
             },

@@ -7,16 +7,10 @@ import 'package:app/src/presentation/widgets/widget_app_map.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
-import 'dart:convert';
-
-import 'widgets/test_socket.dart';
-import 'widgets/test_stripe.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,8 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   initialCenter: LatLng(37.7749, -122.4194),
                 ),
                 Positioned(
-                  left: 28,
-                  right: 28,
+                  left: 16,
+                  right: 16,
                   top: 20 + context.mediaQueryPadding.top,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,12 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 bool isOnline = socketController.isOnline;
                 return Container(
                   key: ValueKey(isOnline),
-                  decoration: BoxDecoration(
-                    color: appColorBackground,
-                    boxShadow: [],
-                  ),
-                  padding: EdgeInsets.fromLTRB(20.sw, 16.sw, 20.sw,
-                      12.sw + MediaQuery.paddingOf(context).bottom),
+                  width: context.width,
+                  color: Colors.white,
+                  padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw,
+                      16.sw + MediaQuery.paddingOf(context).bottom),
                   child: isOnline
                       ? SliderButton(
                           direction: DismissDirection.endToStart,
