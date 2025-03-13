@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
-import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 
 import 'internal_setup.dart';
@@ -16,20 +15,15 @@ import 'src/utils/utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    setPathUrlStrategy();
-  }
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
-    if (!kIsWeb) ...[
-      if (Platform.isAndroid)
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-            overlays: [SystemUiOverlay.top]),
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]),
-    ],
+    if (Platform.isAndroid)
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+          overlays: [SystemUiOverlay.top]),
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]),
     AppPrefs.instance.initialize(),
     initEasyLocalization(),
   ]);
@@ -38,7 +32,7 @@ void main() async {
   internalSetup();
   getItSetup();
 
-  if (kDebugMode) {
+  if (kDebugMode || true) {
     runApp(wrapEasyLocalization(child: const _App()));
   } else {
     // await SentryFlutter.init((options) {

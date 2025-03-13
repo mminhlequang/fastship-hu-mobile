@@ -3,6 +3,9 @@ import 'package:app/src/presentation/food_detail/cubit/food_detail_cubit.dart';
 import 'package:app/src/presentation/restaurant_detail/restaurant_detail_screen.dart';
 import 'package:app/src/presentation/restaurant_detail/cubit/restaurant_detail_cubit.dart';
 import 'package:app/src/presentation/splash/splash_screen.dart';
+import 'package:app/src/presentation/checkout/checkout_screen.dart';
+import 'package:app/src/presentation/checkout/cubit/checkout_cubit.dart';
+import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -62,6 +65,19 @@ final goRouter = GoRouter(
         return RestaurantDetailScreen(
           restaurantId: state.pathParameters['id'] ?? '',
         );
+      },
+    ),
+    // Thêm route cho trang checkout
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) {
+        // Đăng ký CheckoutCubit nếu chưa đăng ký
+        if (!getIt.isRegistered<CheckoutCubit>()) {
+          getIt.registerSingleton<CheckoutCubit>(
+            CheckoutCubit(cartCubit: getIt<CartCubit>()),
+          );
+        }
+        return const CheckoutScreen();
       },
     ),
   ],

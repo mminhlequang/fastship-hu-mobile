@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 
 import '../base/bloc.dart';
 import '../presentation/navigation/cubit/navigation_cubit.dart';
-
+import '../presentation/cart/cubit/cart_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -15,4 +15,5 @@ void getItSetup() {
       GlobalKey<NavigatorState>());
   getIt.registerSingleton<AuthCubit>(AuthCubit());
   getIt.registerSingleton<NavigationCubit>(NavigationCubit());
+  getIt.registerSingleton<CartCubit>(CartCubit());
 }
