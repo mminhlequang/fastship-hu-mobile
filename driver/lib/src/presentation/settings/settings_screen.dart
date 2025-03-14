@@ -20,87 +20,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            height: 244.sw + context.mediaQueryPadding.top,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(assetpng('setting_backgorund')),
-                fit: BoxFit.cover,
-              ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 20.sw),
-            child: SafeArea(
-              bottom: false,
-              child: Stack(
-                alignment: Alignment.topRight,
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              Column(
                 children: [
-                  Column(
-                    children: [
-                      Gap(context.mediaQueryPadding.top),
-                      Row(
-                        children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              WidgetAppSVG(
-                                assetsvg('avatar_border'),
-                                width: 66.sw,
-                                height: 66.sw,
-                              ),
-                              WidgetAvatar.withoutBorder(
-                                imageUrl: AppPrefs.instance.user?.avatar,
-                                radius: 56.sw / 2,
-                              )
-                            ],
-                          ),
-                          Gap(12.sw),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppPrefs.instance.user?.name ?? '',
-                                  style: w500TextStyle(
-                                      fontSize: 18.sw, color: Colors.white),
-                                ),
-                                Gap(4.sw),
-                                Text(
-                                  AppPrefs.instance.user?.phone ?? '',
-                                  style: w300TextStyle(
-                                      fontSize: 16.sw, color: Colors.white),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      Spacer(),
-                      WidgetWallet(
-                        onTap: () {
-                          appHaptic();
-                          context.push('/wallet');
-                        },
-                      ),
-                      Gap(20.sw),
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16.sw),
-                    child: GestureDetector(
-                      onTap: () {
-                        appHaptic();
-                        context.pop();
-                      },
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: 28.sw,
-                        color: Colors.white,
+                  Container(
+                    height: 236.sw + context.mediaQueryPadding.top,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(assetpng('setting_backgorund')),
+                        fit: BoxFit.fill,
                       ),
                     ),
-                  )
+                    padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Gap(context.mediaQueryPadding.top + 40.sw),
+                              Row(
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      WidgetAppSVG(
+                                        assetsvg('avatar_border'),
+                                        width: 66.sw,
+                                        height: 66.sw,
+                                      ),
+                                      WidgetAvatar.withoutBorder(
+                                        imageUrl: AppPrefs.instance.user?.avatar,
+                                        radius: 56.sw / 2,
+                                      )
+                                    ],
+                                  ),
+                                  Gap(12.sw),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          AppPrefs.instance.user?.name ?? '',
+                                          style: w500TextStyle(
+                                              fontSize: 18.sw, color: Colors.white),
+                                        ),
+                                        Gap(4.sw),
+                                        Text(
+                                          AppPrefs.instance.user?.phone ?? '',
+                                          style: w300TextStyle(
+                                              fontSize: 16.sw, color: Colors.white),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 12.sw),
+                            child: CloseButton(
+                              color: Colors.white,
+                              style: ButtonStyle(
+                                  iconSize: WidgetStateProperty.resolveWith(
+                                          (_) => 28.sw)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(height: 30.sw, color: Colors.white),
                 ],
               ),
-            ),
+              Positioned(
+                left: 16.sw,
+                right: 16.sw,
+                child: WidgetWallet(
+                  onTap: () {
+                    appHaptic();
+                    context.push('/wallet');
+                  },
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: ColoredBox(

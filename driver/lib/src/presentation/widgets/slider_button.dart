@@ -8,6 +8,7 @@ class SliderButton extends StatefulWidget {
 
   ///Sets the radius of corners of a button.
   final double radius;
+  final BoxBorder? border;
 
   ///Use it to define a height and width of widget.
   final double height;
@@ -50,6 +51,7 @@ class SliderButton extends StatefulWidget {
   SliderButton({
     required this.action,
     this.radius = 100,
+    this.border,
     this.boxShadow,
     this.child,
     this.vibrationFlag = false,
@@ -92,9 +94,10 @@ class _SliderButtonState extends State<SliderButton> {
         height: widget.height,
         width: widget.width,
         decoration: BoxDecoration(
-            color:
-                widget.disable ? Colors.grey.shade700 : widget.backgroundColor,
-            borderRadius: BorderRadius.circular(widget.radius)),
+          color: widget.disable ? Colors.grey.shade700 : widget.backgroundColor,
+          borderRadius: BorderRadius.circular(widget.radius),
+          border: widget.border,
+        ),
         alignment: Alignment.centerLeft,
         child: Stack(
           alignment: widget.direction == DismissDirection.startToEnd

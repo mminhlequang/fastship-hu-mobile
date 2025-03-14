@@ -89,7 +89,11 @@ class _AppState extends State<_App> {
           appBarTheme: AppBarTheme(
             backgroundColor: appColorPrimary,
             centerTitle: true,
-            titleTextStyle: w500TextStyle(fontSize: 18.sw, color: Colors.white),
+            titleTextStyle: w500TextStyle(
+              fontSize: 18.sw,
+              color: Colors.white,
+              height: 24 / 18,
+            ),
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),

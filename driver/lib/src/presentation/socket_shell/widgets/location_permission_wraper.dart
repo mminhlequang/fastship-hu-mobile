@@ -1,6 +1,10 @@
+import 'package:app/src/constants/app_colors.dart';
+import 'package:app/src/constants/app_sizes.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LocationPermissionWrapper extends StatefulWidget {
   final Widget child;
@@ -42,7 +46,6 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
     }
 
     if (status.isPermanentlyDenied) {
-      // Hiển thị dialog gợi ý mở cài đặt
       await _showOpenSettingsDialog();
       return false;
     }
@@ -51,57 +54,161 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
   }
 
   Future<bool?> _showPermissionExplanationDialog() async {
-    return await showDialog<bool>(
+    return await showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.location_on, color: Colors.blue, size: 24),
-            SizedBox(width: 8),
-            Text('Quyền vị trí'),
-          ],
-        ),
-        content: const Text(
-          'Ứng dụng cần quyền truy cập vị trí để cập nhật vị trí của bạn và nhận đơn hàng gần đó. Nếu không có quyền này, ứng dụng sẽ không thể hoạt động đúng.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Từ chối'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Đồng ý'),
-          ),
-        ],
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(context),
+        duration: const Duration(milliseconds: 300),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+              16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 36.sw,
+                backgroundColor: hexColor('#74CA45').withValues(alpha: .25),
+                child: WidgetAppSVG('ic_redirect'),
+              ),
+              Gap(32.sw),
+              Text(
+                'Allow Location Access'.tr(),
+                style: w700TextStyle(fontSize: 20.sw),
+              ),
+              Gap(8.sw),
+              Text(
+                'You’ll need to give Fast Ship permissiom to always use your location to get notifications about order near you'
+                    .tr(),
+                style: w400TextStyle(fontSize: 16.sw),
+                textAlign: TextAlign.center,
+              ),
+              Gap(32.sw),
+              WidgetRippleButton(
+                onTap: () => Navigator.pop(context, true),
+                color: appColorPrimary,
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'Continue'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Gap(8.sw),
+              WidgetRippleButton(
+                onTap: () => Navigator.pop(context, false),
+                borderSide: BorderSide(color: appColorPrimary),
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'Not now'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: appColorPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Future<void> _showOpenSettingsDialog() async {
-    await showDialog<bool>(
+    await showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Quyền vị trí đã bị từ chối'),
-        content: const Text(
-          'Quyền vị trí là cực kỳ quan trọng để ứng dụng hoạt động. Bạn cần mở cài đặt để cấp quyền vị trí cho ứng dụng.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              openAppSettings();
-            },
-            child: const Text('Mở cài đặt'),
-          ),
-        ],
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(context),
+        duration: const Duration(milliseconds: 300),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+              16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 36.sw,
+                backgroundColor: hexColor('#74CA45').withValues(alpha: .25),
+                child: WidgetAppSVG('ic_redirect'),
+              ),
+              Gap(32.sw),
+              Text(
+                'Your location'.tr(),
+                style: w700TextStyle(fontSize: 20.sw),
+              ),
+              Gap(8.sw),
+              Text(
+                'To center the map on your current location, update your setting to “always” or “while using”.'
+                    .tr(),
+                style: w400TextStyle(fontSize: 16.sw),
+                textAlign: TextAlign.center,
+              ),
+              Gap(32.sw),
+              WidgetRippleButton(
+                onTap: () {
+                  Navigator.pop(context);
+                  openAppSettings();
+                },
+                color: appColorPrimary,
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'Go to settings'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Gap(8.sw),
+              WidgetRippleButton(
+                onTap: () => Navigator.pop(context),
+                borderSide: BorderSide(color: appColorPrimary),
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'No, thanks'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: appColorPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -36,7 +36,7 @@ class AppColors extends AppColorsBase {
   static AppColors get instance => _instance;
 
   @override
-  Color get primary => appValueByTheme(hexColor('#74CA45'));
+  Color get primary => appValueByTheme(hexColor('#5CC23C'));
 
   @override
   Color get background => appValueByTheme(hexColor('#F1F4F6'), kdark: Colors.black);

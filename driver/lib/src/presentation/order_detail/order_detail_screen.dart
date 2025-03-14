@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -16,11 +17,13 @@ class OrderDetailScreen extends StatefulWidget {
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
-class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTickerProviderStateMixin {
+class _OrderDetailScreenState extends State<OrderDetailScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool isLate = false; // Muộn giao hàng
   bool isCanceled = false; // Đơn hàng bị huỷ
   int step = 1;
+  int? selectedReason;
 
   @override
   void initState() {
@@ -54,8 +57,115 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
     appContext.push('/order-detail/chat');
   }
 
+  List<String> reasons = [
+    'Người nhận hẹn giao lại sau',
+    'Không liên hệ được người nhận',
+    'Người nhận muốn huỷ đơn/ thay đổi địa chỉ',
+    'Bận việc cá nhân',
+    'Kẹt xe',
+    'Khác',
+  ];
+
   _onRefuse() {
-    // Todo:
+    setState(() {
+      selectedReason = null;
+    });
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(context),
+        duration: const Duration(milliseconds: 300),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16.sw, 4.sw, 6.sw, 4.sw),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Refusal reason'.tr(),
+                        style: w600TextStyle(fontSize: 16.sw),
+                      ),
+                      const CloseButton(),
+                    ],
+                  ),
+                ),
+                const AppDivider(),
+                ...List.generate(
+                  reasons.length,
+                  (index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 0.sw),
+                            child: RadioListTile(
+                              title: Text(
+                                reasons[index],
+                                style: w400TextStyle(fontSize: 16.sw),
+                              ),
+                              dense: true,
+                              activeColor: appColorPrimary,
+                              visualDensity: VisualDensity(horizontal: -4),
+                              contentPadding: EdgeInsets.zero,
+                              value: index,
+                              groupValue: selectedReason,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedReason = value;
+                                });
+                              },
+                            ),
+                          ),
+                          if (index != reasons.length - 1) const AppDivider(),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const AppDivider(),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw,
+                      16.sw + context.mediaQueryPadding.bottom),
+                  child: WidgetRippleButton(
+                    onTap: selectedReason == null
+                        ? null
+                        : () {
+                            // Todo:
+                          },
+                    color: selectedReason == null ? grey8 : appColorPrimary,
+                    child: SizedBox(
+                      height: 48.sw,
+                      child: Center(
+                        child: Text(
+                          'Confirm'.tr(),
+                          style: w500TextStyle(
+                            fontSize: 16.sw,
+                            color:
+                                selectedReason == null ? grey1 : Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -95,7 +205,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
                             Gap(6.sw),
                             Text(
                               'Điện thoại'.tr(),
-                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
                           ],
                         ),
@@ -140,7 +251,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
                             Gap(6.sw),
                             Text(
                               'Chat'.tr(),
-                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
                           ],
                         ),
@@ -158,7 +270,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
                             Gap(6.sw),
                             Text(
                               'Từ chối'.tr(),
-                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
                           ],
                         ),
@@ -175,12 +288,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
             child: Container(
               width: context.width,
               color: Colors.white,
-              padding: EdgeInsets.fromLTRB(
-                  16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
+              padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
+                  16.sw + MediaQuery.paddingOf(context).bottom),
               child: SliderButton(
                 action: () async {
                   setState(() {
-                    step++;
+                    if (step < 4) {
+                      step++;
+                    } else {
+                      appContext.push('/order-detail/report-order');
+                    }
                   });
                   return false;
                 },
@@ -288,7 +405,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
             ),
           ),
           if (!isCanceled) ...[
-            AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
+            AppDivider(
+                height: 5.sw, thickness: 5.sw, color: appColorBackground),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 7.sw),
               child: Row(
@@ -665,7 +783,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
                     ),
                   ),
                 )
-              : AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
+              : AppDivider(
+                  height: 5.sw, thickness: 5.sw, color: appColorBackground),
           Padding(
             padding: EdgeInsets.fromLTRB(16.sw, 8.sw, 16.sw, 0),
             child: Column(

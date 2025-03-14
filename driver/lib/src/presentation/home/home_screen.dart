@@ -7,10 +7,11 @@ import 'package:app/src/presentation/widgets/widget_app_map.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,112 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _checkNotificationPermission());
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+
+    if (status.isGranted) {
+      return;
+    }
+
+    final bool? userResponse = await _showPermissionExplanationDialog();
+
+    if (userResponse == true) {
+      await Permission.notification.request();
+    }
+  }
+
+  Future<bool?> _showPermissionExplanationDialog() async {
+    return await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(context),
+        duration: const Duration(milliseconds: 300),
+      ),
+      builder: (context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: 24.sw + context.mediaQueryPadding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 255.sw,
+                color: hexColor('#EFF0F4'),
+              ),
+              Gap(24.sw),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                child: Text(
+                  'Don’t miss anything'.tr(),
+                  style: w700TextStyle(fontSize: 20.sw),
+                ),
+              ),
+              Gap(8.sw),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                child: Text(
+                  'You will receive push notification from Fast Ship like News and Balance alert.'
+                      .tr(),
+                  style: w400TextStyle(fontSize: 16.sw),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Gap(32.sw),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                child: WidgetRippleButton(
+                  onTap: () => Navigator.pop(context, true),
+                  color: appColorPrimary,
+                  child: SizedBox(
+                    height: 48.sw,
+                    child: Center(
+                      child: Text(
+                        'Turn on Notification'.tr(),
+                        style: w500TextStyle(
+                          fontSize: 16.sw,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Gap(8.sw),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                child: WidgetRippleButton(
+                  onTap: () => Navigator.pop(context, false),
+                  borderSide: BorderSide(color: appColorPrimary),
+                  child: SizedBox(
+                    height: 48.sw,
+                    child: Center(
+                      child: Text(
+                        'Not now'.tr(),
+                        style: w500TextStyle(
+                          fontSize: 16.sw,
+                          color: appColorPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -107,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   key: ValueKey(isOnline),
                   width: context.width,
                   color: Colors.white,
-                  padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw,
+                  padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
                       16.sw + MediaQuery.paddingOf(context).bottom),
                   child: isOnline
                       ? SliderButton(
@@ -118,30 +225,33 @@ class _HomeScreenState extends State<HomeScreen> {
                             setState(() {});
                             return true;
                           },
-
-                          ///Put label over here
                           label: Text(
                             "Go offline".tr(),
-                            style: w400TextStyle(fontSize: 20.sw),
+                            style: w500TextStyle(
+                              fontSize: 18.sw,
+                              color: darkGreen,
+                            ),
                           ),
                           icon: Center(
                             child: Icon(
                               Icons.arrow_back_rounded,
-                              color: hexColor('F58737'),
-                              size: 32.sw,
+                              color: Colors.white,
+                              size: 24.sw,
                             ),
                           ),
-
-                          ///Change All the color and size from here.
-                          height: 56.sw,
-                          buttonSize: 48.sw,
-                          width: context.width - 40.sw,
-                          radius: 12.sw,
+                          height: 48.sw,
+                          buttonSize: 40.sw,
+                          width: context.width,
+                          radius: 99.sw,
+                          border: Border.all(
+                              color: appColorPrimary.withValues(alpha: .23)),
                           alignLabel: Alignment.center,
-                          buttonColor: Colors.white,
-                          backgroundColor: hexColor('F58737'),
-                          highlightedColor: hexColor('F58737'),
+                          buttonColor: appColorPrimary,
+                          backgroundColor:
+                              appColorPrimary.withValues(alpha: .2),
+                          highlightedColor: darkGreen,
                           baseColor: Colors.white,
+                          shimmer: false,
                         )
                       : SliderButton(
                           action: () async {
@@ -154,21 +264,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ///Put label over here
                           label: Text(
                             "Go online".tr(),
-                            style: w400TextStyle(fontSize: 20.sw),
+                            style: w500TextStyle(
+                              fontSize: 18.sw,
+                              color: Colors.white,
+                            ),
                           ),
                           icon: Center(
                             child: Icon(
                               Icons.arrow_forward_rounded,
                               color: appColorPrimary,
-                              size: 32.sw,
+                              size: 24.sw,
                             ),
                           ),
 
                           ///Change All the color and size from here.
-                          height: 56.sw,
-                          buttonSize: 48.sw,
-                          width: context.width - 40.sw,
-                          radius: 12.sw,
+                          height: 48.sw,
+                          buttonSize: 40.sw,
+                          width: context.width,
+                          radius: 99.sw,
                           alignLabel: Alignment.center,
                           buttonColor: Colors.white,
                           backgroundColor: appColorPrimary,
