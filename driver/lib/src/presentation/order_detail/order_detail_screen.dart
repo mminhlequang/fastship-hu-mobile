@@ -1,9 +1,11 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/app_go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -48,6 +50,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
     }
   }
 
+  _onChat() {
+    appContext.push('/order-detail/chat');
+  }
+
+  _onRefuse() {
+    // Todo:
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,134 +76,136 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
             ),
           ),
           AppDivider(color: appColorBackground),
-          SizedBox(
-            height: 61.sw,
-            child: Row(
-              children: [
-                Expanded(
-                  child: WidgetRippleButton(
-                    onTap: _onPhoneCall,
-                    radius: 0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        WidgetAppSVG('ic_calling'),
-                        Gap(6.sw),
-                        Text(
-                          'Điện thoại'.tr(),
-                          style: w400TextStyle(fontSize: 12.sw, color: grey1),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(width: 1.sw, color: appColorBackground),
-                Expanded(
-                  child: WidgetRippleButton(
-                    onTap: () {
-                      // Todo:
-                    },
-                    radius: 0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
+          IgnorePointer(
+            ignoring: isCanceled,
+            child: Opacity(
+              opacity: isCanceled ? .5 : 1,
+              child: SizedBox(
+                height: 61.sw,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: WidgetRippleButton(
+                        onTap: _onPhoneCall,
+                        radius: 0,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            WidgetAppSVG('ic_message'),
-                            Positioned(
-                              top: -4.sw,
-                              right: -6.sw,
-                              child: Container(
-                                height: 16.sw,
-                                width: 16.sw,
-                                decoration: BoxDecoration(
-                                  color: appColorPrimary,
-                                  border: Border.all(color: Colors.white),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '2',
-                                    style: w400TextStyle(
-                                      fontSize: 10.sw,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            WidgetAppSVG('ic_calling'),
+                            Gap(6.sw),
+                            Text(
+                              'Điện thoại'.tr(),
+                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
                           ],
                         ),
-                        Gap(6.sw),
-                        Text(
-                          'Chat'.tr(),
-                          style: w400TextStyle(fontSize: 12.sw, color: grey1),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Container(width: 1.sw, color: appColorBackground),
-                Expanded(
-                  child: WidgetRippleButton(
-                    onTap: () {
-                      // Todo:
-                    },
-                    radius: 0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        WidgetAppSVG('ic_close'),
-                        Gap(6.sw),
-                        Text(
-                          'Từ chối'.tr(),
-                          style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                    Container(width: 1.sw, color: appColorBackground),
+                    Expanded(
+                      child: WidgetRippleButton(
+                        onTap: _onChat,
+                        radius: 0,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                WidgetAppSVG('ic_message'),
+                                Positioned(
+                                  top: -4.sw,
+                                  right: -6.sw,
+                                  child: Container(
+                                    height: 16.sw,
+                                    width: 16.sw,
+                                    decoration: BoxDecoration(
+                                      color: appColorPrimary,
+                                      border: Border.all(color: Colors.white),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '2',
+                                        style: w400TextStyle(
+                                          fontSize: 10.sw,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Gap(6.sw),
+                            Text(
+                              'Chat'.tr(),
+                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Container(width: 1.sw, color: appColorBackground),
+                    Expanded(
+                      child: WidgetRippleButton(
+                        onTap: _onRefuse,
+                        radius: 0,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            WidgetAppSVG('ic_close'),
+                            Gap(6.sw),
+                            Text(
+                              'Từ chối'.tr(),
+                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           AppDivider(color: appColorBackground),
-          Container(
-            width: context.width,
-            color: Colors.white,
-            padding: EdgeInsets.fromLTRB(
-                16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
-            child: SliderButton(
-              action: () async {
-                setState(() {
-                  step++;
-                });
-                return false;
-              },
-
-              ///Put label over here
-              label: Text(
-                stepText,
-                style: w400TextStyle(fontSize: 20.sw),
-              ),
-              icon: Center(
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: appColorPrimary,
-                  size: 32.sw,
+          IgnorePointer(
+            ignoring: isCanceled,
+            child: Container(
+              width: context.width,
+              color: Colors.white,
+              padding: EdgeInsets.fromLTRB(
+                  16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
+              child: SliderButton(
+                action: () async {
+                  setState(() {
+                    step++;
+                  });
+                  return false;
+                },
+                label: Text(
+                  stepText,
+                  style: w500TextStyle(fontSize: 18.sw, color: Colors.white),
                 ),
+                icon: Center(
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: isCanceled ? grey9 : appColorPrimary,
+                    size: 24.sw,
+                  ),
+                ),
+                height: 48.sw,
+                buttonSize: 40.sw,
+                width: context.width,
+                radius: 8.sw,
+                alignLabel: Alignment.center,
+                buttonColor: Colors.white,
+                backgroundColor: isCanceled ? grey9 : appColorPrimary,
+                highlightedColor: appColorPrimary,
+                baseColor: Colors.white,
+                shimmer: !isCanceled,
               ),
-
-              ///Change All the color and size from here.
-              height: 56.sw,
-              buttonSize: 48.sw,
-              width: context.width - 40.sw,
-              radius: 12.sw,
-              alignLabel: Alignment.center,
-              buttonColor: Colors.white,
-              backgroundColor: appColorPrimary,
-              highlightedColor: appColorPrimary,
-              baseColor: Colors.white,
             ),
           ),
         ],
@@ -275,41 +287,53 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTicker
               ],
             ),
           ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 7.sw),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                WidgetAppSVG('ic_timer'),
-                Gap(4.sw),
-                Text.rich(
-                  isLate
-                      ? TextSpan(
-                          text: 'Late'.tr(),
-                          style: w400TextStyle(),
-                          children: [
-                            TextSpan(
-                              text: ' 44 minutes',
-                              style: w400TextStyle(color: appColorError),
-                            ),
-                          ],
-                        )
-                      : TextSpan(
-                          text: '44 minutes',
-                          style: w400TextStyle(color: darkGreen),
-                          children: [
-                            TextSpan(
-                              text: ' ${'left to deliver'.tr()}',
-                              style: w400TextStyle(color: appColorText),
-                            ),
-                          ],
-                        ),
-                ),
-              ],
+          if (!isCanceled) ...[
+            AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 7.sw),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  WidgetAppSVG('ic_timer'),
+                  Gap(4.sw),
+                  Text.rich(
+                    isLate
+                        ? TextSpan(
+                            text: 'Late'.tr(),
+                            style: w400TextStyle(),
+                            children: [
+                              TextSpan(
+                                text: ' 44 minutes',
+                                style: w400TextStyle(color: appColorError),
+                              ),
+                            ],
+                          )
+                        : TextSpan(
+                            text: '44 minutes',
+                            style: w400TextStyle(color: darkGreen),
+                            children: [
+                              TextSpan(
+                                text: ' ${'left to deliver'.tr()}',
+                                style: w400TextStyle(color: appColorText),
+                              ),
+                            ],
+                          ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
+            AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground)
+          ] else
+            Container(
+              color: appColorBackground,
+              padding: EdgeInsets.symmetric(vertical: 8.sw),
+              child: Center(
+                child: Text(
+                  'Order canceled'.tr(),
+                  style: w400TextStyle(),
+                ),
+              ),
+            ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
             child: Row(

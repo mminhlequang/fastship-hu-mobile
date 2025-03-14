@@ -23,6 +23,7 @@ Color get grey5 => AppColors.instance.grey5;
 Color get grey6 => AppColors.instance.grey6;
 Color get grey7 => AppColors.instance.grey7;
 Color get grey8 => AppColors.instance.grey8;
+Color get grey9 => AppColors.instance.grey9;
 Color get yellow1 => AppColors.instance.yellow1;
 Color get orange1 => AppColors.instance.orange1;
 Color get blue1 => AppColors.instance.blue1;
@@ -38,8 +39,7 @@ class AppColors extends AppColorsBase {
   Color get primary => appValueByTheme(hexColor('#74CA45'));
 
   @override
-  Color get background =>
-      appValueByTheme(hexColor('#F1F4F6'), kdark: Colors.black);
+  Color get background => appValueByTheme(hexColor('#F1F4F6'), kdark: Colors.black);
 
   @override
   Color get text => appValueByTheme(hexColor('#333333'), kdark: Colors.white);
@@ -81,6 +81,9 @@ class AppColors extends AppColorsBase {
   Color get grey8 => appValueByTheme(hexColor('#F2F2F2'));
 
   @override
+  Color get grey9 => appValueByTheme(hexColor('#BDBDBD'));
+
+  @override
   Color get yellow1 => appValueByTheme(hexColor('#F8C435'));
 
   @override
@@ -90,8 +93,7 @@ class AppColors extends AppColorsBase {
   Color get blue1 => appValueByTheme(hexColor('#0085FF'));
 
   @override
-  Color get element =>
-      appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
+  Color get element => appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
 
   @override
   Color get shimmerHighlightColor => appValueByTheme(hexColor('#fafafa'));
