@@ -64,6 +64,10 @@
 	<string>Allow access to camera</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Allow access to contacts</string>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>tel</string>
+    </array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Allow access to authentication using face id</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key});
@@ -13,9 +14,10 @@ class OrderDetailScreen extends StatefulWidget {
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
-class _OrderDetailScreenState extends State<OrderDetailScreen>
-    with SingleTickerProviderStateMixin {
+class _OrderDetailScreenState extends State<OrderDetailScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool isLate = false; // Muộn giao hàng
+  bool isCanceled = false; // Đơn hàng bị huỷ
   int step = 1;
 
   @override
@@ -36,6 +38,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
         3 => 'Đã giao'.tr(),
         _ => 'Cập nhật hình ảnh'.tr(),
       };
+
+  Future<void> _onPhoneCall() async {
+    var url = Uri.parse('tel:+36 9830268966');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      print('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +72,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
               children: [
                 Expanded(
                   child: WidgetRippleButton(
-                    onTap: () {
-                      // Todo:
-                    },
+                    onTap: _onPhoneCall,
                     radius: 0,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -152,8 +161,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
           Container(
             width: context.width,
             color: Colors.white,
-            padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
-                16.sw + MediaQuery.paddingOf(context).bottom),
+            padding: EdgeInsets.fromLTRB(
+                16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
             child: SliderButton(
               action: () async {
                 setState(() {
@@ -275,27 +284,27 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 WidgetAppSVG('ic_timer'),
                 Gap(4.sw),
                 Text.rich(
-                  // trường hợp muộn
-                  // TextSpan(
-                  //   text: 'Late'.tr(),
-                  //   style: w400TextStyle(),
-                  //   children: [
-                  //     TextSpan(
-                  //       text: ' 44 minutes',
-                  //       style: w400TextStyle(color: appColorError),
-                  //     ),
-                  //   ],
-                  // ),
-                  TextSpan(
-                    text: '44 minutes',
-                    style: w400TextStyle(color: darkGreen),
-                    children: [
-                      TextSpan(
-                        text: ' ${'left to deliver'.tr()}',
-                        style: w400TextStyle(color: appColorText),
-                      ),
-                    ],
-                  ),
+                  isLate
+                      ? TextSpan(
+                          text: 'Late'.tr(),
+                          style: w400TextStyle(),
+                          children: [
+                            TextSpan(
+                              text: ' 44 minutes',
+                              style: w400TextStyle(color: appColorError),
+                            ),
+                          ],
+                        )
+                      : TextSpan(
+                          text: '44 minutes',
+                          style: w400TextStyle(color: darkGreen),
+                          children: [
+                            TextSpan(
+                              text: ' ${'left to deliver'.tr()}',
+                              style: w400TextStyle(color: appColorText),
+                            ),
+                          ],
+                        ),
                 ),
               ],
             ),
@@ -621,16 +630,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
               ],
             ),
           ),
-          Container(
-            color: appColorBackground,
-            padding: EdgeInsets.symmetric(vertical: 8.sw),
-            child: Center(
-              child: Text(
-                'Order canceled'.tr(),
-                style: w400TextStyle(),
-              ),
-            ),
-          ),
+          isCanceled
+              ? Container(
+                  color: appColorBackground,
+                  padding: EdgeInsets.symmetric(vertical: 8.sw),
+                  child: Center(
+                    child: Text(
+                      'Order canceled'.tr(),
+                      style: w400TextStyle(),
+                    ),
+                  ),
+                )
+              : AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
           Padding(
             padding: EdgeInsets.fromLTRB(16.sw, 8.sw, 16.sw, 0),
             child: Column(
