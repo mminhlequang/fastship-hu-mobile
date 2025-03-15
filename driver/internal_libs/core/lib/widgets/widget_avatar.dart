@@ -53,7 +53,7 @@ class WidgetAvatar extends StatelessWidget {
       errorWidget: CircleAvatar(
         backgroundColor: Colors.transparent,
         backgroundImage: AssetImage(
-          errorAsset ?? assetjpg('defaultavatar'),
+          errorAsset ?? assetpng('defaultavatar'),
           package: errorAsset != null ? null : '_private_core',
         ),
       ),
@@ -70,8 +70,7 @@ class WidgetAvatar extends StatelessWidget {
         decoration: BoxDecoration(
             color: backgroundColor,
             border: Border.all(
-                width: radius1 - radius2,
-                color: borderColor ?? appColors?.text ?? Colors.white),
+                width: radius1 - radius2, color: borderColor ?? appColors?.text ?? Colors.white),
             shape: BoxShape.circle),
         width: radius1 * 2,
         height: radius1 * 2,

@@ -1,11 +1,62 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 
 import 'widgets/widget_wallet.dart';
+
+enum SettingsItem {
+  myProfile,
+  status,
+  notifications,
+  incomeStatistics,
+  customerReviews,
+  changePassword,
+  vehicles,
+  helpCenter,
+  deleteAccount,
+  logout;
+
+  String get title => switch (this) {
+        myProfile => 'My profile'.tr(),
+        status => 'Status'.tr(),
+        notifications => 'Notifications'.tr(),
+        incomeStatistics => 'Income statistics'.tr(),
+        customerReviews => 'Customer’s reviews'.tr(),
+        changePassword => 'Change password'.tr(),
+        vehicles => 'Vehicles'.tr(),
+        helpCenter => 'Help center'.tr(),
+        deleteAccount => 'Delete account'.tr(),
+        logout => 'Log out'.tr(),
+      };
+
+  String get icon => switch (this) {
+        myProfile => assetsvg('ic_my_profile'),
+        status => assetsvg('ic_status'),
+        notifications => assetsvg('ic_notification'),
+        incomeStatistics => assetsvg('ic_income_statistics'),
+        customerReviews => assetsvg('ic_review'),
+        changePassword => assetsvg('ic_lock'),
+        vehicles => assetsvg('ic_vehicle'),
+        helpCenter => assetsvg('ic_support'),
+        deleteAccount => assetsvg('ic_delete_acc'),
+        logout => assetsvg('ic_logout'),
+      };
+
+  String? get route => switch (this) {
+        myProfile => '',
+        incomeStatistics => '/statistics',
+        customerReviews => '',
+        changePassword => '',
+        vehicles => '',
+        helpCenter => '/help-center',
+        _ => null,
+      };
+}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,9 +66,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  bool status = true;
+  bool notifications = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Stack(
@@ -27,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Column(
                 children: [
                   Container(
-                    height: 236.sw + context.mediaQueryPadding.top,
+                    height: 230.sw + context.mediaQueryPadding.top,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(assetpng('setting_backgorund')),
@@ -43,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Gap(context.mediaQueryPadding.top + 40.sw),
+                              Gap(context.mediaQueryPadding.top + 36.sw),
                               Row(
                                 children: [
                                   Stack(
@@ -57,6 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       WidgetAvatar.withoutBorder(
                                         imageUrl: AppPrefs.instance.user?.avatar,
                                         radius: 56.sw / 2,
+                                        errorAsset: assetpng('defaultavatar'),
                                       )
                                     ],
                                   ),
@@ -67,14 +123,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       children: [
                                         Text(
                                           AppPrefs.instance.user?.name ?? '',
-                                          style: w500TextStyle(
-                                              fontSize: 18.sw, color: Colors.white),
+                                          style:
+                                              w500TextStyle(fontSize: 18.sw, color: Colors.white),
                                         ),
                                         Gap(4.sw),
                                         Text(
                                           AppPrefs.instance.user?.phone ?? '',
-                                          style: w300TextStyle(
-                                              fontSize: 16.sw, color: Colors.white),
+                                          style:
+                                              w300TextStyle(fontSize: 16.sw, color: Colors.white),
                                         )
                                       ],
                                     ),
@@ -89,8 +145,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: CloseButton(
                               color: Colors.white,
                               style: ButtonStyle(
-                                  iconSize: WidgetStateProperty.resolveWith(
-                                          (_) => 28.sw)),
+                                iconSize: WidgetStateProperty.resolveWith((_) => 24.sw),
+                              ),
                             ),
                           ),
                         ],
@@ -113,70 +169,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           Expanded(
-            child: ColoredBox(
-              color: AppColors.instance.grey6,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildButton('Statistics', 'wallet', () {
-                      appHaptic();
-                      context.push('/statistics');
-                    }),
-                    _divider(),
-                    _buildButton('Help Center', 'wallet', () {
-                      appHaptic();
-                      context.push('/help-center');
-                    }),
-                    _divider(),
-                    _buildButton('My Wallet', 'wallet', () {
-                      appHaptic();
-                      context.push('/wallet');
-                    }),
-                  ],
-                ),
-              ),
+            child: ListView.separated(
+              padding: EdgeInsets.zero,
+              itemCount: SettingsItem.values.length,
+              separatorBuilder: (context, index) => const AppDivider(),
+              itemBuilder: (context, index) {
+                final item = SettingsItem.values[index];
+                return WidgetRippleButton(
+                  onTap: () {
+                    // Todo:
+                  },
+                  radius: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.sw),
+                    child: Row(
+                      children: [
+                        WidgetAppSVG(item.icon),
+                        Gap(8.sw),
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: w400TextStyle(fontSize: 16.sw),
+                          ),
+                        ),
+                        if (item.route != null) WidgetAppSVG('chevron_right'),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _divider() {
-    return Divider(
-      height: 1.sw,
-      color: hexColor('F2F2F2'),
-    );
-  }
-
-  Widget _buildButton(String title, String icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 16.sw, horizontal: 20.sw),
-        child: Row(
-          children: [
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 24.sw,
-              color: AppColors.instance.grey4,
-            ),
-            Gap(8.sw),
-            Expanded(
-              child: Text(
-                title,
-                style: w400TextStyle(fontSize: 16.sw, color: appColorText),
-              ),
-            ),
-            Gap(8.sw),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 20.sw,
-              color: AppColors.instance.grey4,
-            ),
-          ],
-        ),
       ),
     );
   }
