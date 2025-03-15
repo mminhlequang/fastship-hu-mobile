@@ -11,6 +11,7 @@ class FoodScreen extends StatefulWidget {
 }
 
 class _FoodScreenState extends State<FoodScreen> {
+  FoodCubit get foodCubit => context.read<FoodCubit>();
   @override
   void initState() {
     super.initState();

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../utils/utils.dart';
 
-Color get appColorBackground => AppColors.instance.background;
+// Color get appColorBackground => AppColors.instance.background;
 
-Color get appColorElement => AppColors.instance.element;
+// Color get appColorElement => AppColors.instance.element;
 
-Color get appColorPrimary => AppColors.instance.primary;
+// Color get appColorPrimary => AppColors.instance.primary;
 
-Color get appColorText => AppColors.instance.text;
+// Color get appColorText => AppColors.instance.text;
 
 class AppColors extends AppColorsBase {
   AppColors._();

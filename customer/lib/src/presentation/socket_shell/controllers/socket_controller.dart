@@ -46,12 +46,9 @@ class CustomerSocketController {
   Map<String, dynamic>? get driverLocation => _driverLocation;
   Map<String, dynamic>? get driverInfo => _driverInfo;
 
-  CustomerSocketController() {
-    debugPrint('Debug socket: Khởi tạo CustomerSocketController');
-    _initializeSocket();
-  }
+   
 
-  void _initializeSocket() {
+  void initializeSocket() {
     try {
       debugPrint('Debug socket: Bắt đầu khởi tạo socket');
       socket = IO.io(

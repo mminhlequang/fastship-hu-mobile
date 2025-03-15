@@ -4,6 +4,13 @@ import 'package:internal_core/internal_core.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:app/src/presentation/home/cubit/home_cubit.dart';
+import 'package:app/src/network_resources/common/model/category.dart';
+import 'package:app/src/network_resources/common/model/shop.dart';
+import 'package:app/src/network_resources/common/model/food.dart';
+import 'package:app/src/network_resources/common/model/banner.dart'
+    as app_banner;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +20,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  HomeCubit get homeCubit => context.read<HomeCubit>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Load dữ liệu khi màn hình được khởi tạo
+    homeCubit.fetchHomeData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,20 +38,37 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _buildHeader(),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPromotionBanner(),
-                    _buildPopularCategories(),
-                    _buildRestaurantsNearYou(),
-                    _buildDiscountGuaranteed(),
-                    _buildBestSeller(),
-                    _buildRecommendedForYou(),
-                    _buildPartnershipSection(),
-                    _buildNewsSection(),
-                    const Gap(20),
-                  ],
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  homeCubit.refreshHomeData();
+                },
+                child: BlocBuilder<HomeCubit, HomeState>(
+                  bloc: homeCubit,
+                  builder: (context, state) {
+                    if (state is HomeLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (state is HomeError) {
+                      return Center(child: Text(state.message));
+                    } else if (state is HomeLoaded) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPromotionBanner(state.banners),
+                            _buildPopularCategories(state.categories),
+                            _buildRestaurantsNearYou(state.shops),
+                            _buildDiscountGuaranteed(),
+                            _buildBestSeller(state.popularItems),
+                            _buildRecommendedForYou(),
+                            _buildPartnershipSection(),
+                            _buildNewsSection(),
+                            const Gap(20),
+                          ],
+                        ),
+                      );
+                    }
+                    return Center(child: Text('Loading...'));
+                  },
                 ),
               ),
             ),
@@ -114,17 +147,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPromotionBanner() {
+  Widget _buildPromotionBanner(List<app_banner.Banner> banners) {
+    if (banners.isEmpty) {
+      return SizedBox.shrink();
+    }
+
     return Container(
       height: 100,
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: PageView(
-        children: [
-          Container(
+      child: PageView.builder(
+        itemCount: banners.length,
+        itemBuilder: (context, index) {
+          final banner = banners[index];
+          return Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.green,
               borderRadius: BorderRadius.circular(12),
+              image: banner.image != null
+                  ? DecorationImage(
+                      image: NetworkImage(banner.image!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
             child: Row(
               children: [
@@ -134,36 +179,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '30% Discount only valid for today!',
+                        banner.name ?? 'Special Offer',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      Text(
-                        'Get special discount',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+                      if (banner.description != null)
+                        Text(
+                          banner.description!,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                      const Gap(4),
-                      Text(
-                        '₫ 12.88',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
                     ],
                   ),
-                ),
-                Image.asset(
-                  'assets/images/burger.png',
-                  width: 80,
-                  height: 80,
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -187,13 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildPopularCategories() {
+  Widget _buildPopularCategories(List<Category> categories) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -214,53 +246,81 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SizedBox(
-          height: 90,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildCategoryItem('Fast food', '27 Places', Icons.fastfood),
-              _buildCategoryItem('Salads', '20 Places', Icons.eco),
-              _buildCategoryItem('Salads', '20 Places', Icons.eco),
-            ],
-          ),
+          height: 100,
+          child: categories.isEmpty
+              ? Center(child: Text('Không có danh mục'))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return _buildCategoryItem(
+                      category.name,
+                      category.description ?? '',
+                      Icons.fastfood,
+                      imageUrl: category.image,
+                    );
+                  },
+                ),
         ),
       ],
     );
   }
 
-  Widget _buildCategoryItem(String title, String subtitle, IconData icon) {
+  Widget _buildCategoryItem(
+    String title,
+    String subtitle,
+    IconData icon, {
+    String? imageUrl,
+  }) {
     return Container(
       width: 90,
       margin: EdgeInsets.only(right: 16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.blue),
-          ),
+          imageUrl != null
+              ? Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(imageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
+              : Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Colors.blue),
+                ),
           const Gap(4),
           Text(
             title,
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             subtitle,
             style: TextStyle(fontSize: 10, color: Colors.grey),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRestaurantsNearYou() {
+  Widget _buildRestaurantsNearYou(List<Shop> shops) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -282,77 +342,92 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(
           height: 150,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildRestaurantCard('Vegetarian restaurant', '1.2km', 'rest1'),
-              _buildRestaurantCard('Vegetarian finest', '1.2km', 'rest2'),
-            ],
-          ),
+          child: shops.isEmpty
+              ? Center(child: Text('Không có cửa hàng gần đây'))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: shops.length,
+                  itemBuilder: (context, index) {
+                    final shop = shops[index];
+                    return _buildRestaurantCard(
+                      shop.name,
+                      shop.distance ?? '?km',
+                      shop.id,
+                      imageUrl: shop.image,
+                    );
+                  },
+                ),
         ),
       ],
     );
   }
 
-  Widget _buildRestaurantCard(String name, String distance, String id) {
+  Widget _buildRestaurantCard(
+    String name,
+    String distance,
+    String id, {
+    String? imageUrl,
+  }) {
     return GestureDetector(
       onTap: () {
-        // Điều hướng đến trang chi tiết nhà hàng
         context.push('/restaurant-detail/$id');
       },
       child: Container(
-        width: 150,
+        width: 140,
         margin: EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          image: DecorationImage(
-            image: AssetImage('assets/images/restaurant.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Icon(Icons.favorite_border, color: Colors.white),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: Offset(0, 2),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+                image: DecorationImage(
+                  image: imageUrl != null
+                      ? NetworkImage(imageUrl) as ImageProvider
+                      : AssetImage('assets/images/restaurant_placeholder.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                  const Gap(2),
+                  Text(
+                    distance,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.white, size: 12),
-                        Text(
-                          distance,
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -482,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBestSeller() {
+  Widget _buildBestSeller(List<Food> popularItems) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -492,82 +567,116 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Best seller',
+                'Best Sellers',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton(
-                onPressed: () {},
-                child: Text('View all'),
+              Text(
+                'See all',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
         ),
         SizedBox(
           height: 220,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildFoodCard('Blueberry pancake', 4.3, 9.20, 4.50, 'food1'),
-              _buildFoodCard('Pizza Hut - Lumintui', 4.3, 9.20, 4.50, 'food2'),
-            ],
-          ),
+          child: popularItems.isEmpty
+              ? Center(child: Text('Không có món ăn nổi bật'))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: popularItems.length,
+                  itemBuilder: (context, index) {
+                    final food = popularItems[index];
+                    return _buildFoodCard(
+                      food.name,
+                      food.price ?? 0,
+                      food.discountPrice,
+                      food.id,
+                      rating: food.rating ?? 0,
+                      reviewCount: food.reviewCount ?? 0,
+                      imageUrl: food.image,
+                    );
+                  },
+                ),
         ),
       ],
     );
   }
 
-  Widget _buildFoodCard(String name, double rating, double price,
-      double discountPrice, String id) {
+  Widget _buildFoodCard(
+    String name,
+    double price,
+    double? discountPrice,
+    String id, {
+    double rating = 0,
+    int reviewCount = 0,
+    String? imageUrl,
+  }) {
     return GestureDetector(
       onTap: () {
-        // Điều hướng đến trang chi tiết món ăn
         context.push('/food-detail/$id');
       },
       child: Container(
         width: 160,
         margin: EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+            Stack(
+              children: [
+                Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                    image: DecorationImage(
+                      image: imageUrl != null
+                          ? NetworkImage(imageUrl) as ImageProvider
+                          : AssetImage('assets/images/food_placeholder.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                image: DecorationImage(
-                  image: AssetImage('assets/images/pancake.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Stack(
-                children: [
+                if (discountPrice != null && discountPrice < price)
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: Colors.red,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'HOT',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
+                        '${((price - discountPrice) / price * 100).toInt()}% OFF',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -580,57 +689,58 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      Text(
-                        '₫ ${price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const Gap(8),
-                      Text(
-                        '₫ ${discountPrice.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 8,
-                        backgroundColor: Colors.blue,
-                        child: Text(
-                          'R',
-                          style: TextStyle(color: Colors.white, fontSize: 8),
-                        ),
-                      ),
-                      const Gap(4),
-                      Text(
-                        'Restaurant name',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ],
                   ),
                   const Gap(4),
                   Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 14),
                       Text(
-                        ' $rating (11k)',
-                        style: TextStyle(fontSize: 10),
+                        '$rating',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
+                      Text(
+                        ' ($reviewCount)',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(4),
+                  Row(
+                    children: [
+                      if (discountPrice != null && discountPrice < price) ...[
+                        Text(
+                          '₫${discountPrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.green,
+                          ),
+                        ),
+                        const Gap(4),
+                        Text(
+                          '₫${price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      ] else
+                        Text(
+                          '₫${price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
                     ],
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:internal_core/internal_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internal_network/options.dart';
 
 import 'src/constants/constants.dart';
 import 'src/utils/utils.dart';
@@ -11,18 +12,17 @@ internalSetup() {
       appColors: AppColors.instance,
       appPrefs: AppPrefs.instance,
       appTextStyleWrap: AppTextStyleWrap(
-        fontWrap: (textStyle) => GoogleFonts.poppins(textStyle: textStyle),
+        fontWrap: (textStyle) => GoogleFonts.fredoka(textStyle: textStyle),
       ),
-      // networkOptions: PNetworkOptionsImpl(
-      //   loggingEnable: kDebugMode,
-      //   baseUrl: '',
-      //   baseUrlAsset: '',
-      //   responsePrefixData: '',
-      //   responseIsSuccess: (response) => true,
-      //   errorInterceptor: (e) {
-      //     print(e);
-      //   },
-      // ),
+      networkOptions: PNetworkOptionsImpl(
+        loggingEnable: true,
+        baseUrl: 'https://zennail23.com',
+        baseUrlAsset: '',
+        responsePrefixData: 'data',
+        // errorInterceptor: (e) {
+        //   print(e);
+        // },
+      ),
     ),
   );
-} 
+}

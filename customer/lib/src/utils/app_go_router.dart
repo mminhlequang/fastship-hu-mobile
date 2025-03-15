@@ -7,9 +7,14 @@ import 'package:app/src/presentation/checkout/checkout_screen.dart';
 import 'package:app/src/presentation/checkout/cubit/checkout_cubit.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../presentation/account/cubit/account_cubit.dart';
+import '../presentation/food/cubit/food_cubit.dart';
+import '../presentation/home/cubit/home_cubit.dart';
 import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/orders/cubit/orders_cubit.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
@@ -42,7 +47,20 @@ final goRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/navigation',
-          builder: (context, state) => const NavigationScreen(),
+          builder: (context, state) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => HomeCubit()),
+              BlocProvider(create: (context) => FoodCubit()),
+              BlocProvider(create: (context) => CartCubit()),
+              BlocProvider(
+                  create: (context) => CheckoutCubit(
+                        cartCubit: getIt<CartCubit>(),
+                      )),
+              BlocProvider(create: (context) => OrdersCubit()),
+              BlocProvider(create: (context) => AccountCubit()),
+            ],
+            child: const NavigationScreen(),
+          ),
         ),
       ],
     ),

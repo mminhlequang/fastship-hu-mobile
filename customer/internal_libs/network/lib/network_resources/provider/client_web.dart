@@ -36,8 +36,7 @@ class AppClient extends DioForBrowser {
     );
     if (options != null) _instance!.options = options;
     if (appBaseUrl != null) _instance!.options.baseUrl = appBaseUrl!;
-    (_instance!.transformer as BackgroundTransformer).jsonDecodeCallback =
-        parseJson;
+    
     if ((token == null || token.isEmpty)) {
       _instance!.options.headers.remove(r'Authorization');
     } else {

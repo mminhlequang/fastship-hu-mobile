@@ -4,7 +4,6 @@ import 'package:app/src/utils/utils.dart';
 
 part 'food_state.dart';
 
-FoodCubit get foodCubit => findInstance<FoodCubit>();
 
 class FoodCubit extends Cubit<FoodState> {
   FoodCubit() : super(FoodInitial());

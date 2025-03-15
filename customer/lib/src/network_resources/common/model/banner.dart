@@ -4,6 +4,7 @@ class Banner {
   final String? image;
   final String? type;
   final int? referenceId;
+  final String? description;
 
   Banner({
     this.id,
@@ -11,6 +12,7 @@ class Banner {
     this.image,
     this.type,
     this.referenceId,
+    this.description,
   });
 
   factory Banner.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Banner {
       image: json['image'] as String?,
       type: json['type'] as String?,
       referenceId: json['reference_id'] as int?,
+      description: json['description'] as String?,
     );
   }
 
@@ -30,6 +33,7 @@ class Banner {
       'image': image,
       'type': type,
       'reference_id': referenceId,
+      'description': description,
     };
   }
 
@@ -39,6 +43,7 @@ class Banner {
     String? image,
     String? type,
     int? referenceId,
+    String? description,
   }) {
     return Banner(
       id: id ?? this.id,
@@ -46,6 +51,7 @@ class Banner {
       image: image ?? this.image,
       type: type ?? this.type,
       referenceId: referenceId ?? this.referenceId,
+      description: description ?? this.description,
     );
   }
 }
