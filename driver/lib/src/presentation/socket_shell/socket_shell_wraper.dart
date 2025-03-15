@@ -124,6 +124,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   }
 
   void _initSocketController() {
+    _socketController.init();
     try {
       _socketController.onBlinkingChanged = (isBlinking) {
         setState(() {

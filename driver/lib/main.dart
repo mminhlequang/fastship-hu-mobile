@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 
 import 'internal_setup.dart';
@@ -30,14 +29,12 @@ void main() async {
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
-    if (!kIsWeb) ...[
       if (Platform.isAndroid)
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
             overlays: [SystemUiOverlay.top]),
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]),
-    ],
     AppPrefs.instance.initialize(),
     initEasyLocalization(),
   ]);

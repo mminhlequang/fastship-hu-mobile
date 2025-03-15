@@ -40,7 +40,6 @@ dependencies:
   auto_size_text: ^3.0.0
   google_fonts: ^6.2.1
   file: ^7.0.1
-  url_strategy: ^0.3.0
   flutter_portal: ^1.1.4
   flutter_native_splash: ^2.4.5
   dotted_border: ^2.1.0

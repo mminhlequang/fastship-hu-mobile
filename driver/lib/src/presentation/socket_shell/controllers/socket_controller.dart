@@ -55,8 +55,7 @@ class SocketController {
   DriverOrderStatus get orderStatus => _orderStatus;
   Map<String, dynamic>? get currentOrder => _currentOrder;
 
-  SocketController() {
-    debugPrint('Debug socket: Khởi tạo SocketController');
+  init() {
     _initializeSocket();
     _checkOnlineStatus();
   }
