@@ -49,11 +49,11 @@ enum SettingsItem {
       };
 
   String? get route => switch (this) {
-        myProfile => '',
+        myProfile => '/my-profile',
         incomeStatistics => '/statistics',
-        customerReviews => '',
-        changePassword => '',
-        vehicles => '',
+        customerReviews => '/customer-reviews',
+        changePassword => '/change-password',
+        vehicles => '/vehicles',
         helpCenter => '/help-center',
         _ => null,
       };
@@ -190,7 +190,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: item == SettingsItem.status || item == SettingsItem.notifications
                       ? null
                       : () {
-                          // Todo:
+                          if (item == SettingsItem.deleteAccount) {
+                            // Todo: delete account
+                          } else if (item == SettingsItem.logout) {
+                            // Todo: logout
+                          } else {
+                            appContext.push(item.route!);
+                          }
                         },
                   radius: 0,
                   child: Padding(
