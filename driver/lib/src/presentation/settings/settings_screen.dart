@@ -3,6 +3,7 @@ import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
@@ -66,8 +67,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool status = true;
-  bool notifications = true;
+  final _statusController = ValueNotifier<bool>(true);
+  final _notificationController = ValueNotifier<bool>(true);
+
+  @override
+  void dispose() {
+    _statusController.dispose();
+    _notificationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +131,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       children: [
                                         Text(
                                           AppPrefs.instance.user?.name ?? '',
-                                          style:
-                                              w500TextStyle(fontSize: 18.sw, color: Colors.white),
+                                          style: w500TextStyle(
+                                            fontSize: 16.sw,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         Gap(4.sw),
                                         Text(
                                           AppPrefs.instance.user?.phone ?? '',
-                                          style:
-                                              w300TextStyle(fontSize: 16.sw, color: Colors.white),
+                                          style: w400TextStyle(
+                                            color: Colors.white.withValues(alpha: .6),
+                                          ),
                                         )
                                       ],
                                     ),
@@ -145,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: CloseButton(
                               color: Colors.white,
                               style: ButtonStyle(
-                                iconSize: WidgetStateProperty.resolveWith((_) => 24.sw),
+                                iconSize: WidgetStateProperty.resolveWith((_) => 28.sw),
                               ),
                             ),
                           ),
@@ -176,12 +187,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               itemBuilder: (context, index) {
                 final item = SettingsItem.values[index];
                 return WidgetRippleButton(
-                  onTap: () {
-                    // Todo:
-                  },
+                  onTap: item == SettingsItem.status || item == SettingsItem.notifications
+                      ? null
+                      : () {
+                          // Todo:
+                        },
                   radius: 0,
                   child: Padding(
-                    padding: EdgeInsets.all(16.sw),
+                    padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
                     child: Row(
                       children: [
                         WidgetAppSVG(item.icon),
@@ -193,6 +206,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         if (item.route != null) WidgetAppSVG('chevron_right'),
+                        if (item == SettingsItem.status)
+                          AdvancedSwitch(
+                            controller: _statusController,
+                            height: 22.sw,
+                            width: 40.sw,
+                            activeColor: appColorPrimary,
+                            inactiveColor: hexColor('#E2E2EF'),
+                          ),
+                        if (item == SettingsItem.notifications)
+                          AdvancedSwitch(
+                            controller: _notificationController,
+                            height: 22.sw,
+                            width: 40.sw,
+                            activeColor: appColorPrimary,
+                            inactiveColor: hexColor('#E2E2EF'),
+                          )
                       ],
                     ),
                   ),
