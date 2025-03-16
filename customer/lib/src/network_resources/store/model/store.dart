@@ -1,4 +1,4 @@
-class Shop {
+class Store {
   final String id;
   final String name;
   final String? image;
@@ -15,7 +15,7 @@ class Shop {
   final List<String>? categories;
   final bool? isFavorite;
 
-  Shop({
+  Store({
     required this.id,
     required this.name,
     this.image,
@@ -33,14 +33,14 @@ class Shop {
     this.isFavorite,
   });
 
-  factory Shop.fromJson(Map<String, dynamic> json) {
+  factory Store.fromJson(Map<String, dynamic> json) {
     List<String>? categoriesList;
     if (json['categories'] != null) {
       categoriesList = List<String>.from(
           json['categories'].map((category) => category.toString()));
     }
 
-    return Shop(
+    return Store(
       id: json['id'].toString(),
       name: json['name'] ?? '',
       image: json['image'],

@@ -12,12 +12,12 @@ internalSetup() {
       appColors: AppColors.instance,
       appPrefs: AppPrefs.instance,
       appTextStyleWrap: AppTextStyleWrap(
-        fontWrap: (textStyle) => GoogleFonts.fredoka(textStyle: textStyle),
+        fontWrap: (textStyle) => GoogleFonts.fredoka( ).merge(textStyle),
       ),
       networkOptions: PNetworkOptionsImpl(
         loggingEnable: true,
         baseUrl: 'https://zennail23.com',
-        baseUrlAsset: '',
+        baseUrlAsset: 'https://zennail23.com',
         responsePrefixData: 'data',
         // errorInterceptor: (e) {
         //   print(e);

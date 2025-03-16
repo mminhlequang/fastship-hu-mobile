@@ -1,4 +1,4 @@
-class Food {
+class Product {
   final String id;
   final String name;
   final String? image;
@@ -13,7 +13,7 @@ class Food {
   final List<String>? ingredients;
   final Map<String, dynamic>? nutrition;
 
-  Food({
+  Product({
     required this.id,
     required this.name,
     this.image,
@@ -29,14 +29,14 @@ class Food {
     this.nutrition,
   });
 
-  factory Food.fromJson(Map<String, dynamic> json) {
+  factory Product.fromJson(Map<String, dynamic> json) {
     List<String>? ingredientsList;
     if (json['ingredients'] != null) {
       ingredientsList = List<String>.from(
           json['ingredients'].map((ingredient) => ingredient.toString()));
     }
 
-    return Food(
+    return Product(
       id: json['id'].toString(),
       name: json['name'] ?? '',
       image: json['image'],

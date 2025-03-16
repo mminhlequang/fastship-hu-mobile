@@ -63,7 +63,7 @@ class AppPrefs extends AppPrefsBase {
       _boxData.put(AppPrefsBase.languageCodeKey, value);
 
   @override
-  String get languageCode => _boxData.get(AppPrefsBase.languageCodeKey) ?? 'en';
+  String get languageCode => _boxData.get(AppPrefsBase.languageCodeKey) ?? 'fr';
 
   @override
   set dateFormat(String value) => _boxData.put('dateFormat', value);

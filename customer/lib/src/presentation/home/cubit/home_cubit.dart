@@ -1,43 +1,58 @@
+import 'package:app/src/network_resources/category/model/category.dart';
+import 'package:app/src/network_resources/category/repo.dart';
+import 'package:app/src/network_resources/product/model/product.dart';
+import 'package:app/src/network_resources/product/repo.dart';
+import 'package:app/src/network_resources/store/model/store.dart';
+import 'package:app/src/network_resources/store/repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:app/src/network_resources/common/model/banner.dart';
-import 'package:app/src/network_resources/common/model/category.dart';
-import 'package:app/src/network_resources/common/model/shop.dart';
-import 'package:app/src/network_resources/common/model/food.dart';
 import 'package:app/src/network_resources/common/repo.dart';
 
 part 'home_state.dart';
 
-
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(HomeInitial());
+  HomeCubit() : super(HomeState.initial());
 
-  // Thêm các hàm xử lý logic cho màn hình Home
+  // Hàm xử lý logic lấy dữ liệu cho màn hình Home
   void fetchHomeData() async {
-    emit(HomeLoading());
+    // Đặt trạng thái loading
+    emit(HomeState.loading());
 
     try {
-      final repo = CommonRepo();
 
-      // Gọi API để lấy dữ liệu
-      final categories = await repo.getCategories() ?? [];
-      final shops = await repo.getShops() ?? [];
-      final foods = await repo.getFoods() ?? [];
-      final banners = await repo.getBanners() ?? [];
-
-      // Lọc các món ăn phổ biến
-      final popularItems =
-          foods.where((food) => food.isPopular == true).toList();
-
-      emit(HomeLoaded(
+      final categories = await CategoryRepo().getCategories();
+       
+      // Cập nhật state với dữ liệu mới, không còn loading
+      emit(HomeState(
+        isLoading: false,
         categories: categories,
-        shops: shops,
-        popularItems: popularItems,
-        banners: banners,
       ));
+
+      // final categories = await CategoryRepo().getCategories();
+      // final stores = await StoreRepo().getStores();
+      // final products = await ProductRepo().getProducts();
+      // final banners = await CommonRepo().getBanners();
+
+      // // Lọc các món ăn phổ biến
+      // final popularItems =
+      //     products?.where((product) => product.isPopular == true).toList();
+
+      // // Cập nhật state với dữ liệu mới, không còn loading
+      // emit(HomeState(
+      //   isLoading: false,
+      //   banners: banners,
+      //   categories: categories,
+      //   popularItems: popularItems,
+      //   stores: stores,
+      // ));
     } catch (e) {
-      emit(HomeError('Không thể tải dữ liệu: ${e.toString()}'));
+      // Cập nhật state với thông báo lỗi
+      emit(HomeState(
+        isLoading: false,
+        errorMessage: 'Không thể tải dữ liệu: ${e.toString()}',
+      ));
     }
   }
 

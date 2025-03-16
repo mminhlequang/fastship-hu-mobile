@@ -11,6 +11,8 @@ import '../utils/utils.dart';
 
 // Color get appColorText => AppColors.instance.text;
 
+Color get appColorBorder => hexColor('#EEEEEE');
+
 class AppColors extends AppColorsBase {
   AppColors._();
 

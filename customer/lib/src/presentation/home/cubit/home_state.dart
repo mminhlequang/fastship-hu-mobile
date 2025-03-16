@@ -1,38 +1,77 @@
 part of 'home_cubit.dart';
 
-sealed class HomeState extends Equatable {
-  const HomeState();
+class HomeState extends Equatable {
+  // Trạng thái loading
+  final bool isLoading;
+  // Thông báo lỗi (nếu có)
+  final String? errorMessage;
+  // Dữ liệu
+  final List<Banner>? banners;
+  final List<Category>? categories;
+  final List<Product>? popularItems;
+  final List<Store>? stores;
 
-  @override
-  List<Object> get props => [];
-}
-
-final class HomeInitial extends HomeState {}
-
-final class HomeLoading extends HomeState {}
-
-final class HomeLoaded extends HomeState {
-  final List<Banner> banners;
-  final List<Category> categories;
-  final List<Food> popularItems;
-  final List<Shop> shops;
-
-  const HomeLoaded({
-    this.banners = const [],
-    this.categories = const [],
-    this.popularItems = const [],
-    this.shops = const [],
+  const HomeState({
+    this.isLoading = false,
+    this.errorMessage,
+    this.banners,
+    this.categories,
+    this.popularItems,
+    this.stores,
   });
 
+  // Helper để kiểm tra trạng thái
+  bool get hasError => errorMessage != null;
+  bool get hasData =>
+      banners != null ||
+      categories != null ||
+      popularItems != null ||
+      stores != null;
+
+  // Tạo bản sao với các giá trị mới
+  HomeState copyWith({
+    bool? isLoading,
+    String? errorMessage,
+    List<Banner>? banners,
+    List<Category>? categories,
+    List<Product>? popularItems,
+    List<Store>? stores,
+  }) {
+    return HomeState(
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
+      banners: banners ?? this.banners,
+      categories: categories ?? this.categories,
+      popularItems: popularItems ?? this.popularItems,
+      stores: stores ?? this.stores,
+    );
+  }
+
+  // Tạo trạng thái ban đầu
+  factory HomeState.initial() {
+    return const HomeState(
+      isLoading: false,
+      errorMessage: null,
+      banners: null,
+      categories: null,
+      popularItems: null,
+      stores: null,
+    );
+  }
+
+  // Tạo trạng thái loading
+  factory HomeState.loading() {
+    return const HomeState(
+      isLoading: true,
+      errorMessage: null,
+      banners: null,
+      categories: null,
+      popularItems: null,
+      stores: null,
+    );
+  }
+
   @override
-  List<Object> get props => [banners, categories, popularItems, shops];
-}
-
-final class HomeError extends HomeState {
-  final String message;
-
-  const HomeError(this.message);
-
-  @override
-  List<Object> get props => [message];
+  List<Object?> get props =>
+      [isLoading, errorMessage, banners, categories, popularItems, stores];
 }

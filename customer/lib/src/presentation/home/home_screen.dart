@@ -1,3 +1,5 @@
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/category/model/category.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
@@ -6,11 +8,79 @@ import 'package:go_router/go_router.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app/src/presentation/home/cubit/home_cubit.dart';
-import 'package:app/src/network_resources/common/model/category.dart';
-import 'package:app/src/network_resources/common/model/shop.dart';
-import 'package:app/src/network_resources/common/model/food.dart';
 import 'package:app/src/network_resources/common/model/banner.dart'
     as app_banner;
+
+double get _horizontalPadding => 16.sw;
+
+// Thêm lớp Shimmer tùy chỉnh
+class _Shimmer extends StatefulWidget {
+  final Widget child;
+  final Color baseColor;
+  final Color highlightColor;
+
+  const _Shimmer({
+    Key? key,
+    required this.child,
+    this.baseColor = const Color(0xFFEEEEEE),
+    this.highlightColor = const Color(0xFFFAFAFA),
+  }) : super(key: key);
+
+  @override
+  _ShimmerState createState() => _ShimmerState();
+}
+
+class _ShimmerState extends State<_Shimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+    _animation = Tween<double>(begin: -2.0, end: 2.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutSine,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return ShaderMask(
+          blendMode: BlendMode.srcATop,
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              colors: [
+                widget.baseColor,
+                widget.highlightColor,
+                widget.baseColor
+              ],
+              stops: const [0.0, 0.5, 1.0],
+              begin: Alignment(_animation.value, 0.0),
+              end: Alignment(2 + _animation.value, 0.0),
+            ).createShader(bounds);
+          },
+          child: widget.child,
+        );
+      },
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,29 +115,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: BlocBuilder<HomeCubit, HomeState>(
                   bloc: homeCubit,
                   builder: (context, state) {
-                    if (state is HomeLoading) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (state is HomeError) {
-                      return Center(child: Text(state.message));
-                    } else if (state is HomeLoaded) {
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildPromotionBanner(state.banners),
-                            _buildPopularCategories(state.categories),
-                            _buildRestaurantsNearYou(state.shops),
-                            _buildDiscountGuaranteed(),
-                            _buildBestSeller(state.popularItems),
-                            _buildRecommendedForYou(),
-                            _buildPartnershipSection(),
-                            _buildNewsSection(),
-                            const Gap(20),
-                          ],
-                        ),
-                      );
-                    }
-                    return Center(child: Text('Loading...'));
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildPromotionBanner(state.banners),
+                          _buildPopularCategories(state.categories),
+                          // _buildRestaurantsNearYou(state.shops),
+                          // _buildDiscountGuaranteed(),
+                          // _buildBestSeller(state.popularItems),
+                          // _buildRecommendedForYou(),
+                          // _buildPartnershipSection(),
+                          // _buildNewsSection(),
+                          const Gap(20),
+                        ],
+                      ),
+                    );
                   },
                 ),
               ),
@@ -78,9 +141,175 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Widget shimmer đơn giản cho container hình chữ nhật
+  Widget _buildShimmerBox({
+    double width = double.infinity,
+    double height = 100,
+    double borderRadius = 8.0,
+  }) {
+    return _Shimmer(
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+    );
+  }
+
+  // Widget shimmer cho text
+  Widget _buildShimmerText({
+    double width = 100,
+    double height = 12,
+  }) {
+    return _Shimmer(
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
+  // Shimmer cho banner promotion
+  Widget _buildPromotionBannerShimmer() {
+    return Container(
+      height: 200,
+      margin:
+          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
+      child: _buildShimmerBox(
+        height: 200,
+        borderRadius: 12,
+      ),
+    );
+  }
+
+  // Shimmer cho categories
+  Widget _buildCategoriesShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 8),
+          child: Row(
+            children: [
+              _buildShimmerText(width: 150, height: 20),
+              const Spacer(),
+              _buildShimmerBox(width: 40, height: 40, borderRadius: 20),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 5, // 5 items giả
+            itemBuilder: (context, index) {
+              return Container(
+                width: 90,
+                margin: EdgeInsets.only(right: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildShimmerBox(width: 50, height: 50, borderRadius: 25),
+                    const Gap(4),
+                    _buildShimmerText(width: 70, height: 12),
+                    const Gap(2),
+                    _buildShimmerText(width: 50, height: 10),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Shimmer cho restaurants
+  Widget _buildRestaurantsShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildShimmerText(width: 180, height: 18),
+              _buildShimmerBox(width: 24, height: 24, borderRadius: 12),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 150,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 4, // 4 items giả
+            itemBuilder: (context, index) {
+              return Container(
+                width: 140,
+                margin: EdgeInsets.only(right: 16),
+                child: _buildShimmerBox(height: 150, borderRadius: 8),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Shimmer cho best sellers
+  Widget _buildBestSellerShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildShimmerText(width: 120, height: 18),
+              _buildShimmerText(width: 60, height: 14),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 3, // 3 items giả
+            itemBuilder: (context, index) {
+              return Container(
+                width: 160,
+                margin: EdgeInsets.only(right: 16),
+                child: _buildShimmerBox(height: 220, borderRadius: 8),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeader() {
+    return SizedBox(
+      height: 100,
+    );
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding:
+          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
       child: Column(
         children: [
           Row(
@@ -147,14 +376,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPromotionBanner(List<app_banner.Banner> banners) {
+  Widget _buildPromotionBanner(List<app_banner.Banner>? banners) {
+    // Hiển thị shimmer nếu banners là null
+    if (banners == null) {
+      return _buildPromotionBannerShimmer();
+    }
+
+    // Hiển thị thông báo nếu danh sách rỗng
     if (banners.isEmpty) {
       return SizedBox.shrink();
     }
 
+    return SizedBox(
+      height: 200,
+    );
+
     return Container(
       height: 100,
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin:
+          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
       child: PageView.builder(
         itemCount: banners.length,
         itemBuilder: (context, index) {
@@ -225,143 +465,167 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPopularCategories(List<Category> categories) {
+  Widget _buildPopularCategories(List<Category>? categories) {
+    // Hiển thị shimmer nếu categories là null
+    if (categories == null) {
+      return _buildCategoriesShimmer();
+    } else if (categories.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    Widget _buildCategoryItem({
+      required int index,
+      required Category category,
+    }) {
+      return Container(
+        height: 124.sw,
+        constraints: BoxConstraints(minWidth: 110.sw),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.sw),
+          boxShadow: index != 0
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 32,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+        ),
+        padding: EdgeInsets.all(6.sw),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: WidgetAppImage(
+                  imageUrl: category.image,
+                  placeholderWidget: SizedBox(),
+                ),
+              ),
+            ),
+            Gap(4.sw),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 110.sw),
+              child: Text(
+                category.name,
+                style: w500TextStyle(fontSize: 16.sw),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 110.sw),
+              child: Text(
+                category.description ?? '',
+                style:
+                    w400TextStyle(fontSize: 12.sw, color: hexColor('#F17228')),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Popular Categories',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+          padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
+          child: _WidgetTitle(
+            title: 'Popular Categories',
+            actions: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: appColorBorder),
                 ),
-              ),
-              Icon(Icons.filter_list),
+                width: 48.sw,
+                height: 48.sw,
+                alignment: Alignment.center,
+                child: WidgetAppSVG(
+                  'Setting',
+                  width: 24.sw,
+                ),
+              )
             ],
           ),
         ),
+        Gap(24.sw),
         SizedBox(
-          height: 100,
-          child: categories.isEmpty
-              ? Center(child: Text('Không có danh mục'))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return _buildCategoryItem(
-                      category.name,
-                      category.description ?? '',
-                      Icons.fastfood,
-                      imageUrl: category.image,
-                    );
-                  },
-                ),
+          height: 124.sw,
+          child: ListView.separated(
+            clipBehavior: Clip.none,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
+            itemCount: categories.length,
+            separatorBuilder: (context, index) => Gap(8.sw),
+            itemBuilder: (context, index) {
+              return _buildCategoryItem(
+                index: index,
+                category: categories[index],
+              );
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCategoryItem(
-    String title,
-    String subtitle,
-    IconData icon, {
-    String? imageUrl,
-  }) {
-    return Container(
-      width: 90,
-      margin: EdgeInsets.only(right: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          imageUrl != null
-              ? Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              : Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: Colors.blue),
-                ),
-          const Gap(4),
-          Text(
-            title,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 10, color: Colors.grey),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildRestaurantsNearYou(List<Shop>? shops) {
+  //   // Hiển thị shimmer nếu shops là null
+  //   if (shops == null) {
+  //     return _buildRestaurantsShimmer();
+  //   }
 
-  Widget _buildRestaurantsNearYou(List<Shop> shops) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Restaurants near you',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Icon(Icons.search),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 150,
-          child: shops.isEmpty
-              ? Center(child: Text('Không có cửa hàng gần đây'))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: shops.length,
-                  itemBuilder: (context, index) {
-                    final shop = shops[index];
-                    return _buildRestaurantCard(
-                      shop.name,
-                      shop.distance ?? '?km',
-                      shop.id,
-                      imageUrl: shop.image,
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: EdgeInsets.symmetric(
+  //             horizontal: _horizontalPadding, vertical: 16),
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               'Restaurants near you',
+  //               style: TextStyle(
+  //                 fontSize: 18,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             Icon(Icons.search),
+  //           ],
+  //         ),
+  //       ),
+  //       SizedBox(
+  //         height: 150,
+  //         child: shops.isEmpty
+  //             ? Center(child: Text('Không có cửa hàng gần đây'))
+  //             : ListView.builder(
+  //                 scrollDirection: Axis.horizontal,
+  //                 padding: EdgeInsets.symmetric(horizontal: 16),
+  //                 itemCount: shops.length,
+  //                 itemBuilder: (context, index) {
+  //                   final shop = shops[index];
+  //                   return _buildRestaurantCard(
+  //                     shop.name,
+  //                     shop.distance ?? '?km',
+  //                     shop.id,
+  //                     imageUrl: shop.image,
+  //                   );
+  //                 },
+  //               ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildRestaurantCard(
     String name,
@@ -406,7 +670,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -441,7 +705,8 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
           child: Row(
             children: [
               Text(
@@ -536,7 +801,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDiscountTag(String title) {
     return Container(
       margin: EdgeInsets.only(right: 12),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding:
+          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 8),
       decoration: BoxDecoration(
         color: title == 'Pizza & Fast food' ? Colors.green : Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -557,57 +823,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBestSeller(List<Food> popularItems) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Best Sellers',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'See all',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 220,
-          child: popularItems.isEmpty
-              ? Center(child: Text('Không có món ăn nổi bật'))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: popularItems.length,
-                  itemBuilder: (context, index) {
-                    final food = popularItems[index];
-                    return _buildFoodCard(
-                      food.name,
-                      food.price ?? 0,
-                      food.discountPrice,
-                      food.id,
-                      rating: food.rating ?? 0,
-                      reviewCount: food.reviewCount ?? 0,
-                      imageUrl: food.image,
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildBestSeller(List<Food>? popularItems) {
+  //   // Hiển thị shimmer nếu popularItems là null
+  //   if (popularItems == null) {
+  //     return _buildBestSellerShimmer();
+  //   }
+
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: EdgeInsets.symmetric(
+  //             horizontal: _horizontalPadding, vertical: 16),
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               'Best Sellers',
+  //               style: TextStyle(
+  //                 fontSize: 18,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             Text(
+  //               'See all',
+  //               style: TextStyle(
+  //                 color: Colors.blue,
+  //                 fontSize: 14,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       SizedBox(
+  //         height: 220,
+  //         child: popularItems.isEmpty
+  //             ? Center(child: Text('Không có món ăn nổi bật'))
+  //             : ListView.builder(
+  //                 scrollDirection: Axis.horizontal,
+  //                 padding: EdgeInsets.symmetric(horizontal: 16),
+  //                 itemCount: popularItems.length,
+  //                 itemBuilder: (context, index) {
+  //                   final food = popularItems[index];
+  //                   return _buildFoodCard(
+  //                     food.name,
+  //                     food.price ?? 0,
+  //                     food.discountPrice,
+  //                     food.id,
+  //                     rating: food.rating ?? 0,
+  //                     reviewCount: food.reviewCount ?? 0,
+  //                     imageUrl: food.image,
+  //                   );
+  //                 },
+  //               ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildFoodCard(
     String name,
@@ -679,7 +951,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -757,7 +1029,8 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -839,7 +1112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -890,7 +1163,8 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
           child: Text(
             'Let\'s be partners now!',
             style: TextStyle(
@@ -900,7 +1174,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
               Expanded(
@@ -993,7 +1267,8 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: EdgeInsets.symmetric(
+              horizontal: _horizontalPadding, vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1050,7 +1325,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1072,6 +1347,27 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _WidgetTitle extends StatelessWidget {
+  final String title;
+  final List<Widget>? actions;
+  const _WidgetTitle({super.key, required this.title, this.actions});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: w500TextStyle(fontSize: 24.sw),
+          ),
+        ),
+        if (actions != null) ...actions!,
+      ],
     );
   }
 }

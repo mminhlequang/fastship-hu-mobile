@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/options.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -44,6 +45,8 @@ class AppClient extends DioForNative {
         r'Authorization': isAuthorizationCustom ? token : ('Bearer $token')
       });
     }
+    _instance!.options.headers.addAll(
+        {r'Accept-Language': appPrefs?.languageCode});
     _instance!.options.headers.addAll(appHeaders);
     return _instance!;
   }
