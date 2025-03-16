@@ -1,8 +1,8 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/utils/app_go_router.dart';
-import 'package:app/src/utils/app_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 
@@ -267,12 +267,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 padding:
                     EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Stop cooperation'.tr(),
                       style: w400TextStyle(fontSize: 16.sw),
                     ),
+                    const Spacer(),
+                    Text(
+                      'Pending'.tr(),
+                      style: w400TextStyle(color: hexColor('#FFC148')),
+                    ),
+                    Gap(2.sw),
                     WidgetAppSVG('chevron_right'),
                   ],
                 ),
