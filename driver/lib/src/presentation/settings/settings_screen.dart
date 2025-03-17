@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
@@ -76,6 +78,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _statusController.dispose();
     _notificationController.dispose();
     super.dispose();
+  }
+
+  _deleteAccount() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return WidgetConfirmDialog(
+          title: 'Delete account'.tr(),
+          subTitle: 'Are you sure you want to delete your account?'.tr(),
+          onConfirm: () {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext dialogContext) {
+                return BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                  child: Center(
+                    child: Material(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Container(
+                        width: context.width - 112.sw,
+                        padding: EdgeInsets.all(20.sw),
+                        constraints: BoxConstraints(maxWidth: 264.sw),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const WidgetAppSVG('ic_check_circle'),
+                            Gap(15.sw),
+                            Text(
+                              'Your account deletion request was successful! You will now be logged out.'
+                                  .tr(),
+                              style: w400TextStyle(color: grey1),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+            Future.delayed(const Duration(seconds: 2), () => authCubit.logout());
+          },
+        );
+      },
+    );
+  }
+
+  _logout() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return WidgetConfirmDialog(
+          title: 'Log out'.tr(),
+          subTitle: 'Do you really want to log out?'.tr(),
+          onConfirm: authCubit.logout,
+        );
+      },
+    );
   }
 
   @override
@@ -192,29 +257,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? null
                       : () {
                           if (item == SettingsItem.deleteAccount) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return WidgetConfirmDialog(
-                                  title: 'Delete account'.tr(),
-                                  subTitle: 'Are you sure you want to delete your account?'.tr(),
-                                  onConfirm: () {
-                                    // Todo:
-                                  },
-                                );
-                              },
-                            );
+                            _deleteAccount();
                           } else if (item == SettingsItem.logout) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return WidgetConfirmDialog(
-                                  title: 'Log out'.tr(),
-                                  subTitle: 'Do you really want to log out?'.tr(),
-                                  onConfirm: authCubit.logout,
-                                );
-                              },
-                            );
+                            _logout();
                           } else {
                             appContext.push(item.route!);
                           }
