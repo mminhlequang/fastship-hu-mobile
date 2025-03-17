@@ -1,4 +1,6 @@
+import 'package:app/src/presentation/add_card/add_card_screen.dart';
 import 'package:app/src/presentation/auth/auth_screen.dart';
+import 'package:app/src/presentation/banks_cards/banks_cards_screen.dart';
 import 'package:app/src/presentation/change_password/change_password_screen.dart';
 import 'package:app/src/presentation/chat/chat_screen.dart';
 import 'package:app/src/presentation/customer_reviews/customer_reviews_screen.dart';
@@ -333,6 +335,46 @@ final goRouter = GoRouter(
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
                 opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/my-wallet/banks-cards',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const BanksCardsScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/my-wallet/banks-cards/add-card',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const AddCardScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
                 child: child,
               );
             },

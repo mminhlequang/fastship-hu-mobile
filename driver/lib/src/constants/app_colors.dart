@@ -39,7 +39,8 @@ class AppColors extends AppColorsBase {
   Color get primary => appValueByTheme(hexColor('#5CC23C'));
 
   @override
-  Color get background => appValueByTheme(hexColor('#F1F4F6'), kdark: Colors.black);
+  Color get background =>
+      appValueByTheme(hexColor('#F4F4F6'), kdark: Colors.black);
 
   @override
   Color get text => appValueByTheme(hexColor('#333333'), kdark: Colors.white);
@@ -93,7 +94,8 @@ class AppColors extends AppColorsBase {
   Color get blue1 => appValueByTheme(hexColor('#0085FF'));
 
   @override
-  Color get element => appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
+  Color get element =>
+      appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
 
   @override
   Color get shimmerHighlightColor => appValueByTheme(hexColor('#fafafa'));

@@ -33,7 +33,7 @@ Future<T> appOpenBottomSheet<T>(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     isDismissible: isDismissible,
-    backgroundColor: backgroundColor ?? Colors.transparent,
+    backgroundColor: backgroundColor ?? Colors.white,
     useRootNavigator: true,
   );
   appIsBottomSheetOpen = false;

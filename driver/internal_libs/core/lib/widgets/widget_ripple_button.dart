@@ -28,7 +28,7 @@ class WidgetRippleButton extends StatelessWidget {
     return Material(
       elevation: elevation,
       shadowColor: shadowColor ?? appColors?.text.withValues(alpha: .1),
-      color: color ?? Colors.white,
+      color: enable ? (color ?? Colors.white) : hexColor('#F2F2F2'),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
         side: borderSide,

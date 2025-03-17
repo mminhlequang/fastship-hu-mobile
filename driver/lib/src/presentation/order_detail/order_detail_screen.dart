@@ -94,7 +94,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                     children: [
                       Text(
                         'Refusal reason'.tr(),
-                        style: w600TextStyle(fontSize: 16.sw),
+                        style: w600TextStyle(fontSize: 16.sw, color: grey1),
                       ),
                       const CloseButton(),
                     ],

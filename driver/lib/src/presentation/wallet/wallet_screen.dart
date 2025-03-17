@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/network_resources/transaction/models/models.dart';
@@ -9,8 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 
+import '../widgets/widgets.dart';
 import 'widgets/widget_topup_sheet.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -24,8 +28,9 @@ class _WalletScreenState extends State<WalletScreen> {
   bool isLoading = false;
   List<TransactionModel>? transactions;
   bool _isLoadingTransactions = true;
+  bool hidePass = true;
 
-  void onTopUp(num amount) async {
+  Future<void> onTopUp(num amount) async {
     setState(() {
       isLoading = true;
     });
@@ -100,7 +105,7 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  onRequestWithdraw(num amount) async {
+  Future<void> onRequestWithdraw(num amount) async {
     setState(() {
       isLoading = true;
     });
@@ -129,7 +134,7 @@ class _WalletScreenState extends State<WalletScreen> {
     _fetchTransactions();
   }
 
-  _fetchTransactions() async {
+  Future<void> _fetchTransactions() async {
     authCubit.fetchWallet();
     setState(() {
       _isLoadingTransactions = true;
@@ -141,6 +146,131 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
+  _verifyPassword({required VoidCallback onConfirm}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: Center(
+                child: Material(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Container(
+                    width: appContext.width - 112.sw,
+                    padding: EdgeInsets.all(20.sw),
+                    constraints: BoxConstraints(maxWidth: 264.sw),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Enter password'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(12.sw),
+                        TextFormField(
+                          style: w400TextStyle(fontSize: 16.sw),
+                          obscureText: hidePass,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12.sw, vertical: 8.sw),
+                            filled: true,
+                            fillColor: appColorBackground,
+                            hintText: 'Password'.tr(),
+                            hintStyle: w400TextStyle(
+                              fontSize: 16.sw,
+                              color: hexColor('#8A8C91'),
+                            ),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(8.sw),
+                            ),
+                            suffixIcon: Padding(
+                              padding: EdgeInsets.only(right: 8.sw),
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    hidePass = !hidePass;
+                                  });
+                                },
+                                child: WidgetAppSVG(
+                                  hidePass ? 'ic_eye' : 'ic_eye_off',
+                                  width: 20.sw,
+                                ),
+                              ),
+                            ),
+                            suffixIconConstraints: BoxConstraints(
+                                maxHeight: 24.sw, minWidth: 28.sw),
+                          ),
+                        ),
+                        Gap(20.sw),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: WidgetRippleButton(
+                                onTap: () {
+                                  Navigator.of(dialogContext).pop();
+                                },
+                                radius: 8,
+                                borderSide: BorderSide(color: appColorPrimary),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.sw),
+                                  child: Center(
+                                    child: Text(
+                                      'Close'.tr(),
+                                      style: w500TextStyle(
+                                        fontSize: 16.sw,
+                                        color: appColorPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Gap(10.sw),
+                            Expanded(
+                              child: WidgetRippleButton(
+                                onTap: () {
+                                  Navigator.of(dialogContext).pop();
+                                  // Todo: check password
+                                  onConfirm.call();
+                                },
+                                radius: 8,
+                                color: appColorPrimary,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.sw),
+                                  child: Center(
+                                    child: Text(
+                                      'Ok'.tr(),
+                                      style: w500TextStyle(
+                                        fontSize: 16.sw,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
@@ -148,7 +278,7 @@ class _WalletScreenState extends State<WalletScreen> {
       child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(assetpng('setting_backgorund')),
+            image: AssetImage(assetpng('app_background')),
             alignment: Alignment.topCenter,
             fit: BoxFit.fitWidth,
           ),
@@ -157,11 +287,12 @@ class _WalletScreenState extends State<WalletScreen> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text('My Wallet'.tr()),
+            backgroundColor: Colors.transparent,
             actions: [
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: WidgetAppSVG('ic_settings'),
                 onPressed: () {
-                  // Todo:
+                  appContext.push('/my-wallet/banks-cards');
                 },
               ),
               Gap(4.sw),
@@ -169,7 +300,7 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           body: Column(
             children: [
-              Gap(32.sw),
+              Gap(24.sw),
               BlocBuilder<AuthCubit, AuthState>(
                 bloc: authCubit,
                 builder: (context, state) {
@@ -180,85 +311,94 @@ class _WalletScreenState extends State<WalletScreen> {
                           symbol: AppPrefs.instance.currencySymbol,
                           decimalDigits: 2,
                         ).format(state.wallet?.availableBalance ?? 0),
-                        style: w700TextStyle(
-                          fontSize: 48,
+                        style: w500TextStyle(
+                          fontSize: 40.sw,
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        "Frozen Balance",
-                        style: w400TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
+                      Gap(4.sw),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.sw, vertical: 4.sw),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: .2),
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: .5)),
                         ),
-                      ),
-                      Text(
-                        NumberFormat.currency(
-                          symbol: AppPrefs.instance.currencySymbol,
-                          decimalDigits: 2,
-                        ).format(state.wallet?.frozenBalance ?? 0),
-                        style: w400TextStyle(fontSize: 16, color: Colors.white),
+                        child: Text(
+                          '${'Pending'.tr()} ${NumberFormat.currency(
+                            symbol: AppPrefs.instance.currencySymbol,
+                            decimalDigits: 2,
+                          ).format(state.wallet?.frozenBalance ?? 0)}',
+                          style: w400TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   );
                 },
               ),
-              Gap(30.sw),
+              Gap(24.sw),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
                 child: Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          appHaptic();
-                          final r =
-                              await appOpenBottomSheet(WidgetTopUpSheet());
-                          if (r is num) {
-                            onTopUp(r);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      child: Container(
+                        padding: EdgeInsets.only(bottom: 3.sw),
+                        decoration: BoxDecoration(
+                          color: hexColor('#EDEDED'),
+                          borderRadius: BorderRadius.circular(10.sw),
                         ),
-                        child: const Text(
-                          'Top Up',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
+                        child: WidgetRippleButton(
+                          onTap: () async {
+                            appHaptic();
+                            final r =
+                                await appOpenBottomSheet(WidgetTopUpSheet());
+                            if (r is num) {
+                              _verifyPassword(onConfirm: () => onTopUp(r));
+                            }
+                          },
+                          radius: 10.sw,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14.5.sw),
+                              child: Text(
+                                'Top Up'.tr(),
+                                style: w500TextStyle(fontSize: 16.sw),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Gap(20.sw),
+                    Gap(12.sw),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          appHaptic();
-                          final r =
-                              await appOpenBottomSheet(WidgetWithDrawSheet());
-                          if (r is num) {
-                            onRequestWithdraw(r);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      child: Container(
+                        padding: EdgeInsets.only(bottom: 3.sw),
+                        decoration: BoxDecoration(
+                          color: hexColor('#EDEDED'),
+                          borderRadius: BorderRadius.circular(10.sw),
                         ),
-                        child: const Text(
-                          'Withdraw',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
+                        child: WidgetRippleButton(
+                          onTap: () async {
+                            appHaptic();
+                            final r =
+                                await appOpenBottomSheet(WidgetWithdrawSheet());
+                            if (r is num) {
+                              _verifyPassword(
+                                  onConfirm: () => onRequestWithdraw(r));
+                            }
+                          },
+                          radius: 10.sw,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14.5.sw),
+                              child: Text(
+                                'Withdraw'.tr(),
+                                style: w500TextStyle(fontSize: 16.sw),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -266,74 +406,100 @@ class _WalletScreenState extends State<WalletScreen> {
                   ],
                 ),
               ),
-              Gap(30.sw),
+              Gap(12.sw),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
+                      topLeft: Radius.circular(20.sw),
+                      topRight: Radius.circular(20.sw),
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(20),
+                      Padding(
+                        padding: EdgeInsets.all(16.sw),
                         child: Text(
-                          'Transactions',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                          'Transactions'.tr(),
+                          style: w600TextStyle(
+                            fontSize: 16.sw,
+                            color: hexColor('#4F4F4F'),
                           ),
                         ),
                       ),
                       Expanded(
                         child: _isLoadingTransactions
-                            ? ListView.builder(
-                                itemCount: 5,
+                            ? ListView.separated(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 16.sw),
+                                itemCount: 10,
+                                separatorBuilder: (context, index) =>
+                                    const AppDivider(),
                                 itemBuilder: (context, index) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
+                                    padding: EdgeInsets.only(
+                                      top: index == 0 ? 0 : 8.sw,
+                                      bottom: 8.sw,
                                     ),
                                     child: Row(
                                       children: [
                                         WidgetAppShimmer(
-                                          height: 40,
-                                          width: 40,
+                                          height: 32.sw,
+                                          width: 32.sw,
                                           borderRadius:
-                                              BorderRadius.circular(8),
+                                              BorderRadius.circular(16.sw),
                                         ),
-                                        Gap(16.sw),
+                                        Gap(8.sw),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
                                             children: [
-                                              WidgetAppShimmer(
-                                                height: 16,
-                                                width: 120,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  WidgetAppShimmer(
+                                                    height: 17.sw,
+                                                    width: 120.sw,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                  WidgetAppShimmer(
+                                                    height: 17.sw,
+                                                    width: 56.sw,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                ],
                                               ),
-                                              Gap(8.sw),
-                                              WidgetAppShimmer(
-                                                height: 14,
-                                                width: 80,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
+                                              Gap(4.sw),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  WidgetAppShimmer(
+                                                    height: 15.sw,
+                                                    width: 105.sw,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                  WidgetAppShimmer(
+                                                    height: 15.sw,
+                                                    width: 48.sw,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        WidgetAppShimmer(
-                                          height: 16,
-                                          width: 60,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
                                         ),
                                       ],
                                     ),
@@ -341,74 +507,122 @@ class _WalletScreenState extends State<WalletScreen> {
                                 },
                               )
                             : transactions!.isEmpty
-                                ? Center(
+                                ? Padding(
+                                    padding: EdgeInsets.only(top: 20.sw),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
-                                        Icon(
-                                          Icons.receipt_long_outlined,
-                                          size: 64,
-                                          color: Colors.grey[400],
-                                        ),
+                                        WidgetAppSVG('ic_empty_transaction'),
                                         Gap(16.sw),
                                         Text(
-                                          'Không có giao dịch nào',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey[600],
-                                          ),
+                                          'There’s nothing here...yet'.tr(),
+                                          style: w500TextStyle(fontSize: 18.sw),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Gap(4.sw),
+                                        Text(
+                                          'We’ll let you know when we get news for you'
+                                              .tr(),
+                                          style: w400TextStyle(color: grey1),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
                                   )
-                                : ListView.builder(
-                                    itemCount: transactions!.length,
-                                    itemBuilder: (context, index) {
-                                      final transaction = transactions![index];
-                                      return ListTile(
-                                        leading: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.green.shade100,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                : RefreshIndicator(
+                                    onRefresh: () async =>
+                                        await _fetchTransactions(),
+                                    child: ListView.separated(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.sw),
+                                      itemCount: transactions!.length,
+                                      separatorBuilder: (context, index) =>
+                                          const AppDivider(),
+                                      itemBuilder: (context, index) {
+                                        final transaction =
+                                            transactions![index];
+                                        bool isDeposit =
+                                            transaction.type?.toLowerCase() ==
+                                                'deposit';
+
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            top: index == 0 ? 0 : 8.sw,
+                                            bottom: 8.sw,
                                           ),
-                                          child: Icon(
-                                            transaction.type == 'deposit'
-                                                ? Icons.add
-                                                : Icons.remove,
-                                            color: Colors.green,
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 16.sw,
+                                                backgroundColor:
+                                                    hexColor('#F9F9F9'),
+                                                child: WidgetAppSVG(
+                                                  isDeposit
+                                                      ? 'wallet-add'
+                                                      : 'wallet-minus',
+                                                  width: 24.sw,
+                                                ),
+                                              ),
+                                              Gap(8.sw),
+                                              Expanded(
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          isDeposit
+                                                              ? 'Depositing money'
+                                                                  .tr()
+                                                              : 'Withdrawing money'
+                                                                  .tr(),
+                                                          style:
+                                                              w400TextStyle(),
+                                                        ),
+                                                        Text(
+                                                          '\$${(transaction.price ?? 0).toStringAsFixed(2)}',
+                                                          style:
+                                                              w400TextStyle(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Gap(2.sw),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          string2DateTime(transaction
+                                                                      .createdAt!)
+                                                                  ?.toLocal()
+                                                                  .formatDateTime() ??
+                                                              '',
+                                                          style: w400TextStyle(
+                                                            fontSize: 12.sw,
+                                                            color: grey1,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          'Success'.tr(),
+                                                          style: w400TextStyle(
+                                                            fontSize: 12.sw,
+                                                            color: green2,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        title: Text(
-                                          transaction.type == 'deposit'
-                                              ? 'Depositing money'
-                                              : 'Withdrawing money',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          string2DateTime(
-                                                      transaction.createdAt!)
-                                                  ?.toLocal()
-                                                  .formatDateTime() ??
-                                              '',
-                                          style: TextStyle(
-                                            color: Colors.grey.shade600,
-                                          ),
-                                        ),
-                                        trailing: Text(
-                                          '\$${(transaction.price ?? 0).toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
                                   ),
                       ),
                     ],

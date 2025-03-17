@@ -11,6 +11,7 @@ class WidgetAppButtonOK extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final double? height;
+  final BorderRadius? borderRadius;
 
   const WidgetAppButtonOK({
     super.key,
@@ -19,6 +20,7 @@ class WidgetAppButtonOK extends StatelessWidget {
     required this.label,
     this.onTap,
     this.height,
+    this.borderRadius,
   });
 
   @override
@@ -30,7 +32,7 @@ class WidgetAppButtonOK extends StatelessWidget {
         child: Ink(
           height: height ?? _height,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.sw),
+            borderRadius: borderRadius ?? BorderRadius.circular(12.sw),
             color: enable ? appColorPrimary : AppColors.instance.grey8,
           ),
           child: Center(
@@ -110,6 +112,7 @@ class WidgetAppButtonCancel extends StatelessWidget {
     );
   }
 }
+
 class WidgetInkWellTransparent extends StatelessWidget {
   const WidgetInkWellTransparent({
     super.key,
@@ -152,7 +155,7 @@ class WidgetInkWellTransparent extends StatelessWidget {
         borderRadius: _borderRadius,
         onTap: onTap,
         onTapDown: onTapDown,
-        hoverColor: hoverColor  ,
+        hoverColor: hoverColor,
         child: child,
       ),
     );

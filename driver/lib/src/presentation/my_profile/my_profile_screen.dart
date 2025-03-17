@@ -61,7 +61,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     children: [
                       Text(
                         'REQUEST TO STOP COOPERATION'.tr(),
-                        style: w600TextStyle(fontSize: 16.sw),
+                        style: w600TextStyle(fontSize: 16.sw, color: grey1),
                       ),
                       const CloseButton(),
                     ],

@@ -92,6 +92,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               context: context,
               barrierDismissible: false,
               builder: (BuildContext dialogContext) {
+                Future.delayed(
+                  const Duration(seconds: 2),
+                  () {
+                    if (mounted) {
+                      Navigator.of(dialogContext).pop();
+                      authCubit.logout();
+                    }
+                  },
+                );
                 return BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
                   child: Center(
@@ -101,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Container(
-                        width: context.width - 112.sw,
+                        width: appContext.width - 112.sw,
                         padding: EdgeInsets.all(20.sw),
                         constraints: BoxConstraints(maxWidth: 264.sw),
                         child: Column(
@@ -123,7 +132,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               },
             );
-            Future.delayed(const Duration(seconds: 2), () => authCubit.logout());
           },
         );
       },
@@ -159,7 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 230.sw + context.mediaQueryPadding.top,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(assetpng('setting_backgorund')),
+                        image: AssetImage(assetpng('setting_background')),
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -184,7 +192,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         height: 66.sw,
                                       ),
                                       WidgetAvatar.withoutBorder(
-                                        imageUrl: AppPrefs.instance.user?.avatar,
+                                        imageUrl:
+                                            AppPrefs.instance.user?.avatar,
                                         radius: 56.sw / 2,
                                         errorAsset: assetpng('defaultavatar'),
                                       )
@@ -193,7 +202,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Gap(12.sw),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           AppPrefs.instance.user?.name ?? '',
@@ -206,7 +216,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         Text(
                                           AppPrefs.instance.user?.phone ?? '',
                                           style: w400TextStyle(
-                                            color: Colors.white.withValues(alpha: .6),
+                                            color: Colors.white
+                                                .withValues(alpha: .6),
                                           ),
                                         )
                                       ],
@@ -222,7 +233,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: CloseButton(
                               color: Colors.white,
                               style: ButtonStyle(
-                                iconSize: WidgetStateProperty.resolveWith((_) => 28.sw),
+                                iconSize: WidgetStateProperty.resolveWith(
+                                    (_) => 28.sw),
                               ),
                             ),
                           ),
@@ -253,7 +265,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               itemBuilder: (context, index) {
                 final item = SettingsItem.values[index];
                 return WidgetRippleButton(
-                  onTap: item == SettingsItem.status || item == SettingsItem.notifications
+                  onTap: item == SettingsItem.status ||
+                          item == SettingsItem.notifications
                       ? null
                       : () {
                           if (item == SettingsItem.deleteAccount) {
@@ -266,7 +279,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                   radius: 0,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 14.sw),
                     child: Row(
                       children: [
                         WidgetAppSVG(item.icon),

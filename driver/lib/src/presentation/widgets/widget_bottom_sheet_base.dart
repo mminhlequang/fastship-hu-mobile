@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:app/src/constants/app_colors.dart';
@@ -36,59 +38,35 @@ class WidgetAppBaseSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
       decoration: BoxDecoration(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          color: color ?? appColorBackground),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        color: color ?? appColorBackground,
+      ),
       child: SingleChildScrollView(
         padding: EdgeInsets.zero,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 20,
-              child: Center(
-                child: Container(
-                  height: 5,
-                  width: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.instance.grey5,
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                ),
-              ),
-            ),
             if (title != null)
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16, top: 8, bottom: 8, right: 16),
+                    padding: EdgeInsets.fromLTRB(16.sw, 4.sw, 6.sw, 4.sw),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: title is Widget
-                              ? title
-                              : Text(
-                                  title!,
-                                  style: w400TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.instance.text,
-                                  ),
-                                ),
+                        Text(
+                          title,
+                          style: w600TextStyle(fontSize: 16.sw, color: grey1),
                         ),
-                        if (actions != null) ...actions!,
+                        const CloseButton(),
                       ],
                     ),
                   ),
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: AppColors.instance.grey8,
-                  ),
+                  const AppDivider(),
                   Container(
                     height: height,
                     width: width,

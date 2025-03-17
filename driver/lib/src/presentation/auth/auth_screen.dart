@@ -92,9 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
           delayRedirect: const Duration(seconds: 2),
         );
         appShowSnackBar(
-            msg: 'Login success, redirecting to home...'.tr(),
-            context: context,
-            type: AppSnackBarType.success);
+          msg: 'Login success, redirecting to home...'.tr(),
+          context: context,
+          type: AppSnackBarType.success,
+        );
       } else {
         // Xử lý lỗi
         _showError(response.msg ?? 'Login failed, please try again!');
