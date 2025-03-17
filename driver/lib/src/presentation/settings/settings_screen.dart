@@ -1,3 +1,4 @@
+import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
@@ -118,8 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         height: 66.sw,
                                       ),
                                       WidgetAvatar.withoutBorder(
-                                        imageUrl:
-                                            AppPrefs.instance.user?.avatar,
+                                        imageUrl: AppPrefs.instance.user?.avatar,
                                         radius: 56.sw / 2,
                                         errorAsset: assetpng('defaultavatar'),
                                       )
@@ -128,8 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Gap(12.sw),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           AppPrefs.instance.user?.name ?? '',
@@ -142,8 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         Text(
                                           AppPrefs.instance.user?.phone ?? '',
                                           style: w400TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: .6),
+                                            color: Colors.white.withValues(alpha: .6),
                                           ),
                                         )
                                       ],
@@ -159,8 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: CloseButton(
                               color: Colors.white,
                               style: ButtonStyle(
-                                iconSize: WidgetStateProperty.resolveWith(
-                                    (_) => 28.sw),
+                                iconSize: WidgetStateProperty.resolveWith((_) => 28.sw),
                               ),
                             ),
                           ),
@@ -191,8 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               itemBuilder: (context, index) {
                 final item = SettingsItem.values[index];
                 return WidgetRippleButton(
-                  onTap: item == SettingsItem.status ||
-                          item == SettingsItem.notifications
+                  onTap: item == SettingsItem.status || item == SettingsItem.notifications
                       ? null
                       : () {
                           if (item == SettingsItem.deleteAccount) {
@@ -201,9 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               builder: (context) {
                                 return WidgetConfirmDialog(
                                   title: 'Delete account'.tr(),
-                                  subTitle:
-                                      'Are you sure you want to delete your account?'
-                                          .tr(),
+                                  subTitle: 'Are you sure you want to delete your account?'.tr(),
                                   onConfirm: () {
                                     // Todo:
                                   },
@@ -216,11 +210,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               builder: (context) {
                                 return WidgetConfirmDialog(
                                   title: 'Log out'.tr(),
-                                  subTitle:
-                                      'Do you really want to log out?'.tr(),
-                                  onConfirm: () {
-                                    // Todo:
-                                  },
+                                  subTitle: 'Do you really want to log out?'.tr(),
+                                  onConfirm: authCubit.logout,
                                 );
                               },
                             );
@@ -230,8 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                   radius: 0,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 16.sw, vertical: 14.sw),
+                    padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
                     child: Row(
                       children: [
                         WidgetAppSVG(item.icon),
