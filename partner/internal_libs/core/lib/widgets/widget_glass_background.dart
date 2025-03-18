@@ -37,7 +37,7 @@ class WidgetGlassBackground extends StatelessWidget {
             decoration: BoxDecoration(
               border: border,
               borderRadius: borderRadius ?? BorderRadius.circular(8),
-              color: backgroundColor ?? Colors.grey.shade200.withOpacity(0.5),
+              color: backgroundColor ?? Colors.grey.shade200.withValues(alpha: 0.5),
             ),
             child: child,
           ),
@@ -59,7 +59,7 @@ class WidgetGlassBackground extends StatelessWidget {
     //             ),
     //           ),
     //           decoration: new BoxDecoration(
-    //             color: backgroundColor ?? Colors.grey.shade200.withOpacity(0.5),
+    //             color: backgroundColor ?? Colors.grey.shade200.withValues(alpha: 0.5),
     //           ),
     //         ),
     //         new BackdropFilter(

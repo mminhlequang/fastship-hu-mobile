@@ -1,11 +1,15 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:app/src/network_resources/auth/repo.dart';
 import 'package:internal_core/setup/app_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../network_resources/auth/models/models.dart';
 
 class AppPrefs extends AppPrefsBase {
   AppPrefs._();
@@ -40,9 +44,11 @@ class AppPrefs extends AppPrefsBase {
   Stream watch(key) => _boxData.watch(key: key);
 
   void clear() {
-    _boxData.deleteAll([
+    _boxAuth.deleteAll([
       AppPrefsBase.accessTokenKey,
       AppPrefsBase.refreshTokenKey,
+    ]);
+    _boxData.deleteAll([
       AppPrefsBase.themeModeKey,
       AppPrefsBase.languageCodeKey,
       "user_info",
@@ -68,57 +74,65 @@ class AppPrefs extends AppPrefsBase {
   set dateFormat(String value) => _boxData.put('dateFormat', value);
 
   @override
-  String get dateFormat => _boxData.get('dateFormat') ?? 'en';
+  String get dateFormat => _boxData.get('dateFormat') ?? 'dd/MM/yyyy';
 
   @override
   set timeFormat(String value) => _boxData.put('timeFormat', value);
 
   @override
-  String get timeFormat => _boxData.get('timeFormat') ?? 'en';
+  String get timeFormat => _boxData.get('timeFormat') ?? 'HH:mm';
 
-  // Future saveAccountToken(AccountToken token) async {
-  //   await Future.wait([
-  //     _box.put(AppPrefsBase.accessTokenKey, token.accessToken),
-  //     _box.put(AppPrefsBase.refreshTokenKey, token.refreshToken)
-  //   ]);
-  // }
+  Future saveAccountToken(ResponseLogin response) async {
+    await Future.wait([
+      _boxAuth.put(AppPrefsBase.accessTokenKey, response.accessToken),
+      _boxAuth.put(AppPrefsBase.refreshTokenKey, response.refreshToken)
+    ]);
+  }
 
-  // dynamic getNormalToken() async {
-  //   var result = await _box.get(AppPrefsBase.accessTokenKey);
-  //   if (result != null) {
-  //     DateTime? expiryDate = Jwt.getExpiryDate(result.toString());
-  //     if (expiryDate != null &&
-  //         expiryDate.millisecondsSinceEpoch <
-  //             DateTime.now().millisecondsSinceEpoch) {
-  //       String? refresh = await _box.get(AppPrefsBase.refreshTokenKey);
-  //       if (refresh != null) {
-  //         NetworkResponse response =
-  //             await AccountUsersRepo().refresh_access_token(refresh);
-  //         if (response.data?.accessToken != null) {
-  //           result = response.data?.accessToken;
-  //           saveAccountToken(response.data!);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return result;
-  // }
+  dynamic getNormalToken() async {
+    var result = await _boxAuth.get(AppPrefsBase.accessTokenKey);
+    if (result != null) {
+      DateTime? expiryDate = Jwt.getExpiryDate(result.toString());
+      if (expiryDate != null &&
+          expiryDate.millisecondsSinceEpoch <
+              DateTime.now().millisecondsSinceEpoch) {
+        String? refresh = await _boxAuth.get(AppPrefsBase.refreshTokenKey);
+        if (refresh != null) {
+          NetworkResponse response =
+              await AuthRepo().refreshToken({"refresh_token": refresh});
+          if (response.data?.accessToken != null) {
+            result = response.data?.accessToken;
+            saveAccountToken(response.data!);
+          }
+        }
+      }
+    }
+    return result;
+  }
 
-  // AccountUser? get user {
-  //   final objectString = _box.get('user_info');
-  //   if (objectString != null) {
-  //     final jsonMap = jsonDecode(objectString);
-  //     return AccountUser.fromJson(jsonMap);
-  //   }
-  //   return null;
-  // }
+  AccountModel? get user {
+    final objectString = _boxData.get('user_info');
+    if (objectString != null) {
+      final jsonMap = jsonDecode(objectString);
+      return AccountModel.fromJson(jsonMap);
+    }
+    return null;
+  }
 
-  // set user(userInfo) {
-  //   if (userInfo != null) {
-  //     final string = json.encode(userInfo.toJson());
-  //     _box.put('user_info', string);
-  //   } else {
-  //     _box.delete('user_info');
-  //   }
-  // }
+  set user(userInfo) {
+    if (userInfo != null) {
+      final string = json.encode(userInfo.toJson());
+      _boxData.put('user_info', string);
+    } else {
+      _boxData.delete('user_info');
+    }
+  }
+
+  String? get currency => _boxData.get('currency') ?? "EUR";
+
+  set currency(String? value) => _boxData.put('currency', value);
+
+  String? get currencySymbol => _boxData.get('currency_symbol') ?? "€";
+
+  set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 }

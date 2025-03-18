@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
@@ -49,7 +48,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
-    appContext.pushReplacement("/navigation");
+    appContext.pushReplacement('/activity-area');
     return;
     if (state.stateType == AuthStateType.logged) {
       appContext.pushReplacement("/navigation");

@@ -191,7 +191,7 @@ class _WidgetRowValueState extends State<WidgetRowValue> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withValues(alpha: 0.08),
                           offset: const Offset(0, 6),
                           blurRadius: 20,
                           spreadRadius: 0,

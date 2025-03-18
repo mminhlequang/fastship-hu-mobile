@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/firebase_options.dart';
+import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -8,13 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/setup/app_utils.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
 import 'src/utils/utils.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); 
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
@@ -69,12 +73,70 @@ class _AppState extends State<_App> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        theme: AppPrefs.instance.isDarkTheme
-            ? ThemeData.dark()
-            : ThemeData.light(),
+        theme: (AppPrefs.instance.isDarkTheme
+                ? ThemeData.dark()
+                : ThemeData.light())
+            .copyWith(
+          scaffoldBackgroundColor: appColorBackground,
+          appBarTheme: AppBarTheme(
+            backgroundColor: appColorPrimary,
+            titleSpacing: 0,
+            titleTextStyle: GoogleFonts.inter(
+              fontSize: 20.sw,
+              color: Colors.white,
+              height: 1.2,
+              fontWeight: FontWeight.w500,
+            ),
+            iconTheme: IconThemeData(color: Colors.white),
+            actionsIconTheme: IconThemeData(color: Colors.white),
+          ),
+          tabBarTheme: TabBarTheme(
+            dividerHeight: 1.sw,
+            dividerColor: hexColor('#F1F4F6'),
+            indicator: _TabIndicator(),
+            labelColor: appColorText,
+            labelStyle: w400TextStyle(fontSize: 16.sw),
+            unselectedLabelColor: appColorText,
+            unselectedLabelStyle: w400TextStyle(fontSize: 16.sw),
+            indicatorSize: TabBarIndicatorSize.tab,
+          ),
+        ),
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       ),
+    );
+  }
+}
+
+class _TabIndicator extends BoxDecoration {
+  final BoxPainter _painter;
+
+  _TabIndicator() : _painter = _TabIndicatorPainter();
+
+  @override
+  BoxPainter createBoxPainter([onChanged]) => _painter;
+}
+
+class _TabIndicatorPainter extends BoxPainter {
+  final Paint _paint;
+
+  _TabIndicatorPainter()
+      : _paint = Paint()
+          ..color = appColorPrimary
+          ..isAntiAlias = true;
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
+    final double xPos = offset.dx + cfg.size!.width;
+    final double yPos = offset.dy + cfg.size!.height;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        // Rect.fromLTRB(offset.dx, 0, xPos, 2),
+        Rect.fromLTRB(offset.dx, yPos - 2, xPos, yPos),
+        const Radius.circular(4),
+      ),
+      _paint,
     );
   }
 }

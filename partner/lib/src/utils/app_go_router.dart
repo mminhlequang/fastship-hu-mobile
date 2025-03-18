@@ -1,4 +1,5 @@
 import 'package:app/src/presentation/splash/splash_screen.dart';
+import 'package:app/src/presentation/store_registration/export.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,6 +20,77 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/activity-area',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const ActivityAreaScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/select-area',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const SelectAreaScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/store-registration',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const StoreRegistrationScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/provide-info',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const ProvideInfoScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
     ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,

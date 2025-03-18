@@ -25,7 +25,7 @@ class WidgetPopupContainer extends StatelessWidget {
           margin: const EdgeInsets.only(top: 8),
           decoration: BoxDecoration(
               boxShadow: [
-                BoxShadow(color: appColorText.withOpacity(.1), blurRadius: 12)
+                BoxShadow(color: appColorText.withValues(alpha: .1), blurRadius: 12)
               ],
               color: appColorBackground,
               borderRadius: BorderRadius.circular(16)),
