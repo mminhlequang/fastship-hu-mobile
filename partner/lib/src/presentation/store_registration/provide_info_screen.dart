@@ -21,8 +21,7 @@ import 'package:internal_core/extensions/date_extension.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widget_app_svg.dart';
-
-import '../../network_resources/auth/models/models.dart';
+import 'package:app/src/network_resources/auth/models/models.dart';
 
 class ProvideInfoScreen extends StatefulWidget {
   const ProvideInfoScreen({super.key});
@@ -32,14 +31,13 @@ class ProvideInfoScreen extends StatefulWidget {
 }
 
 class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
+  List<String> allSteps = [
+    'Basic Information'.tr(),
+    'Representative Information'.tr(),
+    'Bank Information'.tr(),
+    'Detail Information'.tr()
+  ];
   int step = 0;
-
-  String get nameStep => switch (step) {
-        0 => 'Basic Information'.tr(),
-        1 => 'Representative Information'.tr(),
-        2 => 'Bank Information'.tr(),
-        _ => 'Detail Information'.tr(),
-      };
 
   Widget? get actionButton => switch (step) {
         1 => GestureDetector(
@@ -75,15 +73,12 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
             personalInfo['address'] != null,
         1 => kDebugMode
             ? true
-            : (idCardImages['imageIDCardFront'] != null &&
-                idCardImages['imageIDCardBack'] != null),
-        2 =>
-          ((emergencyContact['emergencyContacts'] ?? []) as List).isNotEmpty ==
-              true,
+            : (idCardImages['imageIDCardFront'] != null && idCardImages['imageIDCardBack'] != null),
+        2 => ((emergencyContact['emergencyContacts'] ?? []) as List).isNotEmpty == true,
         _ => true,
       };
 
-  ValueNotifier<String> _processor = ValueNotifier('no');
+  final ValueNotifier<String> _processor = ValueNotifier('no');
 
   _updateProfile({bool showBottomSheet = true}) async {
     _processor.value = 'loading';
@@ -115,21 +110,17 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
     try {
       final futures = await Future.wait([
         if (idCardImages['imageIDCardFront'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageIDCardFront'] as XFile).path,
-              'image_cccd_before'),
+          MerchantRepo()
+              .uploadFile((idCardImages['imageIDCardFront'] as XFile).path, 'image_cccd_before'),
         if (idCardImages['imageIDCardBack'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageIDCardBack'] as XFile).path,
-              'image_cccd_after'),
+          MerchantRepo()
+              .uploadFile((idCardImages['imageIDCardBack'] as XFile).path, 'image_cccd_after'),
         if (idCardImages['imageDrivingLicenseFront'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseFront'] as XFile).path,
-              'image_license_before'),
+              (idCardImages['imageDrivingLicenseFront'] as XFile).path, 'image_license_before'),
         if (idCardImages['imageDrivingLicenseBack'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseBack'] as XFile).path,
-              'image_license_after'),
+              (idCardImages['imageDrivingLicenseBack'] as XFile).path, 'image_license_after'),
       ]);
 
       // Lưu URL của các ảnh đã upload
@@ -171,8 +162,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
         // Thông tin cá nhân
         'name': personalInfo['fullName'],
         'sex': personalInfo['gender'],
-        'birthday': (personalInfo['birthday'] as DateTime)
-            .formatDate(formatType: 'yyyy-MM-dd'),
+        'birthday': (personalInfo['birthday'] as DateTime).formatDate(formatType: 'yyyy-MM-dd'),
         'address': (personalInfo['address'] as HereSearchResult).address,
 
         // Thông tin CCCD
@@ -207,8 +197,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
   Widget _buildStepper() {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-          8.sw, 4.sw + context.mediaQueryPadding.top, 16.sw, 12),
+      padding: EdgeInsets.fromLTRB(8.sw, 4.sw + context.mediaQueryPadding.top, 16.sw, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -225,19 +214,20 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
               Expanded(
                 child: Row(
                   spacing: 6.sw,
-                  children: List.generate(3, (index) {
-                    return Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: index <= step
-                              ? appColorPrimary
-                              : AppColors.instance.grey5,
-                          borderRadius: BorderRadius.circular(100),
+                  children: List.generate(
+                    allSteps.length,
+                    (index) {
+                      return Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: index <= step ? appColorPrimary : AppColors.instance.grey5,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          height: 5.sw,
                         ),
-                        height: 5.sw,
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
               ),
               Gap(12.sw),
@@ -256,7 +246,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
               Gap(8.sw),
               Expanded(
                 child: Text(
-                  nameStep,
+                  allSteps[step],
                   style: w500TextStyle(fontSize: 18.sw),
                 ),
               ),
@@ -271,8 +261,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
   Widget _buildBottomNavigation() {
     return Container(
-      padding: EdgeInsets.fromLTRB(
-          20.sw, 12.sw, 20.sw, 8.sw + context.mediaQueryPadding.bottom),
+      padding: EdgeInsets.fromLTRB(20.sw, 12.sw, 20.sw, 8.sw + context.mediaQueryPadding.bottom),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
@@ -371,7 +360,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
                           });
                         },
                       ),
-                    _ => SizedBox.shrink(),
+                    _ => Placeholder(),
                   },
                 ),
               ),
