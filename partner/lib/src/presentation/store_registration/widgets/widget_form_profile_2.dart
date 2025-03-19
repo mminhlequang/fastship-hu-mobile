@@ -35,11 +35,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
     if (widget.initialData != null) {
       _imageIDCardFront = widget.initialData!['imageIDCardFront'];
       _imageIDCardBack = widget.initialData!['imageIDCardBack'];
-      _imageDrivingLicenseFront =
-          widget.initialData!['imageDrivingLicenseFront'];
+      _imageDrivingLicenseFront = widget.initialData!['imageDrivingLicenseFront'];
       _imageDrivingLicenseBack = widget.initialData!['imageDrivingLicenseBack'];
-      _imageVehicleRegistration =
-          widget.initialData!['imageVehicleRegistration'];
+      _imageVehicleRegistration = widget.initialData!['imageVehicleRegistration'];
     }
   }
 
@@ -82,9 +80,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     isBack: false,
                     image: _imageIDCardFront,
                     onTap: () {
-                      ImagePicker()
-                          .pickImage(source: ImageSource.camera)
-                          .then((value) {
+                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
                         if (value != null) {
                           setState(() {
                             _imageIDCardFront = value;
@@ -100,9 +96,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     isBack: true,
                     image: _imageIDCardBack,
                     onTap: () {
-                      ImagePicker()
-                          .pickImage(source: ImageSource.camera)
-                          .then((value) {
+                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
                         if (value != null) {
                           setState(() {
                             _imageIDCardBack = value;
@@ -121,8 +115,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               ),
               Gap(4.sw),
               Text(
-                'Upload both sides to verify your driving ability and license validity.'
-                    .tr(),
+                'Upload both sides to verify your driving ability and license validity.'.tr(),
                 style: w300TextStyle(
                   fontSize: 14.sw,
                 ),
@@ -135,9 +128,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     isBack: false,
                     image: _imageDrivingLicenseFront,
                     onTap: () {
-                      ImagePicker()
-                          .pickImage(source: ImageSource.camera)
-                          .then((value) {
+                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
                         if (value != null) {
                           setState(() {
                             _imageDrivingLicenseFront = value;
@@ -153,9 +144,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     isBack: true,
                     image: _imageDrivingLicenseBack,
                     onTap: () {
-                      ImagePicker()
-                          .pickImage(source: ImageSource.camera)
-                          .then((value) {
+                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
                         if (value != null) {
                           setState(() {
                             _imageDrivingLicenseBack = value;
@@ -174,8 +163,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               ),
               Gap(4.sw),
               Text(
-                'Upload to verify your vehicle ownership and ensure safety standards.'
-                    .tr(),
+                'Upload to verify your vehicle ownership and ensure safety standards.'.tr(),
                 style: w300TextStyle(
                   fontSize: 14.sw,
                 ),
@@ -187,9 +175,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     'Upload certificate'.tr(),
                     image: _imageVehicleRegistration,
                     onTap: () {
-                      ImagePicker()
-                          .pickImage(source: ImageSource.camera)
-                          .then((value) {
+                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
                         if (value != null) {
                           setState(() {
                             _imageVehicleRegistration = value;

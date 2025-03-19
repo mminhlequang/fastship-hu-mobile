@@ -51,8 +51,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialData != null &&
-        widget.initialData!['emergencyContacts'] != null) {
+    if (widget.initialData != null && widget.initialData!['emergencyContacts'] != null) {
       final List<dynamic> contacts = widget.initialData!['emergencyContacts'];
       _emergencyContacts.addAll(
         contacts.map((contact) => EmergencyContact(
@@ -121,8 +120,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
               ),
               Gap(4.sw),
               Text(
-                'Add emergency contacts who can be reached in case of need.'
-                    .tr(),
+                'Add emergency contacts who can be reached in case of need.'.tr(),
                 style: w300TextStyle(
                   fontSize: 14.sw,
                 ),
@@ -243,8 +241,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                   Expanded(
                     child: WidgetAppButtonOK(
                       onTap: _addEmergencyContact,
-                      enable: _nameController.text.isNotEmpty &&
-                          _isValidPhoneNumber,
+                      enable: _nameController.text.isNotEmpty && _isValidPhoneNumber,
                       label: 'Add'.tr(),
                       height: 48.sw,
                     ),

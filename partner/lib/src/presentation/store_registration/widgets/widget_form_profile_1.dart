@@ -36,8 +36,7 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     if (widget.initialData != null) {
       _fullNameController.text = widget.initialData!['fullName'] ?? '';
       _selectedGender = widget.initialData!['gender'] != null
-          ? Gender.values
-              .firstWhere((e) => e.value == widget.initialData!['gender'])
+          ? Gender.values.firstWhere((e) => e.value == widget.initialData!['gender'])
           : null;
       _birthday = widget.initialData!['birthday'];
       _selectedAddress = widget.initialData!['address'];

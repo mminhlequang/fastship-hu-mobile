@@ -7,6 +7,7 @@ import 'package:app/src/presentation/store_registration/widgets/widget_bottomshe
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_1.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_2.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_3.dart';
+import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_4.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_prefs.dart';
 import 'package:app/src/utils/app_utils.dart';
@@ -360,7 +361,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
                           });
                         },
                       ),
-                    _ => Placeholder(),
+                    _ => WidgetFormProfile4(),
                   },
                 ),
               ),
