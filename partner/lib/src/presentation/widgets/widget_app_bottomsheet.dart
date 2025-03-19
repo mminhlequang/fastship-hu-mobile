@@ -39,7 +39,7 @@ class WidgetAppBottomSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        color: color ?? appColorBackground,
+        color: color ?? Colors.white,
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.zero,

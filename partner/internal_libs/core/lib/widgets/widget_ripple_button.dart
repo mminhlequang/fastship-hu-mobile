@@ -36,6 +36,7 @@ class WidgetRippleButton extends StatelessWidget {
       clipBehavior: Clip.none,
       child: InkWell(
         borderRadius: BorderRadius.circular(radius),
+        radius: radius,
         onTap: enable && onTap != null
             ? () {
                 appHaptic();

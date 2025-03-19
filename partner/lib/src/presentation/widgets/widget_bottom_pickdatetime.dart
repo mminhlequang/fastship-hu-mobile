@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
@@ -82,16 +83,9 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
             ),
           ),
         ),
-        Gap(4)
+        Gap(4),
       ],
-      child: Container(
-        margin: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: appColorElement,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: _buildPickerContent(),
-      ),
+      child: _buildPickerContent(),
     );
   }
 
@@ -208,13 +202,8 @@ class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
         ),
         Gap(4)
       ],
-      child: Container(
-        margin: EdgeInsets.all(12),
-        height: 200,
-        decoration: BoxDecoration(
-          color: appColorElement,
-          borderRadius: BorderRadius.circular(16),
-        ),
+      child: SizedBox(
+        height: 180.sw,
         child: WidgetTimePicker(
           onTimeChange: (DateTime time) {
             setState(() {
@@ -253,8 +242,8 @@ class _WidgetTimePickerState extends State<WidgetTimePicker> {
           is24HourMode: true,
           isShowSeconds: false,
           time: widget.initialSelectedDate,
-          normalTextStyle:
-              w500TextStyle(color: appColorText.withValues(alpha: .65), fontSize: 16),
+          normalTextStyle: w500TextStyle(
+              color: appColorText.withValues(alpha: .65), fontSize: 16),
           highlightedTextStyle:
               w500TextStyle(color: appColorText, fontSize: 18),
           spacing: 24,

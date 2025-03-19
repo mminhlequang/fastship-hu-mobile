@@ -15,3 +15,4 @@ export 'widget_drop_selector_builder.dart';
 export 'widget_bottom_pickdatetime.dart';
 export 'widget_time_picker_spinner.dart';
 export 'widget_app_textfield.dart';
+export 'widget_app_upload_image.dart';

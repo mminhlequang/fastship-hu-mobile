@@ -18,6 +18,8 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.hintText,
+    this.onTap,
+    this.padding,
   });
 
   final String title;
@@ -31,53 +33,63 @@ class AppTextField extends StatelessWidget {
   final Function(String value)? onChanged;
   final Function(String value)? onSubmitted;
   final String? hintText;
+  final VoidCallback? onTap;
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text.rich(
-          TextSpan(
-            text: title,
-            style: w600TextStyle(),
-            children: isRequired
-                ? [
-                    TextSpan(
-                      text: '*',
-                      style: w600TextStyle(color: appColorError),
-                    )
-                  ]
-                : null,
-          ),
-        ),
-        Gap(8.sw),
-        TextFormField(
-          controller: controller,
-          style: w400TextStyle(fontSize: 16.sw),
-          maxLines: maxLines,
-          minLines: minLines,
-          readOnly: readOnly,
-          focusNode: focusNode,
-          keyboardType: keyboardType,
-          cursorColor: appColorText,
-          onChanged: onChanged?.call,
-          onFieldSubmitted: onSubmitted?.call,
-          decoration: InputDecoration(
-            isDense: true,
-            isCollapsed: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
-            filled: true,
-            fillColor: appColorBackground,
-            hintText: hintText,
-            hintStyle: w400TextStyle(fontSize: 16.sw, color: hexColor('#8A8C91')),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(8.sw),
+    return Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
+              text: title,
+              style: w600TextStyle(),
+              children: isRequired
+                  ? [
+                      TextSpan(
+                        text: '*',
+                        style: w600TextStyle(color: appColorError),
+                      )
+                    ]
+                  : null,
             ),
           ),
-        ),
-      ],
+          Gap(8.sw),
+          TextFormField(
+            controller: controller,
+            style: w400TextStyle(fontSize: 16.sw),
+            maxLines: maxLines,
+            minLines: minLines,
+            readOnly: readOnly,
+            focusNode: focusNode,
+            keyboardType: keyboardType,
+            cursorColor: appColorText,
+            onChanged: onChanged?.call,
+            onFieldSubmitted: onSubmitted?.call,
+            onTap: onTap?.call,
+            decoration: InputDecoration(
+              isDense: true,
+              isCollapsed: true,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+              filled: true,
+              fillColor: appColorBackground,
+              hintText: hintText,
+              hintStyle: w400TextStyle(
+                fontSize: 16.sw,
+                color: hexColor('#8A8C91'),
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(8.sw),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

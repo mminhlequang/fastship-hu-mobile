@@ -1,13 +1,26 @@
-import 'dart:io';
-
 import 'package:app/src/constants/constants.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/app_utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widgets.dart';
+
+enum RepresentativeType {
+  personal,
+  householdBusiness,
+  enterprise;
+
+  String get displayName => switch (this) {
+        personal => 'Personal'.tr(),
+        householdBusiness => 'Household Business'.tr(),
+        enterprise => 'Enterprise'.tr(),
+      };
+}
 
 class WidgetFormProfile2 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
@@ -23,11 +36,30 @@ class WidgetFormProfile2 extends StatefulWidget {
 }
 
 class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
+  RepresentativeType type = RepresentativeType.personal;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _idController = TextEditingController(); // cccd
+  DateTime? _issueDate; // ngày cấp cccd
+  final TextEditingController _taxCodeController = TextEditingController();
+
+  /// Hộ kinh doanh
+  final TextEditingController _businessNameController = TextEditingController();
+  final TextEditingController _businessAddressController =
+      TextEditingController();
+
+  /// Doanh nghiệp
+  final TextEditingController _enterpriseNameController =
+      TextEditingController();
+  final TextEditingController _enterpriseAddressController =
+      TextEditingController();
+
   XFile? _imageIDCardFront;
   XFile? _imageIDCardBack;
-  XFile? _imageDrivingLicenseFront;
-  XFile? _imageDrivingLicenseBack;
-  XFile? _imageVehicleRegistration;
+  XFile? _imageBusinessLicense;
+  XFile? _imageTaxCode;
+  XFile? _imageRelatedDocument;
 
   @override
   void initState() {
@@ -35,203 +67,287 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
     if (widget.initialData != null) {
       _imageIDCardFront = widget.initialData!['imageIDCardFront'];
       _imageIDCardBack = widget.initialData!['imageIDCardBack'];
-      _imageDrivingLicenseFront = widget.initialData!['imageDrivingLicenseFront'];
-      _imageDrivingLicenseBack = widget.initialData!['imageDrivingLicenseBack'];
-      _imageVehicleRegistration = widget.initialData!['imageVehicleRegistration'];
     }
   }
 
-  void _onChanged() {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _idController.dispose();
+    _taxCodeController.dispose();
+    _businessNameController.dispose();
+    _businessAddressController.dispose();
+    _enterpriseNameController.dispose();
+    _enterpriseAddressController.dispose();
+    super.dispose();
+  }
+
+  _onChanged() {
     widget.onChanged({
       'imageIDCardFront': _imageIDCardFront,
       'imageIDCardBack': _imageIDCardBack,
-      'imageDrivingLicenseFront': _imageDrivingLicenseFront,
-      'imageDrivingLicenseBack': _imageDrivingLicenseBack,
-      'imageVehicleRegistration': _imageVehicleRegistration,
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.sw),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'National ID Card or Passport'.tr(),
-                style: w500TextStyle(fontSize: 14.sw),
-              ),
-              Gap(4.sw),
-              Text(
-                'Upload clear photos of both sides to verify your identity and ensure compliance.'
-                    .tr(),
-                style: w300TextStyle(
-                  fontSize: 14.sw,
-                ),
-              ),
-              Gap(12.sw),
-              Row(
-                children: [
-                  _buildUploadBox(
-                    'Front side'.tr(),
-                    isBack: false,
-                    image: _imageIDCardFront,
-                    onTap: () {
-                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                        if (value != null) {
-                          setState(() {
-                            _imageIDCardFront = value;
-                          });
-                          _onChanged();
-                        }
-                      });
-                    },
-                  ),
-                  Gap(12.sw),
-                  _buildUploadBox(
-                    'Back side'.tr(),
-                    isBack: true,
-                    image: _imageIDCardBack,
-                    onTap: () {
-                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                        if (value != null) {
-                          setState(() {
-                            _imageIDCardBack = value;
-                          });
-                          _onChanged();
-                        }
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Gap(24.sw),
-              Text(
-                'Driving License'.tr(),
-                style: w500TextStyle(fontSize: 14.sw),
-              ),
-              Gap(4.sw),
-              Text(
-                'Upload both sides to verify your driving ability and license validity.'.tr(),
-                style: w300TextStyle(
-                  fontSize: 14.sw,
-                ),
-              ),
-              Gap(12.sw),
-              Row(
-                children: [
-                  _buildUploadBox(
-                    'Front side'.tr(),
-                    isBack: false,
-                    image: _imageDrivingLicenseFront,
-                    onTap: () {
-                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                        if (value != null) {
-                          setState(() {
-                            _imageDrivingLicenseFront = value;
-                          });
-                          _onChanged();
-                        }
-                      });
-                    },
-                  ),
-                  Gap(12.sw),
-                  _buildUploadBox(
-                    'Back side'.tr(),
-                    isBack: true,
-                    image: _imageDrivingLicenseBack,
-                    onTap: () {
-                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                        if (value != null) {
-                          setState(() {
-                            _imageDrivingLicenseBack = value;
-                          });
-                          _onChanged();
-                        }
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Gap(24.sw),
-              Text(
-                'Vehicle Registration Certificate'.tr(),
-                style: w500TextStyle(fontSize: 14.sw),
-              ),
-              Gap(4.sw),
-              Text(
-                'Upload to verify your vehicle ownership and ensure safety standards.'.tr(),
-                style: w300TextStyle(
-                  fontSize: 14.sw,
-                ),
-              ),
-              Gap(12.sw),
-              Row(
-                children: [
-                  _buildUploadBox(
-                    'Upload certificate'.tr(),
-                    image: _imageVehicleRegistration,
-                    onTap: () {
-                      ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                        if (value != null) {
-                          setState(() {
-                            _imageVehicleRegistration = value;
-                          });
-                          _onChanged();
-                        }
-                      });
-                    },
-                  ),
-                  Gap(12.sw),
-                  Spacer(),
-                ],
-              ),
-              Gap(12.sw),
-            ],
-          ),
-        ),
-        Gap(32),
-      ],
-    );
-  }
-
-  Widget _buildUploadBox(
-    String title, {
-    XFile? image,
-    bool isBack = false,
-    VoidCallback? onTap,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
+    return ColoredBox(
+      color: Colors.white,
+      child: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (image != null)
-              Image.file(
-                File(image.path),
-                width: double.infinity,
-                height: 120.sw,
-                fit: BoxFit.fill,
-              )
-            else
-              WidgetAppSVG(
-                isBack ? 'cccd_back' : 'cccd_front',
-                width: double.infinity,
-                height: 120.sw,
-                fit: BoxFit.fill,
-              ),
-            Gap(12.sw),
-            Text(
-              title,
-              style: w300TextStyle(
-                fontSize: 12.sw,
-                color: appColorText.withValues(alpha: 0.5),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              child: Row(
+                children: RepresentativeType.values.map((e) {
+                  bool isSelected = e == type;
+                  return Expanded(
+                    child: WidgetRippleButton(
+                      onTap: () {
+                        if (!isSelected) {
+                          setState(() {
+                            type = e;
+                          });
+                        }
+                      },
+                      color: isSelected
+                          ? hexColor('#74CA45').withValues(alpha: .05)
+                          : Colors.white,
+                      borderSide: BorderSide(
+                          color: isSelected ? appColorPrimary : grey8),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12.sw),
+                          child: Text(
+                            e.displayName,
+                            style: w400TextStyle(
+                              color: isSelected ? appColorPrimary : grey1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
+            if (type == RepresentativeType.enterprise) ...[
+              Gap(24.sw),
+              AppTextField(
+                controller: _enterpriseNameController,
+                title: 'Company name'.tr(),
+                hintText: 'Enter company name'.tr(),
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              ),
+              Gap(24.sw),
+              AppTextField(
+                controller: _enterpriseAddressController,
+                title: 'Company address'.tr(),
+                hintText: 'Enter company address'.tr(),
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              ),
+              Gap(24.sw),
+              Container(height: 8.sw, color: appColorBackground),
+            ],
+            Gap(24.sw),
+            AppTextField(
+              controller: _nameController,
+              title: 'Full name'.tr(),
+              hintText: 'Enter full name'.tr(),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            ),
+            Gap(24.sw),
+            AppTextField(
+              controller: _emailController,
+              title: 'Email'.tr(),
+              hintText: 'Enter email'.tr(),
+              keyboardType: TextInputType.emailAddress,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            ),
+            Gap(24.sw),
+            AppTextField(
+              controller: _phoneController,
+              title: 'Phone number'.tr(),
+              hintText: 'Enter phone number'.tr(),
+              keyboardType: TextInputType.phone,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            ),
+            Gap(24.sw),
+            AppTextField(
+              controller: _idController,
+              title: 'ID Card number'.tr(),
+              hintText: 'Enter ID Card number'.tr(),
+              keyboardType: TextInputType.number,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            ),
+            Gap(24.sw),
+            AppTextField(
+              title: 'Issue date'.tr(),
+              hintText: 'dd/mm/yyyy',
+              readOnly: true,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onTap: () {
+                appHaptic();
+                appOpenDateTimePicker(
+                  DateTime.now(),
+                  (date) {
+                    setState(() {
+                      _issueDate = date;
+                    });
+                    _onChanged();
+                  },
+                );
+              },
+            ),
+            Gap(24.sw),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              child: Text.rich(
+                TextSpan(
+                  text: 'ID Card images'.tr(),
+                  style: w600TextStyle(),
+                  children: [
+                    TextSpan(
+                      text: '*',
+                      style: w600TextStyle(color: appColorError),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Gap(4.sw),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              child: GestureDetector(
+                onTap: () {
+                  appHaptic();
+                  // Todo:
+                },
+                child: Text(
+                  'See instruction'.tr(),
+                  style: w400TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: blue1,
+                  ),
+                ),
+              ),
+            ),
+            Gap(16.sw),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            appHaptic();
+                            // Todo: upload cccd front
+                          },
+                          child: WidgetAppSVG(
+                            'cccd_front',
+                            width: (context.width - 55.sw) / 2,
+                          ),
+                        ),
+                        Gap(12.sw),
+                        Text(
+                          '1. ${'Front'.tr()}',
+                          style: w400TextStyle(color: grey1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Gap(23.sw),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            appHaptic();
+                            // Todo: upload cccd back
+                          },
+                          child: WidgetAppSVG(
+                            'cccd_back',
+                            width: (context.width - 55.sw) / 2,
+                          ),
+                        ),
+                        Gap(12.sw),
+                        Text(
+                          '2. ${'Back'.tr()}',
+                          style: w400TextStyle(color: grey1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gap(24.sw),
+            if (type == RepresentativeType.householdBusiness) ...[
+              AppTextField(
+                controller: _businessNameController,
+                title: 'Household business name'.tr(),
+                hintText: 'Enter name'.tr(),
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              ),
+              Gap(24.sw),
+              AppTextField(
+                controller: _businessAddressController,
+                title: 'Business address'.tr(),
+                hintText: 'Enter address'.tr(),
+                padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              ),
+              Gap(24.sw),
+            ],
+            AppUploadImage(
+              title: 'Business license'.tr(),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSeeInstruction: () {
+                // Todo:
+              },
+              onPickImage: (image) {
+                // Todo:
+              },
+            ),
+            Gap(24.sw),
+            Container(height: 8, color: appColorBackground),
+            Gap(24.sw),
+            AppTextField(
+              controller: _taxCodeController,
+              title: 'Tax code'.tr(),
+              hintText: 'Enter tax code'.tr(),
+              keyboardType: TextInputType.number,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            ),
+            Gap(24.sw),
+            AppUploadImage(
+              title: 'Tax code image'.tr(),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSeeInstruction: () {
+                // Todo:
+              },
+              onPickImage: (image) {
+                // Todo:
+              },
+            ),
+            Gap(24.sw),
+            AppUploadImage(
+              title: 'Related documents'.tr(),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSeeInstruction: () {
+                // Todo:
+              },
+              onPickImage: (image) {
+                // Todo:
+              },
+            ),
+            Gap(24.sw),
           ],
         ),
       ),

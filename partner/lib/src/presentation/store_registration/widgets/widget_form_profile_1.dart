@@ -1,13 +1,8 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
-import 'package:app/src/utils/app_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:internal_core/extensions/date_extension.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
 
 class WidgetFormProfile1 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
@@ -38,6 +33,14 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     }
   }
 
+  @override
+  void dispose() {
+    _storeNameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
   _onChanged() {
     widget.onChanged({
       'storeName': _storeNameController.text,
@@ -47,16 +50,9 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   }
 
   @override
-  void dispose() {
-    _storeNameController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: 16.sw),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -65,6 +61,7 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
             controller: _storeNameController,
             title: 'Store name'.tr(),
             hintText: 'Enter store name'.tr(),
+            onChanged: (_) => _onChanged(),
           ),
           Gap(24.sw),
           AppTextField(
@@ -72,48 +69,17 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
             title: 'Phone number'.tr(),
             hintText: 'Enter phone number'.tr(),
             keyboardType: TextInputType.phone,
+            onChanged: (_) => _onChanged(),
           ),
           Gap(24.sw),
           AppTextField(
             controller: _addressController,
             title: 'Address'.tr(),
             hintText: 'Enter address'.tr(),
+            onChanged: (_) => _onChanged(),
           ),
+          Gap(24.sw),
         ],
-      ),
-    );
-  }
-
-  Widget _buildUploadBox(String title, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 120.sw,
-        decoration: BoxDecoration(
-          color: hexColor('#FAFAFA'),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: appColorText.withValues(alpha: 0.1),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.camera_alt_outlined,
-              color: appColorText.withValues(alpha: 0.5),
-              size: 32.sw,
-            ),
-            Gap(8.sw),
-            Text(
-              title,
-              style: w300TextStyle(
-                fontSize: 12.sw,
-                color: appColorText.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

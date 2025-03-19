@@ -13,6 +13,7 @@ class WidgetAppButtonOK extends StatelessWidget {
   final VoidCallback? onTap;
   final double? height;
   final BorderRadius? borderRadius;
+  final double radius;
 
   const WidgetAppButtonOK({
     super.key,
@@ -22,6 +23,7 @@ class WidgetAppButtonOK extends StatelessWidget {
     this.onTap,
     this.height,
     this.borderRadius,
+    this.radius = 99,
   });
 
   @override
@@ -30,10 +32,11 @@ class WidgetAppButtonOK extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: !enable || loading ? null : onTap,
+        borderRadius: BorderRadius.circular(radius.sw),
         child: Ink(
           height: height ?? _height,
           decoration: BoxDecoration(
-            borderRadius: borderRadius ?? BorderRadius.circular(12.sw),
+            borderRadius: borderRadius ?? BorderRadius.circular(radius.sw),
             color: enable ? appColorPrimary : AppColors.instance.grey8,
           ),
           child: Center(
@@ -48,9 +51,9 @@ class WidgetAppButtonOK extends StatelessWidget {
                   )
                 : Text(
                     label,
-                    style: w400TextStyle(
-                      color: enable ? Colors.white : AppColors.instance.grey1,
-                      fontSize: 18.sw,
+                    style: w500TextStyle(
+                      color: enable ? Colors.white : grey1,
+                      fontSize: 16.sw,
                     ),
                   ),
           ),
@@ -66,6 +69,7 @@ class WidgetAppButtonCancel extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final double? height;
+  final double radius;
 
   const WidgetAppButtonCancel({
     super.key,
@@ -74,6 +78,7 @@ class WidgetAppButtonCancel extends StatelessWidget {
     required this.label,
     this.onTap,
     this.height,
+    this.radius = 99,
   });
 
   @override
@@ -82,14 +87,16 @@ class WidgetAppButtonCancel extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: !enable || loading ? null : onTap,
+        borderRadius: BorderRadius.circular(radius.sw),
         child: Ink(
           height: height ?? _height,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.sw),
+            borderRadius: BorderRadius.circular(radius.sw),
             color: Colors.transparent,
             border: Border.all(
-              color:
-                  enable ? appColorPrimary : appColorPrimary.withValues(alpha: 0.45),
+              color: enable
+                  ? appColorPrimary
+                  : appColorPrimary.withValues(alpha: 0.45),
               width: 1.2,
             ),
           ),
@@ -105,8 +112,10 @@ class WidgetAppButtonCancel extends StatelessWidget {
                   )
                 : Text(
                     label,
-                    style:
-                        w400TextStyle(color: appColorPrimary, fontSize: 18.sw),
+                    style: w500TextStyle(
+                      fontSize: 16.sw,
+                      color: appColorPrimary,
+                    ),
                   ),
           ),
         ),

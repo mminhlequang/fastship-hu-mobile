@@ -40,44 +40,26 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
   ];
   int step = 0;
 
-  Widget? get actionButton => switch (step) {
-        1 => GestureDetector(
-            onTap: () {
-              appHaptic();
-              appOpenBottomSheet(
-                WidgetBottomSheetGuideTakePhoto(),
-              );
-            },
-            child: Container(
-              color: Colors.transparent,
-              padding: EdgeInsets.symmetric(horizontal: 8.sw, vertical: 2.sw),
-              child: Text(
-                'See the guide'.tr(),
-                style: w300TextStyle(
-                  fontSize: 14.sw,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
-        _ => null,
-      };
   Map<String, dynamic> personalInfo = {};
   Map<String, dynamic> idCardImages = {};
   Map<String, dynamic> emergencyContact = {};
 
-  bool get isEnableContinue => switch (step) {
-        0 => personalInfo['fullName'] != null &&
-            personalInfo['birthday'] != null &&
-            personalInfo['gender'] != null &&
-            personalInfo['address'] != null,
-        1 => kDebugMode
-            ? true
-            : (idCardImages['imageIDCardFront'] != null && idCardImages['imageIDCardBack'] != null),
-        2 => ((emergencyContact['emergencyContacts'] ?? []) as List).isNotEmpty == true,
-        _ => true,
-      };
+  bool get isEnableContinue => kDebugMode
+      ? true
+      : switch (step) {
+          0 => personalInfo['fullName'] != null &&
+              personalInfo['birthday'] != null &&
+              personalInfo['gender'] != null &&
+              personalInfo['address'] != null,
+          1 => kDebugMode
+              ? true
+              : (idCardImages['imageIDCardFront'] != null &&
+                  idCardImages['imageIDCardBack'] != null),
+          2 => ((emergencyContact['emergencyContacts'] ?? []) as List)
+                  .isNotEmpty ==
+              true,
+          _ => true,
+        };
 
   final ValueNotifier<String> _processor = ValueNotifier('no');
 
@@ -111,17 +93,21 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
     try {
       final futures = await Future.wait([
         if (idCardImages['imageIDCardFront'] != null)
-          MerchantRepo()
-              .uploadFile((idCardImages['imageIDCardFront'] as XFile).path, 'image_cccd_before'),
+          MerchantRepo().uploadFile(
+              (idCardImages['imageIDCardFront'] as XFile).path,
+              'image_cccd_before'),
         if (idCardImages['imageIDCardBack'] != null)
-          MerchantRepo()
-              .uploadFile((idCardImages['imageIDCardBack'] as XFile).path, 'image_cccd_after'),
+          MerchantRepo().uploadFile(
+              (idCardImages['imageIDCardBack'] as XFile).path,
+              'image_cccd_after'),
         if (idCardImages['imageDrivingLicenseFront'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseFront'] as XFile).path, 'image_license_before'),
+              (idCardImages['imageDrivingLicenseFront'] as XFile).path,
+              'image_license_before'),
         if (idCardImages['imageDrivingLicenseBack'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseBack'] as XFile).path, 'image_license_after'),
+              (idCardImages['imageDrivingLicenseBack'] as XFile).path,
+              'image_license_after'),
       ]);
 
       // Lưu URL của các ảnh đã upload
@@ -163,7 +149,8 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
         // Thông tin cá nhân
         'name': personalInfo['fullName'],
         'sex': personalInfo['gender'],
-        'birthday': (personalInfo['birthday'] as DateTime).formatDate(formatType: 'yyyy-MM-dd'),
+        'birthday': (personalInfo['birthday'] as DateTime)
+            .formatDate(formatType: 'yyyy-MM-dd'),
         'address': (personalInfo['address'] as HereSearchResult).address,
 
         // Thông tin CCCD
@@ -197,8 +184,14 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
   }
 
   Widget _buildStepper() {
-    return Padding(
-      padding: EdgeInsets.only(left: 8.sw, right: 24.sw, top: 4.sw + context.mediaQueryPadding.top),
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(
+        left: 8.sw,
+        right: 24.sw,
+        top: 4.sw + context.mediaQueryPadding.top,
+        bottom: 20.sw,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -234,18 +227,12 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
             ],
           ),
           Gap(8.sw),
-          Row(
-            children: [
-              Gap(8.sw),
-              Expanded(
-                child: Text(
-                  allSteps[step],
-                  style: w500TextStyle(fontSize: 18.sw),
-                ),
-              ),
-              Gap(12.sw),
-              if (actionButton != null) actionButton!,
-            ],
+          Padding(
+            padding: EdgeInsets.only(left: 8.sw),
+            child: Text(
+              allSteps[step],
+              style: w500TextStyle(fontSize: 18.sw),
+            ),
           ),
         ],
       ),
@@ -254,21 +241,11 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
   Widget _buildBottomNavigation() {
     return Container(
-      padding: EdgeInsets.fromLTRB(20.sw, 12.sw, 20.sw, 8.sw + context.mediaQueryPadding.bottom),
+      padding: EdgeInsets.fromLTRB(
+          16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: appColorText.withValues(alpha: 0.1),
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: appColorText.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, -1),
-          ),
-        ],
+        border: Border(top: BorderSide(color: appColorBackground)),
       ),
       child: Row(
         children: [
@@ -288,13 +265,13 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
               height: 48.sw,
             ),
           ),
-          Gap(16.sw),
+          Gap(10.sw),
           Expanded(
             child: WidgetAppButtonOK(
               loading: _processor.value == 'loading',
               onTap: () {
                 appHaptic();
-                if (step < 2) {
+                if (step < 3) {
                   setState(() {
                     step++;
                   });
@@ -317,50 +294,47 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
     return GestureDetector(
       onTap: appHideKeyboard,
       child: Scaffold(
-        body: ColoredBox(
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildStepper(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(vertical: 24.sw),
-                  child: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 300),
-                    child: switch (step) {
-                      0 => WidgetFormProfile1(
-                          initialData: personalInfo,
-                          onChanged: (data) {
-                            setState(() {
-                              personalInfo = data;
-                            });
-                          },
-                        ),
-                      1 => WidgetFormProfile2(
-                          initialData: idCardImages,
-                          onChanged: (data) {
-                            setState(() {
-                              idCardImages = data;
-                            });
-                          },
-                        ),
-                      2 => WidgetFormProfile3(
-                          initialData: emergencyContact,
-                          onChanged: (data) {
-                            setState(() {
-                              emergencyContact = data;
-                            });
-                          },
-                        ),
-                      _ => WidgetFormProfile4(),
-                    },
-                  ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStepper(),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: switch (step) {
+                    0 => WidgetFormProfile1(
+                        initialData: personalInfo,
+                        onChanged: (data) {
+                          setState(() {
+                            personalInfo = data;
+                          });
+                        },
+                      ),
+                    1 => WidgetFormProfile2(
+                        initialData: idCardImages,
+                        onChanged: (data) {
+                          setState(() {
+                            idCardImages = data;
+                          });
+                        },
+                      ),
+                    2 => WidgetFormProfile3(
+                        initialData: emergencyContact,
+                        onChanged: (data) {
+                          setState(() {
+                            emergencyContact = data;
+                          });
+                        },
+                      ),
+                    _ => WidgetFormProfile4(),
+                  },
                 ),
               ),
-              _buildBottomNavigation(),
-            ],
-          ),
+            ),
+            _buildBottomNavigation(),
+          ],
         ),
       ),
     );

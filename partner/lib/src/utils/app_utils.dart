@@ -126,7 +126,7 @@ bool isImageByMime(type) {
   }
 }
 
-void appOpenDateTimePicker(
+Future<void> appOpenDateTimePicker(
   DateTime? date,
   Function(DateTime date) onConfirm, {
   title,
@@ -146,7 +146,7 @@ void appOpenDateTimePicker(
   }
 }
 
-void appOpenTimePicker(
+Future<void> appOpenTimePicker(
   DateTime? date,
   Function(DateTime date) onConfirm, {
   title,
