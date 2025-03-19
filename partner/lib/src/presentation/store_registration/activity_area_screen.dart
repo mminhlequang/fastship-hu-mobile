@@ -1,6 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/presentation/widgets/widget_dropdown.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,7 @@ class _ActivityAreaScreenState extends State<ActivityAreaScreen> {
           Container(
             color: Colors.white,
             padding: EdgeInsets.all(16.sw),
-            child: WidgetDropdown<String>(
+            child: AppDropdown<String>(
               items: ['Area 1', 'Area 2', 'Area 3'],
               selectedItem: selectedArea,
               title: 'Area'.tr(),
@@ -41,8 +41,8 @@ class _ActivityAreaScreenState extends State<ActivityAreaScreen> {
           const Spacer(),
           Container(
             color: Colors.white,
-            padding: EdgeInsets.fromLTRB(
-                16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
+            padding:
+                EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
             child: WidgetRippleButton(
               onTap: () => appContext.push('/select-area'),
               radius: 10.sw,

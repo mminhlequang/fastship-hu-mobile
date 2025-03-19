@@ -198,7 +198,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
   Widget _buildStepper() {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.sw, 4.sw + context.mediaQueryPadding.top, 16.sw, 12),
+      padding: EdgeInsets.only(left: 8.sw, right: 24.sw, top: 4.sw + context.mediaQueryPadding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -214,15 +214,15 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
               Gap(12.sw),
               Expanded(
                 child: Row(
-                  spacing: 6.sw,
+                  spacing: 8.sw,
                   children: List.generate(
                     allSteps.length,
                     (index) {
                       return Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: index <= step ? appColorPrimary : AppColors.instance.grey5,
-                            borderRadius: BorderRadius.circular(100),
+                            color: index <= step ? appColorPrimary : grey7,
+                            borderRadius: BorderRadius.circular(99),
                           ),
                           height: 5.sw,
                         ),
@@ -231,17 +231,9 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
                   ),
                 ),
               ),
-              Gap(12.sw),
-              Opacity(
-                opacity: 0,
-                child: IconButton(
-                  onPressed: null,
-                  icon: WidgetAppSVG('chevron-left', width: 24.sw),
-                ),
-              ),
             ],
           ),
-          Gap(4.sw),
+          Gap(8.sw),
           Row(
             children: [
               Gap(8.sw),
@@ -322,21 +314,22 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStepper(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.sw),
-                child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  child: switch (step) {
-                    0 => Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.sw),
-                        child: WidgetFormProfile1(
+    return GestureDetector(
+      onTap: appHideKeyboard,
+      child: Scaffold(
+        body: ColoredBox(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStepper(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(vertical: 24.sw),
+                  child: AnimatedSwitcher(
+                    duration: Duration(milliseconds: 300),
+                    child: switch (step) {
+                      0 => WidgetFormProfile1(
                           initialData: personalInfo,
                           onChanged: (data) {
                             setState(() {
@@ -344,31 +337,31 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
                             });
                           },
                         ),
-                      ),
-                    1 => WidgetFormProfile2(
-                        initialData: idCardImages,
-                        onChanged: (data) {
-                          setState(() {
-                            idCardImages = data;
-                          });
-                        },
-                      ),
-                    2 => WidgetFormProfile3(
-                        initialData: emergencyContact,
-                        onChanged: (data) {
-                          setState(() {
-                            emergencyContact = data;
-                          });
-                        },
-                      ),
-                    _ => WidgetFormProfile4(),
-                  },
+                      1 => WidgetFormProfile2(
+                          initialData: idCardImages,
+                          onChanged: (data) {
+                            setState(() {
+                              idCardImages = data;
+                            });
+                          },
+                        ),
+                      2 => WidgetFormProfile3(
+                          initialData: emergencyContact,
+                          onChanged: (data) {
+                            setState(() {
+                              emergencyContact = data;
+                            });
+                          },
+                        ),
+                      _ => WidgetFormProfile4(),
+                    },
+                  ),
                 ),
               ),
-            ),
+              _buildBottomNavigation(),
+            ],
           ),
-          _buildBottomNavigation(),
-        ],
+        ),
       ),
     );
   }

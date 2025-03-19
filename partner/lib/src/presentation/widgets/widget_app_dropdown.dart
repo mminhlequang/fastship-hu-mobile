@@ -6,8 +6,8 @@ import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
-class WidgetDropdown<T> extends StatelessWidget {
-  const WidgetDropdown({
+class AppDropdown<T> extends StatelessWidget {
+  const AppDropdown({
     super.key,
     this.height = 120,
     required this.items,

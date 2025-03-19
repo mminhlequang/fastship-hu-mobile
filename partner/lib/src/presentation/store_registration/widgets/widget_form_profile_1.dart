@@ -12,6 +12,7 @@ import 'package:internal_core/setup/app_utils.dart';
 class WidgetFormProfile1 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
   final Map<String, dynamic>? initialData;
+
   const WidgetFormProfile1({
     super.key,
     required this.onChanged,
@@ -23,140 +24,63 @@ class WidgetFormProfile1 extends StatefulWidget {
 }
 
 class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
-  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _storeNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-
-  Gender? _selectedGender;
-  DateTime? _birthday;
-  HereSearchResult? _selectedAddress;
 
   @override
   void initState() {
     super.initState();
     if (widget.initialData != null) {
-      _fullNameController.text = widget.initialData!['fullName'] ?? '';
-      _selectedGender = widget.initialData!['gender'] != null
-          ? Gender.values.firstWhere((e) => e.value == widget.initialData!['gender'])
-          : null;
-      _birthday = widget.initialData!['birthday'];
-      _selectedAddress = widget.initialData!['address'];
-      _addressController.text = _selectedAddress?.address ?? '';
+      _storeNameController.text = widget.initialData!['storeName'] ?? '';
+      _phoneController.text = widget.initialData!['storePhone'] ?? '';
+      _addressController.text = widget.initialData!['storeAddress'] ?? '';
     }
   }
 
-  void _onChanged() {
+  _onChanged() {
     widget.onChanged({
-      'fullName': _fullNameController.text,
-      'birthday': _birthday,
-      'gender': _selectedGender?.value,
-      'address': _selectedAddress,
+      'storeName': _storeNameController.text,
+      'storePhone': _phoneController.text,
+      'storeAddress': _addressController.text,
     });
   }
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _storeNameController.dispose();
+    _phoneController.dispose();
     _addressController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        WidgetTextField(
-          controller: _fullNameController,
-          label: 'Full name*'.tr(),
-          hint: 'Ex: John Doe..'.tr(),
-        ),
-        Gap(16.sw),
-        WidgetDropSelectorBuilder(
-          items: Gender.values,
-          selectedItem: _selectedGender,
-          titleBuilder: (item) => item.name,
-          onChanged: (item) {
-            setState(() {
-              _selectedGender = item;
-            });
-          },
-          child: IgnorePointer(
-            ignoring: true,
-            child: WidgetTextField(
-              controller: TextEditingController(
-                text: _selectedGender?.name,
-              ),
-              label: 'Gender*'.tr(),
-              hint: 'Select'.tr(),
-              sufixIconWidget: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: AppColors.instance.grey1,
-              ),
-            ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.sw),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppTextField(
+            controller: _storeNameController,
+            title: 'Store name'.tr(),
+            hintText: 'Enter store name'.tr(),
           ),
-        ),
-        Gap(16.sw),
-        GestureDetector(
-          onTap: () {
-            appHaptic();
-            appOpenDateTimePicker(
-              DateTime(DateTime.now().year - 18),
-              (date) {
-                setState(() {
-                  _birthday = date;
-                });
-                _onChanged();
-              },
-            );
-          },
-          child: ColoredBox(
-            color: Colors.transparent,
-            child: IgnorePointer(
-              child: WidgetTextField(
-                isReadOnly: true,
-                controller: TextEditingController(
-                  text: _birthday?.formatDate(),
-                ),
-                label: 'Date of birth*'.tr(),
-                hint: 'dd/mm/yyyy',
-                sufixIconWidget: Icon(
-                  CupertinoIcons.calendar,
-                  color: AppColors.instance.grey1,
-                ),
-              ),
-            ),
+          Gap(24.sw),
+          AppTextField(
+            controller: _phoneController,
+            title: 'Phone number'.tr(),
+            hintText: 'Enter phone number'.tr(),
+            keyboardType: TextInputType.phone,
           ),
-        ),
-        Gap(16.sw),
-        WidgetSearchPlaceBuilder(
-          controller: _addressController,
-          selectedAddress: _selectedAddress,
-          onSubmitted: (HereSearchResult place) {
-            setState(() {
-              _selectedAddress = place;
-            });
-            _onChanged();
-          },
-          builder: (onChanged, controller, loading, key) {
-            return WidgetTextField(
-              key: key,
-              controller: controller,
-              onChanged: onChanged,
-              label: 'Permanent address*'.tr(),
-              hint: 'Add address'.tr(),
-              sufixIconWidget: loading
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CupertinoActivityIndicator(color: appColorPrimary),
-                    )
-                  : Icon(
-                      Icons.location_on_outlined,
-                      color: AppColors.instance.grey1,
-                    ),
-            );
-          },
-        ),
-      ],
+          Gap(24.sw),
+          AppTextField(
+            controller: _addressController,
+            title: 'Address'.tr(),
+            hintText: 'Enter address'.tr(),
+          ),
+        ],
+      ),
     );
   }
 
