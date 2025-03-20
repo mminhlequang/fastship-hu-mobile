@@ -116,8 +116,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                       color: isSelected
                           ? hexColor('#74CA45').withValues(alpha: .05)
                           : Colors.white,
-                      border: Border.all(
-                          color: isSelected ? appColorPrimary : grey8),
+                      borderSide: BorderSide(
+                        color: isSelected ? appColorPrimary : grey8,
+                      ),
                       child: Center(
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.sw),
