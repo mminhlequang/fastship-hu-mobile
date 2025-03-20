@@ -1,6 +1,7 @@
 import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:app/src/presentation/store_registration/export.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_opening_time.dart';
+import 'package:app/src/presentation/store_registration/widgets/widget_service_type.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,8 +10,7 @@ import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
 
-GlobalKey<NavigatorState> get appNavigatorKey =>
-    findInstance<GlobalKey<NavigatorState>>();
+GlobalKey<NavigatorState> get appNavigatorKey => findInstance<GlobalKey<NavigatorState>>();
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
 
@@ -98,6 +98,25 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: const WidgetOpeningTime(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/provide-info/service-type',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const WidgetServiceType(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: animation.drive(

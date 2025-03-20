@@ -1,5 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widget_ripple_button.dart';
+import 'package:internal_core/widgets/widgets.dart';
 
 class WidgetOpeningTime extends StatefulWidget {
   const WidgetOpeningTime({super.key});
@@ -61,33 +62,40 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
           Gap(4.sw),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.sw),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text.rich(
-              TextSpan(
-                text: 'Opening hours'.tr(),
-                style: w600TextStyle(),
+      body: Column(
+        children: [
+          const AppDivider(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.sw),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextSpan(
-                    text: '*',
-                    style: w600TextStyle(color: appColorError),
-                  )
+                  Text.rich(
+                    TextSpan(
+                      text: 'Opening hours'.tr(),
+                      style: w600TextStyle(),
+                      children: [
+                        TextSpan(
+                          text: '*',
+                          style: w600TextStyle(color: appColorError),
+                        )
+                      ],
+                    ),
+                  ),
+                  Gap(16.sw),
+                  _oneDay('Monday'.tr(), _monday),
+                  _oneDay('Tuesday'.tr(), _tuesday),
+                  _oneDay('Wednesday'.tr(), _wednesday),
+                  _oneDay('Thursday'.tr(), _thursday),
+                  _oneDay('Friday'.tr(), _friday),
+                  _oneDay('Saturday'.tr(), _saturday),
+                  _oneDay('Sunday'.tr(), _sunday),
                 ],
               ),
             ),
-            Gap(16.sw),
-            _oneDay('Monday'.tr(), _monday),
-            _oneDay('Tuesday'.tr(), _tuesday),
-            _oneDay('Wednesday'.tr(), _wednesday),
-            _oneDay('Thursday'.tr(), _thursday),
-            _oneDay('Friday'.tr(), _friday),
-            _oneDay('Saturday'.tr(), _saturday),
-            _oneDay('Sunday'.tr(), _sunday),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -183,8 +191,7 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                         ],
                       )
                     : Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.sw, vertical: 4.sw),
+                        padding: EdgeInsets.symmetric(horizontal: 8.sw, vertical: 4.sw),
                         decoration: BoxDecoration(
                           color: appColorBackground,
                           borderRadius: BorderRadius.circular(4.sw),
