@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
                 child: WidgetRippleButton(
                   onTap: () => Navigator.pop(context, false),
-                  border: Border.all(color: appColorPrimary),
+                  borderSide: BorderSide(color: appColorPrimary),
                   child: SizedBox(
                     height: 48.sw,
                     child: Center(

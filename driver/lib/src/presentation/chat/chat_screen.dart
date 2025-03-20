@@ -142,7 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       // Todo:
                                     },
                                     radius: 99,
-                                    border: Border.all(
+                                    borderSide: BorderSide(
                                         color: hexColor('#E8E8E8')),
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(

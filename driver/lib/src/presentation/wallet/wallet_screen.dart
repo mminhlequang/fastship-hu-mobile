@@ -218,7 +218,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                   Navigator.of(dialogContext).pop();
                                 },
                                 radius: 8,
-                                border: Border.all(color: appColorPrimary),
+                                borderSide: BorderSide(color: appColorPrimary),
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(vertical: 8.sw),
                                   child: Center(

@@ -110,7 +110,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               Gap(8.sw),
               WidgetRippleButton(
                 onTap: () => Navigator.pop(context, false),
-                border: Border.all(color: appColorPrimary),
+                borderSide: BorderSide(color: appColorPrimary),
                 child: SizedBox(
                   height: 48.sw,
                   child: Center(
@@ -191,7 +191,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               Gap(8.sw),
               WidgetRippleButton(
                 onTap: () => Navigator.pop(context),
-                border: Border.all(color: appColorPrimary),
+                borderSide: BorderSide(color: appColorPrimary),
                 child: SizedBox(
                   height: 48.sw,
                   child: Center(
