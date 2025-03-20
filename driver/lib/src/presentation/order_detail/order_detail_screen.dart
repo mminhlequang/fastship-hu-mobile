@@ -365,7 +365,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           // Todo:
                         },
                         radius: 99,
-                        borderSide: BorderSide(color: hexColor('#E3E3E3')),
+                        border: Border.all(color: hexColor('#E3E3E3')),
                         child: SizedBox(
                           height: 32.sw,
                           width: 32.sw,
@@ -741,7 +741,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           // Todo:
                         },
                         radius: 99,
-                        borderSide: BorderSide(color: hexColor('#E3E3E3')),
+                        border: Border.all(color: hexColor('#E3E3E3')),
                         child: SizedBox(
                           height: 32.sw,
                           width: 32.sw,

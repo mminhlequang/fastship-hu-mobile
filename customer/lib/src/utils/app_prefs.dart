@@ -7,7 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:path_provider/path_provider.dart';
 
-class AppPrefs extends AppPrefsBase {
+class AppPrefs {
   AppPrefs._();
 
   static final AppPrefs _instance = AppPrefs._();
@@ -41,40 +41,31 @@ class AppPrefs extends AppPrefsBase {
 
   void clear() {
     _boxData.deleteAll([
-      AppPrefsBase.accessTokenKey,
-      AppPrefsBase.refreshTokenKey,
-      AppPrefsBase.themeModeKey,
-      AppPrefsBase.languageCodeKey,
+      keyAccessToken,
+      keyRefreshToken,
+      keyThemeMode,
+      keyLanguageCode,
       "user_info",
       "customer_id",
     ]);
   }
 
-  bool get isDarkTheme =>
-      AppPrefs.instance.themeModel == AppPrefsBase.themeModeDarkKey;
+  bool get isDarkTheme => themeModel == keyThemeModeDark;
 
-  set themeModel(String? value) =>
-      _boxData.put(AppPrefsBase.themeModeKey, value);
+  set themeModel(String? value) => _boxData.put(keyThemeMode, value);
 
-  String? get themeModel => _boxData.get(AppPrefsBase.themeModeKey);
+  String? get themeModel => _boxData.get(keyThemeMode);
 
-  @override
-  set languageCode(String? value) =>
-      _boxData.put(AppPrefsBase.languageCodeKey, value);
+  set languageCode(String? value) => _boxData.put(keyLanguageCode, value);
 
-  @override
-  String get languageCode => _boxData.get(AppPrefsBase.languageCodeKey) ?? 'fr';
+  String get languageCode => _boxData.get(keyLanguageCode) ?? 'en';
 
-  @override
   set dateFormat(String value) => _boxData.put('dateFormat', value);
 
-  @override
   String get dateFormat => _boxData.get('dateFormat') ?? 'en';
 
-  @override
   set timeFormat(String value) => _boxData.put('timeFormat', value);
 
-  @override
   String get timeFormat => _boxData.get('timeFormat') ?? 'en';
 
   // Future saveAccountToken(AccountToken token) async {

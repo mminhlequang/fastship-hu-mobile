@@ -2,9 +2,9 @@ import 'package:app/src/constants/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter/material.dart';
-import 'package:internal_core/widgets/intl_phone_number_input/src/utils/selector_config.dart';
-import 'package:internal_core/widgets/intl_phone_number_input/src/widgets/input_widget.dart';
-import 'package:internal_core/widgets/intl_phone_number_input/src/utils/phone_number.dart';
+import 'package:intl_phone_number_input/src/utils/selector_config.dart';
+import 'package:intl_phone_number_input/src/widgets/input_widget.dart';
+import 'package:intl_phone_number_input/src/utils/phone_number.dart';
 
 enum TextFieldErrorType { hint, normal }
 

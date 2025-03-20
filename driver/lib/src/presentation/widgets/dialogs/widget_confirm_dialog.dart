@@ -57,7 +57,7 @@ class WidgetConfirmDialog extends StatelessWidget {
                           onConfirm.call();
                         },
                         radius: 8,
-                        borderSide: BorderSide(color: appColorPrimary),
+                        border: Border.all(color: appColorPrimary),
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.sw),
                           child: Center(

@@ -22,6 +22,7 @@ internalSetup() {
         // errorInterceptor: (e) {
         //   print(e);
         // },
+        loggingrequestHeader: true,
       ),
     ),
   );

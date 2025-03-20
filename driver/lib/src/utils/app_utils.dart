@@ -70,8 +70,8 @@ appHideKeyboard() {
 
 appChangedTheme() {
   AppPrefs.instance.themeModel = AppPrefs.instance.isDarkTheme
-      ? AppPrefsBase.themeModeLightKey
-      : AppPrefsBase.themeModeDarkKey;
+      ? keyThemeModeLight
+      : keyThemeModeDark;
   WidgetsBinding.instance.performReassemble();
 }
 

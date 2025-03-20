@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:internal_core/extensions/context_extension.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 

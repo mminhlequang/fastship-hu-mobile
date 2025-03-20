@@ -21,7 +21,7 @@ import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/extensions/date_extension.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widget_app_svg.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:app/src/network_resources/auth/models/models.dart';
 
 class ProvideInfoScreen extends StatefulWidget {

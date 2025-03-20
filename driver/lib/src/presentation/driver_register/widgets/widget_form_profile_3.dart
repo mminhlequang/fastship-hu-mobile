@@ -8,7 +8,7 @@ import 'package:app/src/constants/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:app/src/presentation/widgets/widget_textfield.dart';
 import 'package:app/src/utils/utils.dart';
-import 'package:internal_core/widgets/intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class EmergencyContact {
   final String name;

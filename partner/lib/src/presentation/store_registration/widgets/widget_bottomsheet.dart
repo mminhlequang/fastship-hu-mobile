@@ -5,8 +5,8 @@ import 'package:gap/gap.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widget_app_svg.dart';
-import 'package:internal_core/widgets/widget_asset_image.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 
 class WidgetBottomSheetGuideTakePhoto extends StatelessWidget {
   const WidgetBottomSheetGuideTakePhoto({super.key});

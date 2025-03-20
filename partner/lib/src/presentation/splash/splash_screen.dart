@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widget_animation_staggered_item.dart';
-import 'package:internal_core/widgets/widget_app_svg.dart';
+import 'package:internal_core/internal_core.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

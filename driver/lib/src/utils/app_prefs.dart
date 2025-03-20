@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../network_resources/auth/models/models.dart';
 
-class AppPrefs extends AppPrefsBase {
+class AppPrefs {
   AppPrefs._();
 
   static final AppPrefs _instance = AppPrefs._();
@@ -45,58 +45,49 @@ class AppPrefs extends AppPrefsBase {
 
   void clear() {
     _boxAuth.deleteAll([
-      AppPrefsBase.accessTokenKey,
-      AppPrefsBase.refreshTokenKey,
+      keyAccessToken,
+      keyRefreshToken,
     ]);
     _boxData.deleteAll([
-      AppPrefsBase.themeModeKey,
-      AppPrefsBase.languageCodeKey,
+      keyThemeMode,
+      keyLanguageCode,
       "user_info",
     ]);
   }
 
-  bool get isDarkTheme =>
-      AppPrefs.instance.themeModel == AppPrefsBase.themeModeDarkKey;
+  bool get isDarkTheme => AppPrefs.instance.themeModel == keyThemeModeDark;
 
-  set themeModel(String? value) =>
-      _boxData.put(AppPrefsBase.themeModeKey, value);
+  set themeModel(String? value) => _boxData.put(keyThemeMode, value);
 
-  String? get themeModel => _boxData.get(AppPrefsBase.themeModeKey);
+  String? get themeModel => _boxData.get(keyThemeMode);
 
-  @override
-  set languageCode(String? value) =>
-      _boxData.put(AppPrefsBase.languageCodeKey, value);
+  set languageCode(String? value) => _boxData.put(keyLanguageCode, value);
 
-  @override
-  String get languageCode => _boxData.get(AppPrefsBase.languageCodeKey) ?? 'en';
+  String get languageCode => _boxData.get(keyLanguageCode) ?? 'en';
 
-  @override
   set dateFormat(String value) => _boxData.put('dateFormat', value);
 
-  @override
   String get dateFormat => _boxData.get('dateFormat') ?? 'dd/MM/yyyy';
 
-  @override
   set timeFormat(String value) => _boxData.put('timeFormat', value);
 
-  @override
   String get timeFormat => _boxData.get('timeFormat') ?? 'HH:mm';
 
   Future saveAccountToken(ResponseLogin response) async {
     await Future.wait([
-      _boxAuth.put(AppPrefsBase.accessTokenKey, response.accessToken),
-      _boxAuth.put(AppPrefsBase.refreshTokenKey, response.refreshToken)
+      _boxAuth.put(keyAccessToken, response.accessToken),
+      _boxAuth.put(keyRefreshToken, response.refreshToken)
     ]);
   }
 
   dynamic getNormalToken() async {
-    var result = await _boxAuth.get(AppPrefsBase.accessTokenKey);
+    var result = await _boxAuth.get(keyAccessToken);
     if (result != null) {
       DateTime? expiryDate = Jwt.getExpiryDate(result.toString());
       if (expiryDate != null &&
           expiryDate.millisecondsSinceEpoch <
               DateTime.now().millisecondsSinceEpoch) {
-        String? refresh = await _boxAuth.get(AppPrefsBase.refreshTokenKey);
+        String? refresh = await _boxAuth.get(keyRefreshToken);
         if (refresh != null) {
           NetworkResponse response =
               await AuthRepo().refreshToken({"refresh_token": refresh});

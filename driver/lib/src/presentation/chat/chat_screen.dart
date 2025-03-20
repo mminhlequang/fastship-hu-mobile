@@ -142,8 +142,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                       // Todo:
                                     },
                                     radius: 99,
-                                    borderSide:
-                                        BorderSide(color: hexColor('#E8E8E8')),
+                                    border: Border.all(
+                                        color: hexColor('#E8E8E8')),
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 8.sw, vertical: 4.sw),

@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/widgets/intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:internal_core/widgets/widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
