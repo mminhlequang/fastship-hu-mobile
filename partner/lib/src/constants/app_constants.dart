@@ -73,3 +73,33 @@ enum EmergencyContactType {
     }
   }
 }
+
+
+
+// Các loại tài khoản trong hệ thống
+enum AccountType {
+  customer(1),
+  driver(2),
+  partner(3);
+
+  final int value;
+  const AccountType(this.value);
+
+  static AccountType fromValue(int value) {
+    return AccountType.values.firstWhere(
+      (type) => type.value == value,
+      orElse: () => AccountType.customer,
+    );
+  }
+
+  String get name {
+    switch (this) {
+      case AccountType.customer:
+        return 'Customer'.tr();
+      case AccountType.driver:
+        return 'Driver'.tr();
+      case AccountType.partner:
+        return 'Partner'.tr();
+    }
+  }
+}

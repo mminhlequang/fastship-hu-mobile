@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/merchant/repo.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_bottomsheet.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_1.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_2.dart';
@@ -89,42 +88,42 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
 
     // Upload ảnh và lấy URL
     try {
-      final futures = await Future.wait([
-        if (idCardImages['imageIDCardFront'] != null)
-          MerchantRepo()
-              .uploadFile((idCardImages['imageIDCardFront'] as XFile).path, 'image_cccd_before'),
-        if (idCardImages['imageIDCardBack'] != null)
-          MerchantRepo()
-              .uploadFile((idCardImages['imageIDCardBack'] as XFile).path, 'image_cccd_after'),
-        if (idCardImages['imageDrivingLicenseFront'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseFront'] as XFile).path, 'image_license_before'),
-        if (idCardImages['imageDrivingLicenseBack'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseBack'] as XFile).path, 'image_license_after'),
-      ]);
+      // final futures = await Future.wait([
+      //   if (idCardImages['imageIDCardFront'] != null)
+      //     MerchantRepo()
+      //         .uploadFile((idCardImages['imageIDCardFront'] as XFile).path, 'image_cccd_before'),
+      //   if (idCardImages['imageIDCardBack'] != null)
+      //     MerchantRepo()
+      //         .uploadFile((idCardImages['imageIDCardBack'] as XFile).path, 'image_cccd_after'),
+      //   if (idCardImages['imageDrivingLicenseFront'] != null)
+      //     MerchantRepo().uploadFile(
+      //         (idCardImages['imageDrivingLicenseFront'] as XFile).path, 'image_license_before'),
+      //   if (idCardImages['imageDrivingLicenseBack'] != null)
+      //     MerchantRepo().uploadFile(
+      //         (idCardImages['imageDrivingLicenseBack'] as XFile).path, 'image_license_after'),
+      // ]);
 
-      // Lưu URL của các ảnh đã upload
-      if (idCardImages['imageIDCardFront'] != null) {
-        if (futures[0].isSuccess) {
-          urlImage_cccd_before = futures[0].data;
-        }
-      }
-      if (idCardImages['imageIDCardBack'] != null) {
-        if (futures[1].isSuccess) {
-          urlImage_cccd_after = futures[1].data;
-        }
-      }
-      if (idCardImages['imageDrivingLicenseFront'] != null) {
-        if (futures[2].isSuccess) {
-          urlImage_license_before = futures[2].data;
-        }
-      }
-      if (idCardImages['imageDrivingLicenseBack'] != null) {
-        if (futures[3].isSuccess) {
-          urlImage_license_after = futures[3].data;
-        }
-      }
+      // // Lưu URL của các ảnh đã upload
+      // if (idCardImages['imageIDCardFront'] != null) {
+      //   if (futures[0].isSuccess) {
+      //     urlImage_cccd_before = futures[0].data;
+      //   }
+      // }
+      // if (idCardImages['imageIDCardBack'] != null) {
+      //   if (futures[1].isSuccess) {
+      //     urlImage_cccd_after = futures[1].data;
+      //   }
+      // }
+      // if (idCardImages['imageDrivingLicenseFront'] != null) {
+      //   if (futures[2].isSuccess) {
+      //     urlImage_license_before = futures[2].data;
+      //   }
+      // }
+      // if (idCardImages['imageDrivingLicenseBack'] != null) {
+      //   if (futures[3].isSuccess) {
+      //     urlImage_license_after = futures[3].data;
+      //   }
+      // }
     } catch (e, trace) {
       _processor.value = 'error';
       print('Error uploading image: $e');
@@ -161,14 +160,14 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
       };
 
       // Gọi API cập nhật thông tin
-      final response = await MerchantRepo().updateProfile(requestData);
+      // final response = await MerchantRepo().updateProfile(requestData);
 
-      if (response.isSuccess) {
-        _processor.value = 'success';
-      } else {
-        _processor.value = 'error';
-        print(response.msg);
-      }
+      // if (response.isSuccess) {
+      //   _processor.value = 'success';
+      // } else {
+      //   _processor.value = 'error';
+      //   print(response.msg);
+      // }
     } catch (e, trace) {
       _processor.value = 'error';
 

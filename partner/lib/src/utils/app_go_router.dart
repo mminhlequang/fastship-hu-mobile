@@ -7,12 +7,14 @@ import 'package:app/src/presentation/store_registration/widgets/widget_service_t
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../presentation/auth/auth_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
 
-GlobalKey<NavigatorState> get appNavigatorKey => findInstance<GlobalKey<NavigatorState>>();
+GlobalKey<NavigatorState> get appNavigatorKey =>
+    findInstance<GlobalKey<NavigatorState>>();
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
 
@@ -22,8 +24,46 @@ final goRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const SplashScreen(),
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const SplashScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
     ),
+    GoRoute(
+      path: '/auth',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const LoginScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    // GoRoute(
+    //   path: '/driver-register',
+    //   pageBuilder: (context, state) => CustomTransitionPage(
+    //     key: state.pageKey,
+    //     child: const DriverRegisterScreen(),
+    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    //       return FadeTransition(
+    //         opacity: animation,
+    //         child: child,
+    //       );
+    //     },
+    //     transitionDuration: const Duration(milliseconds: 300),
+    //   ),
+    // ),
     GoRoute(
       path: '/activity-area',
       pageBuilder: (context, state) => CustomTransitionPage(
