@@ -55,9 +55,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
               ? true
               : (idCardImages['imageIDCardFront'] != null &&
                   idCardImages['imageIDCardBack'] != null),
-          2 => ((emergencyContact['emergencyContacts'] ?? []) as List)
-                  .isNotEmpty ==
-              true,
+          2 => ((emergencyContact['emergencyContacts'] ?? []) as List).isNotEmpty == true,
           _ => true,
         };
 
@@ -93,21 +91,17 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
     try {
       final futures = await Future.wait([
         if (idCardImages['imageIDCardFront'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageIDCardFront'] as XFile).path,
-              'image_cccd_before'),
+          MerchantRepo()
+              .uploadFile((idCardImages['imageIDCardFront'] as XFile).path, 'image_cccd_before'),
         if (idCardImages['imageIDCardBack'] != null)
-          MerchantRepo().uploadFile(
-              (idCardImages['imageIDCardBack'] as XFile).path,
-              'image_cccd_after'),
+          MerchantRepo()
+              .uploadFile((idCardImages['imageIDCardBack'] as XFile).path, 'image_cccd_after'),
         if (idCardImages['imageDrivingLicenseFront'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseFront'] as XFile).path,
-              'image_license_before'),
+              (idCardImages['imageDrivingLicenseFront'] as XFile).path, 'image_license_before'),
         if (idCardImages['imageDrivingLicenseBack'] != null)
           MerchantRepo().uploadFile(
-              (idCardImages['imageDrivingLicenseBack'] as XFile).path,
-              'image_license_after'),
+              (idCardImages['imageDrivingLicenseBack'] as XFile).path, 'image_license_after'),
       ]);
 
       // Lưu URL của các ảnh đã upload
@@ -149,8 +143,7 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
         // Thông tin cá nhân
         'name': personalInfo['fullName'],
         'sex': personalInfo['gender'],
-        'birthday': (personalInfo['birthday'] as DateTime)
-            .formatDate(formatType: 'yyyy-MM-dd'),
+        'birthday': (personalInfo['birthday'] as DateTime).formatDate(formatType: 'yyyy-MM-dd'),
         'address': (personalInfo['address'] as HereSearchResult).address,
 
         // Thông tin CCCD
@@ -239,56 +232,6 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
     );
   }
 
-  Widget _buildBottomNavigation() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-          16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: appColorBackground)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: WidgetAppButtonCancel(
-              onTap: () {
-                appHaptic();
-                if (step > 0) {
-                  setState(() {
-                    step--;
-                  });
-                } else {
-                  context.pop();
-                }
-              },
-              label: 'Back'.tr(),
-              height: 48.sw,
-            ),
-          ),
-          Gap(10.sw),
-          Expanded(
-            child: WidgetAppButtonOK(
-              loading: _processor.value == 'loading',
-              onTap: () {
-                appHaptic();
-                if (step < 3) {
-                  setState(() {
-                    step++;
-                  });
-                } else {
-                  _updateProfile();
-                }
-              },
-              enable: isEnableContinue,
-              label: 'Continue'.tr(),
-              height: 48.sw,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -336,6 +279,55 @@ class _ProvideInfoScreenState extends State<ProvideInfoScreen> {
             _buildBottomNavigation(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: appColorBackground)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: WidgetAppButtonCancel(
+              onTap: () {
+                appHaptic();
+                if (step > 0) {
+                  setState(() {
+                    step--;
+                  });
+                } else {
+                  context.pop();
+                }
+              },
+              label: 'Back'.tr(),
+              height: 48.sw,
+            ),
+          ),
+          Gap(10.sw),
+          Expanded(
+            child: WidgetAppButtonOK(
+              loading: _processor.value == 'loading',
+              onTap: () {
+                appHaptic();
+                if (step < 3) {
+                  setState(() {
+                    step++;
+                  });
+                } else {
+                  _updateProfile();
+                }
+              },
+              enable: isEnableContinue,
+              label: 'Continue'.tr(),
+              height: 48.sw,
+            ),
+          ),
+        ],
       ),
     );
   }

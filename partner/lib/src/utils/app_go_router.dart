@@ -1,3 +1,5 @@
+import 'package:app/src/presentation/create_store/create_store_screen.dart';
+import 'package:app/src/presentation/merchant_onboarding/merchant_onboarding_screen.dart';
 import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:app/src/presentation/store_registration/export.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_opening_time.dart';
@@ -125,6 +127,34 @@ final goRouter = GoRouter(
                 end: Offset.zero,
               ).chain(CurveTween(curve: Curves.easeInOut)),
             ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/merchant-onboarding',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const MerchantOnboardingScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    ),
+    GoRoute(
+      path: '/create-store',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const CreateStoreScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
             child: child,
           );
         },

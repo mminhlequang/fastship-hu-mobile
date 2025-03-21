@@ -313,6 +313,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> {
               },
               radius: 10.sw,
               enable: step != totalStep || acceptTerms,
+              color: appColorPrimary,
               child: SizedBox(
                 height: 48.sw,
                 child: Center(

@@ -119,6 +119,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                       borderSide: BorderSide(
                         color: isSelected ? appColorPrimary : grey8,
                       ),
+                      radius: 0,
                       child: Center(
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.sw),

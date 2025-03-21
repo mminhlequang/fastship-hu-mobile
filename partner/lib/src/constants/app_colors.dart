@@ -37,8 +37,7 @@ class AppColors {
 
   Color get primary => appValueByTheme(hexColor('#5CC23C'));
 
-  Color get background =>
-      appValueByTheme(hexColor('#F4F4F6'), kdark: Colors.black);
+  Color get background => appValueByTheme(hexColor('#F4F4F6'), kdark: Colors.black);
 
   Color get text => appValueByTheme(hexColor('#333333'), kdark: Colors.white);
 
@@ -74,8 +73,7 @@ class AppColors {
 
   Color get blue1 => appValueByTheme(hexColor('#0085FF'));
 
-  Color get element =>
-      appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
+  Color get element => appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
 
   Color get shimmerHighlightColor => appValueByTheme(hexColor('#fafafa'));
 

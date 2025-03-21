@@ -48,7 +48,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
-    appContext.pushReplacement('/activity-area');
+    appContext.pushReplacement('/merchant-onboarding');
     return;
     if (state.stateType == AuthStateType.logged) {
       appContext.pushReplacement("/navigation");

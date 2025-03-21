@@ -24,8 +24,7 @@ void main() async {
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
     if (!kIsWeb) ...[
       if (Platform.isAndroid)
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-            overlays: [SystemUiOverlay.top]),
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]),
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]),
@@ -73,10 +72,7 @@ class _AppState extends State<_App> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        theme: (AppPrefs.instance.isDarkTheme
-                ? ThemeData.dark()
-                : ThemeData.light())
-            .copyWith(
+        theme: (AppPrefs.instance.isDarkTheme ? ThemeData.dark() : ThemeData.light()).copyWith(
           scaffoldBackgroundColor: appColorBackground,
           appBarTheme: AppBarTheme(
             backgroundColor: appColorPrimary,
@@ -101,8 +97,7 @@ class _AppState extends State<_App> {
             indicatorSize: TabBarIndicatorSize.tab,
           ),
         ),
-        themeMode:
-            AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+        themeMode: AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       ),
     );
   }

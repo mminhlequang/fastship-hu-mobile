@@ -47,6 +47,7 @@ class _ActivityAreaScreenState extends State<ActivityAreaScreen> {
               onTap: () => appContext.push('/select-area'),
               radius: 10.sw,
               enable: selectedArea != null,
+              color: appColorPrimary,
               child: SizedBox(
                 height: 48.sw,
                 child: Center(

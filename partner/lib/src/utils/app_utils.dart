@@ -53,8 +53,7 @@ appOpenDialog(Widget child, {bool barrierDismissible = true}) async {
     },
     transitionBuilder: (context, anim1, anim2, child) {
       return SlideTransition(
-        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0))
-            .animate(anim1),
+        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1),
         child: child,
       );
     },
@@ -68,9 +67,8 @@ appHideKeyboard() {
 }
 
 appChangedTheme() {
-  AppPrefs.instance.themeModel = AppPrefs.instance.isDarkTheme
-      ? keyThemeModeLight
-      : keyThemeModeDark;
+  AppPrefs.instance.themeModel =
+      AppPrefs.instance.isDarkTheme ? keyThemeModeLight : keyThemeModeDark;
   WidgetsBinding.instance.performReassemble();
 }
 
@@ -154,10 +152,9 @@ Future<void> appOpenTimePicker(
   date ??= DateTime.now();
   final rs = await appOpenBottomSheet(
     WidgetBottomPickTime(
-      title: title ?? 'Please choose time'.tr(),
+      title: title ?? 'SELECT TIME'.tr(),
       time: date,
     ),
-    // isDismissible: false,
     enableDrag: false,
     backgroundColor: Colors.transparent,
   );

@@ -172,39 +172,41 @@ class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
       title: widget.title,
       enableSafeArea: true,
       actions: [
-        WidgetInkWellTransparent(
-          onTap: () {
-            appHaptic();
-            appContext.pop();
-          },
-          enableInkWell: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Text(
-              'Cancel'.tr(),
-              style: w400TextStyle(color: appColorPrimaryRed),
+        WidgetRippleButton(
+          onTap: appContext.pop,
+          borderSide: BorderSide(color: appColorPrimary),
+          child: SizedBox(
+            height: 48.sw,
+            child: Center(
+              child: Text(
+                'Cancel'.tr(),
+                style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
+              ),
             ),
           ),
         ),
-        WidgetInkWellTransparent(
-          onTap: () {
-            appHaptic();
-            appContext.pop(DateTime(
-                _time.year, _time.month, _time.day, _time.hour, _time.minute));
-          },
-          enableInkWell: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Text(
-              'Save'.tr(),
-              style: w400TextStyle(color: appColorPrimary),
+        WidgetRippleButton(
+          onTap: () => appContext.pop(DateTime(
+            _time.year,
+            _time.month,
+            _time.day,
+            _time.hour,
+            _time.minute,
+          )),
+          color: appColorPrimary,
+          child: SizedBox(
+            height: 48.sw,
+            child: Center(
+              child: Text(
+                'Confirm'.tr(),
+                style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
+              ),
             ),
           ),
         ),
-        Gap(4)
       ],
       child: SizedBox(
-        height: 180.sw,
+        height: 130.sw,
         child: WidgetTimePicker(
           onTimeChange: (DateTime time) {
             setState(() {
@@ -221,8 +223,12 @@ class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
 class WidgetTimePicker extends StatefulWidget {
   final Function(DateTime) onTimeChange;
   final DateTime? initialSelectedDate;
-  const WidgetTimePicker(
-      {super.key, required this.onTimeChange, this.initialSelectedDate});
+
+  const WidgetTimePicker({
+    super.key,
+    required this.onTimeChange,
+    this.initialSelectedDate,
+  });
 
   @override
   State<WidgetTimePicker> createState() => _WidgetTimePickerState();
@@ -236,19 +242,24 @@ class _WidgetTimePickerState extends State<WidgetTimePicker> {
       children: [
         Container(
           width: appContext.width,
-          height: 46,
+          height: 36.sw,
           color: appColorBackground,
+          margin: EdgeInsets.symmetric(horizontal: 16.sw),
+          child: Center(
+            child: Text(
+              ':',
+              style: w500TextStyle(fontSize: 16.sw),
+            ),
+          ),
         ),
         TimePickerSpinner(
           is24HourMode: true,
           isShowSeconds: false,
           time: widget.initialSelectedDate,
-          normalTextStyle: w500TextStyle(
-              color: appColorText.withValues(alpha: .65), fontSize: 16),
-          highlightedTextStyle:
-              w500TextStyle(color: appColorText, fontSize: 18),
-          spacing: 24,
-          itemHeight: 55,
+          normalTextStyle: w400TextStyle(fontSize: 15.sw, color: grey9),
+          highlightedTextStyle: w500TextStyle(fontSize: 16.sw),
+          spacing: 37.sw,
+          itemHeight: 36.sw,
           isForce2Digits: true,
           onTimeChange: widget.onTimeChange,
         ),
