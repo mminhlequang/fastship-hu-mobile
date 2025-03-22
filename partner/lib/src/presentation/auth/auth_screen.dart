@@ -60,9 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _toggleFormType() {
     setState(() {
-      _currentForm = _currentForm == AuthFormType.login
-          ? AuthFormType.register
-          : AuthFormType.login;
+      _currentForm =
+          _currentForm == AuthFormType.login ? AuthFormType.register : AuthFormType.login;
       _showOtpField = false;
     });
   }
@@ -118,8 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
       phoneNumber: _phoneNumber!.phoneNumber!,
       timeout: const Duration(seconds: 60),
       verificationCompleted: (PhoneAuthCredential credential) async {
-        UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
+        UserCredential userCredential = await _auth.signInWithCredential(credential);
         print(
             'Phone number automatically verified and signed in: ${_auth.currentUser?.phoneNumber}');
 
@@ -247,9 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.isSuccess) {
       appShowSnackBar(
-          msg: 'Reset password success',
-          context: context,
-          type: AppSnackBarType.success);
+          msg: 'Reset password success', context: context, type: AppSnackBarType.success);
       // Chuyển về form đăng nhập
       setState(() {
         _currentForm = AuthFormType.login;
@@ -481,8 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
               isPassword: true,
               onSubmitted: (_) {
                 if (_passwordController.text.length > 4 &&
-                    _confirmPasswordController.text ==
-                        _passwordController.text) {
+                    _confirmPasswordController.text == _passwordController.text) {
                   _register();
                 }
               },
@@ -504,8 +499,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? _otpController.text.length == 6
                     : _showEnterPasswordField
                         ? _passwordController.text.length > 4 &&
-                            _confirmPasswordController.text ==
-                                _passwordController.text
+                            _confirmPasswordController.text == _passwordController.text
                         : _isValidPhoneNumber,
                 label: _showOtpField
                     ? 'Verify OTP'
@@ -651,8 +645,7 @@ class _LoginScreenState extends State<LoginScreen> {
               isPassword: true,
               onSubmitted: (_) {
                 if (_passwordController.text.length > 4 &&
-                    _confirmPasswordController.text ==
-                        _passwordController.text) {
+                    _confirmPasswordController.text == _passwordController.text) {
                   _resetPassword();
                 }
               },
@@ -674,8 +667,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? _otpController.text.length == 6
                     : _showEnterPasswordField
                         ? _passwordController.text.length > 4 &&
-                            _confirmPasswordController.text ==
-                                _passwordController.text
+                            _confirmPasswordController.text == _passwordController.text
                         : _isValidPhoneNumber,
                 label: _showOtpField
                     ? 'Verify OTP'
@@ -715,6 +707,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -732,8 +725,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onDoubleTap: kReleaseMode
                             ? null
                             : () {
-                                _login(
-                                    phone: '+84979797979', password: '123456');
+                                _login(phone: '+84979797979', password: '123456');
                               },
                         child: Hero(
                           tag: 'app_logo',

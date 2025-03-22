@@ -94,9 +94,7 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
       separatorBuilder: (context, index) => Gap(8.sw),
       itemBuilder: (context, index) {
         return WidgetRippleButton(
-          onTap: () {
-            // Todo: go to store
-          },
+          onTap: () => appContext.pushReplacement('/navigation'),
           radius: 8.sw,
           child: Padding(
             padding: EdgeInsets.all(8.sw),

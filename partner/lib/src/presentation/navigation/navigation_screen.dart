@@ -1,13 +1,11 @@
+import 'package:app/src/presentation/home/home_screen.dart';
+import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
+import 'package:app/src/presentation/navigation/widgets/custom_bottom_bar.dart';
+import 'package:app/src/presentation/notification/notification_screen.dart';
+import 'package:app/src/presentation/orders/orders_screen.dart';
+import 'package:app/src/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../store/store_screen.dart';
-import '../orders/orders_screen.dart';
-import '../reviews/reviews_screen.dart';
-import '../notifications/notifications_screen.dart';
-import '../wallet/wallet_screen.dart';
-import 'cubit/navigation_cubit.dart';
-import 'widgets/custom_bottom_bar.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
@@ -17,12 +15,11 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NavigationScreen> {
-  final List<Widget> _screens = [
-    const StoreScreen(),
-    const OrdersScreen(),
-    const ReviewsScreen(),
-    const NotificationsScreen(),
-    const WalletScreen(),
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    NotificationScreen(),
+    OrdersScreen(),
+    ProfileScreen(),
   ];
 
   @override

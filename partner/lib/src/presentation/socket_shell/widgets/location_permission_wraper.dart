@@ -7,8 +7,7 @@ class LocationPermissionWrapper extends StatefulWidget {
   const LocationPermissionWrapper({super.key, required this.child});
 
   @override
-  State<LocationPermissionWrapper> createState() =>
-      _LocationPermissionWrapperState();
+  State<LocationPermissionWrapper> createState() => _LocationPermissionWrapperState();
 }
 
 class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
@@ -112,8 +111,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
-              color: Colors.white,
-              child: const Center(child: CircularProgressIndicator()));
+              color: Colors.white, child: const Center(child: CircularProgressIndicator()));
         }
 
         final hasPermission = snapshot.data ?? false;
@@ -167,8 +165,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
                 icon: const Icon(Icons.settings),
                 label: const Text('Mở cài đặt hệ thống'),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
               ),
               const SizedBox(height: 16),

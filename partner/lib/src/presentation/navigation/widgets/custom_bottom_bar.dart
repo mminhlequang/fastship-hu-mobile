@@ -1,62 +1,103 @@
+import 'package:app/src/constants/app_colors.dart';
+import 'package:app/src/constants/app_sizes.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:internal_core/internal_core.dart';
 
 class CustomBottomBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
   const CustomBottomBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 65,
+      padding: EdgeInsets.fromLTRB(
+        32.sw,
+        10.sw,
+        32.sw,
+        10.sw + context.mediaQueryPadding.bottom,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black12,
             blurRadius: 10,
             offset: const Offset(0, -3),
           ),
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTabItem(0, Icons.store, 'Cửa hàng'),
-          _buildTabItem(1, Icons.receipt_outlined, 'Đơn hàng'),
-          _buildTabItem(2, Icons.star_border, 'Đánh giá'),
-          _buildTabItem(3, Icons.notifications_none, 'Thông báo'),
-          _buildTabItem(4, Icons.account_balance_wallet_outlined, 'Ví'),
+          _buildTabItem(0, 'ic_home', 'Home'.tr()),
+          _buildTabItem(1, 'ic_bell', 'Notification'.tr()),
+          _buildTabItem(2, 'ic_orders', 'Orders'.tr()),
+          _buildTabItem(3, 'ic_profile', 'Profile'.tr()),
         ],
       ),
     );
   }
 
-  Widget _buildTabItem(int index, IconData icon, String label) {
-    final isSelected = currentIndex == index;
+  Widget _buildTabItem(int index, String icon, String label) {
+    bool isNotification = index == 1;
+    bool isSelected = currentIndex == index;
 
     return InkWell(
       onTap: () => onTap(index),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.green : Colors.grey,
-            size: 24,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              WidgetAppSVG(
+                icon,
+                width: 24.sw,
+                color: isSelected ? appColorPrimary : hexColor('#E1E1E1'),
+              ),
+              if (isNotification)
+                Positioned(
+                  top: -5.sw,
+                  right: -7.sw,
+                  child: Container(
+                    height: 15.sw,
+                    padding: EdgeInsets.symmetric(horizontal: 4.sw),
+                    decoration: BoxDecoration(
+                      color: hexColor('#FF8832'),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '10',
+                        style: GoogleFonts.roboto(
+                          fontSize: 10.sw,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 4),
+          Gap(2.sw),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isSelected ? Colors.green : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            style: w500TextStyle(
+              fontSize: 10.sw,
+              color: isSelected ? darkGreen : grey9,
             ),
           ),
         ],

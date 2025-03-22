@@ -1,4 +1,9 @@
 import 'package:app/src/presentation/create_store/create_store_screen.dart';
+import 'package:app/src/presentation/menu/menu_screen.dart';
+import 'package:app/src/presentation/menu/widgets/widget_add_category.dart';
+import 'package:app/src/presentation/menu/widgets/widget_add_dish.dart';
+import 'package:app/src/presentation/menu/widgets/widget_add_option.dart';
+import 'package:app/src/presentation/menu/widgets/widget_add_topping.dart';
 import 'package:app/src/presentation/merchant_onboarding/merchant_onboarding_screen.dart';
 import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:app/src/presentation/store_registration/export.dart';
@@ -13,8 +18,7 @@ import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
 
-GlobalKey<NavigatorState> get appNavigatorKey =>
-    findInstance<GlobalKey<NavigatorState>>();
+GlobalKey<NavigatorState> get appNavigatorKey => findInstance<GlobalKey<NavigatorState>>();
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
 
@@ -216,6 +220,96 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/navigation',
           builder: (context, state) => const NavigationScreen(),
+        ),
+        GoRoute(
+          path: '/menu',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const MenuScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/add-category',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: WidgetAddCategory(category: state.extra as CategoryModel?),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/add-dish',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: WidgetAddDish(dish: state.extra as String?),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/add-topping',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: WidgetAddTopping(topping: state.extra as String?),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/add-option',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const WidgetAddOption(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
         ),
       ],
     ),

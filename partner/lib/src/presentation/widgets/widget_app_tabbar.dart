@@ -7,11 +7,15 @@ class WidgetAppTabBar extends StatelessWidget {
     required this.tabController,
     required this.tabs,
     required this.children,
+    this.scrollPhysics,
+    this.onTap,
   });
 
   final TabController tabController;
   final List<String> tabs;
   final List<Widget> children;
+  final ScrollPhysics? scrollPhysics;
+  final Function(int index)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +28,13 @@ class WidgetAppTabBar extends StatelessWidget {
             controller: tabController,
             tabs: tabs.map((e) => Tab(child: Text(e))).toList(),
             indicatorPadding: EdgeInsets.symmetric(horizontal: 16.sw),
+            onTap: onTap?.call,
           ),
         ),
         Expanded(
           child: TabBarView(
             controller: tabController,
+            physics: scrollPhysics ?? const NeverScrollableScrollPhysics(),
             children: children,
           ),
         )

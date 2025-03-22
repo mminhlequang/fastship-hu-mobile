@@ -60,7 +60,7 @@ class AppDropdown<T> extends StatelessWidget {
         WidgetOverlayActions(
           inkwellBorderRadius: 8.sw,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+            padding: EdgeInsets.fromLTRB(12.sw, 8.sw, 8.sw, 8.sw),
             decoration: BoxDecoration(
               color: appColorBackground,
               borderRadius: BorderRadius.circular(8.sw),

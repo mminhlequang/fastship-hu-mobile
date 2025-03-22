@@ -117,7 +117,7 @@ class _TabIndicatorPainter extends BoxPainter {
 
   _TabIndicatorPainter()
       : _paint = Paint()
-          ..color = appColorPrimary
+          ..color = darkGreen
           ..isAntiAlias = true;
 
   @override

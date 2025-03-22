@@ -89,8 +89,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
       'promocode': 25000,
       'finalTotal': 100000,
       'status': 'accepted',
-      'estimatedTime':
-          DateTime.now().add(const Duration(minutes: 30)).toIso8601String(),
+      'estimatedTime': DateTime.now().add(const Duration(minutes: 30)).toIso8601String(),
       'driver': {
         'name': 'Nguyễn Văn A',
         'phone': '0901234567',
@@ -146,8 +145,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Thông báo'),
-        content: const Text(
-            'Ứng dụng cần quyền thông báo để gửi cập nhật về đơn hàng của bạn.'),
+        content: const Text('Ứng dụng cần quyền thông báo để gửi cập nhật về đơn hàng của bạn.'),
         actions: [
           TextButton(
             child: const Text('Để sau'),
