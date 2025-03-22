@@ -1,3 +1,4 @@
+import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/presentation/home/home_screen.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/navigation/widgets/custom_bottom_bar.dart';
@@ -6,6 +7,7 @@ import 'package:app/src/presentation/orders/orders_screen.dart';
 import 'package:app/src/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internal_core/setup/app_textstyles.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
@@ -28,6 +30,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
       bloc: navigationCubit,
       builder: (context, state) {
         return Scaffold(
+          appBar: AppBar(
+            title: Text('Bánh cuốn Hồng Liên'),
+            titleSpacing: 16.sw,
+          ),
           body: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: _screens[state.currentIndex],

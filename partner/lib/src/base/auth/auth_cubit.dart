@@ -93,17 +93,17 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
-    List<StoreModel> myStores = state.stores ?? [];
-    if (state.stateType == AuthStateType.logged) {
-      if (myStores.isNotEmpty) {
-        appContext.pushReplacement('/merchant-onboarding');
-      } else {
-        appContext.pushReplacement('/activity-area');
-      }
-    } else {
-      // appContext.pushReplacement('/auth');
-      appContext.pushReplacement('/merchant-onboarding');
-    }
+    appContext.pushReplacement('/merchant-onboarding');
+    // List<StoreModel> myStores = state.stores ?? [];
+    // if (state.stateType == AuthStateType.logged) {
+    //   if (myStores.isNotEmpty) {
+    //     appContext.pushReplacement('/merchant-onboarding');
+    //   } else {
+    //     appContext.pushReplacement('/activity-area');
+    //   }
+    // } else {
+    //   appContext.pushReplacement('/auth');
+    // }
   }
 }
 

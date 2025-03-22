@@ -89,176 +89,165 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Bánh cuốn Hồng Liên',
-          style: w500TextStyle(fontSize: 20.sw, height: 1.2),
-        ),
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        titleSpacing: 16.sw,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.sw),
-        child: Column(
-          children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return CarouselSlider.builder(
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    aspectRatio: 343 / 129,
-                    viewportFraction: 1,
-                    autoPlayAnimationDuration: const Duration(seconds: 1),
-                    autoPlayCurve: Curves.easeInOut,
-                    enlargeCenterPage: true,
-                  ),
-                  itemCount: banners.length,
-                  itemBuilder: (context, index, realIndex) {
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        WidgetAppImage(
-                          imageUrl: banners[index],
-                          radius: 8.sw,
-                          fit: BoxFit.cover,
-                        ),
-                        Positioned(
-                          left: 16.sw,
-                          bottom: 24.sw,
-                          child: WidgetRippleButton(
-                            onTap: () {
-                              // Todo:
-                            },
-                            radius: 4.sw,
-                            color: hexColor('#F5DA27'),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.sw, vertical: 4.sw),
-                              child: Text(
-                                'Try now'.tr(),
-                                style: w600TextStyle(fontSize: 12.sw),
-                              ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16.sw),
+      child: Column(
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return CarouselSlider.builder(
+                options: CarouselOptions(
+                  autoPlay: true,
+                  aspectRatio: 343 / 129,
+                  viewportFraction: 1,
+                  autoPlayAnimationDuration: const Duration(seconds: 1),
+                  autoPlayCurve: Curves.easeInOut,
+                  enlargeCenterPage: true,
+                ),
+                itemCount: banners.length,
+                itemBuilder: (context, index, realIndex) {
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      WidgetAppImage(
+                        imageUrl: banners[index],
+                        radius: 8.sw,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        left: 16.sw,
+                        bottom: 16.sw,
+                        child: WidgetRippleButton(
+                          onTap: () {
+                            // Todo:
+                          },
+                          radius: 4.sw,
+                          color: hexColor('#F5DA27'),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.sw, vertical: 4.sw),
+                            child: Text(
+                              'Try now'.tr(),
+                              style: w600TextStyle(fontSize: 12.sw),
                             ),
                           ),
                         ),
-                      ],
-                    );
-                  },
-                );
-              },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+          Gap(16.sw),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 13.sw, vertical: 16.sw),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.sw),
             ),
-            Gap(16.sw),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 13.sw, vertical: 16.sw),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.sw),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(
-                  4,
-                  (index) {
-                    final topItem = HomeItem.values[index];
-                    final bottomItem = HomeItem.values[index + 4];
-                    bool isRating = bottomItem == HomeItem.rating;
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(
+                4,
+                (index) {
+                  final topItem = HomeItem.values[index];
+                  final bottomItem = HomeItem.values[index + 4];
+                  bool isRating = bottomItem == HomeItem.rating;
 
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        WidgetInkWellTransparent(
-                            onTap: () => appContext.push(topItem.route),
-                            enableInkWell: false,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  height: 40.sw,
-                                  width: 40.sw,
-                                  decoration: BoxDecoration(
-                                    color: topItem.backgroundColor,
-                                    borderRadius: BorderRadius.circular(12.sw),
-                                    border: Border.all(color: topItem.borderColor),
-                                  ),
-                                  child: Center(
-                                    child: WidgetAppSVG(topItem.icon),
-                                  ),
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      WidgetInkWellTransparent(
+                          onTap: () => appContext.push(topItem.route),
+                          enableInkWell: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                height: 40.sw,
+                                width: 40.sw,
+                                decoration: BoxDecoration(
+                                  color: topItem.backgroundColor,
+                                  borderRadius: BorderRadius.circular(12.sw),
+                                  border: Border.all(color: topItem.borderColor),
                                 ),
-                                Gap(4.sw),
-                                Text(
-                                  topItem.displayName,
-                                  style: w400TextStyle(fontSize: 12.sw),
+                                child: Center(
+                                  child: WidgetAppSVG(topItem.icon),
                                 ),
-                              ],
-                            )),
-                        Gap(16.sw),
-                        WidgetInkWellTransparent(
-                            onTap: () {
-                              // Todo:
-                              print(bottomItem);
-                            },
-                            enableInkWell: false,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      height: 40.sw,
-                                      width: 40.sw,
-                                      decoration: BoxDecoration(
-                                        color: bottomItem.backgroundColor,
-                                        borderRadius: BorderRadius.circular(12.sw),
-                                        border: Border.all(color: bottomItem.borderColor),
-                                      ),
-                                      child: Center(
-                                        child: WidgetAppSVG(bottomItem.icon),
-                                      ),
+                              ),
+                              Gap(4.sw),
+                              Text(
+                                topItem.displayName,
+                                style: w400TextStyle(fontSize: 12.sw),
+                              ),
+                            ],
+                          )),
+                      Gap(16.sw),
+                      WidgetInkWellTransparent(
+                          onTap: () {
+                            // Todo:
+                            print(bottomItem);
+                          },
+                          enableInkWell: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Container(
+                                    height: 40.sw,
+                                    width: 40.sw,
+                                    decoration: BoxDecoration(
+                                      color: bottomItem.backgroundColor,
+                                      borderRadius: BorderRadius.circular(12.sw),
+                                      border: Border.all(color: bottomItem.borderColor),
                                     ),
-                                    if (isRating)
-                                      Positioned(
-                                        top: -3.sw,
-                                        right: -5.sw,
-                                        child: Container(
-                                          height: 15.sw,
-                                          padding: EdgeInsets.symmetric(horizontal: 4.sw),
-                                          decoration: BoxDecoration(
-                                            color: hexColor('#FF8832'),
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: Colors.white),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '10',
-                                              style: GoogleFonts.roboto(
-                                                fontSize: 10.sw,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white,
-                                                height: 1.4,
-                                              ),
+                                    child: Center(
+                                      child: WidgetAppSVG(bottomItem.icon),
+                                    ),
+                                  ),
+                                  if (isRating)
+                                    Positioned(
+                                      top: -3.sw,
+                                      right: -5.sw,
+                                      child: Container(
+                                        height: 15.sw,
+                                        padding: EdgeInsets.symmetric(horizontal: 4.sw),
+                                        decoration: BoxDecoration(
+                                          color: hexColor('#FF8832'),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(color: Colors.white),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '10',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 10.sw,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white,
+                                              height: 1.4,
                                             ),
                                           ),
                                         ),
                                       ),
-                                  ],
-                                ),
-                                Gap(4.sw),
-                                Text(
-                                  bottomItem.displayName,
-                                  style: w400TextStyle(fontSize: 12.sw),
-                                ),
-                              ],
-                            ))
-                      ],
-                    );
-                  },
-                ),
+                                    ),
+                                ],
+                              ),
+                              Gap(4.sw),
+                              Text(
+                                bottomItem.displayName,
+                                style: w400TextStyle(fontSize: 12.sw),
+                              ),
+                            ],
+                          ))
+                    ],
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

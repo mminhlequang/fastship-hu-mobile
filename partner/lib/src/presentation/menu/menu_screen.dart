@@ -70,6 +70,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
       ),
       body: WidgetAppTabBar(
         tabController: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         tabs: ['Menu'.tr(), 'Topping'.tr()],
         children: [_menu, _topping],
         onTap: (index) {

@@ -1,4 +1,5 @@
 import 'package:app/src/presentation/create_store/create_store_screen.dart';
+import 'package:app/src/presentation/detail_order/detail_order_screen.dart';
 import 'package:app/src/presentation/menu/menu_screen.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_category.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_dish.dart';
@@ -305,6 +306,20 @@ final goRouter = GoRouter(
                     end: Offset.zero,
                   ).chain(CurveTween(curve: Curves.easeInOut)),
                 ),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/detail-order',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const DetailOrderScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
                 child: child,
               );
             },

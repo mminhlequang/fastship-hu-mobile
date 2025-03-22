@@ -74,6 +74,7 @@ class _AppState extends State<_App> {
         debugShowCheckedModeBanner: false,
         theme: (AppPrefs.instance.isDarkTheme ? ThemeData.dark() : ThemeData.light()).copyWith(
           scaffoldBackgroundColor: appColorBackground,
+          colorScheme: ColorScheme.fromSeed(seedColor: appColorPrimary),
           appBarTheme: AppBarTheme(
             backgroundColor: appColorPrimary,
             titleSpacing: 0,
