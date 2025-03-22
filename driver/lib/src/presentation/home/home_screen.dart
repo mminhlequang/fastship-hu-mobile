@@ -64,9 +64,15 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                height: 255.sw,
-                color: hexColor('#EFF0F4'),
+              AspectRatio(
+                aspectRatio: 375 / 255,
+                child: SizedBox(
+                  width: context.width,
+                  child: Image.asset(
+                    assetpng('bg_noti_permission'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               Gap(24.sw),
               Padding(

@@ -11,8 +11,7 @@ class LocationPermissionWrapper extends StatefulWidget {
   const LocationPermissionWrapper({super.key, required this.child});
 
   @override
-  State<LocationPermissionWrapper> createState() =>
-      _LocationPermissionWrapperState();
+  State<LocationPermissionWrapper> createState() => _LocationPermissionWrapperState();
 }
 
 class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
@@ -68,8 +67,8 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.fromLTRB(
-              16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
+          padding:
+              EdgeInsets.fromLTRB(16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -85,7 +84,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               ),
               Gap(8.sw),
               Text(
-                'You’ll need to give Fast Ship permissiom to always use your location to get notifications about order near you'
+                'You’ll need to give Fast Ship permission to always use your location to get notifications about order near you'
                     .tr(),
                 style: w400TextStyle(fontSize: 16.sw),
                 textAlign: TextAlign.center,
@@ -146,8 +145,8 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.fromLTRB(
-              16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
+          padding:
+              EdgeInsets.fromLTRB(16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -219,8 +218,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
-              color: Colors.white,
-              child: const Center(child: CircularProgressIndicator()));
+              color: Colors.white, child: const Center(child: CircularProgressIndicator()));
         }
 
         final hasPermission = snapshot.data ?? false;
@@ -274,8 +272,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
                 icon: const Icon(Icons.settings),
                 label: const Text('Mở cài đặt hệ thống'),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
               ),
               const SizedBox(height: 16),
