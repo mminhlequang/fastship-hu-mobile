@@ -12,10 +12,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Firebase
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.1
- 
+  firebase_messaging: ^15.2.3
   equatable: ^2.0.7
   bloc: ^9.0.0
   flutter_bloc: ^9.1.0
@@ -40,7 +39,6 @@ dependencies:
   auto_size_text: ^3.0.0
   google_fonts: ^6.2.1
   file: ^7.0.1
-  url_strategy: ^0.3.0
   flutter_portal: ^1.1.4
   flutter_native_splash: ^2.4.5
   dotted_border: ^2.1.0
@@ -87,7 +85,7 @@ dev_dependencies:
 flutter_icons:
   android: "ic_launcher"
   ios: true
-  image_path: "assets/images/png/logo_1024.png"
+  image_path: "assets/images/logo_1024.png"
 
 jsonToDart:
   typeChecking: true  #default: undefined (Select from picker)

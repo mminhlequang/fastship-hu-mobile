@@ -730,9 +730,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       GestureDetector(
                         onDoubleTap: () {
-                                _login(
-                                    phone: '+84979797979', password: '123456');
-                              },
+                          _login(phone: '+84979797979', password: '1234567');
+                        },
                         child: Hero(
                           tag: 'app_logo',
                           child: WidgetAppSVG(

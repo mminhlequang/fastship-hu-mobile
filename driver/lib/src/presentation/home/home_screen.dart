@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/auth/repo.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widget_app_map.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -30,8 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _checkNotificationPermission());
+    _checkNotificationPermission().then((_) async {
+      AuthRepo().updateDeviceToken(
+          {"device_token": await FirebaseMessaging.instance.getToken()});
+    });
   }
 
   Future<void> _checkNotificationPermission() async {

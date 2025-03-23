@@ -12,10 +12,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Firebase
   firebase_core: 3.12.0
   firebase_auth: 5.5.0
- 
+  firebase_messaging: ^15.2.3
   equatable: ^2.0.7
   bloc: ^9.0.0
   flutter_bloc: ^9.1.0
@@ -64,7 +63,7 @@ dependencies:
   intl_phone_number_input:
     git:
       url: https://github.com/mminhlequang/intl_phone_number_input.git
-      ref: develop
+      ref: 94f946c518eb10fb5f108d3fb8cd35c8511c7330
   internal_core:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git

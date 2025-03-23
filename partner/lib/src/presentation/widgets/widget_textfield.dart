@@ -127,7 +127,7 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
                       : appColorPrimary),
             ),
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 20.sw),
             child: Row(
               children: [
                 if (widget.prefixW != null) widget.prefixW!,
@@ -289,10 +289,13 @@ class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
           child: InternationalPhoneNumberInput(
             textFieldController: _controller,
             onInputValidated: widget.onInputValidated,
+            countries:
+                ["VN"] + euroCounries.map((e) => e["code"].toString()).toList(),
             spaceBetweenSelectorAndTextField: 12.sw,
             initialValue: PhoneNumber(isoCode: widget.initialCountryCode),
             selectorConfig: SelectorConfig(
               trailingSpace: false,
+              bgColor: Colors.white,
               selectorTextStyle: w400TextStyle(
                   color: appColorText, fontSize: _fontSize, height: 1.2),
             ),

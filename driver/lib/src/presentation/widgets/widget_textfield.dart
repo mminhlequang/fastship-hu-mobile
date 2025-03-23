@@ -122,13 +122,13 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
               borderRadius: BorderRadius.circular(8),
               color: hexColor('#FAFAFA'),
               border: Border.all(
-                  width: widget.error == null ? 0 : 1,
-                  color: widget.error == null
-                      ? Colors.transparent
-                      : appColorPrimary),
+                width: widget.error == null ? 0 : 1,
+                color:
+                    widget.error == null ? Colors.transparent : appColorPrimary,
+              ),
             ),
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 20.sw),
             child: Row(
               children: [
                 if (widget.prefixW != null) widget.prefixW!,

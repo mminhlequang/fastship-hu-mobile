@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:app/src/utils/app_get.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import '../../constants/app_constants.dart';
-import '../../utils/app_utils.dart';
+import '../../constants/app_constants.dart'; 
 import 'controllers/socket_controller.dart';
 import 'widgets/order_action_widget.dart';
 import 'widgets/order_notification_widget.dart';
@@ -33,94 +31,6 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   void initState() {
     super.initState();
     _initSocketController();
-    _checkPermissions();
-  }
-
-  // Kiểm tra và yêu cầu các quyền cần thiết
-  Future<void> _checkPermissions() async {
-    // Kiểm tra quyền thông báo
-    await _checkNotificationPermission();
-  }
-
-  // Kiểm tra và yêu cầu quyền thông báo
-  Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-
-    if (status.isDenied) {
-      // Hiển thị dialog tùy chỉnh giải thích lý do cần quyền thông báo
-      await appOpenDialog(
-        _buildPermissionDialog(
-          title: 'Quyền thông báo',
-          content:
-              'Ứng dụng cần quyền gửi thông báo để bạn không bỏ lỡ đơn hàng mới và cập nhật quan trọng.',
-          iconData: Icons.notifications,
-          iconColor: Colors.orange,
-        ),
-      );
-
-      // Nếu người dùng đồng ý, hiển thị dialog hệ thống
-      await Permission.notification.request();
-
-      // Kiểm tra xem người dùng đã cấp quyền chưa
-      final newStatus = await Permission.notification.status;
-      if (newStatus.isPermanentlyDenied) {
-        // Người dùng đã từ chối vĩnh viễn, gợi ý mở cài đặt
-        await _showOpenSettingsDialog('Quyền thông báo đã bị từ chối vĩnh viễn',
-            'Vui lòng mở cài đặt để cấp quyền thông báo cho ứng dụng.');
-      }
-    }
-  }
-
-  // Hiển thị dialog gợi ý mở cài đặt
-  Future<void> _showOpenSettingsDialog(String title, String content) async {
-    await appOpenDialog(
-      AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Để sau'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-              openAppSettings();
-            },
-            child: const Text('Mở cài đặt'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Xây dựng dialog quyền tùy chỉnh
-  Widget _buildPermissionDialog({
-    required String title,
-    required String content,
-    required IconData iconData,
-    required Color iconColor,
-  }) {
-    return AlertDialog(
-      title: Row(
-        children: [
-          Icon(iconData, color: iconColor, size: 24),
-          const SizedBox(width: 8),
-          Text(title),
-        ],
-      ),
-      content: Text(content),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Từ chối'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text('Đồng ý'),
-        ),
-      ],
-    );
   }
 
   void _initSocketController() {

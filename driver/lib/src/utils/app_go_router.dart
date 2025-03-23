@@ -1,4 +1,4 @@
-import 'package:app/src/presentation/add_card/add_card_screen.dart';
+import 'package:app/src/presentation/banks_card_add/banks_card_add_screen.dart';
 import 'package:app/src/presentation/auth/auth_screen.dart';
 import 'package:app/src/presentation/banks_cards/banks_cards_screen.dart';
 import 'package:app/src/presentation/change_password/change_password_screen.dart';
@@ -11,6 +11,7 @@ import 'package:app/src/presentation/report_order/report_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../network_resources/transaction/models/models.dart';
 import '../presentation/driver_register/driver_register_screen.dart';
 import '../presentation/driver_register/widgets/widget_form_profile.dart';
 import '../presentation/help_center/help_center_screen.dart';
@@ -18,7 +19,7 @@ import '../presentation/home/home_screen.dart';
 import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/settings/settings_screen.dart';
 import '../presentation/socket_shell/socket_shell_wraper.dart';
-import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
+import '../presentation/socket_shell/widgets/permissions_wraper.dart';
 import '../presentation/splash/splash_screen.dart';
 import '../presentation/statistics/statistics_screen.dart';
 import '../presentation/vehicles/vehicles_screen.dart';
@@ -95,7 +96,7 @@ final goRouter = GoRouter(
       parentNavigatorKey: appNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child: LocationPermissionWrapper(
+          child: PermissionsWrapper(
             child: SocketShellWrapper(
               child: child,
             ),
@@ -365,7 +366,9 @@ final goRouter = GoRouter(
           path: '/my-wallet/banks-cards/add-card',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
-            child: const AddCardScreen(),
+            child: BanksCardAddScreen(
+              params: state.extra as Map<String, dynamic>,
+            ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return SlideTransition(

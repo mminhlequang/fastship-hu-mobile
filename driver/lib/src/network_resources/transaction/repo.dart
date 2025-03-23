@@ -34,4 +34,24 @@ class TransactionRepo {
   Future<NetworkResponse> getMyWallet(Map<String, dynamic> data) async {
     return await _api.getMyWallet(data);
   }
+
+  Future<NetworkResponse> getPaymentWalletProvider() async {
+    return await _api.getPaymentWalletProvider();
+  }
+
+  Future<NetworkResponse> getPaymentAccounts() async {
+    return await _api.getPaymentAccounts();
+  }
+
+  Future<NetworkResponse> createPaymentAccounts(Map<String, dynamic> data) async {
+    return await _api.createPaymentAccounts(data);
+  }
+
+  Future<NetworkResponse> updatePaymentAccounts(Map<String, dynamic> data) async {
+    return await _api.updatePaymentAccounts(data);
+  }
+
+  Future<NetworkResponse> deletePaymentAccounts(Map<String, dynamic> data) async {
+    return await _api.deletePaymentAccounts(data);
+  }
 }

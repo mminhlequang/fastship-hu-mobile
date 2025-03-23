@@ -12,6 +12,16 @@ class _MyAppEndpoint {
   static String requestTopUp() => "/api/v1/transaction/request_topup";
   static String requestWithdraw() => "/api/v1/transaction/request_withdraw";
   static String getMyWallet() => "/api/v1/transaction/get_my_wallet";
+  static String getPaymentWalletProvider() =>
+      "/api/v1/transaction/get_payment_wallet_provider";
+  static String getPaymentAccounts() =>
+      "/api/v1/transaction/get_payment_accounts";
+  static String createPaymentAccounts() =>
+      "/api/v1/transaction/create_payment_accounts";
+  static String updatePaymentAccounts() =>
+      "/api/v1/transaction/update_payment_accounts";
+  static String deletePaymentAccounts() =>
+      "/api/v1/transaction/delete_payment_accounts";
 }
 
 abstract class MyAppApi {
@@ -20,6 +30,11 @@ abstract class MyAppApi {
   Future<NetworkResponse> requestTopUp(Map<String, dynamic> data);
   Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data);
   Future<NetworkResponse> getMyWallet(Map<String, dynamic> data);
+  Future<NetworkResponse> getPaymentWalletProvider();
+  Future<NetworkResponse> getPaymentAccounts();
+  Future<NetworkResponse> createPaymentAccounts(Map<String, dynamic> data);
+  Future<NetworkResponse> updatePaymentAccounts(Map<String, dynamic> data);
+  Future<NetworkResponse> deletePaymentAccounts(Map<String, dynamic> data);
 }
 
 class MyAppApiImp extends MyAppApi {
@@ -93,6 +108,86 @@ class MyAppApiImp extends MyAppApi {
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => MyWallet.fromJson(json),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> getPaymentWalletProvider() async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.getPaymentWalletProvider());
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => (json as List)
+              .map((e) => PaymentWalletProvider.fromJson(e))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> getPaymentAccounts() async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.getPaymentAccounts());
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) =>
+              (json as List).map((e) => PaymentAccount.fromJson(e)).toList(),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> createPaymentAccounts(
+      Map<String, dynamic> data) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.createPaymentAccounts(), data: data);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => PaymentAccount.fromJson(json),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> updatePaymentAccounts(
+      Map<String, dynamic> data) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.updatePaymentAccounts(), data: data);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => PaymentAccount.fromJson(json),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> deletePaymentAccounts(
+      Map<String, dynamic> data) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.deletePaymentAccounts(), data: data);
+        return NetworkResponse.fromResponse(
+          response,
         );
       },
     );

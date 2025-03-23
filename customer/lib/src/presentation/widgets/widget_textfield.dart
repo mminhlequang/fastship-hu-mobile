@@ -111,7 +111,7 @@ class _WidgetTextFieldState extends State<WidgetTextField> {
                       : appColorPrimary),
             ),
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 20.sw),
             child: Row(
               children: [
                 if (widget.prefixW != null) widget.prefixW!,

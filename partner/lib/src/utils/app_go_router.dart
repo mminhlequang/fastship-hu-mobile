@@ -54,54 +54,7 @@ final goRouter = GoRouter(
         },
         transitionDuration: const Duration(milliseconds: 300),
       ),
-    ),
-    // GoRoute(
-    //   path: '/driver-register',
-    //   pageBuilder: (context, state) => CustomTransitionPage(
-    //     key: state.pageKey,
-    //     child: const DriverRegisterScreen(),
-    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-    //       return FadeTransition(
-    //         opacity: animation,
-    //         child: child,
-    //       );
-    //     },
-    //     transitionDuration: const Duration(milliseconds: 300),
-    //   ),
-    // ),
-    GoRoute(
-      path: '/activity-area',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const ActivityAreaScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/select-area',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SelectAreaScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).chain(CurveTween(curve: Curves.easeInOut)),
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
+    ), 
     GoRoute(
       path: '/store-registration',
       pageBuilder: (context, state) => CustomTransitionPage(

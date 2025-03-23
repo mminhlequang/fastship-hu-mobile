@@ -17,7 +17,7 @@ internalSetup() {
       networkOptions: PNetworkOptionsImpl(
         loggingEnable: true,
         baseUrl: 'https://zennail23.com',
-        baseUrlAsset: '',
+        baseUrlAsset: 'https://zennail23.com',
         responsePrefixData: 'data',
         // errorInterceptor: (e) {
         //   print(e);
