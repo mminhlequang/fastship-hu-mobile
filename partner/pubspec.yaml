@@ -88,7 +88,7 @@ dev_dependencies:
 flutter_icons:
   android: "ic_launcher"
   ios: true
-  image_path: "assets/images/png/logo_1024.png"
+  image_path: "assets/images/logo_1024.png"
 
 jsonToDart:
   typeChecking: true  #default: undefined (Select from picker)
