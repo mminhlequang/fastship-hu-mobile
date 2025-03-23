@@ -4,8 +4,10 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widget_app_map.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -22,12 +24,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Completer<AnimatedMapController> mapController = Completer<AnimatedMapController>();
+  Completer<AnimatedMapController> mapController =
+      Completer<AnimatedMapController>();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkNotificationPermission());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _checkNotificationPermission());
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -60,7 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(bottom: 24.sw + context.mediaQueryPadding.bottom),
+          padding:
+              EdgeInsets.only(bottom: 24.sw + context.mediaQueryPadding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -147,9 +152,33 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Stack(
               children: [
-                WidgetAppFlutterMapAnimation(
-                  mapController: mapController,
-                  initialCenter: LatLng(37.7749, -122.4194),
+                ValueListenableBuilder(
+                  valueListenable: socketController.currentLocation,
+                  builder: (context, location, child) {
+                    print('location: $location');
+                    return WidgetAppFlutterMapAnimation(
+                      mapController: mapController,
+                      initialCenter: location ?? LatLng(37.7749, -122.4194),
+                      markers: [
+                        if (location != null)
+                          Marker(
+                            point: location,
+                            width: 32.sw,
+                            height: 32.sw,
+                            child: Center(
+                              child: AvatarGlow(
+                                glowColor: appColorPrimary,
+                                child: WidgetAppSVG(
+                                  'motor',
+                                  width: 28.sw,
+                                  height: 28.sw,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
                 Positioned(
                   left: 16,
@@ -186,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   top: -6,
                                   right: -4,
                                   child: Container(
-                                    padding: EdgeInsets.fromLTRB(4.sw, 2.53.sw, 4.sw, 0.47.sw),
+                                    padding: EdgeInsets.fromLTRB(
+                                        4.sw, 2.53.sw, 4.sw, 0.47.sw),
                                     decoration: BoxDecoration(
                                       color: hexColor('#F58737'),
                                       borderRadius: BorderRadius.circular(7.sw),
@@ -222,8 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   key: ValueKey(isOnline),
                   width: context.width,
                   color: Colors.white,
-                  padding: EdgeInsets.fromLTRB(
-                      16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
+                  padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
+                      16.sw + MediaQuery.paddingOf(context).bottom),
                   child: isOnline
                       ? SliderButton(
                           direction: DismissDirection.endToStart,
@@ -251,10 +281,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           buttonSize: 40.sw,
                           width: context.width,
                           radius: 99.sw,
-                          border: Border.all(color: appColorPrimary.withValues(alpha: .23)),
+                          border: Border.all(
+                              color: appColorPrimary.withValues(alpha: .23)),
                           alignLabel: Alignment.center,
                           buttonColor: appColorPrimary,
-                          backgroundColor: appColorPrimary.withValues(alpha: .2),
+                          backgroundColor:
+                              appColorPrimary.withValues(alpha: .2),
                           highlightedColor: darkGreen,
                           baseColor: Colors.white,
                           shimmer: false,

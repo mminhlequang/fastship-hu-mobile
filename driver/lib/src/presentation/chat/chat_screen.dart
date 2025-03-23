@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             child: Text(
                               index.isOdd
-                                  ? 'Đơn hàng đã đến nơi rồi bạn ơi. Nhanh nhanh ra nhận thôi nào!'
+                                  ? 'Đơn hàng đã đến nơi rồi bạn ơi.Nhanh nhanh ra nhận thôi nào!'
                                   : 'Hello!',
                               style: w400TextStyle(
                                 fontSize: 16.sw,

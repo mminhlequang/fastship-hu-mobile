@@ -291,9 +291,12 @@ class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
             textFieldController: _controller,
             onInputValidated: widget.onInputValidated,
             spaceBetweenSelectorAndTextField: 12.sw,
+            countries: ['VN'] +
+                euroCounries.map((e) => e['code']!.toString()).toList(),
             initialValue: PhoneNumber(isoCode: widget.initialCountryCode),
             selectorConfig: SelectorConfig(
               trailingSpace: false,
+              bgColor: Colors.white,
               selectorTextStyle: w400TextStyle(
                   color: appColorText, fontSize: _fontSize, height: 1.2),
             ),

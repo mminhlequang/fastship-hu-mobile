@@ -722,9 +722,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       GestureDetector(
-                        onDoubleTap: kReleaseMode
-                            ? null
-                            : () {
+                        onDoubleTap: () {
                                 _login(phone: '+84979797979', password: '123456');
                               },
                         child: Hero(

@@ -1,5 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -12,14 +13,14 @@ class HelpCenterScreen extends StatelessWidget {
   const HelpCenterScreen({super.key});
 
   void _launchMessenger() async {
-    final Uri url = Uri.parse('https://m.me/fastship');
+    final Uri url = Uri.parse(appMessengerUrl);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     }
   }
 
   void _launchWhatsapp() async {
-    final Uri url = Uri.parse('https://wa.me/84123456789');
+    final Uri url = Uri.parse(appWhatsappUrl);
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     }
@@ -107,7 +108,7 @@ class HelpCenterScreen extends StatelessWidget {
                         ),
                         Gap(2.sw),
                         Text(
-                          '19008028',
+                          appHotlineNumber,
                           style: w400TextStyle(color: grey9),
                         ),
                       ],

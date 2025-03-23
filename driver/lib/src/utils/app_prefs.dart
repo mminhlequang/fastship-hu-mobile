@@ -127,7 +127,7 @@ class AppPrefs {
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 
-  bool get isDriverOnline => _boxData.get('is_driver_online') ?? false;
+  bool get autoActiveOnlineStatus => _boxData.get('auto_active_online_status') ?? true;
 
-  set isDriverOnline(bool value) => _boxData.put('is_driver_online', value);
+  set autoActiveOnlineStatus(bool value) => _boxData.put('auto_active_online_status', value);
 }

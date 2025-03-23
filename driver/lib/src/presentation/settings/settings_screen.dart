@@ -16,7 +16,6 @@ import 'widgets/widget_wallet.dart';
 enum SettingsItem {
   myProfile,
   status,
-  notifications,
   incomeStatistics,
   customerReviews,
   changePassword,
@@ -27,8 +26,7 @@ enum SettingsItem {
 
   String get title => switch (this) {
         myProfile => 'My profile'.tr(),
-        status => 'Status'.tr(),
-        notifications => 'Notifications'.tr(),
+        status => 'Auto active online status'.tr(),
         incomeStatistics => 'Income statistics'.tr(),
         customerReviews => 'Customer’s reviews'.tr(),
         changePassword => 'Change password'.tr(),
@@ -41,7 +39,6 @@ enum SettingsItem {
   String get icon => switch (this) {
         myProfile => assetsvg('ic_my_profile'),
         status => assetsvg('ic_status'),
-        notifications => assetsvg('ic_notification'),
         incomeStatistics => assetsvg('ic_income_statistics'),
         customerReviews => assetsvg('ic_review'),
         changePassword => assetsvg('ic_lock'),
@@ -70,12 +67,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _statusController = ValueNotifier<bool>(true);
+  final _autoActiveOnlineStatusController =
+      ValueNotifier<bool>(AppPrefs.instance.autoActiveOnlineStatus);
   final _notificationController = ValueNotifier<bool>(true);
 
   @override
   void dispose() {
-    _statusController.dispose();
+    _autoActiveOnlineStatusController.dispose();
     _notificationController.dispose();
     super.dispose();
   }
@@ -151,6 +149,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void onTap(SettingsItem item) {
+    switch (item) {
+      case SettingsItem.deleteAccount:
+        _deleteAccount();
+        break;
+      case SettingsItem.logout:
+        _logout();
+        break;
+      default:
+        appContext.push(item.route!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,7 +191,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Gap(context.mediaQueryPadding.top + 36.sw),
+                              Gap(36.sw),
                               Row(
                                 children: [
                                   Stack(
@@ -242,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  Container(height: 30.sw, color: Colors.white),
+                  Container(height: 20.sw, color: Colors.white),
                 ],
               ),
               Positioned(
@@ -257,25 +268,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
+          Gap(8.sw),
           Expanded(
             child: ListView.separated(
               padding: EdgeInsets.zero,
-              itemCount: SettingsItem.values.length,
+              itemCount: SettingsItem.values.length + 1,
               separatorBuilder: (context, index) => const AppDivider(),
               itemBuilder: (context, index) {
+                if (index == SettingsItem.values.length) {
+                  return Container(height: 100.sw);
+                }
                 final item = SettingsItem.values[index];
                 return WidgetRippleButton(
-                  onTap: item == SettingsItem.status ||
-                          item == SettingsItem.notifications
+                  onTap: item == SettingsItem.status
                       ? null
                       : () {
-                          if (item == SettingsItem.deleteAccount) {
-                            _deleteAccount();
-                          } else if (item == SettingsItem.logout) {
-                            _logout();
-                          } else {
-                            appContext.push(item.route!);
-                          }
+                          onTap(item);
                         },
                   radius: 0,
                   child: Padding(
@@ -294,20 +302,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         if (item.route != null) WidgetAppSVG('chevron_right'),
                         if (item == SettingsItem.status)
                           AdvancedSwitch(
-                            controller: _statusController,
+                            controller: _autoActiveOnlineStatusController,
                             height: 22.sw,
                             width: 40.sw,
                             activeColor: appColorPrimary,
                             inactiveColor: hexColor('#E2E2EF'),
+                            onChanged: (value) {
+                              AppPrefs.instance.autoActiveOnlineStatus = value;
+                            },
                           ),
-                        if (item == SettingsItem.notifications)
-                          AdvancedSwitch(
-                            controller: _notificationController,
-                            height: 22.sw,
-                            width: 40.sw,
-                            activeColor: appColorPrimary,
-                            inactiveColor: hexColor('#E2E2EF'),
-                          )
                       ],
                     ),
                   ),

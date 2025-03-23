@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/utils/utils.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:vibration/vibration.dart';
 
 import '../../../constants/app_constants.dart';
-import '../../../utils/app_prefs.dart';
 import '../models/socket_response.dart';
 import '../models/order_model.dart';
 
@@ -31,6 +31,8 @@ class SocketController {
   Map<String, dynamic>? _currentOrder;
   DriverOrderStatus _orderStatus = DriverOrderStatus.waiting;
   final ValueNotifier<bool> socketConnected = ValueNotifier<bool>(false);
+  final ValueNotifier<LatLng?> currentLocation = ValueNotifier<LatLng?>(null);
+
 
   // Callback cho việc cập nhật UI
   Function(Map<String, dynamic>)? onNewOrder;
@@ -57,16 +59,10 @@ class SocketController {
 
   init() {
     _initializeSocket();
-    _checkOnlineStatus();
-  }
-
-  Future<void> _checkOnlineStatus() async {
-    final bool savedStatus = AppPrefs.instance.isDriverOnline;
-    debugPrint('Debug socket: Trạng thái online đã lưu: $savedStatus');
-    if (savedStatus) {
+    if (AppPrefs.instance.autoActiveOnlineStatus) {
       setOnlineStatus(true);
     }
-  }
+  } 
 
   void _initializeSocket() {
     try {
@@ -174,10 +170,7 @@ class SocketController {
 
   void setOnlineStatus(bool isOnline) {
     debugPrint('Debug socket: Đặt trạng thái online: $isOnline');
-    _isOnline = isOnline;
-
-    // Lưu trạng thái
-    AppPrefs.instance.isDriverOnline = isOnline;
+    _isOnline = isOnline; 
 
     // Gửi trạng thái lên server
     _emitDriverStatus(isOnline);
@@ -217,7 +210,7 @@ class SocketController {
   void _startLocationUpdates() {
     debugPrint('Debug socket: Bắt đầu cập nhật vị trí');
     _locationTimer?.cancel();
-    _locationTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+    _locationTimer = Timer.periodic(const Duration(seconds: kDebugMode ?60 : 30), (_) {
       debugPrint('Debug socket: Timer cập nhật vị trí kích hoạt');
       _sendCurrentLocation();
     });
@@ -236,8 +229,12 @@ class SocketController {
     debugPrint('Debug socket: Đang lấy vị trí hiện tại');
     try {
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 15),
+        ),
       );
+      currentLocation.value = LatLng(position.latitude, position.longitude);
 
       debugPrint(
           'Debug socket: Đã lấy vị trí: ${position.latitude}, ${position.longitude}');

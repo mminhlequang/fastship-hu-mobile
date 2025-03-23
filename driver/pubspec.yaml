@@ -62,11 +62,12 @@ dependencies:
   currency_text_input_formatter: ^2.2.9
   flutter_advanced_switch: ^3.1.0
   flutter_rating_bar: ^4.0.1
+  avatar_glow: ^3.0.1
 
   intl_phone_number_input:
     git:
       url: https://github.com/mminhlequang/intl_phone_number_input.git
-      ref: develop
+      ref: 94f946c518eb10fb5f108d3fb8cd35c8511c7330
   internal_core:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
