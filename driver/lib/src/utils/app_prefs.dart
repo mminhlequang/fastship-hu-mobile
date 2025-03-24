@@ -9,6 +9,7 @@ import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../constants/app_constants.dart';
 import '../network_resources/auth/models/models.dart';
 
 class AppPrefs {
@@ -119,7 +120,7 @@ class AppPrefs {
     }
   }
 
-  String? get currency => _boxData.get('currency') ?? "EUR";
+  String? get currency => _boxData.get('currency') ?? appCurrency;
 
   set currency(String? value) => _boxData.put('currency', value);
 

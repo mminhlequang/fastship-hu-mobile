@@ -5,16 +5,17 @@ import 'package:app/src/network_resources/transaction/repo.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 
-import '../widgets/widget_loader.dart';
 import '../widgets/widgets.dart';
 
 class BanksCardsScreen extends StatefulWidget {
-  const BanksCardsScreen({super.key});
+  final bool isSelector;
+  const BanksCardsScreen({super.key, this.isSelector = false});
 
   @override
   State<BanksCardsScreen> createState() => _BanksCardsScreenState();
@@ -61,7 +62,11 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bank Accounts/Wallets'.tr()),
+        title: Text(
+          widget.isSelector
+              ? 'Select Bank Account/Wallet'.tr()
+              : 'Bank Accounts/Wallets'.tr(),
+        ),
         // actions: [
         //   if (paymentAccounts.isNotEmpty)
         //     TextButton(
@@ -78,7 +83,7 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
         // ],
       ),
       body: isLoading
-          ? const WidgetAppLoader() //TODO: add shimmer
+          ? _buildShimmer()
           : SingleChildScrollView(
               child: Column(
                 children: [
@@ -101,7 +106,9 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
                           onTap: () {
                             appHaptic();
                             appContext.push('/my-wallet/banks-cards/add-card',
-                                extra: {'type': 'bank'});
+                                extra: {'type': 'bank'}).then((value) {
+                              if (mounted) _fetchData();
+                            });
                           },
                           radius: 0,
                           child: Padding(
@@ -145,7 +152,9 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
                                 extra: {
                                   'type': 'wallet',
                                   'providers': paymentWalletProvider
-                                });
+                                }).then((value) {
+                              if (mounted) _fetchData();
+                            });
                           },
                           radius: 0,
                           child: Padding(
@@ -224,7 +233,11 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
     final bool isDefault = account.isDefault == 1;
     return WidgetInkWellTransparent(
       onTap: () {
-        _showAccountOptions(account);
+        if (widget.isSelector) {
+          appContext.pop(account);
+        } else {
+          _showAccountOptions(account);
+        }
       },
       radius: 0,
       child: Padding(
@@ -235,14 +248,22 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
               WidgetAppSVG('radio-check', width: 24.sw)
             else
               WidgetAppSVG('radio-uncheck', width: 24.sw),
-            if (account.accountType != 'bank') ...[
+            ...[
               Gap(12.sw),
-              WidgetAppImage(
-                imageUrl: account.paymentWalletProvider?.iconUrl ?? '',
-                height: 32.sw,
-                width: 32.sw,
-                radius: 10.sw,
-              ),
+              if (account.accountType != 'bank')
+                WidgetAppImage(
+                  imageUrl: account.paymentWalletProvider?.iconUrl ?? '',
+                  height: 32.sw,
+                  width: 32.sw,
+                  radius: 10.sw,
+                )
+              else
+                Image.asset(
+                  assetpng('card'),
+                  width: 32.sw,
+                  height: 32.sw,
+                  fit: BoxFit.cover,
+                ),
             ],
             Gap(12.sw),
             Expanded(
@@ -280,47 +301,51 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
   void _showAccountOptions(PaymentAccount account) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(16.sw),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Account Options'.tr(),
-              style: w400TextStyle(
-                fontSize: 18.sw,
+      backgroundColor: Colors.white,
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          padding: EdgeInsets.all(16.sw),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Account Options'.tr(),
+                style: w400TextStyle(
+                  fontSize: 18.sw,
+                ),
               ),
-            ),
-            Gap(16.sw),
-            ListTile(
-              leading: WidgetAppSVG('ic_edit'),
-              title: Text('Edit'.tr()),
-              onTap: () {
-                Navigator.pop(context);
-                _editAccount(account);
-              },
-            ),
-            if (account.isDefault != 1)
+              Gap(16.sw),
               ListTile(
-                leading: WidgetAppSVG('ic_default'),
-                title: Text('Set as default'.tr()),
+                leading: Icon(CupertinoIcons.pencil),
+                title: Text('Edit'.tr()),
                 onTap: () {
                   Navigator.pop(context);
-                  _setAsDefault(account);
+                  _editAccount(account);
                 },
               ),
-            ListTile(
-              leading: WidgetAppSVG('ic_delete', color: Colors.red),
-              title: Text(
-                'Delete'.tr(),
-                style: w400TextStyle(color: Colors.red),
+              if (account.isDefault != 1)
+                ListTile(
+                  leading: Icon(CupertinoIcons.star),
+                  title: Text('Set as default'.tr()),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _setAsDefault(account);
+                  },
+                ),
+              ListTile(
+                leading: Icon(CupertinoIcons.delete, color: Colors.red),
+                title: Text(
+                  'Delete'.tr(),
+                  style: w400TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _confirmDelete(account);
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                _confirmDelete(account);
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -332,62 +357,47 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
       'type': account.accountType == 'bank' ? 'bank' : 'wallet',
       'account': account,
       'providers': paymentWalletProvider,
+    }).then((value) {
+      if (mounted) _fetchData();
     });
   }
 
   Future<void> _setAsDefault(PaymentAccount account) async {
-    setState(() {
-      isLoading = true;
+    // // Giả sử có API để set làm mặc định
+    final response = await TransactionRepo().updatePaymentAccounts({
+      "is_default": 1,
+      "id": account.id,
     });
 
-    // // Giả sử có API để set làm mặc định
-    // final response =
-    //     await TransactionRepo().setDefaultPaymentAccount(account.id!);
-
-    // if (response.isSuccess) {
-    //   await appShowSnackBar(
-    //     context: context,
-    //     msg: 'Default account updated successfully'.tr(),
-    //     type: AppSnackBarType.success,
-    //   );
-    //   await _fetchData();
-    // } else {
-    //   await appShowSnackBar(
-    //     context: context,
-    //     msg: 'Failed to update default account'.tr(),
-    //     type: AppSnackBarType.error,
-    //   );
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
+    if (response.isSuccess) {
+      await appShowSnackBar(
+        context: context,
+        msg: 'Default account updated successfully'.tr(),
+        type: AppSnackBarType.success,
+      );
+      await _fetchData();
+    } else {
+      await appShowSnackBar(
+        context: context,
+        msg: 'Failed to update default account'.tr(),
+        type: AppSnackBarType.error,
+      );
+    }
   }
 
   void _confirmDelete(PaymentAccount account) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Deletion'.tr()),
-        content: Text(
-          'Are you sure you want to delete this account?'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteAccount(account);
-            },
-            child: Text(
-              'Delete'.tr(),
-              style: w400TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return WidgetConfirmDialog(
+          title: 'Confirm Deletion'.tr(),
+          subTitle:
+              'Are you sure you want to delete this payment account?'.tr(),
+          onConfirm: () {
+            _deleteAccount(account);
+          },
+        );
+      },
     );
   }
 
@@ -396,7 +406,6 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
       isLoading = true;
     });
 
-    // Giả sử có API để xóa tài khoản
     final response =
         await TransactionRepo().deletePaymentAccounts({"id": account.id});
 
@@ -419,12 +428,151 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
     }
   }
 
-  Future<void> _refreshData() async {
-    await _fetchData();
-    await appShowSnackBar(
-      context: context,
-      msg: 'Data refreshed'.tr(),
-      type: AppSnackBarType.success,
+  Widget _buildShimmer() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // SHIMMER CHO PHẦN BANK ACCOUNT
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Gap(16.sw),
+                // Tiêu đề phần
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 100.sw,
+                    height: 14.sw,
+                    color: Colors.white,
+                  ),
+                ),
+                Gap(16.sw),
+                // Danh sách ngân hàng
+                ...List.generate(3, (index) => _buildShimmerAccountItem()),
+                const AppDivider(),
+                // Nút thêm tài khoản
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.sw),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24.sw,
+                          height: 24.sw,
+                          color: Colors.white,
+                        ),
+                        Gap(8.sw),
+                        Container(
+                          width: 120.sw,
+                          height: 16.sw,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Gap(8.sw),
+          // SHIMMER CHO PHẦN WALLET
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Gap(16.sw),
+                // Tiêu đề phần
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 80.sw,
+                    height: 14.sw,
+                    color: Colors.white,
+                  ),
+                ),
+                Gap(16.sw),
+                // Danh sách ví
+                ...List.generate(2, (index) => _buildShimmerAccountItem()),
+                const AppDivider(),
+                // Nút thêm ví
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.sw),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24.sw,
+                          height: 24.sw,
+                          color: Colors.white,
+                        ),
+                        Gap(8.sw),
+                        Container(
+                          width: 100.sw,
+                          height: 16.sw,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerAccountItem() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.sw),
+        child: Row(
+          children: [
+            // Radio button
+            Container(
+              width: 24.sw,
+              height: 24.sw,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+            ),
+            Gap(12.sw),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 16.sw,
+                    color: Colors.white,
+                  ),
+                  Gap(4.sw),
+                  Container(
+                    width: 200.sw,
+                    height: 14.sw,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

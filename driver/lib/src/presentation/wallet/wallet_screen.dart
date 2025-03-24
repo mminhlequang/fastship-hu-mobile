@@ -38,7 +38,7 @@ class _WalletScreenState extends State<WalletScreen> {
       // Gọi API backend để lấy clientSecret
 
       final response = await TransactionRepo()
-          .requestTopUp({'amount': amount, 'currency': 'eur'});
+          .requestTopUp({'amount': amount, 'currency': appCurrency});
       if (response.isSuccess) {
         final data = response.data;
         print(data);
@@ -105,13 +105,17 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  Future<void> onRequestWithdraw(num amount) async {
+  // params: {'amount': amount, 'account': account}
+  Future<void> onRequestWithdraw(Map params) async {
     setState(() {
       isLoading = true;
     });
 
-    final response = await TransactionRepo()
-        .requestWithdraw({'amount': amount, 'currency': 'eur'});
+    final response = await TransactionRepo().requestWithdraw({
+      'amount': params['amount'],
+      'currency': appCurrency,
+      'payment_account_id': params['account'].id,
+    });
     if (response.isSuccess) {
       await appShowSnackBar(
         context: context,
@@ -383,12 +387,18 @@ class _WalletScreenState extends State<WalletScreen> {
                         child: WidgetRippleButton(
                           onTap: () async {
                             appHaptic();
-                            final r =
-                                await appOpenBottomSheet(WidgetWithdrawSheet());
-                            if (r is num) {
-                              _verifyPassword(
-                                  onConfirm: () => onRequestWithdraw(r));
-                            }
+                            appContext
+                                .push('/my-wallet/banks-cards', extra: true)
+                                .then((value) async {
+                              if (value is PaymentAccount) {
+                                final r = await appOpenBottomSheet(
+                                    WidgetWithdrawSheet(account: value));
+                                if (r is Map) {
+                                  _verifyPassword(
+                                      onConfirm: () => onRequestWithdraw(r));
+                                }
+                              }
+                            });
                           },
                           radius: 10.sw,
                           child: Center(

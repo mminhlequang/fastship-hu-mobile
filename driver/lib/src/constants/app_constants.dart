@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 
 const String appName = "Driver-FastshipHu";
+const String appCurrency = "EUR";
 
 const String appHotlineNumber = "19008028";
 const String appMessengerUrl = "https://m.me/fastship.vn";

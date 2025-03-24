@@ -346,7 +346,7 @@ final goRouter = GoRouter(
           path: '/my-wallet/banks-cards',
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
-            child: const BanksCardsScreen(),
+            child: BanksCardsScreen(isSelector: state.extra == true),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return SlideTransition(

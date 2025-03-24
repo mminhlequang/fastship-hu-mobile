@@ -1,5 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/constants/constants.dart';
 import 'package:app/src/network_resources/transaction/models/models.dart';
 import 'package:app/src/network_resources/transaction/repo.dart';
 import 'package:app/src/utils/utils.dart';
@@ -21,7 +22,20 @@ class BanksCardAddScreen extends StatefulWidget {
 }
 
 class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
-  bool enableSubmit = false;
+  bool get enableSubmit {
+    if (accountType == 'bank') {
+      return _accountNameController.text.isNotEmpty &&
+          _accountNumberController.text.isNotEmpty &&
+          _bankNameController.text.isNotEmpty &&
+          _currencyController.text.isNotEmpty;
+    } else {
+      // wallet
+      return _accountNameController.text.isNotEmpty &&
+          _accountNumberController.text.isNotEmpty &&
+          selectedProvider != null;
+    }
+  }
+
   bool isLoading = false;
   String accountType = 'bank';
   List<PaymentWalletProvider> providers = [];
@@ -40,7 +54,7 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
   @override
   void initState() {
     super.initState();
-    _currencyController.text = 'EUR'; // Đặt giá trị mặc định cho tiền tệ
+    _currencyController.text = appCurrency; // Đặt giá trị mặc định cho tiền tệ
 
     // Kiểm tra xem có phải đang chỉnh sửa không
     if (widget.params.containsKey('account')) {
@@ -75,21 +89,12 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
 
       if (accountType == 'bank') {
         _bankNameController.text = accountToEdit!.bankName ?? '';
-        _currencyController.text = accountToEdit!.currency ?? 'EUR';
+        _currencyController.text = accountToEdit!.currency ?? appCurrency;
       } else if (accountType == 'wallet') {
         // Tìm provider tương ứng nếu có
-        if (accountToEdit!.paymentWalletProviderId != null) {
+        if (accountToEdit!.paymentWalletProvider != null) {
           // Đợi đến khi providers được khởi tạo đầy đủ
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            for (var provider in providers) {
-              if (provider.id == accountToEdit!.paymentWalletProviderId) {
-                setState(() {
-                  selectedProvider = provider;
-                });
-                break;
-              }
-            }
-          });
+          selectedProvider = accountToEdit!.paymentWalletProvider;
         }
       }
     }
@@ -105,19 +110,7 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
   }
 
   void _validateForm() {
-    setState(() {
-      if (accountType == 'bank') {
-        enableSubmit = _accountNameController.text.isNotEmpty &&
-            _accountNumberController.text.isNotEmpty &&
-            _bankNameController.text.isNotEmpty &&
-            _currencyController.text.isNotEmpty;
-      } else {
-        // wallet
-        enableSubmit = _accountNameController.text.isNotEmpty &&
-            _accountNumberController.text.isNotEmpty &&
-            selectedProvider != null;
-      }
-    });
+    setState(() {});
   }
 
   @override
@@ -159,9 +152,9 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
                       WidgetTextField(
                         controller: _accountNumberController,
                         hint: 'Enter account number'.tr(),
-                        keyboardType: TextInputType.number,
-                        isReadOnly:
-                            isEditMode, // Không cho phép chỉnh sửa số tài khoản trong chế độ chỉnh sửa
+                        // keyboardType: TextInputType.number,
+                        // isReadOnly:
+                        //     isEditMode, // Không cho phép chỉnh sửa số tài khoản trong chế độ chỉnh sửa
                       ),
                       Gap(16.sw),
 
@@ -176,13 +169,13 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
                         Gap(16.sw),
 
                         // Tiền tệ (chỉ cho tài khoản ngân hàng)
-                        Text('Currency'.tr(), style: w400TextStyle()),
-                        Gap(8.sw),
-                        WidgetTextField(
-                          controller: _currencyController,
-                          hint: 'Enter currency code'.tr(),
-                        ),
-                        Gap(16.sw),
+                        // Text('Currency'.tr(), style: w400TextStyle()),
+                        // Gap(8.sw),
+                        // WidgetTextField(
+                        //   controller: _currencyController,
+                        //   hint: 'Enter currency code'.tr(),
+                        // ),
+                        // Gap(16.sw),
                       ] else if (accountType == 'wallet') ...[
                         // Chọn nhà cung cấp ví (chỉ cho ví điện tử)
                         Text('Wallet Provider'.tr(), style: w400TextStyle()),
@@ -290,7 +283,7 @@ class _BanksCardAddScreenState extends State<BanksCardAddScreen> {
       } else if (accountType == 'wallet' && selectedProvider != null) {
         data['payment_wallet_provider_id'] = selectedProvider!.id;
         data['bank_name'] = selectedProvider!.name;
-        data['currency'] = "EUR";
+        data['currency'] = appCurrency;
       }
 
       // Thêm ID tài khoản nếu đang ở chế độ chỉnh sửa

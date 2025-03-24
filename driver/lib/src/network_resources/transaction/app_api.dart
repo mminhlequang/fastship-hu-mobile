@@ -92,7 +92,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.requestWithdraw(), data: data);
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => TransactionModel.fromJson(json),
+          value: response.data['status'] == true,
         );
       },
     );
@@ -172,7 +172,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.updatePaymentAccounts(), data: data);
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => PaymentAccount.fromJson(json),
+          value: response.data['status'] == true,
         );
       },
     );
@@ -188,6 +188,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.deletePaymentAccounts(), data: data);
         return NetworkResponse.fromResponse(
           response,
+          value: response.data['status'] == true,
         );
       },
     );
