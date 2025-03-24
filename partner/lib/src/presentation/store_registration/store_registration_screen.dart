@@ -308,7 +308,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> {
                     step++;
                   });
                 } else {
-                  appContext.push('/provide-info');
+                  appContext.push('/store-registration/provide-info');
                 }
               },
               radius: 10.sw,
