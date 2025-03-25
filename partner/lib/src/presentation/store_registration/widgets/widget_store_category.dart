@@ -148,11 +148,15 @@ class _WidgetStoreCategoryState extends State<WidgetStoreCategory> {
           ...m.children!.map((e) => Padding(
                 padding: EdgeInsets.fromLTRB(20.sw, 0, 0, 0),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.keyboard_arrow_right,
-                      size: 16.sw,
-                      color: appColorText,
+                    Padding(
+                      padding: EdgeInsets.only(top: 14.sw, right: 8.sw),
+                      child: Icon(
+                        Icons.circle,
+                        size: 8.sw,
+                        color: grey1,
+                      ),
                     ),
                     Expanded(child: _buildItem(e, isChild: true)),
                   ],

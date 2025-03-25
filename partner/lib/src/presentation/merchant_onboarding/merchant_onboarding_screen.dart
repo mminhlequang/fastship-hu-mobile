@@ -48,7 +48,13 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
         title: Text("    " + 'Merchant Onboarding'.tr()),
         actions: [
           IconButton(
-            onPressed: () => appContext.push('/store-registration'),
+            onPressed: () {
+              appHaptic();
+              AppPrefs.instance.getNormalToken().then((value) {
+                print(value);
+              });
+              appContext.push('/store-registration');
+            },
             icon: WidgetAppSVG('ic_add_circle'),
           ),
           Gap(4.sw),
