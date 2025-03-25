@@ -24,6 +24,7 @@ class WidgetAppBottomSheet extends StatelessWidget {
     this.height,
     this.width,
     this.padding,
+    this.showCloseButton = true,
   });
 
   final Widget child;
@@ -34,6 +35,7 @@ class WidgetAppBottomSheet extends StatelessWidget {
   final bool enableSafeArea;
   final double? width;
   final EdgeInsets? padding;
+  final bool showCloseButton;
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +52,17 @@ class WidgetAppBottomSheet extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(16.sw, 4.sw, 6.sw, 4.sw),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: w600TextStyle(fontSize: 16.sw, color: grey1),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: w600TextStyle(fontSize: 16.sw, color: grey1),
+                    ),
                   ),
-                  const CloseButton(),
+                  if (actions.isNotEmpty) ...[
+                    ...actions,
+                  ] else if (showCloseButton)
+                    const CloseButton(),
                 ],
               ),
             ),
@@ -68,19 +74,8 @@ class WidgetAppBottomSheet extends StatelessWidget {
             padding: padding,
             child: child,
           ),
-          if (actions.isNotEmpty) ...[
-            const AppDivider(),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 10.sw),
-              child: Row(
-                children: List.generate(
-                  actions.length,
-                  (index) => Expanded(child: actions[index]),
-                )..insert(1, Gap(10.sw)),
-              ),
-            ),
-          ],
-          if (enableSafeArea) SizedBox(height: MediaQuery.paddingOf(context).bottom),
+          if (enableSafeArea)
+            SizedBox(height: MediaQuery.paddingOf(context).bottom),
         ],
       ),
     );
