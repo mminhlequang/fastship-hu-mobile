@@ -116,15 +116,14 @@ class _WidgetAddCategoryState extends State<WidgetAddCategory> {
                                           children: [
                                             Text(
                                               'Vanilla Latte Milk',
-                                              style: w400TextStyle(height: 1),
+                                              style: w400TextStyle(),
                                             ),
-                                            Gap(3.sw),
+                                            Gap(1.sw),
                                             Text(
                                               'Espresso, Vanilla Syrup, Fresh Mink, Fresh Milk',
-                                              style: w400TextStyle(
-                                                  fontSize: 10.sw, color: grey1, height: 1),
+                                              style: w400TextStyle(fontSize: 10.sw, color: grey1),
                                             ),
-                                            Gap(4.sw),
+                                            Gap(1.sw),
                                             Text(
                                               '\$10',
                                               style: w400TextStyle(color: darkGreen),
