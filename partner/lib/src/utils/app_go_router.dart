@@ -16,12 +16,14 @@ import 'package:app/src/presentation/store_registration/widgets/service_types_sc
 import 'package:app/src/presentation/store_settings/store_settings_screen.dart';
 import 'package:app/src/presentation/store_settings/widgets/information_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
+import '../presentation/store_registration/cubit/store_registration_cubit.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey => findInstance<GlobalKey<NavigatorState>>();
@@ -33,123 +35,48 @@ final goRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SplashScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: '/auth',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const LoginScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      builder: (context, state) => const LoginScreen(),
     ),
-    GoRoute(
-      path: '/store-registration',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const StoreRegistrationScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).chain(CurveTween(curve: Curves.easeInOut)),
-            ),
+    ShellRoute(
+      parentNavigatorKey: appNavigatorKey,
+      pageBuilder: (context, state, child) {
+        return NoTransitionPage(
+          child: BlocProvider(
+            create: (context) => StoreRegistrationCubit(),
             child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/provide-info',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const ProvideInfoScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).chain(CurveTween(curve: Curves.easeInOut)),
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/opening-hours',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const OpeningHoursScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).chain(CurveTween(curve: Curves.easeInOut)),
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/provide-info/service-types',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const ServiceTypesScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).chain(CurveTween(curve: Curves.easeInOut)),
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/merchant-onboarding',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const MerchantOnboardingScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    ),
-    GoRoute(
-      path: '/create-store',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const CreateStoreScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+          ),
+        );
+      },
+      routes: [
+        GoRoute(
+          path: '/store-registration',
+          builder: (context, state) => const StoreRegistrationScreen(),
+        ),
+        GoRoute(
+          path: '/provide-info',
+          builder: (context, state) => const ProvideInfoScreen(),
+        ),
+        GoRoute(
+          path: '/provide-info/opening-time',
+          builder: (context, state) => const OpeningHoursScreen(),
+        ),
+        GoRoute(
+          path: '/provide-info/service-type',
+          builder: (context, state) => const ServiceTypesScreen(),
+        ),
+        GoRoute(
+          path: '/merchant-onboarding',
+          builder: (context, state) => const MerchantOnboardingScreen(),
+        ),
+        GoRoute(
+          path: '/create-store',
+          builder: (context, state) => const CreateStoreScreen(),
+        ),
+      ],
     ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,
@@ -169,90 +96,23 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/menu',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const MenuScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) => const MenuScreen(),
         ),
         GoRoute(
           path: '/add-category',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: WidgetAddCategory(category: state.extra as CategoryModel?),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) => WidgetAddCategory(category: state.extra as CategoryModel?),
         ),
         GoRoute(
           path: '/add-dish',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: WidgetAddDish(dish: state.extra as String?),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) => WidgetAddDish(dish: state.extra as String?),
         ),
         GoRoute(
           path: '/add-topping',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: WidgetAddTopping(topping: state.extra as String?),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) => WidgetAddTopping(topping: state.extra as String?),
         ),
         GoRoute(
           path: '/add-option',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const WidgetAddOption(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) => const WidgetAddOption(),
         ),
         GoRoute(
           path: '/detail-order',
@@ -327,6 +187,25 @@ final goRouter = GoRouter(
             child: const HelpCenterScreen(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: '/opening-hours',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const OpeningHoursScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeInOut)),
+                ),
+                child: child,
+              );
             },
             transitionDuration: const Duration(milliseconds: 300),
           ),

@@ -76,7 +76,7 @@ class _WidgetFormProfile4State extends State<WidgetFormProfile4> {
             Gap(16.sw),
             Container(height: 8.sw, color: appColorBackground),
             WidgetRippleButton(
-              onTap: () => appContext.push('/opening-hours'),
+              onTap: () => appContext.push('/provide-info/opening-time'),
               color: Colors.white,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),

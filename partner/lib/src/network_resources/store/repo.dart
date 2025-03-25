@@ -51,7 +51,7 @@ class StoreRepo {
     return await _api.deleteStore(id);
   }
 
-  Future<NetworkResponse> uploadImage(dynamic imageFile) async {
+  Future<NetworkResponse> uploadImage(dynamic imageFile, String type) async {
     return await _api.uploadImage(imageFile);
   }
 

@@ -11,29 +11,6 @@ import 'package:app/src/constants/constants.dart';
 
 import 'widget_popup_container.dart';
 
-class HereSearchResult {
-  final String title;
-  final String address;
-  final double lat;
-  final double lng;
-
-  HereSearchResult({
-    required this.title,
-    required this.address,
-    required this.lat,
-    required this.lng,
-  });
-
-  factory HereSearchResult.fromJson(Map<String, dynamic> json) {
-    return HereSearchResult(
-      title: json['title'] ?? '',
-      address: json['address']['label'] ?? '',
-      lat: json['position']['lat']?.toDouble() ?? 0,
-      lng: json['position']['lng']?.toDouble() ?? 0,
-    );
-  }
-}
-
 class WidgetSearchPlaceBuilder extends StatefulWidget {
   final Widget Function(
       ValueChanged onChanged,
@@ -102,13 +79,13 @@ class _WidgetSearchPlaceBuilderState extends State<WidgetSearchPlaceBuilder> {
       final apiKey = hereMapApiKey;
       final url =
           'https://geocode.search.hereapi.com/v1/geocode?lang=${appPrefs?.languageCode ?? 'en'}&q=$query&apiKey=$apiKey';
-
+      print('searchPlaces url: $url');
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
         final items = List<Map<String, dynamic>>.from(data['items']);
-
+        print('searchPlaces response: $items');
         setState(() {
           _searchPlaces.value =
               items.map((item) => HereSearchResult.fromJson(item)).toList();
@@ -129,10 +106,11 @@ class _WidgetSearchPlaceBuilderState extends State<WidgetSearchPlaceBuilder> {
 
   void _onPlaceSelected(HereSearchResult place) {
     _selectedPlace = place;
-    _textEditingController.text = place.title;
+    _textEditingController.text = place.title ?? '';
     widget.onSubmitted.call(place);
     _searchPlaces.value = [];
-    widget.onChangedFocusMap?.call(AppLatLng(place.lat, place.lng));
+    widget.onChangedFocusMap
+        ?.call(AppLatLng(place.position?.lat, place.position?.lng));
   }
 
   @override
@@ -236,7 +214,7 @@ class _WidgetSearchPlaceBuilderState extends State<WidgetSearchPlaceBuilder> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    place.title,
+                                    place.title ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: w400TextStyle(
@@ -246,7 +224,7 @@ class _WidgetSearchPlaceBuilderState extends State<WidgetSearchPlaceBuilder> {
                                   ),
                                   const Gap(8),
                                   Text(
-                                    place.address,
+                                    place.address?.label ?? '',
                                     style: w300TextStyle(
                                       fontSize: fs12(context),
                                       color: const Color(0xFF666666),
@@ -295,5 +273,175 @@ class AppLatLng {
     data["lat"] = lat;
     data["lng"] = lng;
     return data;
+  }
+}
+
+class HereSearchResult {
+  String? title;
+  String? id;
+  String? resultType;
+  String? houseNumberType;
+  _Address? address;
+  _Position? position;
+
+  HereSearchResult(
+      {this.title,
+      this.id,
+      this.resultType,
+      this.houseNumberType,
+      this.address,
+      this.position});
+
+  HereSearchResult.fromJson(Map<String, dynamic> json) {
+    if (json["title"] is String) {
+      title = json["title"];
+    }
+    if (json["id"] is String) {
+      id = json["id"];
+    }
+    if (json["resultType"] is String) {
+      resultType = json["resultType"];
+    }
+    if (json["houseNumberType"] is String) {
+      houseNumberType = json["houseNumberType"];
+    }
+    if (json["address"] is Map) {
+      address =
+          json["address"] == null ? null : _Address.fromJson(json["address"]);
+    }
+    if (json["position"] is Map) {
+      position = json["position"] == null
+          ? null
+          : _Position.fromJson(json["position"]);
+    }
+  }
+
+  static List<HereSearchResult> fromList(List<Map<String, dynamic>> list) {
+    return list.map(HereSearchResult.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["title"] = title;
+    _data["id"] = id;
+    _data["resultType"] = resultType;
+    _data["houseNumberType"] = houseNumberType;
+    if (address != null) {
+      _data["address"] = address?.toJson();
+    }
+    if (position != null) {
+      _data["position"] = position?.toJson();
+    }
+    return _data;
+  }
+}
+
+class _Position {
+  double? lat;
+  double? lng;
+
+  _Position({this.lat, this.lng});
+
+  _Position.fromJson(Map<String, dynamic> json) {
+    if (json["lat"] is double) {
+      lat = json["lat"];
+    }
+    if (json["lng"] is double) {
+      lng = json["lng"];
+    }
+  }
+
+  static List<_Position> fromList(List<Map<String, dynamic>> list) {
+    return list.map(_Position.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["lat"] = lat;
+    _data["lng"] = lng;
+    return _data;
+  }
+}
+
+class _Address {
+  String? label;
+  String? countryCode;
+  String? countryName;
+  String? stateCode;
+  String? state;
+  String? county;
+  String? city;
+  String? district;
+  String? street;
+  String? postalCode;
+  String? houseNumber;
+
+  _Address(
+      {this.label,
+      this.countryCode,
+      this.countryName,
+      this.stateCode,
+      this.state,
+      this.county,
+      this.city,
+      this.district,
+      this.street,
+      this.postalCode,
+      this.houseNumber});
+
+  _Address.fromJson(Map<String, dynamic> json) {
+    if (json["label"] is String) {
+      label = json["label"];
+    }
+    if (json["countryCode"] is String) {
+      countryCode = json["countryCode"];
+    }
+    if (json["countryName"] is String) {
+      countryName = json["countryName"];
+    }
+    if (json["stateCode"] is String) {
+      stateCode = json["stateCode"];
+    }
+    if (json["state"] is String) {
+      state = json["state"];
+    }
+    if (json["county"] is String) {
+      county = json["county"];
+    }
+    if (json["city"] is String) {
+      city = json["city"];
+    }
+    if (json["district"] is String) {
+      district = json["district"];
+    }
+    if (json["street"] is String) {
+      street = json["street"];
+    }
+    if (json["postalCode"] is String) {
+      postalCode = json["postalCode"];
+    }
+    if (json["houseNumber"] is String) {
+      houseNumber = json["houseNumber"];
+    }
+  }
+
+  static List<_Address> fromList(List<Map<String, dynamic>> list) {
+    return list.map(_Address.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["label"] = label;
+    _data["countryCode"] = countryCode;
+    _data["countryName"] = countryName;
+    _data["stateCode"] = stateCode;
+    _data["state"] = state;
+    _data["county"] = county;
+    _data["city"] = city;
+    _data["district"] = district;
+    _data["street"] = street;
+    _data["postalCode"] = postalCode;
+    _data["houseNumber"] = houseNumber;
+    return _data;
   }
 }

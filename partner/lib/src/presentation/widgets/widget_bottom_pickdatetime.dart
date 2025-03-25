@@ -6,10 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/src/constants/constants.dart';
-import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
 
 import 'widgets.dart';
 
@@ -53,39 +50,39 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
     return WidgetAppBottomSheet(
       title: widget.title ?? 'Please select date time'.tr(),
       enableSafeArea: true,
+      showCloseButton: false,
       actions: [
-        WidgetRippleButton(
+        WidgetInkWellTransparent(
           onTap: () {
+            appHaptic();
             widget.onCancel?.call();
             appContext.pop();
           },
-          borderSide: BorderSide(color: appColorPrimary),
-          child: SizedBox(
-            height: 48.sw,
-            child: Center(
-              child: Text(
-                'Cancel'.tr(),
-                style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
-              ),
+          enableInkWell: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              'Cancel'.tr(),
+              style: w400TextStyle(color: appColorText),
             ),
           ),
         ),
-        WidgetRippleButton(
+        WidgetInkWellTransparent(
           onTap: () {
+            appHaptic();
             widget.onConfirm?.call(_selectedDateTime);
             appContext.pop(_selectedDateTime);
           },
-          color: appColorPrimary,
-          child: SizedBox(
-            height: 48.sw,
-            child: Center(
-              child: Text(
-                'Confirm'.tr(),
-                style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
-              ),
+          enableInkWell: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              'Save'.tr(),
+              style: w400TextStyle(color: appColorPrimary),
             ),
           ),
         ),
+        Gap(4),
       ],
       child: _buildPickerContent(),
     );

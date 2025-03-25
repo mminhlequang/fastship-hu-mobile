@@ -75,11 +75,14 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  fetchStores() async {
+  fetchStores({bool isRedirect = false}) async {
     NetworkResponse response = await StoreRepo().getMyStores({});
     if (response.isSuccess) {
       state.stores = response.data;
       emit(state.update());
+    }
+    if (isRedirect) {
+      appContext.pushReplacement('/merchant-onboarding');
     }
   }
 
@@ -93,17 +96,16 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
-    appContext.pushReplacement('/merchant-onboarding');
-    // List<StoreModel> myStores = state.stores ?? [];
-    // if (state.stateType == AuthStateType.logged) {
-    //   if (myStores.isNotEmpty) {
-    //     appContext.pushReplacement('/merchant-onboarding');
-    //   } else {
-    //     appContext.pushReplacement('/store-registration');
-    //   }
-    // } else {
-    //   appContext.pushReplacement('/auth');
-    // }
+    List<StoreModel> myStores = state.stores ?? [];
+    if (state.stateType == AuthStateType.logged) {
+      if (myStores.isNotEmpty) {
+        appContext.pushReplacement('/merchant-onboarding');
+      } else {
+        appContext.pushReplacement('/store-registration');
+      }
+    } else {
+      appContext.pushReplacement('/auth');
+    }
   }
 }
 
