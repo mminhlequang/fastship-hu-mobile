@@ -30,8 +30,10 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     super.initState();
     if (widget.initialData != null) {
       _storeNameController.text = widget.initialData!['storeName'] ?? '';
-      _phoneNumber =
-          PhoneNumber(phoneNumber: widget.initialData!['storePhone']);
+      _phoneNumber = PhoneNumber(
+          isoCode: widget.initialData!['storePhoneIsoCode'],
+          phoneNumber: widget.initialData!['storePhone'],
+          dialCode: widget.initialData!['storePhoneDialCode']);
       _addressController.text =
           (widget.initialData!['storeAddress'] as HereSearchResult?)?.title ??
               "";
@@ -49,6 +51,8 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     widget.onChanged({
       'storeName': _storeNameController.text,
       'storePhone': _phoneNumber?.phoneNumber,
+      'storePhoneIsoCode': _phoneNumber?.isoCode,
+      'storePhoneDialCode': _phoneNumber?.dialCode,
       'storeAddress': _selectedAddress,
     });
   }

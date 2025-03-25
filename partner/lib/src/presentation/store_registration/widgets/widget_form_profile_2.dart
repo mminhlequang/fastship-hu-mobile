@@ -1,15 +1,21 @@
+import 'dart:io';
+
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_utils.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/extensions/context_extension.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widgets.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+
+import 'widget_bottomsheet.dart';
 
 enum RepresentativeType {
   personal,
@@ -108,24 +114,95 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   }
 
   _onChanged() {
-    widget.onChanged({
-      'type': type,
-      'name': _nameController.text,
-      'email': _emailController.text,
-      'phoneNumber': _phoneNumber?.phoneNumber,
-      'id': _idController.text,
-      'issueDate': _issueDate,
-      'taxCode': _taxCodeController.text,
-      'businessName': _businessNameController.text,
-      'businessAddress': _businessAddressController.text,
-      'enterpriseName': _enterpriseNameController.text,
-      'enterpriseAddress': _enterpriseAddressController.text,
-      'imageIDCardFront': _imageIDCardFront,
-      'imageIDCardBack': _imageIDCardBack,
-      'imageBusinessLicense': _imageBusinessLicense,
-      'imageTaxCode': _imageTaxCode,
-      'imageRelatedDocument': _imageRelatedDocument,
-    });
+    Map<String, dynamic> data = {};
+    if (type == RepresentativeType.personal) {
+      data = {
+        'type': type,
+        'name': _nameController.text,
+        'email': _emailController.text,
+        'phoneNumber': _phoneNumber?.phoneNumber,
+        'id': _idController.text,
+        'issueDate': _issueDate,
+        'taxCode': _taxCodeController.text,
+        'imageIDCardFront': _imageIDCardFront,
+        'imageIDCardBack': _imageIDCardBack,
+        'imageBusinessLicense': _imageBusinessLicense,
+        'imageRelatedDocument': _imageRelatedDocument,
+      };
+    } else if (type == RepresentativeType.householdBusiness) {}
+
+    // {
+    //   'type': type,
+    //   'name': _nameController.text,
+    //   'email': _emailController.text,
+    //   'phoneNumber': _phoneNumber?.phoneNumber,
+    //   'id': _idController.text,
+    //   'issueDate': _issueDate,
+    //   'taxCode': _taxCodeController.text,
+    //   'businessName': _businessNameController.text,
+    //   'businessAddress': _businessAddressController.text,
+    //   'enterpriseName': _enterpriseNameController.text,
+    //   'enterpriseAddress': _enterpriseAddressController.text,
+    //   'imageIDCardFront': _imageIDCardFront,
+    //   'imageIDCardBack': _imageIDCardBack,
+    //   'imageBusinessLicense': _imageBusinessLicense,
+    //   'imageTaxCode': _imageTaxCode,
+    //   'imageRelatedDocument': _imageRelatedDocument,
+    // }
+
+    widget.onChanged(data);
+  }
+
+  _seeInstruction(String title) {
+    appHaptic();
+    appOpenBottomSheet(
+      WidgetBottomSheetGuideTakePhoto(),
+    );
+  }
+
+  Future<void> _pickImage(
+      ImageSource source, Function(XFile) onImagePicked) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source);
+      if (image != null) {
+        onImagePicked(image);
+        _onChanged();
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
+  }
+
+  void _showImageSourceOptions(Function(XFile) onImagePicked) {
+    appHaptic();
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: Text('Take a photo'.tr()),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera, onImagePicked);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: Text('Choose from gallery'.tr()),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery, onImagePicked);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -185,6 +262,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 onSubmitted: (_) {
                   _enterpriseAddressFocusNode.requestFocus();
                 },
+                onChanged: (_) {
+                  _onChanged();
+                },
               ),
               Gap(24.sw),
               AppTextField(
@@ -195,6 +275,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
                 onSubmitted: (_) {
                   _nameFocusNode.requestFocus();
+                },
+                onChanged: (_) {
+                  _onChanged();
                 },
               ),
               Gap(24.sw),
@@ -210,6 +293,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               onSubmitted: (_) {
                 _emailFocusNode.requestFocus();
               },
+              onChanged: (_) {
+                _onChanged();
+              },
             ),
             Gap(24.sw),
             AppTextField(
@@ -221,6 +307,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               onSubmitted: (_) {
                 _phoneFocusNode.requestFocus();
+              },
+              onChanged: (_) {
+                _onChanged();
               },
             ),
             Gap(24.sw),
@@ -257,9 +346,16 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                   _taxCodeFocusNode.requestFocus();
                 }
               },
+              onChanged: (_) {
+                _onChanged();
+              },
             ),
             Gap(24.sw),
             AppTextField(
+              key: ValueKey(_issueDate),
+              controller: TextEditingController(
+                text: _issueDate?.formatDate(),
+              ),
               title: 'Issue date'.tr(),
               hintText: 'dd/mm/yyyy',
               readOnly: true,
@@ -299,7 +395,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               child: GestureDetector(
                 onTap: () {
                   appHaptic();
-                  // Todo:
+                  _seeInstruction('ID Card images');
                 },
                 child: Text(
                   'See instruction'.tr(),
@@ -319,15 +415,15 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            appHaptic();
-                            // Todo: upload cccd front
+                        AppUploadImage2(
+                          assetSvg: 'cccd_front',
+                          onPickImage: (image) {
+                            setState(() {
+                              _imageIDCardFront = image;
+                            });
+                            _onChanged();
                           },
-                          child: WidgetAppSVG(
-                            'cccd_front',
-                            width: (context.width - 55.sw) / 2,
-                          ),
+                          image: _imageIDCardFront,
                         ),
                         Gap(12.sw),
                         Text(
@@ -342,15 +438,15 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            appHaptic();
-                            // Todo: upload cccd back
+                        AppUploadImage2(
+                          assetSvg: 'cccd_back',
+                          onPickImage: (image) {
+                            setState(() {
+                              _imageIDCardBack = image;
+                            });
+                            _onChanged();
                           },
-                          child: WidgetAppSVG(
-                            'cccd_back',
-                            width: (context.width - 55.sw) / 2,
-                          ),
+                          image: _imageIDCardBack,
                         ),
                         Gap(12.sw),
                         Text(
@@ -374,6 +470,9 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 onSubmitted: (_) {
                   _businessAddressFocusNode.requestFocus();
                 },
+                onChanged: (_) {
+                  _onChanged();
+                },
               ),
               Gap(24.sw),
               AppTextField(
@@ -385,17 +484,24 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 onSubmitted: (_) {
                   _taxCodeFocusNode.requestFocus();
                 },
+                onChanged: (_) {
+                  _onChanged();
+                },
               ),
               Gap(24.sw),
             ],
             AppUploadImage(
               title: 'Business license'.tr(),
+              image: _imageBusinessLicense,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               onSeeInstruction: () {
-                // Todo:
+                _seeInstruction('Business license');
               },
               onPickImage: (image) {
-                // Todo:
+                setState(() {
+                  _imageBusinessLicense = image;
+                });
+                _onChanged();
               },
             ),
             Gap(24.sw),
@@ -412,27 +518,38 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 // Bỏ focus của trường cuối cùng
                 FocusScope.of(context).unfocus();
               },
-            ),
-            Gap(24.sw),
-            AppUploadImage(
-              title: 'Tax code image'.tr(),
-              padding: EdgeInsets.symmetric(horizontal: 16.sw),
-              onSeeInstruction: () {
-                // Todo:
-              },
-              onPickImage: (image) {
-                // Todo:
+              onChanged: (_) {
+                _onChanged();
               },
             ),
+            // Gap(24.sw),
+            // AppUploadImage(
+            //   title: 'Tax code image'.tr(),
+            //   image: _imageTaxCode,
+            //   padding: EdgeInsets.symmetric(horizontal: 16.sw),
+            //   onSeeInstruction: () {
+            //     _seeInstruction('Tax code image');
+            //   },
+            //   onPickImage: (image) {
+            //     setState(() {
+            //       _imageTaxCode = image;
+            //     });
+            //     _onChanged();
+            //   },
+            // ),
             Gap(24.sw),
             AppUploadImage(
               title: 'Related documents'.tr(),
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               onSeeInstruction: () {
-                // Todo:
+                _seeInstruction('Related documents');
               },
+              image: _imageRelatedDocument,
               onPickImage: (image) {
-                // Todo:
+                setState(() {
+                  _imageRelatedDocument = image;
+                });
+                _onChanged();
               },
             ),
             Gap(24.sw),

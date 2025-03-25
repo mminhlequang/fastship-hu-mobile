@@ -32,8 +32,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   XFile? _facadeImage;
   String? _selectedOpeningTime;
   String? _selectedServiceType;
-  List<String> _selectedCuisines = [];
-  List<String> _featuredProducts = [];
+  List<String> _categories = [];
 
   @override
   void initState() {
@@ -47,9 +46,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
     _facadeImage = widget.initialData['facadeImage'];
     _selectedOpeningTime = widget.initialData['openingTime'];
     _selectedServiceType = widget.initialData['serviceType'];
-    _selectedCuisines = List<String>.from(widget.initialData['cuisines'] ?? []);
-    _featuredProducts =
-        List<String>.from(widget.initialData['featuredProducts'] ?? []);
+    _categories = List<String>.from(widget.initialData['categories'] ?? []);
 
     // Đảm bảo gọi onChanged ngay lần đầu nếu có dữ liệu initial
     if (widget.initialData.isNotEmpty) {
@@ -64,8 +61,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
       'facadeImage': _facadeImage,
       'openingTime': _selectedOpeningTime,
       'serviceType': _selectedServiceType,
-      'cuisines': _selectedCuisines,
-      'featuredProducts': _featuredProducts,
+      'categories': _categories,
     });
   }
 
@@ -99,6 +95,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             AppUploadImage(
               title: 'Cover image'.tr(),
               width: context.width,
+              height: 120.sw,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               subTitle: Padding(
                 padding: EdgeInsets.only(bottom: 8.sw),
@@ -151,7 +148,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             ),
             AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
             _buildNavigationItem(
-              title: 'Type of service'.tr(),
+              title: 'Business type'.tr(),
               route: '/provide-info/service-type',
               selectedValue: _selectedServiceType,
               onReturn: (value) {
@@ -165,36 +162,21 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             ),
             AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
             _buildNavigationItem(
-              title: 'Cuisine'.tr(),
+              title: 'Categories'.tr(),
               route: '/provide-info/cuisine',
-              selectedValue: _selectedCuisines.isNotEmpty
-                  ? '${_selectedCuisines.length} selected'
+              selectedValue: _categories.isNotEmpty
+                  ? '${_categories.length} selected'
                   : null,
               onReturn: (value) {
                 if (value != null) {
                   setState(() {
-                    _selectedCuisines = List<String>.from(value);
+                    _categories = List<String>.from(value);
                   });
                   _updateData();
                 }
               },
             ),
-            AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
-            _buildNavigationItem(
-              title: 'Featured products'.tr(),
-              route: '/provide-info/featured-products',
-              selectedValue: _featuredProducts.isNotEmpty
-                  ? '${_featuredProducts.length} selected'
-                  : null,
-              onReturn: (value) {
-                if (value != null) {
-                  setState(() {
-                    _featuredProducts = List<String>.from(value);
-                  });
-                  _updateData();
-                }
-              },
-            ),
+            Gap(24.sw),
           ],
         ),
       ),

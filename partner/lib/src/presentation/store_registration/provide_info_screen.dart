@@ -27,18 +27,6 @@ import 'package:app/src/network_resources/auth/models/models.dart';
 class ProvideInfoScreen extends StatelessWidget {
   const ProvideInfoScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => StoreRegistrationCubit(),
-      child: const _ProvideInfoScreenView(),
-    );
-  }
-}
-
-class _ProvideInfoScreenView extends StatelessWidget {
-  const _ProvideInfoScreenView();
-
   List<String> get allSteps => [
         'Basic Information'.tr(),
         'Representative Information'.tr(),
@@ -77,7 +65,7 @@ class _ProvideInfoScreenView extends StatelessWidget {
                       return Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: index <= state.currentStep - 1
+                            color: index <= state.currentStep2 - 1
                                 ? appColorPrimary
                                 : grey7,
                             borderRadius: BorderRadius.circular(99),
@@ -95,7 +83,7 @@ class _ProvideInfoScreenView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: 8.sw),
             child: Text(
-              allSteps[state.currentStep - 1],
+              allSteps[state.currentStep2 - 1],
               style: w500TextStyle(fontSize: 18.sw),
             ),
           ),
@@ -119,8 +107,8 @@ class _ProvideInfoScreenView extends StatelessWidget {
             child: WidgetAppButtonCancel(
               onTap: () {
                 appHaptic();
-                if (state.currentStep > 1) {
-                  cubit.previousStep();
+                if (state.currentStep2 > 1) {
+                  cubit.previousStep2();
                 } else {
                   context.pop();
                 }
@@ -135,8 +123,8 @@ class _ProvideInfoScreenView extends StatelessWidget {
               loading: state.isLoading,
               onTap: () {
                 appHaptic();
-                if (state.currentStep < 3) {
-                  cubit.nextStep();
+                if (state.currentStep2 < 3) {
+                  cubit.nextStep2();
                 } else {
                   _processSubmit(context, cubit);
                 }
@@ -198,7 +186,7 @@ class _ProvideInfoScreenView extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                     child: Align(
                       alignment: Alignment.topCenter,
-                      child: switch (state.currentStep) {
+                      child: switch (state.currentStep2) {
                         1 => WidgetFormProfile1(
                             initialData: state.basicInfo,
                             onChanged: (data) {

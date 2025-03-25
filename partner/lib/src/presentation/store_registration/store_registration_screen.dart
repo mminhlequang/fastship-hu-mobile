@@ -17,22 +17,10 @@ class StoreRegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => StoreRegistrationCubit(),
-      child: const _StoreRegistrationScreenView(),
-    );
-  }
-}
-
-class _StoreRegistrationScreenView extends StatelessWidget {
-  const _StoreRegistrationScreenView();
-
-  @override
-  Widget build(BuildContext context) {
     return BlocBuilder<StoreRegistrationCubit, StoreRegistrationState>(
       builder: (context, state) {
         final cubit = context.read<StoreRegistrationCubit>();
-        Widget child = switch (state.currentStep) {
+        Widget child = switch (state.currentStep1) {
           1 => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -278,8 +266,8 @@ class _StoreRegistrationScreenView extends StatelessWidget {
             title: Text('Store registration'.tr()),
             leading: BackButton(
               onPressed: () {
-                if (state.currentStep > 1) {
-                  cubit.previousStep();
+                if (state.currentStep1 > 1) {
+                  cubit.previousStep1();
                 } else {
                   appContext.pop();
                 }
@@ -300,15 +288,15 @@ class _StoreRegistrationScreenView extends StatelessWidget {
                     10.sw + context.mediaQueryPadding.bottom),
                 child: WidgetRippleButton(
                   onTap: () {
-                    if (state.currentStep < state.totalStep) {
-                      cubit.nextStep();
+                    if (state.currentStep1 < state.totalStep1) {
+                      cubit.nextStep1();
                     } else {
-                      appContext.push('/store-registration/provide-info');
+                      appContext.push('/provide-info');
                     }
                   },
                   radius: 10.sw,
-                  enable:
-                      state.currentStep != state.totalStep || state.acceptTerms,
+                  enable: state.currentStep1 != state.totalStep1 ||
+                      state.acceptTerms,
                   color: appColorPrimary,
                   child: SizedBox(
                     height: 48.sw,

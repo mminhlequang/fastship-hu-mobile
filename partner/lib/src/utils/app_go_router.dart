@@ -38,13 +38,21 @@ final goRouter = GoRouter(
       path: '/auth',
       builder: (context, state) => const LoginScreen(),
     ),
-    GoRoute(
-      path: '/store-registration',
-      builder: (context, state) => BlocProvider(
-        create: (context) => StoreRegistrationCubit(),
-        child: const StoreRegistrationScreen(),
-      ),
+    ShellRoute(
+      parentNavigatorKey: appNavigatorKey,
+      pageBuilder: (context, state, child) {
+        return NoTransitionPage(
+          child: BlocProvider(
+            create: (context) => StoreRegistrationCubit(),
+            child: child,
+          ),
+        );
+      },
       routes: [
+        GoRoute(
+          path: '/store-registration',
+          builder: (context, state) => const StoreRegistrationScreen(),
+        ),
         GoRoute(
           path: '/provide-info',
           builder: (context, state) => const ProvideInfoScreen(),
