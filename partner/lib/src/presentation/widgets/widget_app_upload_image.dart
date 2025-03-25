@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class AppUploadImage extends StatelessWidget {
     this.padding,
     this.subTitle,
     this.width,
+    this.image,
   });
 
   final String title;
@@ -24,6 +27,7 @@ class AppUploadImage extends StatelessWidget {
   final EdgeInsets? padding;
   final Widget? subTitle;
   final double? width;
+  final XFile? image;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +84,12 @@ class AppUploadImage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (image != null)
+                    Image.file(
+                      File(image!.path),
+                      width: 80.sw,
+                      height: 80.sw,
+                    ),
                   const WidgetAppSVG('upload_image'),
                   Gap(2.sw),
                   Text(

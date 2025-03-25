@@ -9,6 +9,7 @@ import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widgets.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 enum RepresentativeType {
   personal,
@@ -39,7 +40,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   RepresentativeType type = RepresentativeType.personal;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  PhoneNumber? _phoneNumber;
   final TextEditingController _idController = TextEditingController(); // cccd
   DateTime? _issueDate; // ngày cấp cccd
   final TextEditingController _taxCodeController = TextEditingController();
@@ -61,6 +62,17 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   XFile? _imageTaxCode;
   XFile? _imageRelatedDocument;
 
+  // Thêm FocusNode cho mỗi trường nhập liệu
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+  final FocusNode _idFocusNode = FocusNode();
+  final FocusNode _taxCodeFocusNode = FocusNode();
+  final FocusNode _businessNameFocusNode = FocusNode();
+  final FocusNode _businessAddressFocusNode = FocusNode();
+  final FocusNode _enterpriseNameFocusNode = FocusNode();
+  final FocusNode _enterpriseAddressFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -74,20 +86,45 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _idController.dispose();
     _taxCodeController.dispose();
     _businessNameController.dispose();
     _businessAddressController.dispose();
     _enterpriseNameController.dispose();
     _enterpriseAddressController.dispose();
+
+    // Giải phóng các FocusNode
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _idFocusNode.dispose();
+    _taxCodeFocusNode.dispose();
+    _businessNameFocusNode.dispose();
+    _businessAddressFocusNode.dispose();
+    _enterpriseNameFocusNode.dispose();
+    _enterpriseAddressFocusNode.dispose();
+
     super.dispose();
   }
 
   _onChanged() {
     widget.onChanged({
+      'type': type,
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phoneNumber': _phoneNumber?.phoneNumber,
+      'id': _idController.text,
+      'issueDate': _issueDate,
+      'taxCode': _taxCodeController.text,
+      'businessName': _businessNameController.text,
+      'businessAddress': _businessAddressController.text,
+      'enterpriseName': _enterpriseNameController.text,
+      'enterpriseAddress': _enterpriseAddressController.text,
       'imageIDCardFront': _imageIDCardFront,
       'imageIDCardBack': _imageIDCardBack,
+      'imageBusinessLicense': _imageBusinessLicense,
+      'imageTaxCode': _imageTaxCode,
+      'imageRelatedDocument': _imageRelatedDocument,
     });
   }
 
@@ -105,6 +142,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 children: RepresentativeType.values.map((e) {
                   bool isSelected = e == type;
                   return Expanded(
+                    flex: e == RepresentativeType.householdBusiness ? 3 : 2,
                     child: WidgetRippleButton(
                       onTap: () {
                         if (!isSelected) {
@@ -140,16 +178,24 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               Gap(24.sw),
               AppTextField(
                 controller: _enterpriseNameController,
+                focusNode: _enterpriseNameFocusNode,
                 title: 'Company name'.tr(),
                 hintText: 'Enter company name'.tr(),
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                onSubmitted: (_) {
+                  _enterpriseAddressFocusNode.requestFocus();
+                },
               ),
               Gap(24.sw),
               AppTextField(
                 controller: _enterpriseAddressController,
+                focusNode: _enterpriseAddressFocusNode,
                 title: 'Company address'.tr(),
                 hintText: 'Enter company address'.tr(),
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                onSubmitted: (_) {
+                  _nameFocusNode.requestFocus();
+                },
               ),
               Gap(24.sw),
               Container(height: 8.sw, color: appColorBackground),
@@ -157,33 +203,60 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
             Gap(24.sw),
             AppTextField(
               controller: _nameController,
+              focusNode: _nameFocusNode,
               title: 'Full name'.tr(),
               hintText: 'Enter full name'.tr(),
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSubmitted: (_) {
+                _emailFocusNode.requestFocus();
+              },
             ),
             Gap(24.sw),
             AppTextField(
               controller: _emailController,
+              focusNode: _emailFocusNode,
               title: 'Email'.tr(),
               hintText: 'Enter email'.tr(),
               keyboardType: TextInputType.emailAddress,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSubmitted: (_) {
+                _phoneFocusNode.requestFocus();
+              },
             ),
             Gap(24.sw),
-            AppTextField(
-              controller: _phoneController,
-              title: 'Phone number'.tr(),
-              hintText: 'Enter phone number'.tr(),
-              keyboardType: TextInputType.phone,
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              child: WidgetAppTextFieldPhone(
+                initialValue: _phoneNumber,
+                focusNode: _phoneFocusNode,
+                title: 'Phone number'.tr(),
+                isRequired: true,
+                hintText: 'Enter phone number'.tr(),
+                onChanged: (_) {
+                  _phoneNumber = _;
+                  _onChanged();
+                },
+                onSubmitted: (_) {
+                  _idFocusNode.requestFocus();
+                },
+              ),
             ),
             Gap(24.sw),
             AppTextField(
               controller: _idController,
+              focusNode: _idFocusNode,
               title: 'ID Card number'.tr(),
               hintText: 'Enter ID Card number'.tr(),
               keyboardType: TextInputType.number,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSubmitted: (_) {
+                // Tiếp tục sang trường tiếp theo tùy theo loại
+                if (type == RepresentativeType.householdBusiness) {
+                  _businessNameFocusNode.requestFocus();
+                } else {
+                  _taxCodeFocusNode.requestFocus();
+                }
+              },
             ),
             Gap(24.sw),
             AppTextField(
@@ -294,16 +367,24 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
             if (type == RepresentativeType.householdBusiness) ...[
               AppTextField(
                 controller: _businessNameController,
+                focusNode: _businessNameFocusNode,
                 title: 'Household business name'.tr(),
                 hintText: 'Enter name'.tr(),
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                onSubmitted: (_) {
+                  _businessAddressFocusNode.requestFocus();
+                },
               ),
               Gap(24.sw),
               AppTextField(
                 controller: _businessAddressController,
+                focusNode: _businessAddressFocusNode,
                 title: 'Business address'.tr(),
                 hintText: 'Enter address'.tr(),
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                onSubmitted: (_) {
+                  _taxCodeFocusNode.requestFocus();
+                },
               ),
               Gap(24.sw),
             ],
@@ -322,10 +403,15 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
             Gap(24.sw),
             AppTextField(
               controller: _taxCodeController,
+              focusNode: _taxCodeFocusNode,
               title: 'Tax code'.tr(),
               hintText: 'Enter tax code'.tr(),
               keyboardType: TextInputType.number,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
+              onSubmitted: (_) {
+                // Bỏ focus của trường cuối cùng
+                FocusScope.of(context).unfocus();
+              },
             ),
             Gap(24.sw),
             AppUploadImage(

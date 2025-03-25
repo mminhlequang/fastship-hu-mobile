@@ -1,8 +1,10 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -74,7 +76,7 @@ class AppTextField extends StatelessWidget {
               isDense: true,
               isCollapsed: true,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+                  EdgeInsets.symmetric(horizontal: 12.sw, vertical: 12.sw),
               filled: true,
               fillColor: appColorBackground,
               hintText: hintText,
@@ -90,6 +92,100 @@ class AppTextField extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class WidgetAppTextFieldPhone extends StatelessWidget {
+  final String title;
+  final bool isRequired;
+  final String? hintText;
+  final bool readOnly;
+  final FocusNode? focusNode;
+  final Function(PhoneNumber)? onChanged;
+  final Function(dynamic)? onSubmitted;
+  final PhoneNumber? initialValue;
+  final String? Function(String?)? validator;
+
+  const WidgetAppTextFieldPhone({
+    Key? key,
+    required this.title,
+    this.isRequired = false,
+    this.hintText,
+    this.readOnly = false,
+    this.focusNode,
+    this.onChanged,
+    this.initialValue,
+    this.validator,
+    this.onSubmitted,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: title,
+            style: w600TextStyle(),
+            children: isRequired
+                ? [
+                    TextSpan(
+                      text: '*',
+                      style: w600TextStyle(color: appColorError),
+                    )
+                  ]
+                : null,
+          ),
+        ),
+        Gap(8.sw),
+        Container(
+          decoration: BoxDecoration(
+            color: appColorBackground,
+            borderRadius: BorderRadius.circular(8.sw),
+          ),
+          child: InternationalPhoneNumberInput(
+            onInputChanged: onChanged,
+            onFieldSubmitted: onSubmitted,
+            initialValue: initialValue,
+            countries:
+                ["VN"] + euroCounries.map((e) => e['code'].toString()).toList(),
+            selectorConfig: SelectorConfig(
+              selectorType: PhoneInputSelectorType.DROPDOWN,
+              selectorTextStyle: w400TextStyle(fontSize: 16.sw),
+              bgColor: Colors.white,
+            ),
+            ignoreBlank: false,
+            autoValidateMode: AutovalidateMode.disabled,
+            textStyle: w400TextStyle(fontSize: 16.sw),
+            inputDecoration: InputDecoration(
+              isDense: true,
+              isCollapsed: true,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+              filled: true,
+              fillColor: appColorBackground,
+              hintText: hintText,
+              hintStyle: w400TextStyle(
+                fontSize: 16.sw,
+                color: hexColor('#8A8C91'),
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(8.sw),
+              ),
+            ),
+            validator: validator,
+            spaceBetweenSelectorAndTextField: 0,
+            keyboardType: TextInputType.phone,
+            textFieldController: TextEditingController(),
+            formatInput: true,
+            keyboardAction: TextInputAction.done,
+            cursorColor: appColorText,
+          ),
+        ),
+      ],
     );
   }
 }

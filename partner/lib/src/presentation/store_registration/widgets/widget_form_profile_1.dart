@@ -3,6 +3,7 @@ import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class WidgetFormProfile1 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;
@@ -20,23 +21,26 @@ class WidgetFormProfile1 extends StatefulWidget {
 
 class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   final TextEditingController _storeNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  HereSearchResult? _selectedAddress;
+  PhoneNumber? _phoneNumber;
 
   @override
   void initState() {
     super.initState();
     if (widget.initialData != null) {
       _storeNameController.text = widget.initialData!['storeName'] ?? '';
-      _phoneController.text = widget.initialData!['storePhone'] ?? '';
-      _addressController.text = widget.initialData!['storeAddress'] ?? '';
+      _phoneNumber =
+          PhoneNumber(phoneNumber: widget.initialData!['storePhone']);
+      _addressController.text =
+          (widget.initialData!['storeAddress'] as HereSearchResult?)?.title ??
+              "";
     }
   }
 
   @override
   void dispose() {
     _storeNameController.dispose();
-    _phoneController.dispose();
     _addressController.dispose();
     super.dispose();
   }
@@ -44,8 +48,8 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   _onChanged() {
     widget.onChanged({
       'storeName': _storeNameController.text,
-      'storePhone': _phoneController.text,
-      'storeAddress': _addressController.text,
+      'storePhone': _phoneNumber?.phoneNumber,
+      'storeAddress': _selectedAddress,
     });
   }
 
@@ -64,19 +68,28 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
             onChanged: (_) => _onChanged(),
           ),
           Gap(24.sw),
-          AppTextField(
-            controller: _phoneController,
+          WidgetAppTextFieldPhone(
+            initialValue: _phoneNumber,
             title: 'Phone number'.tr(),
             hintText: 'Enter phone number'.tr(),
-            keyboardType: TextInputType.phone,
-            onChanged: (_) => _onChanged(),
+            onChanged: (_) {
+              _phoneNumber = _;
+              _onChanged();
+            },
           ),
           Gap(24.sw),
-          AppTextField(
+          WidgetSearchPlaceBuilder(
             controller: _addressController,
-            title: 'Address'.tr(),
-            hintText: 'Enter address'.tr(),
-            onChanged: (_) => _onChanged(),
+            builder: (onChanged, controller, isFocus, key) => AppTextField(
+              controller: controller,
+              title: 'Address'.tr(),
+              hintText: 'Enter address'.tr(),
+              onChanged: onChanged,
+            ),
+            onSubmitted: (value) {
+              _selectedAddress = value;
+              _onChanged();
+            },
           ),
           Gap(24.sw),
         ],
