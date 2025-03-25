@@ -160,6 +160,7 @@ class ProvideInfoScreen extends StatelessWidget {
     });
 
     cubit.submitStoreRegistration().then((success) {
+      print('success: $success');
       if (success) {
         _processor.value = 'success';
       } else {

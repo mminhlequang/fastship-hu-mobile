@@ -30,8 +30,8 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   XFile? _avatarImage;
   XFile? _coverImage;
   XFile? _facadeImage;
-  String? _selectedOpeningTime;
-  String? _selectedServiceType;
+  List? _openTimes;
+  List<String>? _businessTypes;
   List<String> _categories = [];
 
   @override
@@ -44,8 +44,8 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
     _avatarImage = widget.initialData['avatarImage'];
     _coverImage = widget.initialData['coverImage'];
     _facadeImage = widget.initialData['facadeImage'];
-    _selectedOpeningTime = widget.initialData['openingTime'];
-    _selectedServiceType = widget.initialData['serviceType'];
+    _openTimes = widget.initialData['openingTime'];
+    _businessTypes = widget.initialData['serviceType'];
     _categories = List<String>.from(widget.initialData['categories'] ?? []);
 
     // Đảm bảo gọi onChanged ngay lần đầu nếu có dữ liệu initial
@@ -59,8 +59,8 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
       'avatarImage': _avatarImage,
       'coverImage': _coverImage,
       'facadeImage': _facadeImage,
-      'openingTime': _selectedOpeningTime,
-      'serviceType': _selectedServiceType,
+      'openingTime': _openTimes,
+      'serviceType': _businessTypes,
       'categories': _categories,
     });
   }
@@ -135,12 +135,12 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             Container(height: 8.sw, color: appColorBackground),
             _buildNavigationItem(
               title: 'Opening time'.tr(),
-              route: '/provide-info/opening-time',
-              selectedValue: _selectedOpeningTime,
+              route: '/opening-time',
+              extra: _openTimes,
               onReturn: (value) {
                 if (value != null) {
                   setState(() {
-                    _selectedOpeningTime = value;
+                    _openTimes = value;
                   });
                   _updateData();
                 }
@@ -149,12 +149,12 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
             _buildNavigationItem(
               title: 'Business type'.tr(),
-              route: '/provide-info/service-type',
-              selectedValue: _selectedServiceType,
+              route: '/business-type',
+              extra: _businessTypes,
               onReturn: (value) {
                 if (value != null) {
                   setState(() {
-                    _selectedServiceType = value;
+                    _businessTypes = value;
                   });
                   _updateData();
                 }
@@ -164,9 +164,8 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             _buildNavigationItem(
               title: 'Categories'.tr(),
               route: '/provide-info/cuisine',
-              selectedValue: _categories.isNotEmpty
-                  ? '${_categories.length} selected'
-                  : null,
+              extra: _categories,
+
               onReturn: (value) {
                 if (value != null) {
                   setState(() {
@@ -185,13 +184,14 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
 
   Widget _buildNavigationItem({
     required String title,
+    String? description,
     required String route,
     required Function(dynamic) onReturn,
-    String? selectedValue,
+    dynamic extra,
   }) {
     return WidgetRippleButton(
       onTap: () async {
-        final result = await appContext.push(route);
+        final result = await appContext.push(route, extra: extra);
         onReturn(result);
       },
       color: Colors.white,
@@ -208,10 +208,10 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                     title,
                     style: w400TextStyle(),
                   ),
-                  if (selectedValue != null) ...[
+                  if (description != null) ...[
                     Gap(4.sw),
                     Text(
-                      selectedValue,
+                      description,
                       style: w400TextStyle(fontSize: 12.sw, color: grey1),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

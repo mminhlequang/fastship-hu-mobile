@@ -11,8 +11,9 @@ import 'package:app/src/presentation/my_profile/my_profile_screen.dart';
 import 'package:app/src/presentation/order_settings/order_settings_screen.dart';
 import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:app/src/presentation/store_registration/export.dart';
+import 'package:app/src/presentation/store_registration/widgets/widget_opening_time.dart';
+import 'package:app/src/presentation/store_registration/widgets/widget_business_type.dart';
 import 'package:app/src/presentation/store_registration/widgets/opening_hours_screen.dart';
-import 'package:app/src/presentation/store_registration/widgets/service_types_screen.dart';
 import 'package:app/src/presentation/store_settings/store_settings_screen.dart';
 import 'package:app/src/presentation/store_settings/widgets/information_screen.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +62,17 @@ final goRouter = GoRouter(
           builder: (context, state) => const ProvideInfoScreen(),
         ),
         GoRoute(
-          path: '/provide-info/opening-time',
-          builder: (context, state) => const OpeningHoursScreen(),
+          path: '/opening-time',
+          builder: (context, state) =>   WidgetOpeningTime(
+            initialData: state.extra as List?,
+          ),
         ),
         GoRoute(
-          path: '/provide-info/service-type',
-          builder: (context, state) => const ServiceTypesScreen(),
+          path: '/business-type',
+          builder: (context, state) => WidgetBusinessType(
+            initialData: state.extra as List<int>?,
+          ),
+ 
         ),
         GoRoute(
           path: '/merchant-onboarding',

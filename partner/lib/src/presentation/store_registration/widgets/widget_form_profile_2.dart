@@ -18,12 +18,12 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'widget_bottomsheet.dart';
 
 enum RepresentativeType {
-  personal,
+  individual,
   householdBusiness,
   enterprise;
 
   String get displayName => switch (this) {
-        personal => 'Personal'.tr(),
+        individual => 'Individual'.tr(),
         householdBusiness => 'Household Business'.tr(),
         enterprise => 'Enterprise'.tr(),
       };
@@ -43,7 +43,7 @@ class WidgetFormProfile2 extends StatefulWidget {
 }
 
 class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
-  RepresentativeType type = RepresentativeType.personal;
+  RepresentativeType type = RepresentativeType.individual;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   PhoneNumber? _phoneNumber;
@@ -52,15 +52,18 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   final TextEditingController _taxCodeController = TextEditingController();
 
   /// Hộ kinh doanh
-  final TextEditingController _businessNameController = TextEditingController();
-  final TextEditingController _businessAddressController =
+  final TextEditingController _householdNameController =
       TextEditingController();
+  final TextEditingController _householdAddressController =
+      TextEditingController();
+  HereSearchResult? _householdBusinessAddress;
 
   /// Doanh nghiệp
   final TextEditingController _enterpriseNameController =
       TextEditingController();
   final TextEditingController _enterpriseAddressController =
       TextEditingController();
+  HereSearchResult? _enterpriseAddress;
 
   XFile? _imageIDCardFront;
   XFile? _imageIDCardBack;
@@ -94,8 +97,8 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
     _emailController.dispose();
     _idController.dispose();
     _taxCodeController.dispose();
-    _businessNameController.dispose();
-    _businessAddressController.dispose();
+    _householdNameController.dispose();
+    _householdAddressController.dispose();
     _enterpriseNameController.dispose();
     _enterpriseAddressController.dispose();
 
@@ -114,23 +117,31 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   }
 
   _onChanged() {
-    Map<String, dynamic> data = {};
-    if (type == RepresentativeType.personal) {
-      data = {
-        'type': type,
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'phoneNumber': _phoneNumber?.phoneNumber,
-        'id': _idController.text,
-        'issueDate': _issueDate,
-        'taxCode': _taxCodeController.text,
-        'imageIDCardFront': _imageIDCardFront,
-        'imageIDCardBack': _imageIDCardBack,
-        'imageBusinessLicense': _imageBusinessLicense,
-        'imageRelatedDocument': _imageRelatedDocument,
-      };
-    } else if (type == RepresentativeType.householdBusiness) {}
-
+    Map<String, dynamic> data = {
+      'type': type,
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phoneNumber': _phoneNumber?.phoneNumber,
+      'id': _idController.text,
+      'issueDate': _issueDate,
+      'taxCode': _taxCodeController.text,
+      'imageIDCardFront': _imageIDCardFront,
+      'imageIDCardBack': _imageIDCardBack,
+      'imageBusinessLicense': _imageBusinessLicense,
+      'imageRelatedDocument': _imageRelatedDocument,
+    };
+    if (type == RepresentativeType.individual) {
+    } else if (type == RepresentativeType.householdBusiness) {
+      data.addAll({
+        'businessName': _householdNameController.text,
+        'businessAddress': _householdAddressController.text,
+      });
+    } else if (type == RepresentativeType.enterprise) {
+      data.addAll({
+        'enterpriseName': _enterpriseNameController.text,
+        'enterpriseAddress': _enterpriseAddressController.text,
+      });
+    }
     // {
     //   'type': type,
     //   'name': _nameController.text,
@@ -267,17 +278,23 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 },
               ),
               Gap(24.sw),
-              AppTextField(
+              WidgetSearchPlaceBuilder(
                 controller: _enterpriseAddressController,
-                focusNode: _enterpriseAddressFocusNode,
-                title: 'Company address'.tr(),
-                hintText: 'Enter company address'.tr(),
-                padding: EdgeInsets.symmetric(horizontal: 16.sw),
-                onSubmitted: (_) {
-                  _nameFocusNode.requestFocus();
-                },
-                onChanged: (_) {
-                  _onChanged();
+                builder: (onChanged, controller, isFocus, key) => AppTextField(
+                  controller: _enterpriseAddressController,
+                  focusNode: _enterpriseAddressFocusNode,
+                  title: 'Company address'.tr(),
+                  hintText: 'Enter company address'.tr(),
+                  padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                  onSubmitted: (_) {
+                    _nameFocusNode.requestFocus();
+                  },
+                  onChanged: (_) {
+                    _onChanged();
+                  },
+                ),
+                onSubmitted: (HereSearchResult value) {
+                  _enterpriseAddress = value;
                 },
               ),
               Gap(24.sw),
@@ -370,6 +387,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                     });
                     _onChanged();
                   },
+                  minimumDate: DateTime.now().add(Duration(days: 14)),
                 );
               },
             ),
@@ -462,7 +480,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
             Gap(24.sw),
             if (type == RepresentativeType.householdBusiness) ...[
               AppTextField(
-                controller: _businessNameController,
+                controller: _householdNameController,
                 focusNode: _businessNameFocusNode,
                 title: 'Household business name'.tr(),
                 hintText: 'Enter name'.tr(),
@@ -475,17 +493,23 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
                 },
               ),
               Gap(24.sw),
-              AppTextField(
-                controller: _businessAddressController,
-                focusNode: _businessAddressFocusNode,
-                title: 'Business address'.tr(),
-                hintText: 'Enter address'.tr(),
-                padding: EdgeInsets.symmetric(horizontal: 16.sw),
-                onSubmitted: (_) {
-                  _taxCodeFocusNode.requestFocus();
-                },
-                onChanged: (_) {
-                  _onChanged();
+              WidgetSearchPlaceBuilder(
+                controller: _householdAddressController,
+                builder: (onChanged, controller, isFocus, key) => AppTextField(
+                  controller: _householdAddressController,
+                  focusNode: _businessAddressFocusNode,
+                  title: 'Business address'.tr(),
+                  hintText: 'Enter address'.tr(),
+                  padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                  onSubmitted: (_) {
+                    _taxCodeFocusNode.requestFocus();
+                  },
+                  onChanged: (_) {
+                    _onChanged();
+                  },
+                ),
+                onSubmitted: (HereSearchResult value) {
+                  _householdBusinessAddress = value;
                 },
               ),
               Gap(24.sw),

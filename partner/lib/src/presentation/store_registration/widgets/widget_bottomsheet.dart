@@ -139,6 +139,7 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
       child: ValueListenableBuilder(
         valueListenable: widget.processer,
         builder: (context, value, child) {
+          print('value: $value');
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: switch (value) {

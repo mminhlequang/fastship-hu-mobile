@@ -291,7 +291,8 @@ class StoreRegistrationScreen extends StatelessWidget {
                     if (state.currentStep1 < state.totalStep1) {
                       cubit.nextStep1();
                     } else {
-                      appContext.push('/provide-info');
+                      appContext.push('/opening-time');
+                      // appContext.push('/opening-time');
                     }
                   },
                   radius: 10.sw,

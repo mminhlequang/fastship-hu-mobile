@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 const String appName = "Partner-FastshipHu";
 
-const List<String> countriesAvailable = ['VN', 'BE', 'AU'];
+const int serviceTypeFoodDelivery = 1;
 
 String get appMapUrlTemplate =>
     kDebugMode ? appMapUrlTemplateGg : appMapUrlTemplateHERE;
