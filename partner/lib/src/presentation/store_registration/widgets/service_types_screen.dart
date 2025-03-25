@@ -6,14 +6,14 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
-class WidgetServiceType extends StatefulWidget {
-  const WidgetServiceType({super.key});
+class ServiceTypesScreen extends StatefulWidget {
+  const ServiceTypesScreen({super.key});
 
   @override
-  State<WidgetServiceType> createState() => _WidgetServiceTypeState();
+  State<ServiceTypesScreen> createState() => _ServiceTypesScreenState();
 }
 
-class _WidgetServiceTypeState extends State<WidgetServiceType> {
+class _ServiceTypesScreenState extends State<ServiceTypesScreen> {
   List<int> selectedTypes = [];
   List<String> allTypes = [
     'Restaurant'.tr(),
@@ -37,12 +37,7 @@ class _WidgetServiceTypeState extends State<WidgetServiceType> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          'Service types'.tr(),
-          style: w500TextStyle(fontSize: 20.sw, height: 1.2),
-        ),
-        backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: appColorText),
+        title: Text('Service types'.tr()),
         actions: [
           TextButton(
             onPressed: () {
@@ -50,7 +45,7 @@ class _WidgetServiceTypeState extends State<WidgetServiceType> {
             },
             child: Text(
               'Save'.tr(),
-              style: w400TextStyle(fontSize: 16.sw, color: darkGreen),
+              style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
             ),
           ),
           Gap(4.sw),

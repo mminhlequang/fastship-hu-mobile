@@ -44,6 +44,7 @@ class _WidgetFormProfile4State extends State<WidgetFormProfile4> {
             Gap(24.sw),
             AppUploadImage(
               title: 'Cover image'.tr(),
+              height: 110.sw,
               width: context.width,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               subTitle: Padding(
@@ -75,7 +76,7 @@ class _WidgetFormProfile4State extends State<WidgetFormProfile4> {
             Gap(16.sw),
             Container(height: 8.sw, color: appColorBackground),
             WidgetRippleButton(
-              onTap: () => appContext.push('/provide-info/opening-time'),
+              onTap: () => appContext.push('/opening-hours'),
               color: Colors.white,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
@@ -93,7 +94,7 @@ class _WidgetFormProfile4State extends State<WidgetFormProfile4> {
             ),
             AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
             WidgetRippleButton(
-              onTap: () => appContext.push('/provide-info/service-type'),
+              onTap: () => appContext.push('/provide-info/service-types'),
               color: Colors.white,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),

@@ -14,6 +14,7 @@ class AppUploadImage extends StatelessWidget {
     required this.onPickImage,
     this.padding,
     this.subTitle,
+    this.height,
     this.width,
   });
 
@@ -23,6 +24,7 @@ class AppUploadImage extends StatelessWidget {
   final Function(XFile image) onPickImage;
   final EdgeInsets? padding;
   final Widget? subTitle;
+  final double? height;
   final double? width;
 
   @override
@@ -75,7 +77,7 @@ class AppUploadImage extends StatelessWidget {
             radius: 4.sw,
             color: grey8,
             child: SizedBox(
-              height: 80.sw,
+              height: height ?? 80.sw,
               width: width ?? 80.sw,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
