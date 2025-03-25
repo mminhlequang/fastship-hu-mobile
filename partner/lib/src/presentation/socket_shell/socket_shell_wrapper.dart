@@ -47,7 +47,6 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   void initState() {
     super.initState();
     _setupSocketListeners();
-    _checkNotificationPermission();
   }
 
   @override
@@ -55,14 +54,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
     _audioPlayer.dispose();
     _notificationTimer?.cancel();
     super.dispose();
-  }
-
-  Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-    if (status.isDenied) {
-      _showNotificationPermissionDialog();
-    }
-  }
+  } 
 
   Future<void> _setupSocketListeners() async {
     // TODO: Implement socket connection
@@ -139,29 +131,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
       debugPrint('Error playing notification sound: $e');
     }
   }
-
-  void _showNotificationPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Thông báo'),
-        content: const Text('Ứng dụng cần quyền thông báo để gửi cập nhật về đơn hàng của bạn.'),
-        actions: [
-          TextButton(
-            child: const Text('Để sau'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text('Cài đặt'),
-            onPressed: () {
-              Navigator.pop(context);
-              openAppSettings();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+ 
 
   Future<void> _callDriver() async {
     if (_currentOrder != null && _currentOrder!['driver'] != null) {

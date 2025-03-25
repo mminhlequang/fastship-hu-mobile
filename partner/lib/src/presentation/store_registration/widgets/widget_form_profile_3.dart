@@ -166,7 +166,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             AppDivider(padding: EdgeInsets.symmetric(horizontal: 16.sw)),
             _buildNavigationItem(
               title: 'Categories'.tr(),
-              route: '/provide-info/cuisine',
+              route: '/store-category',
               extra: _categories,
               onReturn: (value) {
                 if (value != null) {

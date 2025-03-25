@@ -23,8 +23,8 @@ import '../network_resources/models/opening_time_model.dart';
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
-import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
+import '../presentation/store_registration/widgets/widget_store_category.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -85,6 +85,12 @@ final goRouter = GoRouter(
             initialData: state.extra as List<int>?,
           ),
         ),
+        GoRoute(
+          path: '/store-category',
+          builder: (context, state) => WidgetStoreCategory(
+            initialData: state.extra as List<int>?,
+          ),
+        ),
       ],
     ),
     GoRoute(
@@ -95,10 +101,9 @@ final goRouter = GoRouter(
       parentNavigatorKey: appNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child: LocationPermissionWrapper(
-            child: SocketShellWrapper(
+          child:   SocketShellWrapper(
               child: child,
-            ),
+            
           ),
         );
       },

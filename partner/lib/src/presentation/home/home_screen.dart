@@ -124,7 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           radius: 4.sw,
                           color: hexColor('#F5DA27'),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.sw, vertical: 4.sw),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10.sw, vertical: 4.sw),
                             child: Text(
                               'Try now'.tr(),
                               style: w600TextStyle(fontSize: 12.sw),
@@ -169,7 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decoration: BoxDecoration(
                                   color: topItem.backgroundColor,
                                   borderRadius: BorderRadius.circular(12.sw),
-                                  border: Border.all(color: topItem.borderColor),
+                                  border:
+                                      Border.all(color: topItem.borderColor),
                                 ),
                                 child: Center(
                                   child: WidgetAppSVG(topItem.icon),
@@ -200,8 +202,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 40.sw,
                                     decoration: BoxDecoration(
                                       color: bottomItem.backgroundColor,
-                                      borderRadius: BorderRadius.circular(12.sw),
-                                      border: Border.all(color: bottomItem.borderColor),
+                                      borderRadius:
+                                          BorderRadius.circular(12.sw),
+                                      border: Border.all(
+                                          color: bottomItem.borderColor),
                                     ),
                                     child: Center(
                                       child: WidgetAppSVG(bottomItem.icon),
@@ -213,11 +217,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       right: -5.sw,
                                       child: Container(
                                         height: 15.sw,
-                                        padding: EdgeInsets.symmetric(horizontal: 4.sw),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.sw),
                                         decoration: BoxDecoration(
                                           color: hexColor('#FF8832'),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: Colors.white),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border:
+                                              Border.all(color: Colors.white),
                                         ),
                                         child: Center(
                                           child: Text(

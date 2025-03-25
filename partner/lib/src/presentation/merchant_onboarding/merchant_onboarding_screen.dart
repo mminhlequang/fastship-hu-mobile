@@ -4,6 +4,7 @@ import 'package:app/src/network_resources/store/models/models.dart';
 import 'package:app/src/presentation/widgets/widget_app_tabbar.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';

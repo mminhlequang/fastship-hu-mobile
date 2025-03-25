@@ -20,9 +20,9 @@ class CustomBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        32.sw,
+        40.sw,
         10.sw,
-        32.sw,
+        40.sw,
         10.sw + context.mediaQueryPadding.bottom,
       ),
       decoration: BoxDecoration(
