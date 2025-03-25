@@ -1,6 +1,5 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -20,21 +19,29 @@ Future<T> appOpenBottomSheet<T>(
   bool isDismissible = true,
   bool enableDrag = true,
   Color? backgroundColor,
+  List<BoxShadow>? boxShadow,
 }) async {
   appIsBottomSheetOpen = true;
   var r = await showMaterialModalBottomSheet(
-    enableDrag: enableDrag,
     context: appContext,
-    builder: (_) => Padding(
-      padding: MediaQuery.viewInsetsOf(_),
-      child: child,
-    ),
+    backgroundColor: backgroundColor ?? Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
-    isDismissible: isDismissible,
-    backgroundColor: backgroundColor ?? Colors.white,
     useRootNavigator: true,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    builder: (_) {
+      return Container(
+        padding: MediaQuery.viewInsetsOf(_),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: boxShadow,
+        ),
+        child: child,
+      );
+    },
   );
   appIsBottomSheetOpen = false;
   return r;
@@ -45,7 +52,7 @@ appOpenDialog(Widget child, {bool barrierDismissible = true}) async {
   appIsDialogOpen = true;
   var r = await showGeneralDialog(
     barrierLabel: "popup",
-    barrierColor: Colors.black.withOpacity(.5),
+    barrierColor: Colors.black.withValues(alpha: .5),
     barrierDismissible: barrierDismissible,
     transitionDuration: const Duration(milliseconds: 300),
     context: appContext,
@@ -54,8 +61,7 @@ appOpenDialog(Widget child, {bool barrierDismissible = true}) async {
     },
     transitionBuilder: (context, anim1, anim2, child) {
       return SlideTransition(
-        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0))
-            .animate(anim1),
+        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1),
         child: child,
       );
     },
@@ -69,9 +75,8 @@ appHideKeyboard() {
 }
 
 appChangedTheme() {
-  AppPrefs.instance.themeModel = AppPrefs.instance.isDarkTheme
-      ? keyThemeModeLight
-      : keyThemeModeDark;
+  AppPrefs.instance.themeModel =
+      AppPrefs.instance.isDarkTheme ? keyThemeModeLight : keyThemeModeDark;
   WidgetsBinding.instance.performReassemble();
 }
 
@@ -137,8 +142,7 @@ void appOpenDateTimePicker(DateTime? date, Function(DateTime date) onConfirm,
   }
 }
 
-void appOpenTimePicker(DateTime? date, Function(DateTime date) onConfirm,
-    {title}) async {
+void appOpenTimePicker(DateTime? date, Function(DateTime date) onConfirm, {title}) async {
   date ??= DateTime.now();
   final rs = await appOpenBottomSheet(
       WidgetBottomPickTime(
