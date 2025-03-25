@@ -33,10 +33,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${'Expected delivery at'.tr()} 18:50',
-                          style: w400TextStyle(),
-                        ),
+                        Text('${'Expected delivery at'.tr()} 18:50', style: w400TextStyle()),
                       ],
                     ),
                   ),
@@ -47,8 +44,12 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
           ),
           const AppDivider(),
           Padding(
-            padding:
-                EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
+            padding: EdgeInsets.fromLTRB(
+              16.sw,
+              10.sw,
+              16.sw,
+              10.sw + context.mediaQueryPadding.bottom,
+            ),
             child: Row(
               children: [
                 Expanded(
