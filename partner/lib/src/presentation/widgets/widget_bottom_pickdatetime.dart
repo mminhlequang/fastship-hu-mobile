@@ -22,6 +22,8 @@ class WidgetDateTimePicker extends StatefulWidget {
   final Function(DateTime)? onConfirm;
   final Function()? onCancel;
   final String? title;
+  final DateTime? minimumDate;
+  final DateTime? maximumDate;
 
   const WidgetDateTimePicker({
     super.key,
@@ -30,6 +32,8 @@ class WidgetDateTimePicker extends StatefulWidget {
     this.onConfirm,
     this.onCancel,
     this.title,
+    this.minimumDate,
+    this.maximumDate,
   });
 
   @override
@@ -43,6 +47,14 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
   void initState() {
     super.initState();
     _selectedDateTime = widget.initialDateTime ?? DateTime.now();
+    
+    // Đảm bảo ngày được chọn nằm trong khoảng cho phép
+    if (widget.minimumDate != null && _selectedDateTime.isBefore(widget.minimumDate!)) {
+      _selectedDateTime = widget.minimumDate!;
+    }
+    if (widget.maximumDate != null && _selectedDateTime.isAfter(widget.maximumDate!)) {
+      _selectedDateTime = widget.maximumDate!;
+    }
   }
 
   @override
@@ -105,6 +117,8 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
       child: CupertinoDatePicker(
         mode: CupertinoDatePickerMode.date,
         initialDateTime: _selectedDateTime,
+        minimumDate: widget.minimumDate,
+        maximumDate: widget.maximumDate,
         onDateTimeChanged: (DateTime newDateTime) {
           setState(() {
             _selectedDateTime = newDateTime;
@@ -120,6 +134,8 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
       child: CupertinoDatePicker(
         mode: CupertinoDatePickerMode.time,
         initialDateTime: _selectedDateTime,
+        minimumDate: widget.minimumDate,
+        maximumDate: widget.maximumDate,
         onDateTimeChanged: (DateTime newDateTime) {
           setState(() {
             _selectedDateTime = newDateTime;
@@ -135,6 +151,8 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
       child: CupertinoDatePicker(
         mode: CupertinoDatePickerMode.dateAndTime,
         initialDateTime: _selectedDateTime,
+        minimumDate: widget.minimumDate,
+        maximumDate: widget.maximumDate,
         onDateTimeChanged: (DateTime newDateTime) {
           setState(() {
             _selectedDateTime = newDateTime;
@@ -149,12 +167,16 @@ class WidgetBottomPickTime extends StatefulWidget {
   final String title;
   final String? description;
   final DateTime? time;
+  final DateTime? minimumDate;
+  final DateTime? maximumDate;
 
   const WidgetBottomPickTime({
     super.key,
     required this.title,
     this.description,
     this.time,
+    this.minimumDate,
+    this.maximumDate,
   });
 
   @override
@@ -162,7 +184,21 @@ class WidgetBottomPickTime extends StatefulWidget {
 }
 
 class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
-  late DateTime _time = widget.time ?? DateTime.now();
+  late DateTime _time;
+  
+  @override
+  void initState() {
+    super.initState();
+    _time = widget.time ?? DateTime.now();
+    
+    // Đảm bảo thời gian được chọn nằm trong khoảng cho phép
+    if (widget.minimumDate != null && _time.isBefore(widget.minimumDate!)) {
+      _time = widget.minimumDate!;
+    }
+    if (widget.maximumDate != null && _time.isAfter(widget.maximumDate!)) {
+      _time = widget.maximumDate!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

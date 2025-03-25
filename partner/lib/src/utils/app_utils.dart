@@ -130,12 +130,16 @@ Future<void> appOpenDateTimePicker(
   Function(DateTime date) onConfirm, {
   title,
   type = DateTimePickerType.date,
+  DateTime? minimumDate,
+  DateTime? maximumDate,
 }) async {
   date ??= DateTime.now();
   final rs = await appOpenBottomSheet(
     WidgetDateTimePicker(
       type: type,
       initialDateTime: date,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
     ),
     enableDrag: false,
     backgroundColor: Colors.transparent,

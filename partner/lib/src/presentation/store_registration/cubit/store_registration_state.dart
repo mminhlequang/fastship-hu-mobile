@@ -48,7 +48,7 @@ class StoreRegistrationState extends Equatable {
       case 2:
         var isEnable = false;
         switch (idCardImages['type']) {
-          case RepresentativeType.personal:
+          case RepresentativeType.individual:
             isEnable = _notNullAndNotEmpty(idCardImages['name']) &&
                 _notNullAndNotEmpty(idCardImages['email']) &&
                 _notNullAndNotEmpty(idCardImages['phoneNumber']) &&

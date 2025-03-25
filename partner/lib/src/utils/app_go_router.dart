@@ -9,7 +9,7 @@ import 'package:app/src/presentation/merchant_onboarding/merchant_onboarding_scr
 import 'package:app/src/presentation/splash/splash_screen.dart';
 import 'package:app/src/presentation/store_registration/export.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_opening_time.dart';
-import 'package:app/src/presentation/store_registration/widgets/widget_service_type.dart';
+import 'package:app/src/presentation/store_registration/widgets/widget_business_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -58,12 +58,16 @@ final goRouter = GoRouter(
           builder: (context, state) => const ProvideInfoScreen(),
         ),
         GoRoute(
-          path: '/provide-info/opening-time',
-          builder: (context, state) => const WidgetOpeningTime(),
+          path: '/opening-time',
+          builder: (context, state) =>   WidgetOpeningTime(
+            initialData: state.extra as List?,
+          ),
         ),
         GoRoute(
-          path: '/provide-info/service-type',
-          builder: (context, state) => const WidgetServiceType(),
+          path: '/business-type',
+          builder: (context, state) => WidgetBusinessType(
+            initialData: state.extra as List<int>?,
+          ),
         ),
         GoRoute(
           path: '/merchant-onboarding',

@@ -167,7 +167,7 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
 
       final requestData = {
         "name": state.basicInfo['storeName'],
-        "type": "individual",
+        "type": state.basicInfo['type'].name,
         "company": "Công ty A",
         "phone": state.basicInfo['storePhone'],
         "phone_contact": state.idCardImages['phoneNumber'],
@@ -218,6 +218,7 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         return false;
       }
     } catch (e) {
+      print('Error updating profile: $e');
       emit(state.copyWith(
         isLoading: false,
         errorMessage: () => 'Error updating profile: $e',

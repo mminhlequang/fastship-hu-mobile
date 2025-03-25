@@ -7,7 +7,8 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 
 class WidgetOpeningTime extends StatefulWidget {
-  const WidgetOpeningTime({super.key});
+  final List? initialData;
+  const WidgetOpeningTime({super.key, this.initialData});
 
   @override
   State<WidgetOpeningTime> createState() => _WidgetOpeningTimeState();
@@ -41,12 +42,12 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
       body: Column(
         children: [
           const AppDivider(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.sw),
-              child: const WidgetOpeningTime(),
-            ),
-          ),
+          // Expanded(
+          //   child: SingleChildScrollView(
+          //     padding: EdgeInsets.all(16.sw),
+          //     child: const WidgetOpeningTime(),
+          //   ),
+          // ),
         ],
       ),
     );
