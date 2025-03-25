@@ -17,8 +17,8 @@ class AppUploadImage extends StatelessWidget {
     required this.onPickImage,
     this.padding,
     this.subTitle,
-    this.width,
     this.height,
+    this.width,
     this.image,
   });
 
@@ -28,9 +28,10 @@ class AppUploadImage extends StatelessWidget {
   final Function(XFile image) onPickImage;
   final EdgeInsets? padding;
   final Widget? subTitle;
+  final double? height;
   final double? width;
   final XFile? image;
-  final double? height;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -98,13 +99,11 @@ class AppUploadImage extends StatelessWidget {
                   const WidgetAppSVG('upload_image'),
                   Gap(2.sw),
                   WidgetGlassBackground(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
+                    padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
                     child: Text(
                       'Upload'.tr(),
                       style: w400TextStyle(
-                          fontSize: 12.sw,
-                          color: image == null ? grey1 : Colors.white),
+                          fontSize: 12.sw, color: image == null ? grey1 : Colors.white),
                     ),
                   ),
                 ],
@@ -116,7 +115,6 @@ class AppUploadImage extends StatelessWidget {
     );
   }
 }
-
 
 class AppUploadImage2 extends StatelessWidget {
   final String assetSvg;

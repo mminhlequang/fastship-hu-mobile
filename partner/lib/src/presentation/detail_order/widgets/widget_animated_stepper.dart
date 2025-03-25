@@ -46,7 +46,7 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(4, (index) {
         bool isCompleted = widget.currentStep >= index;
-        bool isInProgress = widget.currentStep > index && widget.currentStep < index + 1;
+        bool isInProgress = widget.currentStep >= index && widget.currentStep < index + 1;
 
         return index == 3
             ? Padding(
@@ -79,7 +79,7 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
                             )
                           : LinearProgressIndicator(
                               value: progress,
-                              backgroundColor: appColorBackground,
+                              backgroundColor: appColorPrimary.withValues(alpha: .15),
                               valueColor: AlwaysStoppedAnimation<Color>(appColorPrimary),
                               borderRadius: BorderRadius.circular(99),
                               minHeight: 3.sw,

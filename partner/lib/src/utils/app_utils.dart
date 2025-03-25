@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
@@ -23,18 +24,18 @@ Future<T> appOpenBottomSheet<T>(
 }) async {
   appIsBottomSheetOpen = true;
   var r = await showMaterialModalBottomSheet(
-    enableDrag: enableDrag,
     context: appContext,
-    builder: (_) => Padding(
-      padding: MediaQuery.viewInsetsOf(_),
-      child: child,
-    ),
+    backgroundColor: backgroundColor ?? Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     isDismissible: isDismissible,
-    backgroundColor: backgroundColor ?? Colors.white,
     useRootNavigator: true,
+    enableDrag: enableDrag,
+    builder: (_) => Padding(
+      padding: MediaQuery.viewInsetsOf(_),
+      child: child,
+    ),
   );
   appIsBottomSheetOpen = false;
   return r;
@@ -169,5 +170,14 @@ Future<void> appOpenTimePicker(
 }
 
 Future<void> copyToClipboard(String text) async {
+  appHaptic();
   await Clipboard.setData(ClipboardData(text: text));
+}
+
+Future<void> makePhoneCall(String phone) async {
+  appHaptic();
+  final Uri url = Uri.parse('tel:$phone');
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  }
 }

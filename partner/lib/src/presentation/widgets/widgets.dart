@@ -16,3 +16,4 @@ export 'widget_app_textfield.dart';
 export 'widget_app_upload_image.dart';
 export 'widget_app_tabbar.dart';
 export 'widget_opening_time.dart';
+export 'widget_confirm_dialog.dart';

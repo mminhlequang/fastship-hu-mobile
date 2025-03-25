@@ -12,8 +12,7 @@ internalSetup() {
       appColors: AppColors.instance,
       appPrefs: AppPrefs.instance,
       appTextStyleWrap: AppTextStyleWrap(
-        fontWrap: (textStyle) =>
-            GoogleFonts.fredoka(textStyle: textStyle.copyWith(height: 1)),
+        fontWrap: (textStyle) => GoogleFonts.fredoka(textStyle: textStyle.copyWith(height: 1)),
       ),
       networkOptions: PNetworkOptionsImpl(
         loggingEnable: true,
