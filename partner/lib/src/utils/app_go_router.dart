@@ -14,7 +14,6 @@ import 'package:app/src/presentation/store_registration/export.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_opening_time.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_business_type.dart';
 import 'package:app/src/presentation/store_registration/widgets/opening_hours_screen.dart';
-import 'package:app/src/presentation/store_registration/widgets/service_types_screen.dart';
 import 'package:app/src/presentation/store_settings/store_settings_screen.dart';
 import 'package:app/src/presentation/store_settings/widgets/information_screen.dart';
 import 'package:flutter/material.dart';
