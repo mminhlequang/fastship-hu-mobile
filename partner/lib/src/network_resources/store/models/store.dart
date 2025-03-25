@@ -1,217 +1,274 @@
+
 class StoreModel {
   int? id;
   String? name;
-  String? type;
   String? phone;
-  String? phoneOther;
-  String? phoneContact;
-  String? email;
-  String? license;
-  String? cccd;
-  String? cccdDate;
-  String? image;
-  String? banner;
-  String? imageCccdBefore;
-  String? imageCccdAfter;
-  String? imageLicense;
-  String? imageTaxCode;
-  List<String>? images;
-  String? taxCode;
-  int? serviceId;
-  List<int>? services;
-  List<int>? foods;
-  List<int>? products;
-  double? fee;
-  List<OperatingHour>? operatingHours;
+  String? contactType;
+  String? contactFullName;
+  String? contactCompany;
+  String? contactCompanyAddress;
+  String? contactPhone;
+  String? contactEmail;
+  String? contactCardId;
+  String? contactCardIdIssueDate;
+  String? contactCardIdImageFront;
+  String? contactCardIdImageBack;
+  String? contactTax;
+  String? avatarImage;
+  String? facadeImage;
+  int? rating;
+  int? isOpen;
+  List<OperatingHours>? operatingHours;
+  List<BannerImages>? bannerImages;
+  List<ContactDocuments>? contactDocuments;
   String? address;
-  double? lat;
-  double? lng;
   String? street;
   String? zip;
   String? city;
   String? state;
   String? country;
   String? countryCode;
-  String? cardBank;
-  String? cardNumber;
-  String? cardHolderName;
-  double? distance;
-  int? isOpen;
-  double? rate;
-  int? countRating;
-  int? countOrder;
+  double? lat;
+  double? lng;
   int? isFavorite;
+  int? active;
   String? createdAt;
-  String? updatedAt;
 
-  StoreModel({
-    this.id,
-    this.name,
-    this.type,
-    this.phone,
-    this.phoneOther,
-    this.phoneContact,
-    this.email,
-    this.license,
-    this.cccd,
-    this.cccdDate,
-    this.image,
-    this.banner,
-    this.imageCccdBefore,
-    this.imageCccdAfter,
-    this.imageLicense,
-    this.imageTaxCode,
-    this.images,
-    this.taxCode,
-    this.serviceId,
-    this.services,
-    this.foods,
-    this.products,
-    this.fee,
-    this.operatingHours,
-    this.address,
-    this.lat,
-    this.lng,
-    this.street,
-    this.zip,
-    this.city,
-    this.state,
-    this.country,
-    this.countryCode,
-    this.cardBank,
-    this.cardNumber,
-    this.cardHolderName,
-    this.distance,
-    this.isOpen,
-    this.rate,
-    this.countRating,
-    this.countOrder,
-    this.isFavorite,
-    this.createdAt,
-    this.updatedAt,
-  });
+  StoreModel({this.id, this.name, this.phone, this.contactType, this.contactFullName, this.contactCompany, this.contactCompanyAddress, this.contactPhone, this.contactEmail, this.contactCardId, this.contactCardIdIssueDate, this.contactCardIdImageFront, this.contactCardIdImageBack, this.contactTax, this.avatarImage, this.facadeImage, this.rating, this.isOpen, this.operatingHours, this.bannerImages, this.contactDocuments, this.address, this.street, this.zip, this.city, this.state, this.country, this.countryCode, this.lat, this.lng, this.isFavorite, this.active, this.createdAt});
 
   StoreModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    type = json['type'];
-    phone = json['phone'];
-    phoneOther = json['phone_other'];
-    phoneContact = json['phone_contact'];
-    email = json['email'];
-    license = json['license'];
-    cccd = json['cccd'];
-    cccdDate = json['cccd_date'];
-    image = json['image'];
-    banner = json['banner'];
-    imageCccdBefore = json['image_cccd_before'];
-    imageCccdAfter = json['image_cccd_after'];
-    imageLicense = json['image_license'];
-    imageTaxCode = json['image_tax_code'];
-    images = json['images'] != null ? List<String>.from(json['images']) : null;
-    taxCode = json['tax_code'];
-    serviceId = json['service_id'];
-    services =
-        json['services'] != null ? List<int>.from(json['services']) : null;
-    foods = json['foods'] != null ? List<int>.from(json['foods']) : null;
-    products =
-        json['products'] != null ? List<int>.from(json['products']) : null;
-    fee = json['fee']?.toDouble();
-    if (json['operating_hours'] != null) {
-      operatingHours = <OperatingHour>[];
-      json['operating_hours'].forEach((v) {
-        operatingHours!.add(OperatingHour.fromJson(v));
-      });
+    if(json["id"] is int) {
+      id = json["id"];
     }
-    address = json['address'];
-    lat = json['lat']?.toDouble();
-    lng = json['lng']?.toDouble();
-    street = json['street'];
-    zip = json['zip'];
-    city = json['city'];
-    state = json['state'];
-    country = json['country'];
-    countryCode = json['country_code'];
-    cardBank = json['card_bank'];
-    cardNumber = json['card_number'];
-    cardHolderName = json['card_holder_name'];
-    distance = json['distance']?.toDouble();
-    isOpen = json['is_open'];
-    rate = json['rate']?.toDouble();
-    countRating = json['count_rating'];
-    countOrder = json['count_order'];
-    isFavorite = json['is_favorite'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    if(json["name"] is String) {
+      name = json["name"];
+    }
+    if(json["phone"] is String) {
+      phone = json["phone"];
+    }
+    if(json["contact_type"] is String) {
+      contactType = json["contact_type"];
+    }
+    if(json["contact_full_name"] is String) {
+      contactFullName = json["contact_full_name"];
+    }
+    if(json["contact_company"] is String) {
+      contactCompany = json["contact_company"];
+    }
+    if(json["contact_company_address"] is String) {
+      contactCompanyAddress = json["contact_company_address"];
+    }
+    if(json["contact_phone"] is String) {
+      contactPhone = json["contact_phone"];
+    }
+    if(json["contact_email"] is String) {
+      contactEmail = json["contact_email"];
+    }
+    if(json["contact_card_id"] is String) {
+      contactCardId = json["contact_card_id"];
+    }
+    if(json["contact_card_id_issue_date"] is String) {
+      contactCardIdIssueDate = json["contact_card_id_issue_date"];
+    }
+    if(json["contact_card_id_image_front"] is String) {
+      contactCardIdImageFront = json["contact_card_id_image_front"];
+    }
+    if(json["contact_card_id_image_back"] is String) {
+      contactCardIdImageBack = json["contact_card_id_image_back"];
+    }
+    if(json["contact_tax"] is String) {
+      contactTax = json["contact_tax"];
+    }
+    if(json["avatar_image"] is String) {
+      avatarImage = json["avatar_image"];
+    }
+    if(json["facade_image"] is String) {
+      facadeImage = json["facade_image"];
+    }
+    if(json["rating"] is int) {
+      rating = json["rating"];
+    }
+    if(json["is_open"] is int) {
+      isOpen = json["is_open"];
+    }
+    if(json["operating_hours"] is List) {
+      operatingHours = json["operating_hours"] == null ? null : (json["operating_hours"] as List).map((e) => OperatingHours.fromJson(e)).toList();
+    }
+    if(json["banner_images"] is List) {
+      bannerImages = json["banner_images"] == null ? null : (json["banner_images"] as List).map((e) => BannerImages.fromJson(e)).toList();
+    }
+    if(json["contact_documents"] is List) {
+      contactDocuments = json["contact_documents"] == null ? null : (json["contact_documents"] as List).map((e) => ContactDocuments.fromJson(e)).toList();
+    }
+    if(json["address"] is String) {
+      address = json["address"];
+    }
+    if(json["street"] is String) {
+      street = json["street"];
+    }
+    if(json["zip"] is String) {
+      zip = json["zip"];
+    }
+    if(json["city"] is String) {
+      city = json["city"];
+    }
+    if(json["state"] is String) {
+      state = json["state"];
+    }
+    if(json["country"] is String) {
+      country = json["country"];
+    }
+    if(json["country_code"] is String) {
+      countryCode = json["country_code"];
+    }
+    if(json["lat"] is double) {
+      lat = json["lat"];
+    }
+    if(json["lng"] is double) {
+      lng = json["lng"];
+    }
+    if(json["is_favorite"] is int) {
+      isFavorite = json["is_favorite"];
+    }
+    if(json["active"] is int) {
+      active = json["active"];
+    }
+    if(json["created_at"] is String) {
+      createdAt = json["created_at"];
+    }
+  }
+
+  static List<StoreModel> fromList(List<Map<String, dynamic>> list) {
+    return list.map(StoreModel.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['type'] = type;
-    data['phone'] = phone;
-    data['phone_other'] = phoneOther;
-    data['phone_contact'] = phoneContact;
-    data['email'] = email;
-    data['license'] = license;
-    data['cccd'] = cccd;
-    data['cccd_date'] = cccdDate;
-    data['image'] = image;
-    data['banner'] = banner;
-    data['image_cccd_before'] = imageCccdBefore;
-    data['image_cccd_after'] = imageCccdAfter;
-    data['image_license'] = imageLicense;
-    data['image_tax_code'] = imageTaxCode;
-    data['images'] = images;
-    data['tax_code'] = taxCode;
-    data['service_id'] = serviceId;
-    data['services'] = services;
-    data['foods'] = foods;
-    data['products'] = products;
-    data['fee'] = fee;
-    if (operatingHours != null) {
-      data['operating_hours'] = operatingHours!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["name"] = name;
+    _data["phone"] = phone;
+    _data["contact_type"] = contactType;
+    _data["contact_full_name"] = contactFullName;
+    _data["contact_company"] = contactCompany;
+    _data["contact_company_address"] = contactCompanyAddress;
+    _data["contact_phone"] = contactPhone;
+    _data["contact_email"] = contactEmail;
+    _data["contact_card_id"] = contactCardId;
+    _data["contact_card_id_issue_date"] = contactCardIdIssueDate;
+    _data["contact_card_id_image_front"] = contactCardIdImageFront;
+    _data["contact_card_id_image_back"] = contactCardIdImageBack;
+    _data["contact_tax"] = contactTax;
+    _data["avatar_image"] = avatarImage;
+    _data["facade_image"] = facadeImage;
+    _data["rating"] = rating;
+    _data["is_open"] = isOpen;
+    if(operatingHours != null) {
+      _data["operating_hours"] = operatingHours?.map((e) => e.toJson()).toList();
     }
-    data['address'] = address;
-    data['lat'] = lat;
-    data['lng'] = lng;
-    data['street'] = street;
-    data['zip'] = zip;
-    data['city'] = city;
-    data['state'] = state;
-    data['country'] = country;
-    data['country_code'] = countryCode;
-    data['card_bank'] = cardBank;
-    data['card_number'] = cardNumber;
-    data['card_holder_name'] = cardHolderName;
-    data['distance'] = distance;
-    data['is_open'] = isOpen;
-    data['rate'] = rate;
-    data['count_rating'] = countRating;
-    data['count_order'] = countOrder;
-    data['is_favorite'] = isFavorite;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
+    if(bannerImages != null) {
+      _data["banner_images"] = bannerImages?.map((e) => e.toJson()).toList();
+    }
+    if(contactDocuments != null) {
+      _data["contact_documents"] = contactDocuments?.map((e) => e.toJson()).toList();
+    }
+    _data["address"] = address;
+    _data["street"] = street;
+    _data["zip"] = zip;
+    _data["city"] = city;
+    _data["state"] = state;
+    _data["country"] = country;
+    _data["country_code"] = countryCode;
+    _data["lat"] = lat;
+    _data["lng"] = lng;
+    _data["is_favorite"] = isFavorite;
+    _data["active"] = active;
+    _data["created_at"] = createdAt;
+    return _data;
   }
 }
 
-class OperatingHour {
-  int? day;
-  List<String>? hours;
+class ContactDocuments {
+  int? id;
+  String? image;
 
-  OperatingHour({this.day, this.hours});
+  ContactDocuments({this.id, this.image});
 
-  OperatingHour.fromJson(Map<String, dynamic> json) {
-    day = json['day'];
-    hours = json['hours'] != null ? List<String>.from(json['hours']) : null;
+  ContactDocuments.fromJson(Map<String, dynamic> json) {
+    if(json["id"] is int) {
+      id = json["id"];
+    }
+    if(json["image"] is String) {
+      image = json["image"];
+    }
+  }
+
+  static List<ContactDocuments> fromList(List<Map<String, dynamic>> list) {
+    return list.map(ContactDocuments.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['day'] = day;
-    data['hours'] = hours;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["image"] = image;
+    return _data;
+  }
+}
+
+class BannerImages {
+  int? id;
+  String? image;
+
+  BannerImages({this.id, this.image});
+
+  BannerImages.fromJson(Map<String, dynamic> json) {
+    if(json["id"] is int) {
+      id = json["id"];
+    }
+    if(json["image"] is String) {
+      image = json["image"];
+    }
+  }
+
+  static List<BannerImages> fromList(List<Map<String, dynamic>> list) {
+    return list.map(BannerImages.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["image"] = image;
+    return _data;
+  }
+}
+
+class OperatingHours {
+  int? day;
+  String? startTime;
+  String? endTime;
+
+  OperatingHours({this.day, this.startTime, this.endTime});
+
+  OperatingHours.fromJson(Map<String, dynamic> json) {
+    if(json["day"] is int) {
+      day = json["day"];
+    }
+    if(json["start_time"] is String) {
+      startTime = json["start_time"];
+    }
+    if(json["end_time"] is String) {
+      endTime = json["end_time"];
+    }
+  }
+
+  static List<OperatingHours> fromList(List<Map<String, dynamic>> list) {
+    return list.map(OperatingHours.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["day"] = day;
+    _data["start_time"] = startTime;
+    _data["end_time"] = endTime;
+    return _data;
   }
 }

@@ -2,7 +2,7 @@
 
 ## 🎀 App Configuration Details 🎀
 - **App Name**: Partner-FastshipHu
-- **App ID**: com.devfastshiphu.partner
+- **App ID**: com.fastshiphu.partner
 - **Package Name**: app
 - **Package Description**: Partner mobile app
 

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/presentation/store_registration/cubit/store_registration_cubit.dart';
@@ -8,21 +6,13 @@ import 'package:app/src/presentation/store_registration/widgets/widget_form_prof
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_2.dart';
 import 'package:app/src/presentation/store_registration/widgets/widget_form_profile_3.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
-import 'package:app/src/utils/app_prefs.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:internal_core/extensions/context_extension.dart';
-import 'package:internal_core/extensions/date_extension.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:app/src/network_resources/auth/models/models.dart';
 
 class ProvideInfoScreen extends StatelessWidget {
   const ProvideInfoScreen({super.key});
@@ -146,27 +136,15 @@ class ProvideInfoScreen extends StatelessWidget {
       WidgetBottomSheetProcess(
         processer: _processor,
         onTryAgain: () {
-          cubit.submitStoreRegistration();
+          _processor.value = 'loading';
+          cubit.submitStoreRegistration(_processor);
         },
       ),
+      enableDrag: false,
       isDismissible: false,
-    ).then((r) {
-      if (r == true) {
-        AccountModel user = AppPrefs.instance.user!;
-        user.profile!.stepId = 2;
-        AppPrefs.instance.user = user;
-        if (context.mounted) context.pop();
-      }
-    });
+    );
 
-    cubit.submitStoreRegistration().then((success) {
-      print('success: $success');
-      if (success) {
-        _processor.value = 'success';
-      } else {
-        _processor.value = 'error';
-      }
-    });
+    cubit.submitStoreRegistration(_processor);
   }
 
   @override
@@ -189,19 +167,19 @@ class ProvideInfoScreen extends StatelessWidget {
                       alignment: Alignment.topCenter,
                       child: switch (state.currentStep2) {
                         1 => WidgetFormProfile1(
-                            initialData: state.basicInfo,
+                            initialData: state.infoStep1,
                             onChanged: (data) {
                               cubit.updatePersonalInfo(data);
                             },
                           ),
                         2 => WidgetFormProfile2(
-                            initialData: state.idCardImages,
+                            initialData: state.infoStep2,
                             onChanged: (data) {
                               cubit.updateIdCardImages(data);
                             },
                           ),
                         _ => WidgetFormProfile3(
-                            initialData: state.detailInfos,
+                            initialData: state.infoStep3,
                             onChanged: (data) {
                               cubit.updateDetailInfo(data);
                             },

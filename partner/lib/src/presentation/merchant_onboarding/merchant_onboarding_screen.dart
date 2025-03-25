@@ -1,8 +1,11 @@
+import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/store/models/models.dart';
 import 'package:app/src/presentation/widgets/widget_app_tabbar.dart';
-import 'package:app/src/utils/app_go_router.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
@@ -11,7 +14,8 @@ class MerchantOnboardingScreen extends StatefulWidget {
   const MerchantOnboardingScreen({super.key});
 
   @override
-  State<MerchantOnboardingScreen> createState() => _MerchantOnboardingScreenState();
+  State<MerchantOnboardingScreen> createState() =>
+      _MerchantOnboardingScreenState();
 }
 
 class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
@@ -21,7 +25,13 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex:
+            authCubit.state.stores!.where((e) => e.active == 1).isNotEmpty
+                ? 0
+                : 1);
   }
 
   @override
@@ -34,67 +44,93 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Merchant Onboarding'.tr()),
+        title: Text("    " + 'Merchant Onboarding'.tr()),
         actions: [
           IconButton(
-            onPressed: () => appContext.push('/create-store'),
+            onPressed: () => appContext.push('/store-registration'),
             icon: WidgetAppSVG('ic_add_circle'),
           ),
           Gap(4.sw),
         ],
       ),
-      body: WidgetAppTabBar(
-        tabController: _tabController,
-        tabs: ['My Store'.tr(), 'Store Register'.tr()],
-        children: [_myStore, _storeRegister],
+      body: BlocBuilder<AuthCubit, AuthState>(
+        bloc: authCubit,
+        builder: (context, state) {
+          if (state.stores?.isNotEmpty != true) {
+            return Container(
+              color: Colors.white,
+              constraints: const BoxConstraints.expand(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const WidgetAppSVG('empty_store'),
+                  Gap(16.sw),
+                  Text(
+                    'No stores available'.tr(),
+                    style: w500TextStyle(fontSize: 18.sw),
+                  ),
+                  Gap(4.sw),
+                  Text(
+                    'Let\'s create your first store'.tr(),
+                    style: w400TextStyle(color: grey1),
+                  ),
+                  Gap(12.sw),
+                  WidgetRippleButton(
+                    onTap: () => appContext.push('/store-registration'),
+                    radius: 8.sw,
+                    borderSide: BorderSide(color: appColorPrimary),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.sw, vertical: 8.sw),
+                      child: Text(
+                        'Create new store'.tr(),
+                        style: w500TextStyle(color: appColorPrimary),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return WidgetAppTabBar(
+            tabController: _tabController,
+            tabs: ['My Store'.tr(), 'Store Register'.tr()],
+            children: [
+              _buildListStores(
+                  state.stores!.where((e) => e.active == 1).toList()),
+              _buildListStores(
+                  state.stores!.where((e) => e.active == 0).toList(),
+                  isNotActive: true)
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget get _myStore {
-    bool isEmpty = false;
-    if (isEmpty) {
-      return Container(
-        color: Colors.white,
-        constraints: const BoxConstraints.expand(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const WidgetAppSVG('empty_store'),
-            Gap(16.sw),
-            Text(
-              'No stores available'.tr(),
-              style: w500TextStyle(fontSize: 18.sw),
-            ),
-            Gap(4.sw),
-            Text(
-              'Let\'s create your first store'.tr(),
-              style: w400TextStyle(color: grey1),
-            ),
-            Gap(12.sw),
-            WidgetRippleButton(
-              onTap: () => appContext.push('/create-store'),
-              radius: 8.sw,
-              borderSide: BorderSide(color: appColorPrimary),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
-                child: Text(
-                  'Create new store'.tr(),
-                  style: w500TextStyle(color: appColorPrimary),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+  Widget _buildListStores(List<StoreModel> stores, {bool isNotActive = false}) {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-      itemCount: 2,
+      itemCount: stores.length,
       separatorBuilder: (context, index) => Gap(8.sw),
       itemBuilder: (context, index) {
+        StoreModel store = stores[index];
         return WidgetRippleButton(
-          onTap: () => appContext.pushReplacement('/navigation'),
+          onTap: () {
+            appHaptic();
+
+            if (isNotActive) {
+              appShowSnackBar(
+                msg:
+                    "Your store is in review process, please wait for approval!"
+                        .tr(),
+                type: AppSnackBarType.notitfication,
+              );
+            } else {
+              authCubit.setStore(store);
+              appContext.pushReplacement('/navigation');
+            }
+          },
           radius: 8.sw,
           child: Padding(
             padding: EdgeInsets.all(8.sw),
@@ -104,8 +140,7 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
                   clipBehavior: Clip.none,
                   children: [
                     WidgetAppImage(
-                      imageUrl:
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1ESafVZL6sr_AUo1QYgGVF4S-eL2KlMhjZQ&s',
+                      imageUrl: store.avatarImage ?? '',
                       height: 64.sw,
                       width: 64.sw,
                       radius: 4.sw,
@@ -117,7 +152,11 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
                         height: 12.sw,
                         width: 12.sw,
                         decoration: BoxDecoration(
-                          color: index == 0 ? appColorPrimary : grey1,
+                          color: isNotActive
+                              ? Colors.deepOrange
+                              : store.isOpen == 1
+                                  ? appColorPrimary
+                                  : grey1,
                           shape: BoxShape.circle,
                           border: Border.all(width: 2.sw, color: Colors.white),
                         ),
@@ -131,14 +170,20 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bánh cuốn Hồng Liên',
+                        store.name ?? 'Unnamed',
                         style: w600TextStyle(fontSize: 16.sw, color: grey10),
                       ),
                       Gap(4.sw),
                       Text(
-                        '41 Quang Trung, Ward 3, Go Vap District, HCMC',
+                        store.address ?? 'Unknown address',
                         style: w400TextStyle(color: grey1),
                       ),
+                      if (isNotActive) Gap(4.sw),
+                      if (isNotActive)
+                        Text(
+                          'In review process'.tr(),
+                          style: w400TextStyle(color: Colors.deepOrange),
+                        ),
                     ],
                   ),
                 ),
@@ -148,9 +193,5 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
         );
       },
     );
-  }
-
-  Widget get _storeRegister {
-    return Column();
   }
 }

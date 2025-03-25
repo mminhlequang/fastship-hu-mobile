@@ -8,6 +8,51 @@ import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/internal_core.dart';
 
+void _showImageSourceOptions(
+    BuildContext context, Function(XFile) onImagePicked) {
+  Future<void> _pickImage(
+      ImageSource source, Function(XFile) onImagePicked) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source);
+      if (image != null) {
+        onImagePicked(image);
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
+  }
+
+  appHaptic();
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return SafeArea(
+        child: Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: Text('Take a photo'.tr()),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera, onImagePicked);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text('Choose from gallery'.tr()),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery, onImagePicked);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 class AppUploadImage extends StatelessWidget {
   const AppUploadImage({
     super.key,
@@ -73,11 +118,7 @@ class AppUploadImage extends StatelessWidget {
               ),
           WidgetRippleButton(
             onTap: () {
-              ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-                if (value != null) {
-                  onPickImage.call(value);
-                }
-              });
+              _showImageSourceOptions(context, onPickImage);
             },
             radius: 4.sw,
             color: grey8,
@@ -99,11 +140,13 @@ class AppUploadImage extends StatelessWidget {
                   const WidgetAppSVG('upload_image'),
                   Gap(2.sw),
                   WidgetGlassBackground(
-                    padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
                     child: Text(
                       'Upload'.tr(),
                       style: w400TextStyle(
-                          fontSize: 12.sw, color: image == null ? grey1 : Colors.white),
+                          fontSize: 12.sw,
+                          color: image == null ? grey1 : Colors.white),
                     ),
                   ),
                 ],
@@ -120,18 +163,18 @@ class AppUploadImage2 extends StatelessWidget {
   final String assetSvg;
   final Function(XFile image) onPickImage;
   final XFile? image;
-  const AppUploadImage2({super.key, required this.assetSvg, required this.onPickImage, this.image});
+  const AppUploadImage2(
+      {super.key,
+      required this.assetSvg,
+      required this.onPickImage,
+      this.image});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         appHaptic();
-        ImagePicker().pickImage(source: ImageSource.camera).then((value) {
-          if (value != null) {
-            onPickImage.call(value);
-          }
-        });
+        _showImageSourceOptions(context, onPickImage);
       },
       child: Stack(
         children: [

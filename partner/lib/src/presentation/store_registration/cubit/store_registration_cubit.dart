@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/models/opening_time_model.dart';
 import 'package:app/src/network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:bloc/bloc.dart';
@@ -55,20 +58,21 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
 
   // Các hàm quản lý các bước của provide_info_screen
   void updatePersonalInfo(Map<String, dynamic> data) {
-    emit(state.copyWith(basicInfo: {...state.basicInfo, ...data}));
+    emit(state.copyWith(infoStep1: {...state.infoStep1, ...data}));
   }
 
   void updateIdCardImages(Map<String, dynamic> data) {
-    emit(state.copyWith(idCardImages: {...state.idCardImages, ...data}));
+    emit(state.copyWith(infoStep2: {...state.infoStep2, ...data}));
   }
 
   void updateDetailInfo(Map<String, dynamic> data) {
-    emit(state.copyWith(detailInfos: {...state.detailInfos, ...data}));
+    emit(state.copyWith(infoStep3: {...state.infoStep3, ...data}));
   }
 
   // Các hàm xử lý API
-  Future<bool> submitStoreRegistration() async {
-    emit(state.copyWith(isLoading: true, errorMessage: () => null));
+  Future<void> submitStoreRegistration(ValueNotifier<String> processor) async {
+    processor.value = 'loading';
+    emit(state.copyWith(isLoading: true));
 
     try {
       // Xử lý upload ảnh
@@ -83,115 +87,102 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
 
       try {
         final futures = await Future.wait([
-          if (state.idCardImages['imageIDCardFront'] != null)
+          if (state.infoStep2['contact_card_id_image_front'] != null)
             StoreRepo().uploadImage(
-                (state.idCardImages['imageIDCardFront'] as XFile).path,
+                (state.infoStep2['contact_card_id_image_front'] as XFile).path,
                 'image_cccd_before'),
-          if (state.idCardImages['imageIDCardBack'] != null)
+          if (state.infoStep2['contact_card_id_image_back'] != null)
             StoreRepo().uploadImage(
-                (state.idCardImages['imageIDCardBack'] as XFile).path,
+                (state.infoStep2['contact_card_id_image_back'] as XFile).path,
                 'image_cccd_after'),
-          if (state.idCardImages['imageBusinessLicense'] != null)
+          if (state.infoStep2['contact_image_license'] != null)
             StoreRepo().uploadImage(
-                (state.idCardImages['imageBusinessLicense'] as XFile).path,
+                (state.infoStep2['contact_image_license'] as XFile).path,
                 'image_license_before'),
-          if (state.idCardImages['imageRelatedDocument'] != null)
+          if (state.infoStep2['contact_documents'] != null)
             StoreRepo().uploadImage(
-                (state.idCardImages['imageRelatedDocument'] as XFile).path,
+                (state.infoStep2['contact_documents'] as XFile).path,
                 'image_license_after'),
-          if (state.detailInfos['avatarImage'] != null)
+          if (state.infoStep3['avatar_image'] != null)
             StoreRepo().uploadImage(
-                (state.detailInfos['avatarImage'] as XFile).path,
+                (state.infoStep3['avatar_image'] as XFile).path,
                 'image_avatar'),
-          if (state.detailInfos['coverImage'] != null)
+          if (state.infoStep3['banner_images'] != null)
             StoreRepo().uploadImage(
-                (state.detailInfos['coverImage'] as XFile).path, 'image_cover'),
-          if (state.detailInfos['facadeImage'] != null)
+                (state.infoStep3['banner_images'] as XFile).path,
+                'image_cover'),
+          if (state.infoStep3['facade_image'] != null)
             StoreRepo().uploadImage(
-                (state.detailInfos['facadeImage'] as XFile).path,
+                (state.infoStep3['facade_image'] as XFile).path,
                 'image_facade'),
         ]);
 
         // Lưu URL của các ảnh đã upload
         int index = 0;
-        if (state.idCardImages['imageIDCardFront'] != null) {
+        if (state.infoStep2['contact_card_id_image_front'] != null) {
           if (futures[index].isSuccess) {
             urlImage_cccd_before = futures[index].data;
           }
           index++;
         }
-        if (state.idCardImages['imageIDCardBack'] != null) {
+        if (state.infoStep2['contact_card_id_image_back'] != null) {
           if (futures[index].isSuccess) {
             urlImage_cccd_after = futures[index].data;
           }
           index++;
         }
-        if (state.idCardImages['imageBusinessLicense'] != null) {
+        if (state.infoStep2['contact_image_license'] != null) {
           if (futures[index].isSuccess) {
             urlImage_license = futures[index].data;
           }
           index++;
         }
-        if (state.idCardImages['imageRelatedDocument'] != null) {
+        if (state.infoStep2['contact_documents'] != null) {
           if (futures[index].isSuccess) {
             urlImage_relatedDocument = futures[index].data;
           }
         }
 
-        if (state.detailInfos['avatarImage'] != null) {
+        if (state.infoStep3['avatar_image'] != null) {
           if (futures[index].isSuccess) {
             urlImage_avatar = futures[index].data;
           }
         }
 
-        if (state.detailInfos['coverImage'] != null) {
+        if (state.infoStep3['banner_images'] != null) {
           if (futures[index].isSuccess) {
             urlImage_cover = futures[index].data;
           }
         }
 
-        if (state.detailInfos['facadeImage'] != null) {
+        if (state.infoStep3['facade_image'] != null) {
           if (futures[index].isSuccess) {
             urlImage_facade = futures[index].data;
           }
         }
       } catch (e) {
+        print('Error uploading image: $e');
         emit(state.copyWith(
-          isLoading: false,
-          errorMessage: () => 'Error uploading image: $e',
-        ));
-        return false;
+          isLoading: false         ));
+        processor.value = 'error';
       }
 
-      HereSearchResult? _selectedAddress = state.basicInfo['storeAddress'];
+      HereSearchResult? _selectedAddress = state.infoStep1['address'];
 
       final requestData = {
-        "name": state.basicInfo['storeName'],
-        "type": state.basicInfo['type'].name,
-        "company": "Công ty A",
-        "phone": state.basicInfo['storePhone'],
-        "phone_contact": state.idCardImages['phoneNumber'],
-        "email": state.idCardImages['email'],
-        "cccd": state.idCardImages['id'],
-        "cccd_date": (state.idCardImages['issueDate'] as DateTime)
-            .formatDate(formatType: 'yyyy-MM-dd'),
-        "image": urlImage_avatar,
-        "banner": urlImage_cover,
-        "image_cccd_before": urlImage_cccd_before,
-        "image_cccd_after": urlImage_cccd_after,
-        "image_license": urlImage_license,
-        "images": [urlImage_relatedDocument, urlImage_facade],
-        "tax_code": state.detailInfos['taxCode'],
-        "support_service_id": 1,
-        "support_service_additional_ids": [1],
-        "business_type_ids": [1, 2, 3],
-        "category_ids": [1, 2, 3],
-        "operating_hours": [
-          {
-            "day": 7,
-            "hours": ["10:00", "15:00"]
-          }
-        ],
+        "name": state.infoStep1['name'],
+        "phone": state.infoStep1['phone'],
+        "support_service_id": serviceTypeFoodDelivery,
+        "support_service_additional_ids": [],
+        "business_type_ids": state.infoStep3['business_type_ids'] ?? [],
+        "category_ids": state.infoStep3['category_ids'] ?? [],
+        "operating_hours":
+            (state.infoStep3['operating_hours'] as List<OpeningTimeModel>?)
+                ?.map((e) => {
+                      "day": e.dayNumber,
+                      "hours": [e.openTime, e.closeTime]
+                    })
+                .toList(),
         "address": _selectedAddress?.address?.label,
         "lat": _selectedAddress?.position?.lat,
         "lng": _selectedAddress?.position?.lng,
@@ -201,6 +192,20 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         "state": _selectedAddress?.address?.state,
         "country": _selectedAddress?.address?.countryName,
         "country_code": _selectedAddress?.address?.countryCode,
+        "contact_phone": state.infoStep2['contact_phone'],
+        "contact_email": state.infoStep2['contact_email'],
+        "contact_card_id": state.infoStep2['contact_card_id'],
+        "contact_card_id_issue_date":
+            (state.infoStep2['contact_card_id_issue_date'] as DateTime)
+                .formatDate(formatType: 'yyyy-MM-dd'),
+        "avatar_image": urlImage_avatar,
+        "banner_images": [urlImage_cover],
+        "contact_card_id_image_front": urlImage_cccd_before,
+        "contact_card_id_image_back": urlImage_cccd_after,
+        "license_image": urlImage_license,
+        "facade_image": urlImage_facade,
+        "related_documents": [urlImage_relatedDocument],
+        "tax_code": state.infoStep3['contact_tax'],
       };
 
       final response = await StoreRepo().createStore(requestData);
@@ -209,21 +214,18 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         authCubit.fetchStores(isRedirect: true);
 
         emit(state.copyWith(isLoading: false));
-        return true;
+        processor.value = 'success';
       } else {
         emit(state.copyWith(
-          isLoading: false,
-          errorMessage: () => response.msg,
-        ));
-        return false;
+          isLoading: false         ));
+        processor.value = 'error';
       }
     } catch (e) {
       print('Error updating profile: $e');
       emit(state.copyWith(
-        isLoading: false,
-        errorMessage: () => 'Error updating profile: $e',
+        isLoading: false
       ));
-      return false;
+      processor.value = 'error';
     }
   }
 }

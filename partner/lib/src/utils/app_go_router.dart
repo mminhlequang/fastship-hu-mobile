@@ -1,4 +1,3 @@
-import 'package:app/src/presentation/create_store/create_store_screen.dart';
 import 'package:app/src/presentation/detail_order/detail_order_screen.dart';
 import 'package:app/src/presentation/help_center/help_center_screen.dart';
 import 'package:app/src/presentation/menu/menu_screen.dart';
@@ -20,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../network_resources/models/opening_time_model.dart';
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
@@ -27,9 +27,21 @@ import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
 import 'app_get.dart';
 
-GlobalKey<NavigatorState> get appNavigatorKey => findInstance<GlobalKey<NavigatorState>>();
+GlobalKey<NavigatorState> get appNavigatorKey =>
+    findInstance<GlobalKey<NavigatorState>>();
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
+
+clearAllRouters([String? router]) {
+  try {
+    while (appContext.canPop() == true) {
+      appContext.pop();
+    }
+  } catch (_) {}
+  if (router != null) {
+    appContext.pushReplacement(router);
+  }
+}
 
 final goRouter = GoRouter(
   navigatorKey: appNavigatorKey,
@@ -63,8 +75,8 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/opening-time',
-          builder: (context, state) =>   WidgetOpeningTime(
-            initialData: state.extra as List?,
+          builder: (context, state) => OpeningTimeScreen(
+            initialData: state.extra as List<OpeningTimeModel>?,
           ),
         ),
         GoRoute(
@@ -72,17 +84,12 @@ final goRouter = GoRouter(
           builder: (context, state) => WidgetBusinessType(
             initialData: state.extra as List<int>?,
           ),
- 
-        ),
-        GoRoute(
-          path: '/merchant-onboarding',
-          builder: (context, state) => const MerchantOnboardingScreen(),
-        ),
-        GoRoute(
-          path: '/create-store',
-          builder: (context, state) => const CreateStoreScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/merchant-onboarding',
+      builder: (context, state) => const MerchantOnboardingScreen(),
     ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,
@@ -106,15 +113,18 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/add-category',
-          builder: (context, state) => WidgetAddCategory(category: state.extra as CategoryModel?),
+          builder: (context, state) =>
+              WidgetAddCategory(category: state.extra as CategoryModel?),
         ),
         GoRoute(
           path: '/add-dish',
-          builder: (context, state) => WidgetAddDish(dish: state.extra as String?),
+          builder: (context, state) =>
+              WidgetAddDish(dish: state.extra as String?),
         ),
         GoRoute(
           path: '/add-topping',
-          builder: (context, state) => WidgetAddTopping(topping: state.extra as String?),
+          builder: (context, state) =>
+              WidgetAddTopping(topping: state.extra as String?),
         ),
         GoRoute(
           path: '/add-option',
@@ -125,7 +135,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const DetailOrderScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 300),
@@ -136,7 +147,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const MyProfileScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 300),
@@ -147,7 +159,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const StoreSettingsScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 300),
@@ -159,7 +172,8 @@ final goRouter = GoRouter(
               pageBuilder: (context, state) => CustomTransitionPage(
                 key: state.pageKey,
                 child: const InformationScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   return SlideTransition(
                     position: animation.drive(
                       Tween<Offset>(
@@ -180,7 +194,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const OrderSettingsScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 300),
@@ -191,7 +206,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const HelpCenterScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 300),
@@ -202,7 +218,8 @@ final goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const OpeningHoursScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return SlideTransition(
                 position: animation.drive(
                   Tween<Offset>(

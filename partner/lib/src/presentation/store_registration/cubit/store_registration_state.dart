@@ -12,9 +12,9 @@ class StoreRegistrationState extends Equatable {
   final bool acceptTerms;
 
   // Lưu thông tin từ provide_info_screen
-  final Map<String, dynamic> basicInfo;
-  final Map<String, dynamic> idCardImages;
-  final Map<String, dynamic> detailInfos;
+  final Map<String, dynamic> infoStep1;
+  final Map<String, dynamic> infoStep2;
+  final Map<String, dynamic> infoStep3;
 
   // Trạng thái làm việc
   final bool isLoading;
@@ -28,9 +28,9 @@ class StoreRegistrationState extends Equatable {
     this.selectedService = 0,
     this.hasAlcohol = false,
     this.acceptTerms = kDebugMode,
-    this.basicInfo = const {},
-    this.idCardImages = const {},
-    this.detailInfos = const {},
+    this.infoStep1 = const {},
+    this.infoStep2 = const {},
+    this.infoStep3 = const {},
     this.isLoading = false,
     this.errorMessage,
   });
@@ -41,41 +41,45 @@ class StoreRegistrationState extends Equatable {
   bool get isEnableProvideInfoContinue {
     switch (currentStep2) {
       case 1:
-        print('basicInfo: ${basicInfo}');
-        return _notNullAndNotEmpty(basicInfo['storeName']) &&
-            _notNullAndNotEmpty(basicInfo['storePhone']) &&
-            basicInfo['storeAddress'] != null;
+        print('infoStep1: ${infoStep1}');
+        return _notNullAndNotEmpty(infoStep1['name'], requiredLength: 5) &&
+            _notNullAndNotEmpty(infoStep1['phone'], requiredLength: 10) &&
+            infoStep1['address'] != null;
       case 2:
+        print('infoStep2: ${infoStep2}');
         var isEnable = false;
-        switch (idCardImages['type']) {
+        switch (infoStep2['contact_type']) {
           case RepresentativeType.individual:
-            isEnable = _notNullAndNotEmpty(idCardImages['name']) &&
-                _notNullAndNotEmpty(idCardImages['email']) &&
-                _notNullAndNotEmpty(idCardImages['phoneNumber']) &&
-                _notNullAndNotEmpty(idCardImages['id']) &&
-                idCardImages['issueDate'] != null &&
-                _notNullAndNotEmpty(idCardImages['taxCode']) &&
-                idCardImages['imageIDCardFront'] != null &&
-                idCardImages['imageIDCardBack'] != null &&
-                idCardImages['imageBusinessLicense'] != null;
+            isEnable = _notNullAndNotEmpty(infoStep2['contact_full_name'],
+                    requiredLength: 5) &&
+                _notNullAndNotEmpty(infoStep2['contact_email']) &&
+                _notNullAndNotEmpty(infoStep2['contact_phone']) &&
+                _notNullAndNotEmpty(infoStep2['contact_card_id'],
+                    requiredLength: 6) &&
+                infoStep2['contact_card_id_issue_date'] != null &&
+                _notNullAndNotEmpty(infoStep2['contact_tax']) &&
+                infoStep2['contact_card_id_image_front'] != null &&
+                infoStep2['contact_card_id_image_back'] != null &&
+                infoStep2['contact_image_license'] != null;
           case RepresentativeType.householdBusiness:
             isEnable = true;
           case RepresentativeType.enterprise:
             isEnable = true;
         }
+        print('isEnable: $isEnable');
         return isEnable;
       case 3:
-        print('detailInfos: ${detailInfos}');
-        return detailInfos['avatarImage'] != null &&
-            detailInfos['coverImage'] != null &&
-            detailInfos['facadeImage'] != null;
+        print('infoStep3: ${infoStep3}');
+        return infoStep3['avatar_image'] != null &&
+            infoStep3['banner_images'] != null &&
+            infoStep3['facade_image'] != null;
       default:
         return true;
     }
   }
 
-  bool _notNullAndNotEmpty(String? value) {
-    return value != null && value.isNotEmpty;
+  bool _notNullAndNotEmpty(String? value, {int requiredLength = 0}) {
+    return value != null && value.isNotEmpty && value.length >= requiredLength;
   }
 
   StoreRegistrationState copyWith({
@@ -86,11 +90,10 @@ class StoreRegistrationState extends Equatable {
     int? selectedService,
     bool? hasAlcohol,
     bool? acceptTerms,
-    Map<String, dynamic>? basicInfo,
-    Map<String, dynamic>? idCardImages,
-    Map<String, dynamic>? detailInfos,
+    Map<String, dynamic>? infoStep1,
+    Map<String, dynamic>? infoStep2,
+    Map<String, dynamic>? infoStep3,
     bool? isLoading,
-    String? Function()? errorMessage,
   }) {
     return StoreRegistrationState(
       totalStep1: totalStep1 ?? this.totalStep1,
@@ -100,11 +103,10 @@ class StoreRegistrationState extends Equatable {
       selectedService: selectedService ?? this.selectedService,
       hasAlcohol: hasAlcohol ?? this.hasAlcohol,
       acceptTerms: acceptTerms ?? this.acceptTerms,
-      basicInfo: basicInfo ?? this.basicInfo,
-      idCardImages: idCardImages ?? this.idCardImages,
-      detailInfos: detailInfos ?? this.detailInfos,
+      infoStep1: infoStep1 ?? this.infoStep1,
+      infoStep2: infoStep2 ?? this.infoStep2,
+      infoStep3: infoStep3 ?? this.infoStep3,
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
     );
   }
 
@@ -117,9 +119,9 @@ class StoreRegistrationState extends Equatable {
         selectedService,
         hasAlcohol,
         acceptTerms,
-        basicInfo,
-        idCardImages,
-        detailInfos,
+        infoStep1,
+        infoStep2,
+        infoStep3,
         isLoading,
         errorMessage
       ];

@@ -1,5 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/models/opening_time_model.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:app/src/presentation/widgets/widget_app_upload_image.dart';
 import 'package:app/src/utils/app_go_router.dart';
@@ -30,9 +31,9 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   XFile? _avatarImage;
   XFile? _coverImage;
   XFile? _facadeImage;
-  List? _openTimes;
-  List<String>? _businessTypes;
-  List<String> _categories = [];
+  List<OpeningTimeModel>? _openTimes;
+  List<int>? _businessTypes;
+  List<int>? _categories;
 
   @override
   void initState() {
@@ -41,12 +42,13 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
   }
 
   void _initData() {
-    _avatarImage = widget.initialData['avatarImage'];
-    _coverImage = widget.initialData['coverImage'];
-    _facadeImage = widget.initialData['facadeImage'];
-    _openTimes = widget.initialData['openingTime'];
-    _businessTypes = widget.initialData['serviceType'];
-    _categories = List<String>.from(widget.initialData['categories'] ?? []);
+    _avatarImage = widget.initialData['avatar_image'];
+    _coverImage = widget.initialData['banner_images'];
+    _facadeImage = widget.initialData['facade_image'];
+    _openTimes = widget.initialData['operating_hours'] ??
+        OpeningTimeModel.getDefaultOpeningTimes();
+    _businessTypes = widget.initialData['business_type_ids'];
+    _categories = widget.initialData['category_ids'];
 
     // Đảm bảo gọi onChanged ngay lần đầu nếu có dữ liệu initial
     if (widget.initialData.isNotEmpty) {
@@ -56,12 +58,12 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
 
   void _updateData() {
     widget.onChanged({
-      'avatarImage': _avatarImage,
-      'coverImage': _coverImage,
-      'facadeImage': _facadeImage,
-      'openingTime': _openTimes,
-      'serviceType': _businessTypes,
-      'categories': _categories,
+      'avatar_image': _avatarImage,
+      'banner_images': _coverImage,
+      'facade_image': _facadeImage,
+      'operating_hours': _openTimes,
+      'business_type_ids': _businessTypes,
+      'category_ids': _categories,
     });
   }
 
@@ -138,6 +140,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
               route: '/opening-time',
               extra: _openTimes,
               onReturn: (value) {
+                print('value: $value');
                 if (value != null) {
                   setState(() {
                     _openTimes = value;
@@ -165,11 +168,10 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
               title: 'Categories'.tr(),
               route: '/provide-info/cuisine',
               extra: _categories,
-
               onReturn: (value) {
                 if (value != null) {
                   setState(() {
-                    _categories = List<String>.from(value);
+                    _categories = value;
                   });
                   _updateData();
                 }
@@ -192,6 +194,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
     return WidgetRippleButton(
       onTap: () async {
         final result = await appContext.push(route, extra: extra);
+        print('result: $result');
         onReturn(result);
       },
       color: Colors.white,

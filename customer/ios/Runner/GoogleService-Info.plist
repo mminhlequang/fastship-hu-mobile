@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.devfastshiphu.customer</string>
+	<string>com.fastshiphu.customer</string>
 	<key>PROJECT_ID</key>
 	<string>fastshiphu-1ac6c</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:938800403743:ios:c66a049448302b72268c2a</string>
+	<string>1:938800403743:ios:b62b01227a16ba3c268c2a</string>
 </dict>
 </plist>

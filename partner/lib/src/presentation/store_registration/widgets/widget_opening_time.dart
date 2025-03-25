@@ -1,20 +1,25 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/models/opening_time_model.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 
-class WidgetOpeningTime extends StatefulWidget {
-  final List? initialData;
-  const WidgetOpeningTime({super.key, this.initialData});
+class OpeningTimeScreen extends StatefulWidget {
+  final List<OpeningTimeModel>? initialData;
+  const OpeningTimeScreen({super.key, this.initialData});
 
   @override
-  State<WidgetOpeningTime> createState() => _WidgetOpeningTimeState();
+  State<OpeningTimeScreen> createState() => _OpeningTimeScreenState();
 }
 
-class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
+class _OpeningTimeScreenState extends State<OpeningTimeScreen> {
+  late List<OpeningTimeModel>? openingTimes = widget.initialData;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +34,8 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
         actions: [
           TextButton(
             onPressed: () {
-              // Todo:
+              appHaptic();
+              context.pop(openingTimes);
             },
             child: Text(
               'Save'.tr(),
@@ -45,7 +51,14 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(16.sw),
-              child: const WidgetOpeningTime(),
+              child: WidgetOpeningTime(
+                initialData: widget.initialData,
+                onChanged: (value) {
+                  setState(() {
+                    openingTimes = value;
+                  });
+                },
+              ),
             ),
           ),
         ],

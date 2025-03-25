@@ -86,8 +86,22 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
   void initState() {
     super.initState();
     if (widget.initialData != null) {
-      _imageIDCardFront = widget.initialData!['imageIDCardFront'];
-      _imageIDCardBack = widget.initialData!['imageIDCardBack'];
+      type = RepresentativeType.values.byName(
+          widget.initialData!['contact_type'] ??
+              RepresentativeType.individual.name);
+      _nameController.text = widget.initialData!['contact_full_name'] ?? '';
+      _emailController.text = widget.initialData!['contact_email'] ?? '';
+      _phoneNumber = PhoneNumber(
+          isoCode: widget.initialData!['contact_phone_iso_code'],
+          phoneNumber: widget.initialData!['contact_phone'],
+          dialCode: widget.initialData!['contact_phone_dial_code']);
+      _imageIDCardFront = widget.initialData!['contact_card_id_image_front'];
+      _imageIDCardBack = widget.initialData!['contact_card_id_image_back'];
+      _imageBusinessLicense = widget.initialData!['contact_image_license'];
+      _imageRelatedDocument = widget.initialData!['contact_documents'];
+      _idController.text = widget.initialData!['contact_card_id'] ?? '';
+      _issueDate = widget.initialData!['contact_card_id_issue_date'];
+      _taxCodeController.text = widget.initialData!['contact_tax'] ?? '';
     }
   }
 
@@ -118,17 +132,19 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
 
   _onChanged() {
     Map<String, dynamic> data = {
-      'type': type,
-      'name': _nameController.text,
-      'email': _emailController.text,
-      'phoneNumber': _phoneNumber?.phoneNumber,
-      'id': _idController.text,
-      'issueDate': _issueDate,
-      'taxCode': _taxCodeController.text,
-      'imageIDCardFront': _imageIDCardFront,
-      'imageIDCardBack': _imageIDCardBack,
-      'imageBusinessLicense': _imageBusinessLicense,
-      'imageRelatedDocument': _imageRelatedDocument,
+      'contact_type': type,
+      'contact_full_name': _nameController.text,
+      'contact_email': _emailController.text,
+      'contact_phone': _phoneNumber?.phoneNumber,
+      'contact_phone_iso_code': _phoneNumber?.isoCode,
+      'contact_phone_dial_code': _phoneNumber?.dialCode,
+      'contact_card_id': _idController.text,
+      'contact_card_id_issue_date': _issueDate,
+      'contact_tax': _taxCodeController.text,
+      'contact_card_id_image_front': _imageIDCardFront,
+      'contact_card_id_image_back': _imageIDCardBack,
+      'contact_image_license': _imageBusinessLicense,
+      'contact_documents': _imageRelatedDocument,
     };
     if (type == RepresentativeType.individual) {
     } else if (type == RepresentativeType.householdBusiness) {
@@ -142,24 +158,6 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
         'enterpriseAddress': _enterpriseAddressController.text,
       });
     }
-    // {
-    //   'type': type,
-    //   'name': _nameController.text,
-    //   'email': _emailController.text,
-    //   'phoneNumber': _phoneNumber?.phoneNumber,
-    //   'id': _idController.text,
-    //   'issueDate': _issueDate,
-    //   'taxCode': _taxCodeController.text,
-    //   'businessName': _businessNameController.text,
-    //   'businessAddress': _businessAddressController.text,
-    //   'enterpriseName': _enterpriseNameController.text,
-    //   'enterpriseAddress': _enterpriseAddressController.text,
-    //   'imageIDCardFront': _imageIDCardFront,
-    //   'imageIDCardBack': _imageIDCardBack,
-    //   'imageBusinessLicense': _imageBusinessLicense,
-    //   'imageTaxCode': _imageTaxCode,
-    //   'imageRelatedDocument': _imageRelatedDocument,
-    // }
 
     widget.onChanged(data);
   }
@@ -168,51 +166,6 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
     appHaptic();
     appOpenBottomSheet(
       WidgetBottomSheetGuideTakePhoto(),
-    );
-  }
-
-  Future<void> _pickImage(
-      ImageSource source, Function(XFile) onImagePicked) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: source);
-      if (image != null) {
-        onImagePicked(image);
-        _onChanged();
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
-    }
-  }
-
-  void _showImageSourceOptions(Function(XFile) onImagePicked) {
-    appHaptic();
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: Text('Take a photo'.tr()),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera, onImagePicked);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: Text('Choose from gallery'.tr()),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery, onImagePicked);
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 

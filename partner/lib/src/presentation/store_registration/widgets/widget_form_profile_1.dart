@@ -20,7 +20,7 @@ class WidgetFormProfile1 extends StatefulWidget {
 }
 
 class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
-  final TextEditingController _storeNameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   HereSearchResult? _selectedAddress;
   PhoneNumber? _phoneNumber;
@@ -29,31 +29,31 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
   void initState() {
     super.initState();
     if (widget.initialData != null) {
-      _storeNameController.text = widget.initialData!['storeName'] ?? '';
+      _nameController.text = widget.initialData!['name'] ?? '';
       _phoneNumber = PhoneNumber(
-          isoCode: widget.initialData!['storePhoneIsoCode'],
-          phoneNumber: widget.initialData!['storePhone'],
-          dialCode: widget.initialData!['storePhoneDialCode']);
+          isoCode: widget.initialData!['phoneIsoCode'],
+          phoneNumber: widget.initialData!['phone'],
+          dialCode: widget.initialData!['phoneDialCode']);
       _addressController.text =
-          (widget.initialData!['storeAddress'] as HereSearchResult?)?.title ??
+          (widget.initialData!['address'] as HereSearchResult?)?.title ??
               "";
     }
   }
 
   @override
   void dispose() {
-    _storeNameController.dispose();
+    _nameController.dispose();
     _addressController.dispose();
     super.dispose();
   }
 
   _onChanged() {
     widget.onChanged({
-      'storeName': _storeNameController.text,
-      'storePhone': _phoneNumber?.phoneNumber,
-      'storePhoneIsoCode': _phoneNumber?.isoCode,
-      'storePhoneDialCode': _phoneNumber?.dialCode,
-      'storeAddress': _selectedAddress,
+      'name': _nameController.text,
+      'phone': _phoneNumber?.phoneNumber,
+      'phoneIsoCode': _phoneNumber?.isoCode,
+      'phoneDialCode': _phoneNumber?.dialCode,
+      'address': _selectedAddress,
     });
   }
 
@@ -66,7 +66,7 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
         mainAxisSize: MainAxisSize.min,
         children: [
           AppTextField(
-            controller: _storeNameController,
+            controller: _nameController,
             title: 'Store name'.tr(),
             hintText: 'Enter store name'.tr(),
             onChanged: (_) => _onChanged(),

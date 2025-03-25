@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.devfastshiphu.partner"
+    namespace = "com.fastshiphu.partner"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
@@ -26,7 +26,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.devfastshiphu.partner"
+        applicationId = "com.fastshiphu.partner"
         minSdk = 23
         targetSdk = 35
         versionCode = flutter.versionCode

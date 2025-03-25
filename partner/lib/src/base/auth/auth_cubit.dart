@@ -82,8 +82,13 @@ class AuthCubit extends Cubit<AuthState> {
       emit(state.update());
     }
     if (isRedirect) {
-      appContext.pushReplacement('/merchant-onboarding');
+      clearAllRouters('/merchant-onboarding');
     }
+  }
+
+  setStore(StoreModel store) {
+    state.store = store;
+    emit(state.update());
   }
 
   logout() async {
@@ -115,12 +120,14 @@ class AuthState {
 
   MyWallet? wallet;
   List<StoreModel>? stores;
+  StoreModel? store;
 
   AuthState({
     this.stateType = AuthStateType.none,
     this.user,
     this.wallet,
     this.stores,
+    this.store,
   });
 
   AuthState update({
@@ -128,12 +135,14 @@ class AuthState {
     AccountModel? user,
     MyWallet? wallet,
     List<StoreModel>? stores,
+    StoreModel? store,
   }) {
     return AuthState(
       stateType: stateType ?? this.stateType,
       user: user ?? this.user,
       wallet: wallet ?? this.wallet,
       stores: stores ?? this.stores,
+      store: store ?? this.store,
     );
   }
 }

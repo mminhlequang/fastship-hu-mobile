@@ -1,4 +1,5 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/models/opening_time_model.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +8,19 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widget_ripple_button.dart';
+import 'package:intl/intl.dart';
 
 class WidgetOpeningTime extends StatefulWidget {
-  const WidgetOpeningTime({super.key});
+  final List<OpeningTimeModel>? initialData;
+  final Function(List<OpeningTimeModel>)? onChanged;
+  const WidgetOpeningTime({super.key, this.initialData, this.onChanged});
 
   @override
   State<WidgetOpeningTime> createState() => _WidgetOpeningTimeState();
 }
 
 class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
+  late List<OpeningTimeModel> openingTimes;
   final _monday = ValueNotifier<bool>(false);
   final _tuesday = ValueNotifier<bool>(true);
   final _wednesday = ValueNotifier<bool>(true);
@@ -23,6 +28,43 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
   final _friday = ValueNotifier<bool>(true);
   final _saturday = ValueNotifier<bool>(true);
   final _sunday = ValueNotifier<bool>(true);
+
+  @override
+  void initState() {
+    super.initState();
+    openingTimes = OpeningTimeModel.getDefaultOpeningTimes();
+    _initializeValueNotifiers();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      widget.onChanged?.call(openingTimes);
+    });
+  }
+
+  void _initializeValueNotifiers() {
+    _monday.value = openingTimes[0].isOpen;
+    _tuesday.value = openingTimes[1].isOpen;
+    _wednesday.value = openingTimes[2].isOpen;
+    _thursday.value = openingTimes[3].isOpen;
+    _friday.value = openingTimes[4].isOpen;
+    _saturday.value = openingTimes[5].isOpen;
+    _sunday.value = openingTimes[6].isOpen;
+  }
+
+  void updateOpeningTime(int index, String field, dynamic value) {
+    setState(() {
+      switch (field) {
+        case 'isOpen':
+          openingTimes[index].isOpen = value;
+          break;
+        case 'openTime':
+          openingTimes[index].openTime = value;
+          break;
+        case 'closeTime':
+          openingTimes[index].closeTime = value;
+          break;
+      }
+    });
+    widget.onChanged?.call(openingTimes);
+  }
 
   @override
   void dispose() {
@@ -66,6 +108,7 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
   }
 
   Widget _oneDay(String day, ValueNotifier<bool> notifier) {
+    final index = openingTimes.indexWhere((element) => element.day == day);
     return Padding(
       padding: EdgeInsets.only(bottom: 13.sw),
       child: Row(
@@ -82,6 +125,7 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                   inactiveColor: hexColor('#E2E2EF'),
                   onChanged: (value) {
                     notifier.value = value;
+                    updateOpeningTime(index, 'isOpen', value);
                   },
                 ),
                 Gap(9.sw),
@@ -105,9 +149,13 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                             child: WidgetRippleButton(
                               onTap: () {
                                 appOpenTimePicker(
-                                  DateTime.now().copyWith(hour: 5, minute: 0),
+                                  string2DateTime(openingTimes[index].openTime,
+                                      format: 'HH:mm'),
                                   (date) {
-                                    // Todo:
+                                    final timeString =
+                                        DateFormat('HH:mm').format(date);
+                                    updateOpeningTime(
+                                        index, 'openTime', timeString);
                                   },
                                 );
                               },
@@ -117,7 +165,7 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                                 height: 25.sw,
                                 child: Center(
                                   child: Text(
-                                    '5:00AM'.tr(),
+                                    openingTimes[index].openTime + 'AM'.tr(),
                                     style: w400TextStyle(),
                                   ),
                                 ),
@@ -134,9 +182,13 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                             child: WidgetRippleButton(
                               onTap: () {
                                 appOpenTimePicker(
-                                  DateTime.now().copyWith(hour: 23, minute: 0),
+                                  string2DateTime(openingTimes[index].closeTime,
+                                      format: 'HH:mm'),
                                   (date) {
-                                    // Todo:
+                                    final timeString =
+                                        DateFormat('HH:mm').format(date);
+                                    updateOpeningTime(
+                                        index, 'closeTime', timeString);
                                   },
                                 );
                               },
@@ -146,7 +198,7 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                                 height: 25.sw,
                                 child: Center(
                                   child: Text(
-                                    '23:00PM'.tr(),
+                                    openingTimes[index].closeTime + 'PM'.tr(),
                                     style: w400TextStyle(),
                                   ),
                                 ),
@@ -156,7 +208,8 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
                         ],
                       )
                     : Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.sw, vertical: 4.sw),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.sw, vertical: 4.sw),
                         decoration: BoxDecoration(
                           color: appColorBackground,
                           borderRadius: BorderRadius.circular(4.sw),

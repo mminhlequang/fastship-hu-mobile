@@ -47,12 +47,14 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
   void initState() {
     super.initState();
     _selectedDateTime = widget.initialDateTime ?? DateTime.now();
-    
+
     // Đảm bảo ngày được chọn nằm trong khoảng cho phép
-    if (widget.minimumDate != null && _selectedDateTime.isBefore(widget.minimumDate!)) {
+    if (widget.minimumDate != null &&
+        _selectedDateTime.isBefore(widget.minimumDate!)) {
       _selectedDateTime = widget.minimumDate!;
     }
-    if (widget.maximumDate != null && _selectedDateTime.isAfter(widget.maximumDate!)) {
+    if (widget.maximumDate != null &&
+        _selectedDateTime.isAfter(widget.maximumDate!)) {
       _selectedDateTime = widget.maximumDate!;
     }
   }
@@ -120,9 +122,7 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
         minimumDate: widget.minimumDate,
         maximumDate: widget.maximumDate,
         onDateTimeChanged: (DateTime newDateTime) {
-          setState(() {
-            _selectedDateTime = newDateTime;
-          });
+          _selectedDateTime = newDateTime;
         },
       ),
     );
@@ -185,12 +185,12 @@ class WidgetBottomPickTime extends StatefulWidget {
 
 class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
   late DateTime _time;
-  
+
   @override
   void initState() {
     super.initState();
     _time = widget.time ?? DateTime.now();
-    
+
     // Đảm bảo thời gian được chọn nằm trong khoảng cho phép
     if (widget.minimumDate != null && _time.isBefore(widget.minimumDate!)) {
       _time = widget.minimumDate!;
@@ -206,20 +206,21 @@ class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
       title: widget.title,
       enableSafeArea: true,
       actions: [
-        WidgetRippleButton(
-          onTap: appContext.pop,
-          borderSide: BorderSide(color: appColorPrimary),
-          child: SizedBox(
-            height: 48.sw,
-            child: Center(
-              child: Text(
-                'Cancel'.tr(),
-                style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
-              ),
+        WidgetInkWellTransparent(
+          onTap: () {
+            appHaptic();
+            appContext.pop();
+          },
+          enableInkWell: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              'Cancel'.tr(),
+              style: w400TextStyle(color: appColorText),
             ),
           ),
         ),
-        WidgetRippleButton(
+        WidgetInkWellTransparent(
           onTap: () => appContext.pop(DateTime(
             _time.year,
             _time.month,
@@ -227,14 +228,12 @@ class _WidgetBottomPickTimeState extends State<WidgetBottomPickTime> {
             _time.hour,
             _time.minute,
           )),
-          color: appColorPrimary,
-          child: SizedBox(
-            height: 48.sw,
-            child: Center(
-              child: Text(
-                'Confirm'.tr(),
-                style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
-              ),
+          enableInkWell: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Text(
+              'Save'.tr(),
+              style: w400TextStyle(color: appColorPrimary),
             ),
           ),
         ),

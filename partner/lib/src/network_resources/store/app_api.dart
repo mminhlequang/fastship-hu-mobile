@@ -35,7 +35,7 @@ abstract class MyAppApi {
   Future<NetworkResponse> createStore(Map<String, dynamic> data);
   Future<NetworkResponse> updateStore(Map<String, dynamic> data);
   Future<NetworkResponse> deleteStore(int id);
-  Future<NetworkResponse> uploadImage(dynamic imageFile);
+  Future<NetworkResponse> uploadImage(dynamic filePath);
   Future<NetworkResponse> ratingStore(Map<String, dynamic> data);
   Future<NetworkResponse> replyRating(Map<String, dynamic> data);
   Future<NetworkResponse> favoriteStore(int id);
@@ -149,7 +149,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.createStore(), data: data);
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => StoreModel.fromJson(json),
+          value: response.data['status'] == true,
         );
       },
     );
@@ -185,18 +185,18 @@ class MyAppApiImp extends MyAppApi {
   }
 
   @override
-  Future<NetworkResponse> uploadImage(dynamic imageFile) async {
+  Future<NetworkResponse> uploadImage(dynamic filePath) async {
     return await handleNetworkError(
       proccess: () async {
         FormData formData = FormData.fromMap({
-          'image': await MultipartFile.fromFile(imageFile.path),
+          'image': await MultipartFile.fromFile(filePath, filename: filePath),
+          // 'type': type,
         });
+
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
         ).post(_MyAppEndpoint.uploadImage(), data: formData);
-        return NetworkResponse.fromResponse(
-          response,
-        );
+        return NetworkResponse.fromResponse(response);
       },
     );
   }
