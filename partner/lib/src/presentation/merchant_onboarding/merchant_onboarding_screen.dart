@@ -132,7 +132,7 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
                     children: [
                       Text(
                         'Bánh cuốn Hồng Liên',
-                        style: w600TextStyle(fontSize: 16.sw, color: hexColor('#4F4F4F')),
+                        style: w600TextStyle(fontSize: 16.sw, color: grey10),
                       ),
                       Gap(4.sw),
                       Text(

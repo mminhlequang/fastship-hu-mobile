@@ -126,7 +126,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               Gap(4.sw),
                               Text(
                                 'You have a new order. ID: 987-4323234',
-                                style: w400TextStyle(fontSize: 12.sw, color: hexColor('#4F4F4F')),
+                                style: w400TextStyle(fontSize: 12.sw, color: grey10),
                               ),
                               Gap(4.sw),
                               Text(
@@ -200,7 +200,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               Gap(4.sw),
                               Text(
                                 'You have a new order. ID: 987-4323234',
-                                style: w400TextStyle(fontSize: 12.sw, color: hexColor('#4F4F4F')),
+                                style: w400TextStyle(fontSize: 12.sw, color: grey10),
                               ),
                               Gap(4.sw),
                               Text(
@@ -274,7 +274,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               Gap(4.sw),
                               Text(
                                 'You have a new order. ID: 987-4323234',
-                                style: w400TextStyle(fontSize: 12.sw, color: hexColor('#4F4F4F')),
+                                style: w400TextStyle(fontSize: 12.sw, color: grey10),
                               ),
                               Gap(4.sw),
                               Text(

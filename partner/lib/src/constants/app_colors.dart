@@ -24,6 +24,7 @@ Color get grey6 => AppColors.instance.grey6;
 Color get grey7 => AppColors.instance.grey7;
 Color get grey8 => AppColors.instance.grey8;
 Color get grey9 => AppColors.instance.grey9;
+Color get grey10 => AppColors.instance.grey10;
 Color get yellow1 => AppColors.instance.yellow1;
 Color get orange1 => AppColors.instance.orange1;
 Color get blue1 => AppColors.instance.blue1;
@@ -66,6 +67,8 @@ class AppColors {
   Color get grey8 => appValueByTheme(hexColor('#F2F2F2'));
 
   Color get grey9 => appValueByTheme(hexColor('#BDBDBD'));
+
+  Color get grey10 => appValueByTheme(hexColor('#4F4F4F'));
 
   Color get yellow1 => appValueByTheme(hexColor('#F8C435'));
 

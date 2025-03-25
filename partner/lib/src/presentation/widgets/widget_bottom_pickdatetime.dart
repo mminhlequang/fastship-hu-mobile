@@ -54,37 +54,38 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
       title: widget.title ?? 'Please select date time'.tr(),
       enableSafeArea: true,
       actions: [
-        WidgetInkWellTransparent(
+        WidgetRippleButton(
           onTap: () {
-            appHaptic();
             widget.onCancel?.call();
             appContext.pop();
           },
-          enableInkWell: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Text(
-              'Cancel'.tr(),
-              style: w400TextStyle(color: appColorText),
+          borderSide: BorderSide(color: appColorPrimary),
+          child: SizedBox(
+            height: 48.sw,
+            child: Center(
+              child: Text(
+                'Cancel'.tr(),
+                style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
+              ),
             ),
           ),
         ),
-        WidgetInkWellTransparent(
+        WidgetRippleButton(
           onTap: () {
-            appHaptic();
             widget.onConfirm?.call(_selectedDateTime);
             appContext.pop(_selectedDateTime);
           },
-          enableInkWell: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Text(
-              'Save'.tr(),
-              style: w400TextStyle(color: appColorPrimary),
+          color: appColorPrimary,
+          child: SizedBox(
+            height: 48.sw,
+            child: Center(
+              child: Text(
+                'Confirm'.tr(),
+                style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
+              ),
             ),
           ),
         ),
-        Gap(4),
       ],
       child: _buildPickerContent(),
     );
