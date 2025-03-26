@@ -1,4 +1,5 @@
 import 'package:app/src/base/bloc.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/constants/constants.dart';
@@ -164,7 +165,22 @@ class _NavigationScreenState extends State<NavigationScreen> {
         };
 
         return Scaffold(
-          appBar: AppBar(title: Text(title), titleSpacing: 16.sw),
+          appBar: AppBar(
+            centerTitle: false,
+            title: Text(title),
+            titleSpacing: 16.sw,
+            actionsPadding: EdgeInsets.only(right: 8.sw),
+            actions: [
+              IconButton(
+                onPressed: () => clearAllRouters('/merchant-onboarding'),
+                icon: Icon(
+                  Icons.store_mall_directory_rounded,
+                  size: 28.sw,
+                  color: Colors.white,
+                ),
+              )
+            ],
+          ),
           body: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: _screens[currentIndex],

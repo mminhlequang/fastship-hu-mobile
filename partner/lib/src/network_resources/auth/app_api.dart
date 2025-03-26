@@ -65,8 +65,9 @@ class MyAppApiImp extends MyAppApi {
   Future<NetworkResponse> updatePassword(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response =
-            await AppClient().post(_MyAppEndpoint.updatePassword(), data: data);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.updatePassword(), data: data);
         return NetworkResponse.fromResponse(response);
       },
     );
@@ -102,8 +103,9 @@ class MyAppApiImp extends MyAppApi {
   Future<NetworkResponse> updateProfile(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response =
-            await AppClient().post(_MyAppEndpoint.updateProfile(), data: data);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.updateProfile(), data: data);
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => AccountModel.fromJson(json),
@@ -127,8 +129,9 @@ class MyAppApiImp extends MyAppApi {
   Future<NetworkResponse> updateDeviceToken(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response = await AppClient()
-            .post(_MyAppEndpoint.updateDeviceToken(), data: data);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.updateDeviceToken(), data: data);
         return NetworkResponse.fromResponse(response);
       },
     );
@@ -152,8 +155,9 @@ class MyAppApiImp extends MyAppApi {
   Future<NetworkResponse> deleteAccount() async {
     return await handleNetworkError(
       proccess: () async {
-        Response response =
-            await AppClient().post(_MyAppEndpoint.deleteAccount());
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.deleteAccount());
         return NetworkResponse.fromResponse(response);
       },
     );

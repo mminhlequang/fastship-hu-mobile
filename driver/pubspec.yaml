@@ -12,9 +12,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  firebase_core: 3.12.0
-  firebase_auth: 5.5.0
-  firebase_messaging: ^15.2.3
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
+  firebase_messaging: ^15.2.4
   equatable: ^2.0.7
   bloc: ^9.0.0
   flutter_bloc: ^9.1.0
@@ -67,17 +67,17 @@ dependencies:
   intl_phone_number_input:
     git:
       url: https://github.com/mminhlequang/intl_phone_number_input.git
-      ref: 94f946c518eb10fb5f108d3fb8cd35c8511c7330
+      ref: b3e350246a78404e5349d7ca12ba203905e5fba1
   internal_core:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
       path: core/
-      ref: 0f3159fae9e206028c05b71b9827c1fd00830075
+      ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
   internal_network:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
       path: network/
-      ref: 0f3159fae9e206028c05b71b9827c1fd00830075
+      ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
   progress_bar_steppers:
     path: flutter_steppers
   shimmer: ^3.0.0
