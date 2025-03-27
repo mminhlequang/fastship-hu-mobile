@@ -142,8 +142,7 @@ class ProductApiImp extends ProductApi {
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
         ).post(_ProductEndpoint.uploadImage(), data: formData);
-        return NetworkResponse.fromResponse(response,
-            converter: (json) => json['data']);
+        return NetworkResponse.fromResponse(response);
       },
     );
   }

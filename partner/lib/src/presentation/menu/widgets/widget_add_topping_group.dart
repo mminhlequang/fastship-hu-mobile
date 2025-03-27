@@ -37,7 +37,7 @@ class _WidgetAddToppingGroupState
   late MenuModel? model = widget.model;
 
   List<int> deleteIds = [];
-  late List<ToppingModel> toppings = model?.items ?? [];
+  late List<ToppingModel> toppings = model?.toppings ?? [];
   late final TextEditingController _nameController =
       TextEditingController(text: widget.model?.name ?? '');
 

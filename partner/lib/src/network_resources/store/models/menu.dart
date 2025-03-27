@@ -8,7 +8,7 @@ class MenuModel {
   int? type;
   int? isFeature;
   List<ProductModel>? products;
-  List<ToppingModel>? items;
+  List<ToppingModel>? toppings;
   String? createdAt;
   String? updatedAt;
 
@@ -20,7 +20,7 @@ class MenuModel {
     this.type,
     this.isFeature,
     this.products,
-    this.items,
+    this.toppings,
     this.createdAt,
     this.updatedAt,
   });
@@ -32,16 +32,16 @@ class MenuModel {
     image = json['image'];
     type = json['type'];
     isFeature = json['is_feature'];
-    if (json['products'] != null) {
+    if (json['items'] != null) {
       products = <ProductModel>[];
-      json['products'].forEach((v) {
+      json['items'].forEach((v) {
         products!.add(ProductModel.fromJson(v));
       });
     }
     if (json['items'] != null) {
-      items = <ToppingModel>[];
+      toppings = <ToppingModel>[];
       json['items'].forEach((v) {
-        items!.add(ToppingModel.fromJson(v));
+        toppings!.add(ToppingModel.fromJson(v));
       });
     }
     createdAt = json['created_at'];
@@ -57,10 +57,10 @@ class MenuModel {
     data['type'] = type;
     data['is_feature'] = isFeature;
     if (products != null) {
-      data['products'] = products!.map((v) => v.toJson()).toList();
+      data['items'] = products!.map((v) => v.toJson()).toList();
     }
-    if (items != null) {
-      data['items'] = items!.map((v) => v.toJson()).toList();
+    if (toppings != null) {
+      data['items'] = toppings!.map((v) => v.toJson()).toList();
     }
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;

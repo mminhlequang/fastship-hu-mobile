@@ -130,7 +130,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         'name': _nameController.text,
         'price': currencyFromEditController(_priceController),
         'description': _describeController.text,
-        'image': imageUrl,
+        'image': imageUrl ?? widget.params.model!.image,
         'store_id': authCubit.storeId,
         'category_ids': widget.params.categoryIds,
         "operating_hours": _openTimes

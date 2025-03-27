@@ -9,6 +9,7 @@ import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
@@ -211,8 +212,9 @@ class _MenuScreenState extends State<MenuScreen>
                         children: [
                           WidgetAppImage(
                             imageUrl: product.image ?? '',
-                            width: 48.sw,
-                            height: 48.sw,
+                            width: 52.sw,
+                            height: 52.sw,
+                            radius: 4,
                           ),
                           Gap(8.sw),
                           Expanded(
@@ -223,16 +225,18 @@ class _MenuScreenState extends State<MenuScreen>
                                   product.name ?? '',
                                   style: w400TextStyle(),
                                 ),
-                                Gap(1.sw),
+                                Gap(2.sw),
                                 if (product.description != null) ...[
                                   Text(
                                     product.description!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: w400TextStyle(
                                       fontSize: 10.sw,
                                       color: grey1,
                                     ),
                                   ),
-                                  Gap(1.sw),
+                                  Gap(2.sw),
                                 ],
                                 Text(
                                   '\$${product.price ?? 0}',
@@ -240,6 +244,19 @@ class _MenuScreenState extends State<MenuScreen>
                                 ),
                               ],
                             ),
+                          ),
+                          Gap(8.sw),
+                          AdvancedSwitch(
+                            controller: ValueNotifier<bool>(true),
+                            initialValue: true,
+                            height: 28.sw,
+                            width: 48.sw,
+                            activeColor: appColorPrimary,
+                            inactiveColor: hexColor('#E2E2EF'),
+                            onChanged: (value) {
+                              appHaptic();
+                              setState(() {});
+                            },
                           ),
                         ],
                       ),
@@ -302,7 +319,7 @@ class _MenuScreenState extends State<MenuScreen>
       separatorBuilder: (_, __) => const AppDivider(),
       itemBuilder: (context, index) {
         final m = toppingGroups[index];
-        String text = m.items?.map((e) => e.name).join(', ') ?? '';
+        String text = m.toppings?.map((e) => e.name).join(', ') ?? '';
         return WidgetRippleButton(
           onTap: () async {
             await appContext.push('/add-topping-group', extra: m);
