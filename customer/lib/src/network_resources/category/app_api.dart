@@ -22,7 +22,7 @@ class CategoryApiImp extends CategoryApi {
             await AppClient().get(_CategoryEndpoint.getCategories());
         return NetworkResponse.fromResponse(response,
             converter: (json) =>
-                (json as List).map((e) => Category.fromJson(e)).toList());
+                (json as List).map((e) => CategoryModel.fromJson(e)).toList());
       },
     );
   }

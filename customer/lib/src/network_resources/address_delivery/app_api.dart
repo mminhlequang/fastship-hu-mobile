@@ -1,82 +1,99 @@
+import 'package:app/src/utils/utils.dart';
 import 'package:internal_network/internal_network.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:dio/dio.dart';
 
-import 'model/address_delivery.dart';
+import 'models/models.dart';
 
-class _AddressDeliveryEndpoint {
-  _AddressDeliveryEndpoint._();
-  static String getAll() => "/api/v1/address_delivery";
-  static String getDetail(String id) => "/api/v1/address_delivery/detail/$id";
-  static String create() => "/api/v1/address_delivery/create";
-  static String update() => "/api/v1/address_delivery/update";
-  static String delete() => "/api/v1/address_delivery/delete";
+class _MyAppEndpoint {
+  _MyAppEndpoint._();
+  static String getAddresses() => "/api/v1/address_delivery";
+  static String getAddressDetail() => "/api/v1/address_delivery/detail";
+  static String createAddress() => "/api/v1/address_delivery/create";
+  static String updateAddress() => "/api/v1/address_delivery/update";
+  static String deleteAddress() => "/api/v1/address_delivery/delete";
 }
 
-abstract class AddressDeliveryApi {
-  Future<NetworkResponse> getAll();
-  Future<NetworkResponse> getDetail(String id);
-  Future<NetworkResponse> create(Map<String, dynamic> params);
-  Future<NetworkResponse> update(Map<String, dynamic> params);
-  Future<NetworkResponse> delete(String id);
+abstract class MyAppApi {
+  Future<NetworkResponse> getAddresses(Map<String, dynamic> params);
+  Future<NetworkResponse> getAddressDetail(int id);
+  Future<NetworkResponse> createAddress(Map<String, dynamic> data);
+  Future<NetworkResponse> updateAddress(Map<String, dynamic> data);
+  Future<NetworkResponse> deleteAddress(int id);
 }
 
-class AddressDeliveryApiImp extends AddressDeliveryApi {
+class MyAppApiImp extends MyAppApi {
   @override
-  Future<NetworkResponse> getAll() async {
+  Future<NetworkResponse> getAddresses(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response =
-            await AppClient().get(_AddressDeliveryEndpoint.getAll());
-        return NetworkResponse.fromResponse(response,
-            converter: (json) => (json as List)
-                .map((e) => AddressDelivery.fromJson(e))
-                .toList());
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.getAddresses(), queryParameters: params);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) =>
+              (json as List).map((e) => AddressModel.fromJson(e)).toList(),
+        );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> getDetail(String id) async {
+  Future<NetworkResponse> getAddressDetail(int id) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response =
-            await AppClient().get(_AddressDeliveryEndpoint.getDetail(id));
-        return NetworkResponse.fromResponse(response,
-            converter: (json) => AddressDelivery.fromJson(json));
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).get(_MyAppEndpoint.getAddressDetail(), queryParameters: {'id': id});
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AddressModel.fromJson(json),
+        );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> create(Map<String, dynamic> params) async {
+  Future<NetworkResponse> createAddress(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response = await AppClient()
-            .post(_AddressDeliveryEndpoint.create(), data: params);
-        return NetworkResponse.fromResponse(response);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.createAddress(), data: data);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AddressModel.fromJson(json),
+        );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> update(Map<String, dynamic> params) async {
+  Future<NetworkResponse> updateAddress(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response = await AppClient()
-            .post(_AddressDeliveryEndpoint.update(), data: params);
-        return NetworkResponse.fromResponse(response);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.updateAddress(), data: data);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => AddressModel.fromJson(json),
+        );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> delete(String id) async {
+  Future<NetworkResponse> deleteAddress(int id) async {
     return await handleNetworkError(
       proccess: () async {
-        Response response = await AppClient()
-            .post(_AddressDeliveryEndpoint.delete(), data: {'id': id});
-        return NetworkResponse.fromResponse(response);
+        Response response = await AppClient(
+          token: await AppPrefs.instance.getNormalToken(),
+        ).post(_MyAppEndpoint.deleteAddress(), data: {'id': id});
+        return NetworkResponse.fromResponse(
+          response,
+        );
       },
     );
   }

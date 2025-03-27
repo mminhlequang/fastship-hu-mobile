@@ -117,7 +117,7 @@ class CustomerSocketController {
   // Xác thực người dùng
   void _authenticate() async {
     debugPrint('Debug socket: Bắt đầu xác thực');
-    final customerId = await AppPrefs.instance.getCustomerId();
+    final customerId = await AppPrefs.instance.user?.id;
     debugPrint(
         'Debug socket: Đã lấy customerId: ${customerId != null ? 'có id' : 'không có id'}');
 

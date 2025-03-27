@@ -7,9 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:app/src/presentation/home/cubit/home_cubit.dart';
-import 'package:app/src/network_resources/common/model/banner.dart'
-    as app_banner;
+import 'package:app/src/presentation/home/cubit/home_cubit.dart';  
 
 double get _horizontalPadding => 16.sw;
 
@@ -376,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPromotionBanner(List<app_banner.Banner>? banners) {
+  Widget _buildPromotionBanner( banners) {
     // Hiển thị shimmer nếu banners là null
     if (banners == null) {
       return _buildPromotionBannerShimmer();
@@ -465,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPopularCategories(List<Category>? categories) {
+  Widget _buildPopularCategories(List<CategoryModel>? categories) {
     // Hiển thị shimmer nếu categories là null
     if (categories == null) {
       return _buildCategoriesShimmer();
@@ -475,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Widget _buildCategoryItem({
       required int index,
-      required Category category,
+      required CategoryModel category,
     }) {
       return Container(
         height: 124.sw,
@@ -510,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 110.sw),
               child: Text(
-                category.name,
+                category.name ?? "",
                 style: w500TextStyle(fontSize: 16.sw),
                 textAlign: TextAlign.center,
                 maxLines: 1,

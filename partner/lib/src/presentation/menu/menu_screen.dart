@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/widgets/widgets.dart';
 import 'package:internal_network/network_resources/resources.dart';
 
@@ -154,17 +155,34 @@ class _MenuScreenState extends State<MenuScreen>
       separatorBuilder: (context, index) => Gap(4.sw),
       itemBuilder: (context, index) {
         final menu = menus[index];
+        onAddDish() async {
+          appHaptic();
+          final r = await appContext.push('/add-dish',
+              extra: AddDishParams(
+                categoryIds: [menu.id!],
+              ));
+          if (r is ProductModel) {
+            menu.products!.add(r);
+            setState(() {});
+          }
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${menu.name} (${menu.products?.length ?? 0})',
-                  style: w500TextStyle(fontSize: 16.sw),
-                ),
-              ],
+            WidgetInkWellTransparent(
+              enableInkWell: false,
+              onTap: onAddDish,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${menu.name} (${menu.products?.length ?? 0})',
+                    style: w500TextStyle(fontSize: 16.sw),
+                  ),
+                  Icon(Icons.arrow_forward_ios_rounded, size: 16.sw),
+                ],
+              ),
             ),
             if (menu.products != null) ...[
               ListView.separated(
@@ -232,16 +250,7 @@ class _MenuScreenState extends State<MenuScreen>
             ] else
               Center(
                 child: GestureDetector(
-                  onTap: () async {
-                    final r = await appContext.push('/add-dish',
-                        extra: AddDishParams(
-                          categoryIds: [menu.id!],
-                        ));
-                    if (r is ProductModel) {
-                      menu.products!.add(r);
-                      setState(() {});
-                    }
-                  },
+                  onTap: onAddDish,
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 24.sw),
                     child: Row(

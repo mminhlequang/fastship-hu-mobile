@@ -1,14 +1,11 @@
+ 
+import 'dart:nativewrappers/_internal/vm/lib/ffi_dynamic_library_patch.dart';
+
 import 'package:app/src/network_resources/category/model/category.dart';
 import 'package:app/src/network_resources/category/repo.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
-import 'package:app/src/network_resources/product/repo.dart';
-import 'package:app/src/network_resources/store/model/store.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:app/src/network_resources/store/models/models.dart'; 
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:app/src/utils/utils.dart';
-import 'package:app/src/network_resources/common/model/banner.dart';
-import 'package:app/src/network_resources/common/repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; 
 
 part 'home_state.dart';
 

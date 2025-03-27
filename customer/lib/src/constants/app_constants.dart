@@ -2,6 +2,8 @@ import 'package:app/src/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 
 const String appName = "FastshipHu";
+const String appCurrency = "EUR";
+const String appCurrencySymbol = "€";
 
 String get appMapUrlTemplate =>
     kDebugMode ? appMapUrlTemplateGg : appMapUrlTemplateHERE;

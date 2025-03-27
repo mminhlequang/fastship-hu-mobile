@@ -6,10 +6,10 @@ class HomeState extends Equatable {
   // Thông báo lỗi (nếu có)
   final String? errorMessage;
   // Dữ liệu
-  final List<Banner>? banners;
-  final List<Category>? categories;
-  final List<Product>? popularItems;
-  final List<Store>? stores;
+  final List<dynamic>? banners;
+  final List<CategoryModel>? categories;
+  final List<ProductModel>? popularItems;
+  final List<StoreModel>? stores;
 
   const HomeState({
     this.isLoading = false,
@@ -32,10 +32,10 @@ class HomeState extends Equatable {
   HomeState copyWith({
     bool? isLoading,
     String? errorMessage,
-    List<Banner>? banners,
-    List<Category>? categories,
-    List<Product>? popularItems,
-    List<Store>? stores,
+    List<dynamic>? banners,
+    List<CategoryModel>? categories,
+    List<ProductModel>? popularItems,
+    List<StoreModel>? stores,
   }) {
     return HomeState(
       isLoading: isLoading ?? this.isLoading,
