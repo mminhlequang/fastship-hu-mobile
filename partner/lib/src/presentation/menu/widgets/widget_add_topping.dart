@@ -1,7 +1,9 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/topping/models/models.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
-import 'package:app/src/utils/app_go_router.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -12,36 +14,52 @@ import 'package:internal_core/internal_core.dart';
 class WidgetAddTopping extends StatefulWidget {
   const WidgetAddTopping({super.key, this.topping});
 
-  final String? topping;
+  final ToppingModel? topping;
 
   @override
   State<WidgetAddTopping> createState() => _WidgetAddToppingState();
 }
 
 class _WidgetAddToppingState extends State<WidgetAddTopping> {
-  String? get _topping => widget.topping;
-  XFile? _toppingImage;
+  late ToppingModel? _topping = widget.topping;
+  XFile? _xImage;
+  String? _imageUrl;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  bool enableSave = true;
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _priceFocusNode = FocusNode();
+
+  bool get enableSave =>
+      (_xImage != null || _imageUrl != null) &&
+      _nameController.text.isNotEmpty &&
+      _priceController.text.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _topping ?? '';
+    _nameController.text = _topping?.name ?? '';
+    _priceController.text = _topping?.price?.toString() ?? '';
+    _imageUrl = _topping?.image != null && _topping?.isLocalImage != true
+        ? _topping?.image
+        : null;
+    _xImage = _topping?.image != null && _topping?.isLocalImage == true
+        ? XFile(_topping?.image ?? '')
+        : null;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
+    _nameFocusNode.dispose();
+    _priceFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_topping ?? 'Add topping'.tr())),
+      appBar: AppBar(title: Text(_topping?.name ?? 'Add topping'.tr())),
       body: Column(
         children: [
           Container(
@@ -53,62 +71,68 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                 AppUploadImage(
                   title: 'Topping image'.tr(),
                   subTitle: Gap(8.sw),
+                  xFileImage: _xImage,
+                  imageUrl: _imageUrl,
                   onPickImage: (image) {
-                    // Todo:
                     setState(() {
-                      _toppingImage = XFile(image.path);
+                      _xImage = XFile(image.path);
                     });
                   },
                 ),
                 Gap(24.sw),
                 AppTextField(
                   controller: _nameController,
+                  focusNode: _nameFocusNode,
                   title: 'Name'.tr(),
                   hintText: 'Enter name'.tr(),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  onSubmitted: (_) {
+                    _priceFocusNode.requestFocus();
+                  },
                 ),
                 Gap(24.sw),
                 AppTextField(
                   controller: _priceController,
+                  focusNode: _priceFocusNode,
                   title: 'Price'.tr(),
                   hintText: 'Enter price'.tr(),
                   keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  inputFormatters: [
+                    CurrencyTextInputFormatter.currency(
+                      locale: 'en_EU',
+                      symbol: AppPrefs.instance.currencySymbol,
+                      enableNegative: false,
+                      decimalDigits: 2,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           Gap(5.sw),
-          WidgetRippleButton(
-            onTap: () => appContext.push('/add-option'),
-            radius: 0,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16.sw, 12.sw, 12.sw, 12.sw),
-              child: Row(
-                children: [
-                  Text(
-                    'Options'.tr(),
-                    style: w400TextStyle(),
-                  ),
-                  const Spacer(),
-                  Text(
-                    'Optional, max 9 toppings',
-                    style: w400TextStyle(fontSize: 12.sw, color: grey1),
-                  ),
-                  Gap(4.sw),
-                  const WidgetAppSVG('chevron-right'),
-                ],
-              ),
-            ),
-          ),
           const Spacer(),
           Container(
             color: Colors.white,
-            padding:
-                EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
-            child: _topping == null
+            padding: EdgeInsets.fromLTRB(
+                16.sw, 10.sw, 16.sw, 10.sw + context.mediaQueryPadding.bottom),
+            child: _topping?.id == null
                 ? WidgetRippleButton(
                     onTap: () {
-                      // Todo:
-                      appContext.pop();
+                      appHaptic();
+                      context.pop(
+                        ToppingModel(
+                          id: widget.topping?.id,
+                          name: _nameController.text,
+                          price: currencyFromEditController(_priceController),
+                          image: _xImage?.path,
+                          isLocalImage: true,
+                        ),
+                      );
                     },
                     enable: enableSave,
                     color: appColorPrimary,
@@ -130,7 +154,8 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                       Expanded(
                         child: WidgetRippleButton(
                           onTap: () {
-                            // Todo:
+                            appHaptic();
+                            appContext.pop(-1);
                           },
                           borderSide: BorderSide(color: appColorPrimary),
                           child: SizedBox(
@@ -138,7 +163,8 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                             child: Center(
                               child: Text(
                                 'Delete'.tr(),
-                                style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
+                                style: w500TextStyle(
+                                    fontSize: 16.sw, color: appColorPrimary),
                               ),
                             ),
                           ),
@@ -147,9 +173,19 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                       Gap(10.sw),
                       Expanded(
                         child: WidgetRippleButton(
+                          enable: enableSave,
                           onTap: () {
-                            // Todo:
-                            appContext.pop();
+                            appHaptic();
+                            appContext.pop(
+                              ToppingModel(
+                                id: widget.topping?.id,
+                                name: _nameController.text,
+                                price: currencyFromEditController(
+                                    _priceController),
+                                image: _xImage?.path,
+                                isLocalImage: true,
+                              ),
+                            );
                           },
                           color: appColorPrimary,
                           child: SizedBox(
@@ -157,7 +193,8 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                             child: Center(
                               child: Text(
                                 'Save'.tr(),
-                                style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
+                                style: w500TextStyle(
+                                    fontSize: 16.sw, color: Colors.white),
                               ),
                             ),
                           ),

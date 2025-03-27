@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 abstract class BaseLoadingState<T extends StatefulWidget> extends State<T> {
   bool _isLoading = false;
 
-  bool get isLoading => _isLoading;
+  bool get isStateLoading => _isLoading;
 
   @protected
   void setLoading(bool loading) {
@@ -33,7 +33,6 @@ abstract class BaseLoadingState<T extends StatefulWidget> extends State<T> {
     );
   }
 }
-
 class WidgetAppLoader extends StatelessWidget {
   const WidgetAppLoader({super.key});
 

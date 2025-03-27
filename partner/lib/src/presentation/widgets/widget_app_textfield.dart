@@ -1,6 +1,7 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
@@ -9,7 +10,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
-    required this.title,
+    this.title,
     this.isRequired = true,
     this.controller,
     this.maxLines,
@@ -17,6 +18,7 @@ class AppTextField extends StatelessWidget {
     this.readOnly = false,
     this.focusNode,
     this.keyboardType = TextInputType.text,
+    this.inputFormatters,
     this.onChanged,
     this.onSubmitted,
     this.hintText,
@@ -24,7 +26,7 @@ class AppTextField extends StatelessWidget {
     this.padding,
   });
 
-  final String title;
+  final String? title;
   final bool isRequired;
   final TextEditingController? controller;
   final int? maxLines;
@@ -37,7 +39,8 @@ class AppTextField extends StatelessWidget {
   final String? hintText;
   final VoidCallback? onTap;
   final EdgeInsets? padding;
-
+  final List<TextInputFormatter>? inputFormatters;
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,21 +48,23 @@ class AppTextField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text.rich(
-            TextSpan(
-              text: title,
-              style: w600TextStyle(),
-              children: isRequired
-                  ? [
-                      TextSpan(
-                        text: '*',
-                        style: w600TextStyle(color: appColorError),
-                      )
-                    ]
-                  : null,
+          if (title != null) ...[
+            Text.rich(
+              TextSpan(
+                text: title,
+                style: w600TextStyle(),
+                children: isRequired
+                    ? [
+                        TextSpan(
+                          text: '*',
+                          style: w600TextStyle(color: appColorError),
+                        )
+                      ]
+                    : null,
+              ),
             ),
-          ),
-          Gap(8.sw),
+            Gap(8.sw)
+          ],
           TextFormField(
             controller: controller,
             style: w400TextStyle(fontSize: 16.sw),
@@ -72,6 +77,7 @@ class AppTextField extends StatelessWidget {
             onChanged: onChanged?.call,
             onFieldSubmitted: onSubmitted?.call,
             onTap: onTap?.call,
+            inputFormatters: inputFormatters,
             decoration: InputDecoration(
               isDense: true,
               isCollapsed: true,

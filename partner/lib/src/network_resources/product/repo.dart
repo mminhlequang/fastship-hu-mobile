@@ -16,8 +16,36 @@ class ProductRepo {
 
   late ProductApi _api;
 
-  Future<List<Product>?> getProducts() async {
-    NetworkResponse response = await _api.getProducts();
-    return response.data;
+  Future<NetworkResponse> getProducts(Map<String, dynamic> params) async {
+    return await _api.getProducts(params);
+  }
+
+  Future<NetworkResponse> getProductDetail(int id) async {
+    return await _api.getProductDetail(id);
+  }
+
+  Future<NetworkResponse> getFavoriteProducts(
+      Map<String, dynamic> params) async {
+    return await _api.getFavoriteProducts(params);
+  }
+
+  Future<NetworkResponse> createProduct(Map<String, dynamic> data) async {
+    return await _api.createProduct(data);
+  }
+
+  Future<NetworkResponse> updateProduct(Map<String, dynamic> data) async {
+    return await _api.updateProduct(data);
+  }
+
+  Future<NetworkResponse> deleteProduct(int id) async {
+    return await _api.deleteProduct(id);
+  }
+
+  Future<NetworkResponse> favoriteProduct(int id) async {
+    return await _api.favoriteProduct(id);
+  }
+
+  Future<NetworkResponse> uploadImage(dynamic filePath) async {
+    return await _api.uploadImage(filePath);
   }
 }

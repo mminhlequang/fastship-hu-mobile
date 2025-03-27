@@ -1,7 +1,8 @@
+import 'package:app/src/network_resources/topping/models/models.dart';
 import 'package:app/src/presentation/detail_order/detail_order_screen.dart';
 import 'package:app/src/presentation/help_center/help_center_screen.dart';
 import 'package:app/src/presentation/menu/menu_screen.dart';
-import 'package:app/src/presentation/menu/widgets/widget_add_category.dart';
+import 'package:app/src/presentation/menu/widgets/widget_add_topping_group.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_dish.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_option.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_topping.dart';
@@ -19,7 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../network_resources/cart/models/cart.dart';
 import '../network_resources/models/opening_time_model.dart';
+import '../network_resources/store/models/models.dart';
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
@@ -101,9 +104,8 @@ final goRouter = GoRouter(
       parentNavigatorKey: appNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child:   SocketShellWrapper(
-              child: child,
-            
+          child: SocketShellWrapper(
+            child: child,
           ),
         );
       },
@@ -117,19 +119,20 @@ final goRouter = GoRouter(
           builder: (context, state) => const MenuScreen(),
         ),
         GoRoute(
-          path: '/add-category',
-          builder: (context, state) =>
-              WidgetAddCategory(category: state.extra as CategoryModel?),
+          path: '/add-topping-group',
+          builder: (context, state) => WidgetAddToppingGroup(
+            model: state.extra as MenuModel?,
+          ),
         ),
         GoRoute(
           path: '/add-dish',
           builder: (context, state) =>
-              WidgetAddDish(dish: state.extra as String?),
+              WidgetAddDish(params: state.extra as AddDishParams),
         ),
         GoRoute(
           path: '/add-topping',
           builder: (context, state) =>
-              WidgetAddTopping(topping: state.extra as String?),
+              WidgetAddTopping(topping: state.extra as ToppingModel?),
         ),
         GoRoute(
           path: '/add-option',

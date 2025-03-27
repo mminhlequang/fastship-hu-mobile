@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 const String appName = "Driver-FastshipHu";
 const String appCurrency = "EUR";
+const String appCurrencySymbol = "€";
 
 const String appHotlineNumber = "19008028";
 const String appMessengerUrl = "https://m.me/fastship.vn";

@@ -1,3 +1,5 @@
+import 'package:app/src/network_resources/topping/models/models.dart';
+
 class MenuModel {
   int? id;
   int? storeId;
@@ -6,6 +8,7 @@ class MenuModel {
   int? type;
   int? isFeature;
   List<ProductModel>? products;
+  List<ToppingModel>? items;
   String? createdAt;
   String? updatedAt;
 
@@ -15,8 +18,9 @@ class MenuModel {
     this.name,
     this.image,
     this.type,
-    this.isFeature,
+    this.isFeature, 
     this.products,
+    this.items,
     this.createdAt,
     this.updatedAt,
   });
@@ -34,6 +38,12 @@ class MenuModel {
         products!.add(ProductModel.fromJson(v));
       });
     }
+    if (json['items'] != null) {
+      items = <ToppingModel>[];
+      json['items'].forEach((v) {
+        items!.add(ToppingModel.fromJson(v));
+      });
+    }
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -48,6 +58,9 @@ class MenuModel {
     data['is_feature'] = isFeature;
     if (products != null) {
       data['products'] = products!.map((v) => v.toJson()).toList();
+    }
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
     }
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;

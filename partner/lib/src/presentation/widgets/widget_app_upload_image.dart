@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -64,7 +65,8 @@ class AppUploadImage extends StatelessWidget {
     this.subTitle,
     this.height,
     this.width,
-    this.image,
+    this.xFileImage,
+    this.imageUrl,
   });
 
   final String title;
@@ -75,7 +77,10 @@ class AppUploadImage extends StatelessWidget {
   final Widget? subTitle;
   final double? height;
   final double? width;
-  final XFile? image;
+  final XFile? xFileImage;
+  final String? imageUrl;
+
+  bool get haveImage => xFileImage != null || imageUrl != null;
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +132,19 @@ class AppUploadImage extends StatelessWidget {
               width: width ?? 80.sw,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                image: image != null
+                image: imageUrl != null
                     ? DecorationImage(
-                        image: AssetImage(image!.path),
+                        image: CachedNetworkImageProvider(
+                          appImageCorrectUrl(imageUrl!),
+                        ),
                         fit: BoxFit.cover,
                       )
-                    : null,
+                    : xFileImage != null
+                        ? DecorationImage(
+                            image: FileImage(File(xFileImage!.path)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +158,7 @@ class AppUploadImage extends StatelessWidget {
                       'Upload'.tr(),
                       style: w400TextStyle(
                           fontSize: 12.sw,
-                          color: image == null ? grey1 : Colors.white),
+                          color: !haveImage ? grey1 : Colors.white),
                     ),
                   ),
                 ],

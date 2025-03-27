@@ -1,9 +1,8 @@
-class ToppingModel {
+import 'package:equatable/equatable.dart';
+
+class ToppingModel extends Equatable {
   int? id;
-  String? nameVi;
-  String? nameEn;
-  String? nameZh;
-  String? nameHu;
+  String? name;
   String? image;
   double? price;
   int? status;
@@ -12,12 +11,12 @@ class ToppingModel {
   String? createdAt;
   String? updatedAt;
 
+  int? quantity;
+  bool? isLocalImage;
+
   ToppingModel({
     this.id,
-    this.nameVi,
-    this.nameEn,
-    this.nameZh,
-    this.nameHu,
+        this.name,
     this.image,
     this.price,
     this.status,
@@ -25,14 +24,13 @@ class ToppingModel {
     this.arrange,
     this.createdAt,
     this.updatedAt,
+    this.quantity,
+    this.isLocalImage,
   });
 
   ToppingModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    nameVi = json['name_vi'];
-    nameEn = json['name_en'];
-    nameZh = json['name_zh'];
-    nameHu = json['name_hu'];
+    name = json['name'];
     image = json['image'];
     price = json['price']?.toDouble();
     status = json['status'];
@@ -40,19 +38,18 @@ class ToppingModel {
     arrange = json['arrange'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    quantity = json['quantity'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (id != null) data['id'] = id;
-    data['name_vi'] = nameVi;
-    data['name_en'] = nameEn;
-    data['name_zh'] = nameZh;
-    data['name_hu'] = nameHu;
+    data['name'] = name;
     data['price'] = price;
     data['status'] = status;
     data['store_id'] = storeId;
     data['arrange'] = arrange;
+    data['quantity'] = quantity;
     return data;
   }
 
@@ -61,4 +58,7 @@ class ToppingModel {
     final Map<String, dynamic> data = toJson();
     return data;
   }
+
+  @override
+  List<Object?> get props => [id, name, image, price];
 }

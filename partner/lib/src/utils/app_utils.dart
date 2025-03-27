@@ -8,12 +8,23 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
-// import 'dart:html' as html;
 
-// setFriendlyRouteName({required String title, required String url}) {
-//   html.document.title = title;
-//   html.window.history.pushState(null, title, url);
-// }
+String currencyFormatted(double? amount) {
+  return NumberFormat.currency(
+    locale: 'vi_VN',
+    symbol: AppPrefs.instance.currencySymbol,
+    decimalDigits: 2,
+  ).format(amount ?? 0);
+}
+
+double currencyFromEditController(TextEditingController controller) {
+  final cleanedText = controller.text.replaceAll(RegExp(r'[^\d.]'), '');
+  if (cleanedText.isNotEmpty) {
+    final amount = double.tryParse(cleanedText) ?? 0;
+    return amount;
+  }
+  return 0;
+}
 
 bool appIsBottomSheetOpen = false;
 Future<T> appOpenBottomSheet<T>(
@@ -55,7 +66,8 @@ appOpenDialog(Widget child, {bool barrierDismissible = true}) async {
     },
     transitionBuilder: (context, anim1, anim2, child) {
       return SlideTransition(
-        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1),
+        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0))
+            .animate(anim1),
         child: child,
       );
     },

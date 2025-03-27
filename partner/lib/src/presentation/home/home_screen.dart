@@ -48,8 +48,8 @@ enum HomeItem {
         statistics => '',
         wallet => '',
         rating => '',
-        support => '',
-        settings => '',
+        support => '/help-center',
+        settings => '/store-settings',
       };
 
   Color get backgroundColor => switch (this) {

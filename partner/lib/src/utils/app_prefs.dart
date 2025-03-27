@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:app/src/constants/app_constants.dart';
 import 'package:app/src/network_resources/auth/repo.dart';
 import 'package:internal_core/setup/app_base.dart';
 import 'package:flutter/foundation.dart';
@@ -119,11 +120,11 @@ class AppPrefs {
     }
   }
 
-  String? get currency => _boxData.get('currency') ?? "EUR";
+  String? get currency => _boxData.get('currency') ?? appCurrency;
 
   set currency(String? value) => _boxData.put('currency', value);
 
-  String? get currencySymbol => _boxData.get('currency_symbol') ?? "€";
+  String? get currencySymbol => _boxData.get('currency_symbol') ?? appCurrencySymbol;
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 }

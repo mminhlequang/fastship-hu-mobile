@@ -124,7 +124,7 @@ class AppPrefs {
 
   set currency(String? value) => _boxData.put('currency', value);
 
-  String? get currencySymbol => _boxData.get('currency_symbol') ?? "€";
+  String? get currencySymbol => _boxData.get('currency_symbol') ?? appCurrencySymbol;
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 

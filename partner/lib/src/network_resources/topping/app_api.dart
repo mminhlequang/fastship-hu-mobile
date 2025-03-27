@@ -95,6 +95,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.deleteTopping(), data: {'id': id});
         return NetworkResponse.fromResponse(
           response,
+          value: response.data['status'] == true,
         );
       },
     );
@@ -156,6 +157,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.deleteGroupTopping(), data: {'id': id});
         return NetworkResponse.fromResponse(
           response,
+          value: response.data['status'] == true,
         );
       },
     );

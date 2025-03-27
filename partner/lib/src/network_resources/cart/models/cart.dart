@@ -1,3 +1,6 @@
+import 'package:app/src/network_resources/store/models/models.dart';
+import 'package:app/src/network_resources/topping/models/models.dart';
+
 class CartModel {
   int? id;
   int? userId;
@@ -81,119 +84,5 @@ class VariationModel {
     return data;
   }
 }
-
-class ToppingModel {
-  int? id;
-  int? quantity;
-  String? name;
-  double? price;
-
-  ToppingModel({
-    this.id,
-    this.quantity,
-    this.name,
-    this.price,
-  });
-
-  ToppingModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    quantity = json['quantity'];
-    name = json['name'];
-    price = json['price']?.toDouble();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['quantity'] = quantity;
-    return data;
-  }
-}
-
-class ProductModel {
-  int? id;
-  String? name;
-  String? description;
-  String? image;
-  double? price;
-  double? pricePromotion;
-  int? isPromotion;
-  int? isPopular;
-  int? status;
-  String? createdAt;
-  String? updatedAt;
-
-  ProductModel({
-    this.id,
-    this.name,
-    this.description,
-    this.image,
-    this.price,
-    this.pricePromotion,
-    this.isPromotion,
-    this.isPopular,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  ProductModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    description = json['description'];
-    image = json['image'];
-    price = json['price']?.toDouble();
-    pricePromotion = json['price_promotion']?.toDouble();
-    isPromotion = json['is_promotion'];
-    isPopular = json['is_popular'];
-    status = json['status'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['description'] = description;
-    data['image'] = image;
-    data['price'] = price;
-    data['price_promotion'] = pricePromotion;
-    data['is_promotion'] = isPromotion;
-    data['is_popular'] = isPopular;
-    data['status'] = status;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
-  }
-}
-
-class StoreModel {
-  int? id;
-  String? name;
-  String? image;
-  String? address;
-
-  StoreModel({
-    this.id,
-    this.name,
-    this.image,
-    this.address,
-  });
-
-  StoreModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    image = json['image'];
-    address = json['address'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['image'] = image;
-    data['address'] = address;
-    return data;
-  }
-}
+ 
+  

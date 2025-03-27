@@ -1,7 +1,11 @@
+import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/store/models/menu.dart';
+import 'package:app/src/network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +13,9 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/widgets/widgets.dart';
+import 'package:internal_network/network_resources/resources.dart';
 
-class CategoryModel {
-  final String name;
-  final List<String> dishes;
-
-  const CategoryModel({required this.name, required this.dishes});
-}
+import 'widgets/widget_add_dish.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -24,28 +24,49 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateMixin {
+class _MenuScreenState extends State<MenuScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   int _currentTab = 0;
-  List<CategoryModel> categories = [
-    CategoryModel(
-      name: 'Drink A',
-      dishes: List.generate(5, (index) => 'Vanilla Latte Milk'),
-    ),
-    CategoryModel(
-      name: 'Drink B',
-      dishes: List.generate(2, (index) => 'Vanilla Latte Milk'),
-    ),
-    CategoryModel(
-      name: 'Topping',
-      dishes: List.generate(4, (index) => 'Vanilla Latte Milk'),
-    ),
-  ];
+  List<MenuModel> menus = [];
+  List<MenuModel> toppingGroups = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    setState(() => isLoading = true);
+
+    if (_currentTab == 0) {
+      // Fetch menu data
+      final menuResponse = await StoreRepo().getStoreMenus({
+        "store_id": authCubit.state.store?.id ?? 0,
+        "type": 1,
+      });
+      if (menuResponse.isSuccess) {
+        menus = menuResponse.data;
+      }
+    } else {
+      // Fetch topping data
+      final toppingResponse = await StoreRepo().getStoreMenus({
+        "store_id": authCubit.state.store?.id ?? 0,
+        "type": 2,
+      });
+      if (toppingResponse.isSuccess) {
+        toppingGroups = toppingResponse.data;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -62,8 +83,43 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
         title: Text('Menu'.tr()),
         actions: [
           IconButton(
-            onPressed: () => appContext.push(_currentTab == 0 ? '/add-category' : '/add-topping'),
-            icon: WidgetAppSVG('ic_add_circle'),
+            onPressed: () async {
+              if (_currentTab == 0) {
+                final r = await appContext.push('/store-category',
+                    extra: authCubit.state.store?.categories
+                            ?.map((e) => e.id!)
+                            .toList() ??
+                        []);
+                if (r is List<int>) {
+                  await StoreRepo().updateStore({
+                    "id": authCubit.state.store!.id!,
+                    "category_ids": r
+                  }).then((v) {
+                    if (v.isSuccess) {
+                      appShowSnackBar(
+                        context: context,
+                        msg: "Store categories updated successfully!".tr(),
+                        type: AppSnackBarType.success,
+                      );
+                      authCubit.refreshStore();
+                    } else {
+                      appShowSnackBar(
+                          context: context,
+                          msg:
+                              "Failed to update store info, please try again later!"
+                                  .tr());
+                    }
+                  });
+                  _fetchData();
+                }
+              } else {
+                await appContext.push('/add-topping-group');
+              }
+              _fetchData();
+            },
+            icon: _currentTab == 0
+                ? Icon(Icons.category_sharp, color: Colors.white)
+                : WidgetAppSVG('ic_add_circle'),
           ),
           Gap(4.sw),
         ],
@@ -71,24 +127,33 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
       body: WidgetAppTabBar(
         tabController: _tabController,
         physics: const NeverScrollableScrollPhysics(),
-        tabs: ['Menu'.tr(), 'Topping'.tr()],
+        tabs: ['Menu'.tr(), 'Topping group'.tr()],
         children: [_menu, _topping],
         onTap: (index) {
-          setState(() {
-            _currentTab = index;
-          });
+          _currentTab = index;
+          _fetchData();
+          setState(() {});
         },
       ),
     );
   }
 
   Widget get _menu {
+    if (isLoading) {
+      return ListView.separated(
+        padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw, 4.sw),
+        itemCount: 3,
+        separatorBuilder: (_, __) => Gap(4.sw),
+        itemBuilder: (_, __) => const MenuShimmer(),
+      );
+    }
+
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw, 4.sw),
-      itemCount: categories.length,
+      itemCount: menus.length,
       separatorBuilder: (context, index) => Gap(4.sw),
       itemBuilder: (context, index) {
-        final category = categories[index];
+        final menu = menus[index];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -96,67 +161,116 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${category.name} (${category.dishes.length})',
+                  '${menu.name} (${menu.products?.length ?? 0})',
                   style: w500TextStyle(fontSize: 16.sw),
-                ),
-                GestureDetector(
-                  onTap: () => appContext.push('/add-category', extra: category),
-                  child: Icon(
-                    CupertinoIcons.arrow_right,
-                    size: 20.sw,
-                    color: appColorText,
-                  ),
                 ),
               ],
             ),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: category.dishes.length,
-              separatorBuilder: (context, index) => const AppDivider(),
-              itemBuilder: (context, index) {
-                String dish = category.dishes[index];
-                return WidgetRippleButton(
-                  onTap: () => appContext.push('/add-dish', extra: dish),
-                  radius: 0,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.sw),
-                    child: Row(
-                      children: [
-                        WidgetAppImage(
-                          imageUrl:
-                              'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/flat-white-3402c4f.jpg',
-                          width: 48.sw,
-                          height: 48.sw,
-                        ),
-                        Gap(8.sw),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                dish,
-                                style: w400TextStyle(),
-                              ),
-                              Gap(1.sw),
-                              Text(
-                                'Espresso, Vanilla Syrup, Fresh Mink, Fresh Milk',
-                                style: w400TextStyle(fontSize: 10.sw, color: grey1),
-                              ),
-                              Gap(1.sw),
-                              Text(
-                                '\$10',
-                                style: w400TextStyle(color: darkGreen),
-                              ),
-                            ],
+            if (menu.products != null) ...[
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: menu.products!.length,
+                separatorBuilder: (_, __) => const AppDivider(),
+                itemBuilder: (context, productIndex) {
+                  final product = menu.products![productIndex];
+                  return WidgetRippleButton(
+                    onTap: () async {
+                      final r = await appContext.push('/add-dish',
+                          extra: AddDishParams(
+                            model: product,
+                            categoryIds: [menu.id!],
+                          ));
+                      if (r is ProductModel) {
+                        menu.products![productIndex] = r;
+                        setState(() {});
+                      }
+                    },
+                    radius: 0,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.sw),
+                      child: Row(
+                        children: [
+                          WidgetAppImage(
+                            imageUrl: product.image ?? '',
+                            width: 48.sw,
+                            height: 48.sw,
                           ),
+                          Gap(8.sw),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name ?? '',
+                                  style: w400TextStyle(),
+                                ),
+                                Gap(1.sw),
+                                if (product.description != null) ...[
+                                  Text(
+                                    product.description!,
+                                    style: w400TextStyle(
+                                      fontSize: 10.sw,
+                                      color: grey1,
+                                    ),
+                                  ),
+                                  Gap(1.sw),
+                                ],
+                                Text(
+                                  '\$${product.price ?? 0}',
+                                  style: w400TextStyle(color: darkGreen),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ] else
+              Center(
+                child: GestureDetector(
+                  onTap: () async {
+                    final r = await appContext.push('/add-dish',
+                        extra: AddDishParams(
+                          categoryIds: [menu.id!],
+                        ));
+                    if (r is ProductModel) {
+                      menu.products!.add(r);
+                      setState(() {});
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24.sw),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const WidgetAppSVG('empty_store'),
+                        Gap(16.sw),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'No have any product'.tr(),
+                              style: w400TextStyle(fontSize: 15.sw),
+                            ),
+                            Gap(4.sw),
+                            Text(
+                              'Let\'s create your first\nproduct for this category'
+                                  .tr(),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey1),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
           ],
         );
       },
@@ -164,37 +278,44 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
   }
 
   Widget get _topping {
+    if (isLoading) {
+      return ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 16.sw),
+        itemCount: 5,
+        separatorBuilder: (_, __) => const AppDivider(),
+        itemBuilder: (_, __) => const ToppingShimmer(),
+      );
+    }
+
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16.sw),
-      itemCount: 10,
-      separatorBuilder: (context, index) => const AppDivider(),
+      itemCount: toppingGroups.length,
+      separatorBuilder: (_, __) => const AppDivider(),
       itemBuilder: (context, index) {
+        final m = toppingGroups[index];
+        String text = m.items?.map((e) => e.name).join(', ') ?? '';
         return WidgetRippleButton(
-          onTap: () => appContext.push('/add-topping', extra: 'Konjac Jelly'),
+          onTap: () async {
+            await appContext.push('/add-topping-group', extra: m);
+            _fetchData();
+          },
           radius: 0,
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 12.sw),
             child: Row(
               children: [
-                WidgetAppImage(
-                  imageUrl:
-                      'https://bizweb.dktcdn.net/100/421/036/files/pudding-la-gi-cach-lam-pudding-ngon-don-gian9.jpg?v=1617095326547',
-                  width: 48.sw,
-                  height: 48.sw,
-                ),
-                Gap(8.sw),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Konjac Jelly',
-                        style: w400TextStyle(),
+                        m.name ?? '',
+                        style: w400TextStyle(fontSize: 16.sw),
                       ),
-                      Gap(1.sw),
+                      Gap(2.sw),
                       Text(
-                        '\$10',
-                        style: w400TextStyle(color: darkGreen),
+                        text,
+                        style: w400TextStyle(color: grey1),
                       ),
                     ],
                   ),
@@ -204,6 +325,104 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
           ),
         );
       },
+    );
+  }
+}
+
+// Thêm các widget Shimmer
+class MenuShimmer extends StatelessWidget {
+  const MenuShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          height: 20.sw,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        Gap(8.sw),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 3,
+          separatorBuilder: (_, __) => const AppDivider(),
+          itemBuilder: (_, __) => Padding(
+            padding: EdgeInsets.symmetric(vertical: 12.sw),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.sw,
+                  height: 48.sw,
+                  color: Colors.grey[300],
+                ),
+                Gap(8.sw),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 120.sw,
+                        height: 16.sw,
+                        color: Colors.grey[300],
+                      ),
+                      Gap(4.sw),
+                      Container(
+                        width: 80.sw,
+                        height: 14.sw,
+                        color: Colors.grey[300],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ToppingShimmer extends StatelessWidget {
+  const ToppingShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12.sw),
+      child: Row(
+        children: [
+          Container(
+            width: 48.sw,
+            height: 48.sw,
+            color: Colors.grey[300],
+          ),
+          Gap(8.sw),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 100.sw,
+                  height: 16.sw,
+                  color: Colors.grey[300],
+                ),
+                Gap(4.sw),
+                Container(
+                  width: 60.sw,
+                  height: 14.sw,
+                  color: Colors.grey[300],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

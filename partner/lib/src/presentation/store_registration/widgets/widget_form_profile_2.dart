@@ -469,7 +469,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
             ],
             AppUploadImage(
               title: 'Business license'.tr(),
-              image: _imageBusinessLicense,
+              xFileImage: _imageBusinessLicense,
               padding: EdgeInsets.symmetric(horizontal: 16.sw),
               onSeeInstruction: () {
                 _seeInstruction('Business license');
@@ -521,7 +521,7 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               onSeeInstruction: () {
                 _seeInstruction('Related documents');
               },
-              image: _imageRelatedDocument,
+              xFileImage: _imageRelatedDocument,
               onPickImage: (image) {
                 setState(() {
                   _imageRelatedDocument = image;

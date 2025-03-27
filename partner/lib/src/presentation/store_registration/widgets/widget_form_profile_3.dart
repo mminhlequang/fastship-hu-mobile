@@ -85,7 +85,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                   style: w400TextStyle(fontSize: 12.sw, color: grey1),
                 ),
               ),
-              image: _avatarImage,
+              xFileImage: _avatarImage,
               onPickImage: (image) {
                 setState(() {
                   _avatarImage = image;
@@ -106,7 +106,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                   style: w400TextStyle(fontSize: 12.sw, color: grey1),
                 ),
               ),
-              image: _coverImage,
+              xFileImage: _coverImage,
               onPickImage: (image) {
                 setState(() {
                   _coverImage = image;
@@ -125,7 +125,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                   style: w400TextStyle(fontSize: 12.sw, color: grey1),
                 ),
               ),
-              image: _facadeImage,
+              xFileImage: _facadeImage,
               onPickImage: (image) {
                 setState(() {
                   _facadeImage = image;

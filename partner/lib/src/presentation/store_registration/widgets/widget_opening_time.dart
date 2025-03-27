@@ -25,6 +25,10 @@ class _OpeningTimeScreenState extends State<OpeningTimeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(openingTimes),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        ),
         title: Text(
           'Opening time'.tr(),
           style: w500TextStyle(fontSize: 20.sw, height: 1.2),

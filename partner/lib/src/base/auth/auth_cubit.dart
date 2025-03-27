@@ -16,9 +16,12 @@ enum AuthStateType { none, logged }
 AuthCubit get authCubit => findInstance<AuthCubit>();
 
 class AuthCubit extends Cubit<AuthState> {
-  StreamSubscription? _subscription;
 
   AuthCubit() : super(AuthState());
+
+  int get storeId => state.store?.id ?? 0;
+
+
   update(user) async {
     state.user = user;
     emit(state.update());
@@ -86,14 +89,26 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  setStore(StoreModel store) {
+  setStore(StoreModel store, {bool refresh = false}) {
     state.store = store;
+    if (refresh) {
+      refreshStore();
+    } else {
+      emit(state.update());
+    }
+  }
+
+  refreshStore() async {
+    NetworkResponse response =
+        await StoreRepo().getStoreDetail(state.store!.id!);
+    if (response.isSuccess) {
+      state.store = response.data;
+    }
     emit(state.update());
   }
 
   logout() async {
     AppPrefs.instance.clear();
-    _subscription?.cancel();
     try {
       emit(state.update(stateType: AuthStateType.none));
       _redirect();

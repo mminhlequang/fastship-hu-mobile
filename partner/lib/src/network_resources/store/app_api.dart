@@ -164,7 +164,7 @@ class MyAppApiImp extends MyAppApi {
         ).post(_MyAppEndpoint.updateStore(), data: data);
         return NetworkResponse.fromResponse(
           response,
-          converter: (json) => StoreModel.fromJson(json),
+          value: response.data['status'] == true,
         );
       },
     );
