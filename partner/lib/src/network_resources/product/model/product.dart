@@ -1,4 +1,6 @@
+import 'package:app/src/network_resources/store/models/menu.dart';
 import 'package:app/src/network_resources/store/models/store.dart';
+import 'package:app/src/network_resources/topping/models/models.dart';
 
 class ProductModel {
   int? id;
@@ -11,7 +13,7 @@ class ProductModel {
   int? quantity;
   num? rating;
   List<dynamic>? variations;
-  List<dynamic>? toppings;
+  List<MenuModel>? toppings;
   int? isFavorite;
   StoreModel? store;
   int? status;
@@ -70,7 +72,9 @@ class ProductModel {
       variations = json["variations"] ?? [];
     }
     if (json["toppings"] is List) {
-      toppings = json["toppings"] ?? [];
+      toppings = (json["toppings"] as List)
+          .map((e) => MenuModel.fromJson(e))
+          .toList();
     }
     if (json["is_favorite"] is int) {
       isFavorite = json["is_favorite"];

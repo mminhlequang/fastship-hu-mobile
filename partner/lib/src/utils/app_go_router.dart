@@ -24,6 +24,7 @@ import '../network_resources/cart/models/cart.dart';
 import '../network_resources/models/opening_time_model.dart';
 import '../network_resources/store/models/models.dart';
 import '../presentation/auth/auth_screen.dart';
+import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
@@ -133,6 +134,12 @@ final goRouter = GoRouter(
           path: '/add-topping',
           builder: (context, state) =>
               WidgetAddTopping(topping: state.extra as ToppingModel?),
+        ),
+        GoRoute(
+          path: '/link-topping-group',
+          builder: (context, state) => WidgetLinkToppingGroup(
+            initList: state.extra as List<int>?,
+          ),
         ),
         GoRoute(
           path: '/add-option',

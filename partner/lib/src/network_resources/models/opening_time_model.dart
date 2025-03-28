@@ -39,7 +39,7 @@ class OpeningTimeModel {
       List<OperatingHours> list) {
     return list
         .map((e) => OpeningTimeModel(
-              day: getDayName(e.day ?? 0),
+              day: getDayOfWeek(e.day ?? 0),
               dayNumber: e.day ?? 0,
               isOpen: e.isOff == 0,
               openTime: e.startTime ?? "",
@@ -48,7 +48,7 @@ class OpeningTimeModel {
         .toList();
   }
 
-  static String getDayName(int dayNumber) {
+  static String getDayOfWeek(int dayNumber) {
     switch (dayNumber) {
       case 1:
         return "Monday";

@@ -5,6 +5,7 @@ import 'package:app/src/network_resources/models/opening_time_model.dart';
 import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/product/repo.dart';
 import 'package:app/src/network_resources/store/models/menu.dart';
+import 'package:app/src/network_resources/topping/models/models.dart';
 import 'package:app/src/presentation/widgets/widget_loading_wrapper.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
@@ -43,13 +44,15 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _describeController = TextEditingController();
-  final ValueNotifier<bool> _status = ValueNotifier(true);
+  final ValueNotifier<bool> _stillAvailable = ValueNotifier(true);
+
+  List<OpeningTimeModel> _openTimes = OpeningTimeModel.getDefaultOpeningTimes();
+  List<MenuModel> _toppingGroups = [];
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _priceFocusNode = FocusNode();
   final FocusNode _describeFocusNode = FocusNode();
 
-  List<OpeningTimeModel> _openTimes = OpeningTimeModel.getDefaultOpeningTimes();
   bool get enableSave =>
       (_dishImage != null || _imageUrl != null) &&
       _nameController.text.isNotEmpty &&
@@ -68,10 +71,11 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
       _nameController.text = product.name ?? '';
       _priceController.text = product.price?.toString() ?? '';
       _describeController.text = product.description ?? '';
-      _status.value = product.status == 1;
+      _stillAvailable.value = product.status == 1;
       _imageUrl = product.image;
-      _openTimes = OpeningTimeModel.fromListOperatingHours(
-          product.operatingHours ?? []);
+      _openTimes =
+          OpeningTimeModel.fromListOperatingHours(product.operatingHours ?? []);
+      _toppingGroups = product.toppings ?? [];
     }
   }
 
@@ -80,7 +84,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
     _nameController.dispose();
     _priceController.dispose();
     _describeController.dispose();
-    _status.dispose();
+    _stillAvailable.dispose();
     _nameFocusNode.dispose();
     _priceFocusNode.dispose();
     _describeFocusNode.dispose();
@@ -106,6 +110,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         'image': imageUrl,
         'store_id': authCubit.storeId,
         'category_ids': widget.params.categoryIds,
+        'group_topping_ids': _toppingGroups.map((e) => e.id!).toList(),
         "operating_hours": _openTimes
             .map((e) => {
                   "is_off": e.isOpen ? 0 : 1,
@@ -259,6 +264,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                           title: 'Describe'.tr(),
                           hintText: 'Enter describe'.tr(),
                           minLines: 3,
+                          maxLines: 8,
                           onSubmitted: (_) {
                             FocusScope.of(context).unfocus();
                           },
@@ -278,18 +284,18 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Status'.tr(),
+                          'Still available'.tr(),
                           style: w400TextStyle(),
                         ),
                         AdvancedSwitch(
-                          controller: _status,
+                          controller: _stillAvailable,
                           initialValue: true,
                           height: 22.sw,
                           width: 40.sw,
                           activeColor: appColorPrimary,
                           inactiveColor: hexColor('#E2E2EF'),
                           onChanged: (value) {
-                            _status.value = value;
+                            _stillAvailable.value = value;
                           },
                         ),
                       ],
@@ -313,9 +319,77 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Opening hours'.tr(),
-                            style: w400TextStyle(fontSize: 16.sw),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Opening hours'.tr(),
+                                  style: w400TextStyle(fontSize: 16.sw),
+                                ),
+                                if (_openTimes.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.sw),
+                                    child: Text(
+                                      _openTimes
+                                          .map((e) =>
+                                              "${OpeningTimeModel.getDayOfWeek(e.dayNumber)} (${!e.isOpen ? 'Close' : '${e.openTime} - ${e.closeTime}'})")
+                                          .join('\n'),
+                                      style: w300TextStyle(
+                                          height: 1.4,
+                                          fontSize: 12.sw,
+                                          color: grey1),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const WidgetAppSVG('chevron-right'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Gap(5.sw),
+                  WidgetRippleButton(
+                    onTap: () async {
+                      final r = await appContext.push('/link-topping-group',
+                              extra:
+                                  _toppingGroups.map((e) => e.id!).toList()) ??
+                          [];
+                      if (r is List<MenuModel>) {
+                        setState(() {
+                          _toppingGroups = r;
+                        });
+                      }
+                    },
+                    radius: 0,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.sw, vertical: 12.sw),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Toppings to use with this dish'.tr(),
+                                style: w400TextStyle(fontSize: 16.sw),
+                              ),
+                              if (_toppingGroups.isNotEmpty)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4.sw),
+                                  child: Text(
+                                    _toppingGroups
+                                        .map((e) =>
+                                            "${e.name ?? ''} (${e.toppings?.length ?? 0})")
+                                        .join(', '),
+                                    style: w300TextStyle(
+                                        fontSize: 12.sw, color: grey1),
+                                  ),
+                                ),
+                            ],
                           ),
                           const WidgetAppSVG('chevron-right'),
                         ],

@@ -48,7 +48,7 @@ class _MenuScreenState extends State<MenuScreen>
     if (_currentTab == 0) {
       // Fetch menu data
       final menuResponse = await StoreRepo().getStoreMenus({
-        "store_id": authCubit.state.store?.id ?? 0,
+        "store_id": authCubit.storeId,
         "type": 1,
       });
       if (menuResponse.isSuccess) {
@@ -57,7 +57,7 @@ class _MenuScreenState extends State<MenuScreen>
     } else {
       // Fetch topping data
       final toppingResponse = await StoreRepo().getStoreMenus({
-        "store_id": authCubit.state.store?.id ?? 0,
+        "store_id": authCubit.storeId,
         "type": 2,
       });
       if (toppingResponse.isSuccess) {
