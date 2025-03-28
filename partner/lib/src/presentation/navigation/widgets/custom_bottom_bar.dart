@@ -20,10 +20,10 @@ class CustomBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        40.sw,
-        10.sw,
-        40.sw,
-        10.sw + context.mediaQueryPadding.bottom,
+        20.sw,
+        0,
+        20.sw,
+        0 + context.mediaQueryPadding.bottom,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -51,56 +51,60 @@ class CustomBottomBar extends StatelessWidget {
     bool isNotification = index == 1;
     bool isSelected = currentIndex == index;
 
-    return InkWell(
-      onTap: () => onTap(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              WidgetAppSVG(
-                icon,
-                width: 24.sw,
-                color: isSelected ? appColorPrimary : hexColor('#E1E1E1'),
-              ),
-              if (isNotification)
-                Positioned(
-                  top: -5.sw,
-                  right: -7.sw,
-                  child: Container(
-                    height: 15.sw,
-                    padding: EdgeInsets.symmetric(horizontal: 4.sw),
-                    decoration: BoxDecoration(
-                      color: hexColor('#FF8832'),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '10',
-                        style: GoogleFonts.roboto(
-                          fontSize: 10.sw,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                          height: 1.4,
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTap(index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Gap(10.sw),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                WidgetAppSVG(
+                  icon,
+                  width: 24.sw,
+                  color: isSelected ? appColorPrimary : hexColor('#E1E1E1'),
+                ),
+                if (isNotification)
+                  Positioned(
+                    top: -5.sw,
+                    right: -7.sw,
+                    child: Container(
+                      height: 15.sw,
+                      padding: EdgeInsets.symmetric(horizontal: 4.sw),
+                      decoration: BoxDecoration(
+                        color: hexColor('#FF8832'),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '10',
+                          style: GoogleFonts.roboto(
+                            fontSize: 10.sw,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          Gap(2.sw),
-          Text(
-            label,
-            style: w500TextStyle(
-              fontSize: 10.sw,
-              color: isSelected ? darkGreen : grey9,
+              ],
             ),
-          ),
-        ],
+            Gap(2.sw),
+            Text(
+              label,
+              style: w500TextStyle(
+                fontSize: 10.sw,
+                color: isSelected ? darkGreen : grey9,
+              ),
+            ),
+            Gap(10.sw),
+          ],
+        ),
       ),
     );
   }

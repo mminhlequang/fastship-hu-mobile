@@ -30,7 +30,7 @@ class _OpeningTimeScreenState extends State<OpeningTimeScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
         title: Text(
-          'Opening time'.tr(),
+          'Opening hours'.tr(),
           style: w500TextStyle(fontSize: 20.sw, height: 1.2),
         ),
         backgroundColor: Colors.white,

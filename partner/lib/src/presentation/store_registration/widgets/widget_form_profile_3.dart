@@ -136,11 +136,10 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
             Gap(16.sw),
             Container(height: 8.sw, color: appColorBackground),
             _buildNavigationItem(
-              title: 'Opening time'.tr(),
+              title: 'Opening hours'.tr(),
               route: '/opening-time',
               extra: _openTimes,
-              onReturn: (value) {
-                print('value: $value');
+              onReturn: (value) { 
                 if (value != null) {
                   setState(() {
                     _openTimes = value;

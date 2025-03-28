@@ -94,10 +94,8 @@ class _MenuScreenState extends State<MenuScreen>
                             .toList() ??
                         []);
                 if (r is List<int>) {
-                  await StoreRepo().updateStore({
-                    "id": authCubit.state.store!.id!,
-                    "category_ids": r
-                  }).then((v) {
+                  await StoreRepo().updateStore(
+                      {"id": authCubit.storeId!, "category_ids": r}).then((v) {
                     if (v.isSuccess) {
                       appShowSnackBar(
                         context: context,
