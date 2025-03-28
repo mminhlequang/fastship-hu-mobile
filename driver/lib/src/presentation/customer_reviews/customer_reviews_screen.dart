@@ -1,5 +1,8 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/rating/models/models.dart';
+import 'package:app/src/network_resources/rating/repo.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -14,19 +17,301 @@ class CustomerReviewsScreen extends StatefulWidget {
 }
 
 class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
+  bool _isLoading = true;
+  List<RatingModel> _reviews = [];
+  double _averageRating = 0;
+  int _totalReviews = 0;
+  double _last7DaysRating = 0;
+  int _last7DaysReviews = 0;
+  String _selectedTimeFilter = '7 days ago';
+  int? _selectedStarFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final response = await RatingRepo().getDriverRatings({
+        'driver_id': AppPrefs.instance.user?.id,
+        // 'time': _selectedTimeFilter,
+        // 'star': _selectedStarFilter,
+      });
+
+      if (response.isSuccess) {
+        final reviews = response.data as List<RatingModel>;
+        setState(() {
+          _reviews = reviews;
+          _calculateStats(reviews);
+          _isLoading = false;
+        });
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to load reviews'.tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Something went wrong'.tr()),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _calculateStats(List<RatingModel> reviews) {
+    if (reviews.isEmpty) return;
+
+    // Calculate average rating
+    final totalStars =
+        reviews.fold(0, (sum, review) => sum + (review.star ?? 0));
+    _averageRating = totalStars / reviews.length;
+
+    // Calculate last 7 days stats
+    final now = DateTime.now();
+    final last7DaysReviews = reviews.where((review) {
+      final reviewDate = DateTime.tryParse(review.createdAt ?? '');
+      if (reviewDate == null) return false;
+      return now.difference(reviewDate).inDays <= 7;
+    }).toList();
+
+    if (last7DaysReviews.isNotEmpty) {
+      final last7DaysTotalStars =
+          last7DaysReviews.fold(0, (sum, review) => sum + (review.star ?? 0));
+      _last7DaysRating = last7DaysTotalStars / last7DaysReviews.length;
+      _last7DaysReviews = last7DaysReviews.length;
+    }
+
+    _totalReviews = reviews.length;
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _loadData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Customer’s Reviews'.tr())),
-      body: Column(
+      appBar: AppBar(title: Text("Customer's Reviews".tr())),
+      body: _isLoading
+          ? _buildShimmer()
+          : Column(
+              children: [
+                _buildOverview(),
+                Gap(8.sw),
+                _buildFilter(),
+                Expanded(
+                  child: _buildReviews(),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildShimmer() {
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          _buildOverview(),
+          _buildShimmerOverview(),
           Gap(8.sw),
-          _buildFilter(),
+          _buildShimmerFilter(),
+          _buildShimmerReviews(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerOverview() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(top: 12.sw, bottom: 8.sw),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Expanded(
-            child: _buildReviews(),
+            child: Column(
+              children: [
+                WidgetAppShimmer(
+                  width: 60.sw,
+                  height: 24.sw,
+                ),
+                Gap(2.sw),
+                WidgetAppShimmer(
+                  width: 100.sw,
+                  height: 20.sw,
+                ),
+                Gap(2.sw),
+                WidgetAppShimmer(
+                  width: 80.sw,
+                  height: 12.sw,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                WidgetAppShimmer(
+                  width: 60.sw,
+                  height: 24.sw,
+                ),
+                Gap(2.sw),
+                WidgetAppShimmer(
+                  width: 100.sw,
+                  height: 20.sw,
+                ),
+                Gap(2.sw),
+                WidgetAppShimmer(
+                  width: 80.sw,
+                  height: 12.sw,
+                ),
+                Gap(2.sw),
+                WidgetAppShimmer(
+                  width: 100.sw,
+                  height: 12.sw,
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerFilter() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+      child: Row(
+        children: [
+          Expanded(
+            child: WidgetAppShimmer(
+              height: 32.sw,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Gap(10.sw),
+          Expanded(
+            child: WidgetAppShimmer(
+              height: 32.sw,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerReviews() {
+    return Column(
+      children: List.generate(
+        3,
+        (index) => Column(
+          children: [
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.all(16.sw),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      WidgetAppShimmer(
+                        width: 34.sw,
+                        height: 34.sw,
+                        borderRadius: BorderRadius.circular(17.sw),
+                      ),
+                      Gap(6.sw),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                WidgetAppShimmer(
+                                  width: 80.sw,
+                                  height: 12.sw,
+                                ),
+                                const Spacer(),
+                                WidgetAppShimmer(
+                                  width: 60.sw,
+                                  height: 16.sw,
+                                ),
+                              ],
+                            ),
+                            Gap(2.sw),
+                            Row(
+                              children: [
+                                WidgetAppShimmer(
+                                  width: 100.sw,
+                                  height: 12.sw,
+                                ),
+                                const Spacer(),
+                                WidgetAppShimmer(
+                                  width: 120.sw,
+                                  height: 12.sw,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Gap(8.sw),
+                  Row(
+                    children: [
+                      Gap(40.sw),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            WidgetAppShimmer(
+                              width: 80.sw,
+                              height: 24.sw,
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                            Gap(8.sw),
+                            WidgetAppShimmer(
+                              width: double.infinity,
+                              height: 36.sw,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: 1,
+              color: Colors.white,
+            ),
+            Container(
+              height: 40.sw,
+              color: Colors.white,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -45,12 +330,12 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                 child: Column(
                   children: [
                     Text(
-                      '4.8',
+                      _averageRating.toStringAsFixed(1),
                       style: w600TextStyle(fontSize: 24.sw),
                     ),
                     Gap(2.sw),
                     RatingBarIndicator(
-                      rating: 4.8,
+                      rating: _averageRating,
                       itemBuilder: (context, index) => WidgetAppSVG('ic_star'),
                       itemCount: 5,
                       itemSize: 20.sw,
@@ -60,7 +345,7 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                     ),
                     Gap(2.sw),
                     Text(
-                      '50 ${'reviews'.tr()}',
+                      '$_totalReviews ${'reviews'.tr()}',
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#4F4F4F'),
@@ -73,12 +358,12 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                 child: Column(
                   children: [
                     Text(
-                      '4.8',
+                      _last7DaysRating.toStringAsFixed(1),
                       style: w600TextStyle(fontSize: 24.sw),
                     ),
                     Gap(2.sw),
                     RatingBarIndicator(
-                      rating: 4.8,
+                      rating: _last7DaysRating,
                       itemBuilder: (context, index) => WidgetAppSVG('ic_star'),
                       itemCount: 5,
                       itemSize: 20.sw,
@@ -88,7 +373,7 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                     ),
                     Gap(2.sw),
                     Text(
-                      '3 ${'reviews'.tr()}',
+                      '$_last7DaysReviews ${'reviews'.tr()}',
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#4F4F4F'),
@@ -135,7 +420,7 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '7 days ago'.tr(),
+                      _selectedTimeFilter.tr(),
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#4F4F4F'),
@@ -168,6 +453,13 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                           ),
                         ],
                       ),
+                      child: ListView(
+                        children: [
+                          _buildTimeFilterItem('7 days ago'),
+                          _buildTimeFilterItem('30 days ago'),
+                          _buildTimeFilterItem('All time'),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -187,7 +479,9 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '5 Star'.tr(),
+                      _selectedStarFilter != null
+                          ? '$_selectedStarFilter Star'.tr()
+                          : 'All Stars'.tr(),
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#4F4F4F'),
@@ -228,37 +522,13 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: List.generate(
-                          5,
-                          (index) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6.sw),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${5 - index} Star'.tr(),
-                                    style: w400TextStyle(
-                                      fontSize: 12.sw,
-                                      color: hexColor('#4F4F4F'),
-                                    ),
-                                  ),
-                                  Gap(2.sw),
-                                  RatingBarIndicator(
-                                    rating: (5 - index) * 1.0,
-                                    itemBuilder: (context, index) =>
-                                        WidgetAppSVG('ic_star'),
-                                    itemCount: 5 - index,
-                                    itemSize: 16.sw,
-                                    direction: Axis.horizontal,
-                                    unratedColor: grey7,
-                                    itemPadding: EdgeInsets.zero,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                        children: [
+                          _buildStarFilterItem(null),
+                          ...List.generate(
+                            5,
+                            (index) => _buildStarFilterItem(5 - index),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -271,15 +541,73 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
     );
   }
 
+  Widget _buildTimeFilterItem(String time) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedTimeFilter = time;
+        });
+        _refreshData();
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.sw),
+        child: Text(
+          time.tr(),
+          style: w400TextStyle(
+            fontSize: 12.sw,
+            color: hexColor('#4F4F4F'),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStarFilterItem(int? star) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedStarFilter = star;
+        });
+        _refreshData();
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.sw),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              star != null ? '$star Star'.tr() : 'All Stars'.tr(),
+              style: w400TextStyle(
+                fontSize: 12.sw,
+                color: hexColor('#4F4F4F'),
+              ),
+            ),
+            if (star != null) ...[
+              Gap(2.sw),
+              RatingBarIndicator(
+                rating: star * 1.0,
+                itemBuilder: (context, index) => WidgetAppSVG('ic_star'),
+                itemCount: star,
+                itemSize: 16.sw,
+                direction: Axis.horizontal,
+                unratedColor: grey7,
+                itemPadding: EdgeInsets.zero,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildReviews() {
     return RefreshIndicator(
-      onRefresh: () async {
-        // Todo: refresh list
-      },
+      onRefresh: _refreshData,
       child: ListView.separated(
-        itemCount: 5,
+        itemCount: _reviews.length,
         separatorBuilder: (context, index) => Gap(5.sw),
         itemBuilder: (context, index) {
+          final review = _reviews[index];
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -293,8 +621,7 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                     Row(
                       children: [
                         WidgetAppImage(
-                          imageUrl:
-                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShkkazTAUNIxKrUcCEMB-7LFeClEFjRaoxAw&s',
+                          imageUrl: review.images?.firstOrNull ?? '',
                           height: 34.sw,
                           width: 34.sw,
                           radius: 99,
@@ -306,12 +633,12 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    'User12345',
+                                    'User${review.id}',
                                     style: w600TextStyle(fontSize: 12.sw),
                                   ),
                                   const Spacer(),
                                   RatingBarIndicator(
-                                    rating: 4,
+                                    rating: review.star?.toDouble() ?? 0,
                                     itemBuilder: (context, index) =>
                                         WidgetAppSVG('ic_star'),
                                     itemCount: 5,
@@ -322,7 +649,7 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                                   ),
                                   Gap(4.sw),
                                   Text(
-                                    '4.0',
+                                    '${review.star}',
                                     style: w400TextStyle(
                                       fontSize: 12.sw,
                                       color: grey1,
@@ -334,13 +661,13 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    '#2345987654',
+                                    '#${review.orderId}',
                                     style: w400TextStyle(
                                         fontSize: 12.sw, color: grey1),
                                   ),
                                   const Spacer(),
                                   Text(
-                                    '24/02/2025 12:30',
+                                    review.createdAt ?? '',
                                     style: w400TextStyle(
                                         fontSize: 12.sw, color: grey1),
                                   ),
@@ -359,24 +686,25 @@ class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8.sw, vertical: 2.sw),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(99),
-                                  border: Border.all(color: grey9),
-                                ),
-                                child: Text(
-                                  'Friendly',
-                                  style: w400TextStyle(
-                                    fontSize: 12.sw,
-                                    color: hexColor('#4F4F4F'),
+                              if (review.content != null)
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8.sw, vertical: 2.sw),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(99),
+                                    border: Border.all(color: grey9),
+                                  ),
+                                  child: Text(
+                                    review.content!,
+                                    style: w400TextStyle(
+                                      fontSize: 12.sw,
+                                      color: hexColor('#4F4F4F'),
+                                    ),
                                   ),
                                 ),
-                              ),
                               Gap(8.sw),
                               Text(
-                                'Khach comment Lorem ipsum dolor sit amet consec tetur. Duis vel libero sed rutrum.',
+                                review.text ?? '',
                                 style: w400TextStyle(
                                   fontSize: 12.sw,
                                   color: hexColor('#4F4F4F'),
