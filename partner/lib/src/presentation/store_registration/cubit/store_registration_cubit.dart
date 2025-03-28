@@ -179,6 +179,7 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         "operating_hours":
             (state.infoStep3['operating_hours'] as List<OpeningTimeModel>?)
                 ?.map((e) => {
+                      "is_off": e.isOpen ? 0 : 1,
                       "day": e.dayNumber,
                       "hours": [e.openTime, e.closeTime]
                     })

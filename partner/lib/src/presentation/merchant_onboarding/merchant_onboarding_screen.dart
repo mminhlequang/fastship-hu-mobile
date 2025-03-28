@@ -45,14 +45,11 @@ class _MerchantOnboardingScreenState extends State<MerchantOnboardingScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("    " + 'Merchant Onboarding'.tr()),
+        title: Text("    ${'Merchant Onboarding'.tr()}"),
         actions: [
           IconButton(
             onPressed: () {
               appHaptic();
-              AppPrefs.instance.getNormalToken().then((value) {
-                print(value);
-              });
               appContext.push('/store-registration');
             },
             icon: WidgetAppSVG('ic_add_circle'),

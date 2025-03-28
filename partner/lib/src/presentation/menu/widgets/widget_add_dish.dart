@@ -2,6 +2,7 @@ import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/network_resources/models/opening_time_model.dart';
+import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/product/repo.dart';
 import 'package:app/src/network_resources/store/models/menu.dart';
 import 'package:app/src/presentation/widgets/widget_loading_wrapper.dart';
@@ -69,6 +70,8 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
       _describeController.text = product.description ?? '';
       _status.value = product.status == 1;
       _imageUrl = product.image;
+      _openTimes = OpeningTimeModel.fromListOperatingHours(
+          product.operatingHours ?? []);
     }
   }
 
@@ -105,6 +108,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         'category_ids': widget.params.categoryIds,
         "operating_hours": _openTimes
             .map((e) => {
+                  "is_off": e.isOpen ? 0 : 1,
                   "day": e.dayNumber,
                   "hours": [e.openTime, e.closeTime]
                 })
@@ -135,6 +139,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         'category_ids': widget.params.categoryIds,
         "operating_hours": _openTimes
             .map((e) => {
+                  "is_off": e.isOpen ? 0 : 1,
                   "day": e.dayNumber,
                   "hours": [e.openTime, e.closeTime]
                 })

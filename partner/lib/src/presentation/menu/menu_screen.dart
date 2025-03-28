@@ -1,6 +1,7 @@
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/store/models/menu.dart';
 import 'package:app/src/network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
@@ -185,7 +186,7 @@ class _MenuScreenState extends State<MenuScreen>
                 ],
               ),
             ),
-            if (menu.products != null) ...[
+            if (menu.products?.isNotEmpty == true) ...[
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

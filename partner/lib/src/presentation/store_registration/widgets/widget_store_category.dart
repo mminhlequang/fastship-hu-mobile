@@ -56,7 +56,7 @@ class _WidgetStoreCategoryState extends State<WidgetStoreCategory> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => context.pop(selectedIds),
+          onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
         title: Text(

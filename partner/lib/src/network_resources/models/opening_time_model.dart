@@ -1,3 +1,5 @@
+import '../store/models/store.dart';
+
 class OpeningTimeModel {
   final String day;
   final int dayNumber;
@@ -31,6 +33,40 @@ class OpeningTimeModel {
       'openTime': openTime,
       'closeTime': closeTime,
     };
+  }
+
+  static List<OpeningTimeModel> fromListOperatingHours(
+      List<OperatingHours> list) {
+    return list
+        .map((e) => OpeningTimeModel(
+              day: getDayName(e.day ?? 0),
+              dayNumber: e.day ?? 0,
+              isOpen: e.isOff == 0,
+              openTime: e.startTime ?? "",
+              closeTime: e.endTime ?? "",
+            ))
+        .toList();
+  }
+
+  static String getDayName(int dayNumber) {
+    switch (dayNumber) {
+      case 1:
+        return "Monday";
+      case 2:
+        return "Tuesday";
+      case 3:
+        return "Wednesday";
+      case 4:
+        return "Thursday";
+      case 5:
+        return "Friday";
+      case 6:
+        return "Saturday";
+      case 7:
+        return "Sunday";
+      default:
+        return "";
+    }
   }
 
   static List<OpeningTimeModel> getDefaultOpeningTimes() {

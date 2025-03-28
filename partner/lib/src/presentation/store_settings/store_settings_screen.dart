@@ -52,14 +52,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             WidgetRippleButton(
               onTap: () async {
                 final r = await appContext.push('/opening-time',
-                        extra: authCubit.state.store!.operatingHours
-                            ?.map((e) => OpeningTimeModel(
-                                day: "",
-                                dayNumber: e.day!,
-                                isOpen: true,
-                                openTime: e.startTime!,
-                                closeTime: e.endTime!))
-                            .toList()) ??
+                        extra: OpeningTimeModel.fromListOperatingHours(
+                            authCubit.state.store!.operatingHours ?? [])) ??
                     [];
                 if (r is List<int>) {
                   StoreRepo().updateStore({
@@ -100,11 +94,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
               ),
             ),
             WidgetRippleButton(
-              onTap: () async {
-                AppPrefs.instance.getNormalToken().then((v) {
-                  print(v);
-                });
-
+              onTap: () async {  
                 final r =
                     await appContext.push('/store-category', extra: authCubit.state.store?.categories
                         ?.map((e) => e.id!)

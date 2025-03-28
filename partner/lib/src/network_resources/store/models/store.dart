@@ -303,10 +303,11 @@ class BannerImages {
 
 class OperatingHours {
   int? day;
+  int? isOff;
   String? startTime;
   String? endTime;
 
-  OperatingHours({this.day, this.startTime, this.endTime});
+  OperatingHours({this.day, this.isOff, this.startTime, this.endTime});
 
   OperatingHours.fromJson(Map<String, dynamic> json) {
     if (json["day"] is int) {
@@ -317,6 +318,9 @@ class OperatingHours {
     }
     if (json["end_time"] is String) {
       endTime = json["end_time"];
+    }
+    if (json["is_off"] is int) {
+      isOff = json["is_off"];
     }
   }
 
@@ -329,6 +333,9 @@ class OperatingHours {
     _data["day"] = day;
     _data["start_time"] = startTime;
     _data["end_time"] = endTime;
+    _data["is_off"] = isOff;
     return _data;
   }
+
+  
 }

@@ -1,3 +1,4 @@
+import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/store/models/models.dart';
 import 'package:app/src/network_resources/topping/models/models.dart';
 

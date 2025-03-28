@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
@@ -24,7 +25,8 @@ void main() async {
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
     if (!kIsWeb) ...[
       if (Platform.isAndroid)
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]),
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+            overlays: [SystemUiOverlay.top]),
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]),
@@ -72,7 +74,10 @@ class _AppState extends State<_App> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        theme: (AppPrefs.instance.isDarkTheme ? ThemeData.dark() : ThemeData.light()).copyWith(
+        theme: (AppPrefs.instance.isDarkTheme
+                ? ThemeData.dark()
+                : ThemeData.light())
+            .copyWith(
           scaffoldBackgroundColor: appColorBackground,
           colorScheme: ColorScheme.fromSeed(seedColor: appColorPrimary),
           appBarTheme: AppBarTheme(
@@ -98,7 +103,22 @@ class _AppState extends State<_App> {
             indicatorSize: TabBarIndicatorSize.tab,
           ),
         ),
-        themeMode: AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+        themeMode:
+            AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+        builder: (context, child) {
+          return GestureDetector(
+            onDoubleTap: kDebugMode
+                ? () {
+                    AppPrefs.instance.getNormalToken().then((value) {
+                      print(value);
+                    });
+                  }
+                : null,
+            child: KeyboardDismissOnTap(
+              child: child!,
+            ),
+          );
+        },
       ),
     );
   }
