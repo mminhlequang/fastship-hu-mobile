@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:internal_core/widgets/widget_commons.dart';
 
 import '../home/widgets/widget_dialog_filters.dart';
-import 'widgets/widget_restaurant_menu1.dart';
+import 'widgets/widget_restaurant_menu.dart';
 
 class RestaurantsScreen extends StatelessWidget {
   const RestaurantsScreen({Key? key}) : super(key: key);
@@ -232,7 +232,7 @@ class RestaurantCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        appOpenBottomSheet(RestaurantMenuScroll());
+        appOpenBottomSheet(RestaurantMenu());
       },
       child: Container(
         padding: EdgeInsets.all(10),
