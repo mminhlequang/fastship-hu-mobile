@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import 'app_get.dart';
@@ -88,6 +89,12 @@ final goRouter = GoRouter(
           );
         }
         return const CheckoutScreen();
+      },
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder: (context, state) {
+        return const NotificationsScreen();
       },
     ),
   ],

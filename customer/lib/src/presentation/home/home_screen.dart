@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:internal_core/widgets/widgets.dart';
 
 class AppColors {
   static const primary = Color(0xFF538D33);
@@ -82,7 +83,7 @@ class LocationHeader extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Image.network(
+                    WidgetAppSVG.network(
                       'https://cdn.builder.io/api/v1/image/assets/TEMP/7b1d8ae7002bb251f986db962a721d67ea805c97?placeholderIfAbsent=true',
                       width: 18,
                       height: 18,
@@ -94,7 +95,7 @@ class LocationHeader extends StatelessWidget {
                       style: AppTextStyles.body1,
                     ),
                     const SizedBox(width: 4),
-                    Image.network(
+                    WidgetAppSVG.network(
                       'https://cdn.builder.io/api/v1/image/assets/TEMP/723312f5d170b02ba79de143973053b9ba04467b?placeholderIfAbsent=true',
                       width: 18,
                       height: 18,
@@ -128,7 +129,7 @@ class LocationHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(100),
               ),
               child: Center(
-                child: Image.network(
+                child: WidgetAppSVG.network(
                   'https://cdn.builder.io/api/v1/image/assets/TEMP/9935934676c6d1f9986d6ad0ef54c80ff5eb3dd8?placeholderIfAbsent=true',
                   width: 24,
                   height: 24,
@@ -157,12 +158,6 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 11),
-                Text(
-                  '9:41',
-                  style: AppTextStyles.urbanist.copyWith(fontSize: 16),
-                ),
-                const SizedBox(height: 22),
                 const LocationHeader(),
                 const SizedBox(height: 17),
                 const SearchBar(),
@@ -205,7 +200,7 @@ class SearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.network(
+          WidgetAppSVG.network(
             'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true',
             width: 24,
             height: 24,
@@ -288,7 +283,7 @@ class PromoBanner extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 2),
-                      Image.network(
+                      WidgetAppSVG.network(
                         'https://cdn.builder.io/api/v1/image/assets/TEMP/2e52ece8ff2046a9cd87f0fcbb0cce173dcb2d83?placeholderIfAbsent=true',
                         width: 24,
                         height: 24,
@@ -339,7 +334,7 @@ class CategorySection extends StatelessWidget {
                 color: Colors.white,
               ),
               child: Center(
-                child: Image.network(
+                child: WidgetAppSVG.network(
                   'https://cdn.builder.io/api/v1/image/assets/TEMP/46077d169b8fe4f3bcf5223e5ba54a905d425ec9?placeholderIfAbsent=true',
                   width: 24,
                   height: 24,
@@ -377,7 +372,7 @@ class CategorySection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       child: Column(
         children: [
-          Image.network(
+          WidgetAppSVG.network(
             imageUrl,
             width: 48,
             height: 48,
