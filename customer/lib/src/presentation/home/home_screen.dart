@@ -1,371 +1,223 @@
-import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/category/model/category.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:internal_core/internal_core.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:go_router/go_router.dart';
-import 'package:app/src/utils/utils.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:app/src/presentation/home/cubit/home_cubit.dart';  
 
-double get _horizontalPadding => 16.sw;
-
-// Thêm lớp Shimmer tùy chỉnh
-class _Shimmer extends StatefulWidget {
-  final Widget child;
-  final Color baseColor;
-  final Color highlightColor;
-
-  const _Shimmer({
-    Key? key,
-    required this.child,
-    this.baseColor = const Color(0xFFEEEEEE),
-    this.highlightColor = const Color(0xFFFAFAFA),
-  }) : super(key: key);
-
-  @override
-  _ShimmerState createState() => _ShimmerState();
+class AppColors {
+  static const primary = Color(0xFF538D33);
+  static const secondary = Color(0xFFF17228);
+  static const background = Color(0xFFFFFFFF);
+  static const textPrimary = Color(0xFF000000);
+  static const textSecondary = Color(0xFF757575);
+  static const textGrey = Color(0xFF616161);
+  static const divider = Color(0xFFEEE);
+  static const cardBackground = Color(0xFFF9F9FC);
+  static const ratingColor = Color(0xFFFC8A06);
+  static const discountBadge = Color(0xFFF17228);
+  static const greenButton = Color(0xFF74CA45);
 }
 
-class _ShimmerState extends State<_Shimmer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+class AppTextStyles {
+  static const urbanist = TextStyle(
+    fontFamily: 'Urbanist',
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.2,
+  );
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
-    _animation = Tween<double>(begin: -2.0, end: 2.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-  }
+  static const fredoka = TextStyle(
+    fontFamily: 'Fredoka',
+    fontWeight: FontWeight.w400,
+  );
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  static TextStyle heading1 = fredoka.copyWith(
+    fontSize: 20,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle heading2 = fredoka.copyWith(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle body1 = fredoka.copyWith(
+    fontSize: 16,
+    color: AppColors.textPrimary,
+  );
+
+  static TextStyle body2 = fredoka.copyWith(
+    fontSize: 14,
+    color: AppColors.textSecondary,
+  );
+
+  static TextStyle caption = fredoka.copyWith(
+    fontSize: 12,
+    color: AppColors.textGrey,
+  );
+}
+
+class LocationHeader extends StatelessWidget {
+  const LocationHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return ShaderMask(
-          blendMode: BlendMode.srcATop,
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              colors: [
-                widget.baseColor,
-                widget.highlightColor,
-                widget.baseColor
-              ],
-              stops: const [0.0, 0.5, 1.0],
-              begin: Alignment(_animation.value, 0.0),
-              end: Alignment(2 + _animation.value, 0.0),
-            ).createShader(bounds);
-          },
-          child: widget.child,
-        );
-      },
-    );
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  HomeCubit get homeCubit => context.read<HomeCubit>();
-
-  @override
-  void initState() {
-    super.initState();
-    // Load dữ liệu khi màn hình được khởi tạo
-    homeCubit.fetchHomeData();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
           children: [
-            _buildHeader(),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  homeCubit.refreshHomeData();
-                },
-                child: BlocBuilder<HomeCubit, HomeState>(
-                  bloc: homeCubit,
-                  builder: (context, state) {
-                    return SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildPromotionBanner(state.banners),
-                          _buildPopularCategories(state.categories),
-                          // _buildRestaurantsNearYou(state.shops),
-                          // _buildDiscountGuaranteed(),
-                          // _buildBestSeller(state.popularItems),
-                          // _buildRecommendedForYou(),
-                          // _buildPartnershipSection(),
-                          // _buildNewsSection(),
-                          const Gap(20),
-                        ],
-                      ),
-                    );
-                  },
+            Image.network(
+              'https://cdn.builder.io/api/v1/image/assets/TEMP/6fe75dc75f6a2d908bc17000d0b54417d6e6a0d9?placeholderIfAbsent=true',
+              width: 48,
+              height: 48,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Deliver to',
+                  style: AppTextStyles.body2
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Image.network(
+                      'https://cdn.builder.io/api/v1/image/assets/TEMP/7b1d8ae7002bb251f986db962a721d67ea805c97?placeholderIfAbsent=true',
+                      width: 18,
+                      height: 18,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Regent, London',
+                      style: AppTextStyles.body1,
+                    ),
+                    const SizedBox(width: 4),
+                    Image.network(
+                      'https://cdn.builder.io/api/v1/image/assets/TEMP/723312f5d170b02ba79de143973053b9ba04467b?placeholderIfAbsent=true',
+                      width: 18,
+                      height: 18,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                ),
+              ),
+            ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Center(
+                child: Image.network(
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/9935934676c6d1f9986d6ad0ef54c80ff5eb3dd8?placeholderIfAbsent=true',
+                  width: 24,
+                  height: 24,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
+}
 
-  // Widget shimmer đơn giản cho container hình chữ nhật
-  Widget _buildShimmerBox({
-    double width = double.infinity,
-    double height = 100,
-    double borderRadius = 8.0,
-  }) {
-    return _Shimmer(
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-      ),
-    );
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-  // Widget shimmer cho text
-  Widget _buildShimmerText({
-    double width = 100,
-    double height = 12,
-  }) {
-    return _Shimmer(
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ),
-    );
-  }
-
-  // Shimmer cho banner promotion
-  Widget _buildPromotionBannerShimmer() {
-    return Container(
-      height: 200,
-      margin:
-          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
-      child: _buildShimmerBox(
-        height: 200,
-        borderRadius: 12,
-      ),
-    );
-  }
-
-  // Shimmer cho categories
-  Widget _buildCategoriesShimmer() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 8),
-          child: Row(
-            children: [
-              _buildShimmerText(width: 150, height: 20),
-              const Spacer(),
-              _buildShimmerBox(width: 40, height: 40, borderRadius: 20),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 5, // 5 items giả
-            itemBuilder: (context, index) {
-              return Container(
-                width: 90,
-                margin: EdgeInsets.only(right: 16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildShimmerBox(width: 50, height: 50, borderRadius: 25),
-                    const Gap(4),
-                    _buildShimmerText(width: 70, height: 12),
-                    const Gap(2),
-                    _buildShimmerText(width: 50, height: 10),
-                  ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 11),
+                Text(
+                  '9:41',
+                  style: AppTextStyles.urbanist.copyWith(fontSize: 16),
                 ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Shimmer cho restaurants
-  Widget _buildRestaurantsShimmer() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildShimmerText(width: 180, height: 18),
-              _buildShimmerBox(width: 24, height: 24, borderRadius: 12),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 150,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 4, // 4 items giả
-            itemBuilder: (context, index) {
-              return Container(
-                width: 140,
-                margin: EdgeInsets.only(right: 16),
-                child: _buildShimmerBox(height: 150, borderRadius: 8),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Shimmer cho best sellers
-  Widget _buildBestSellerShimmer() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildShimmerText(width: 120, height: 18),
-              _buildShimmerText(width: 60, height: 14),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 220,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 3, // 3 items giả
-            itemBuilder: (context, index) {
-              return Container(
-                width: 160,
-                margin: EdgeInsets.only(right: 16),
-                child: _buildShimmerBox(height: 220, borderRadius: 8),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeader() {
-    return SizedBox(
-      height: 100,
-    );
-    return Padding(
-      padding:
-          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundImage: AssetImage('assets/images/avatar.png'),
-              ),
-              const Gap(8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Deliver to',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'Regent, London',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Icon(Icons.keyboard_arrow_down, size: 16),
-                    ],
-                  ),
-                ],
-              ),
-              Spacer(),
-              IconButton(
-                icon: Icon(Icons.notifications_none_outlined),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.favorite_border_outlined),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          const Gap(12),
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(25),
+                const SizedBox(height: 22),
+                const LocationHeader(),
+                const SizedBox(height: 17),
+                const SearchBar(),
+                const SizedBox(height: 17),
+                const PromoBanner(),
+                const SizedBox(height: 24),
+                const CategorySection(),
+                const SizedBox(height: 24),
+                const FastestDeliverySection(),
+                const SizedBox(height: 32),
+                const DiscountSection(),
+                const SizedBox(height: 32),
+                const BestSellerSection(),
+                const SizedBox(height: 32),
+                const RecommendedSection(),
+                const SizedBox(height: 32),
+                const PartnerSection(),
+                const SizedBox(height: 32),
+                const NewsSection(),
+                const SizedBox(height: 92),
+              ],
             ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'What are you craving?',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 13),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  const SearchBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(56),
+      ),
+      child: Row(
+        children: [
+          Image.network(
+            'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true',
+            width: 24,
+            height: 24,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'What are you craving?.....',
+              style: AppTextStyles.body1.copyWith(
+                color: const Color(0xFFACA9A9),
+                letterSpacing: 0.08,
               ),
             ),
           ),
@@ -373,417 +225,74 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  Widget _buildPromotionBanner( banners) {
-    // Hiển thị shimmer nếu banners là null
-    if (banners == null) {
-      return _buildPromotionBannerShimmer();
-    }
+class PromoBanner extends StatelessWidget {
+  const PromoBanner({Key? key}) : super(key: key);
 
-    // Hiển thị thông báo nếu danh sách rỗng
-    if (banners.isEmpty) {
-      return SizedBox.shrink();
-    }
-
-    return SizedBox(
-      height: 200,
-    );
-
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 100,
-      margin:
-          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 12),
-      child: PageView.builder(
-        itemCount: banners.length,
-        itemBuilder: (context, index) {
-          final banner = banners[index];
-          return Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(12),
-              image: banner.image != null
-                  ? DecorationImage(
-                      image: NetworkImage(banner.image!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-            child: Row(
+      height: 180,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: 14,
+            top: 13,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        banner.name ?? 'Special Offer',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      if (banner.description != null)
-                        Text(
-                          banner.description!,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                    ],
+                Text(
+                  '30% Discount only valid for today!',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: Colors.white,
+                    letterSpacing: 0.51,
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  'Get special discount',
+                  style: AppTextStyles.body2.copyWith(
+                    color: Colors.white,
+                    letterSpacing: 0.12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '\$ 12.88',
+                  style: AppTextStyles.heading1.copyWith(
+                    color: Colors.white,
+                    letterSpacing: 0.54,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
                       Text(
                         'Order now',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                        style: AppTextStyles.body1.copyWith(
+                          color: AppColors.greenButton,
                         ),
                       ),
-                      Icon(Icons.arrow_forward, size: 12, color: Colors.green),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildPopularCategories(List<CategoryModel>? categories) {
-    // Hiển thị shimmer nếu categories là null
-    if (categories == null) {
-      return _buildCategoriesShimmer();
-    } else if (categories.isEmpty) {
-      return SizedBox.shrink();
-    }
-
-    Widget _buildCategoryItem({
-      required int index,
-      required CategoryModel category,
-    }) {
-      return Container(
-        height: 124.sw,
-        constraints: BoxConstraints(minWidth: 110.sw),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.sw),
-          boxShadow: index != 0
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 32,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-        ),
-        padding: EdgeInsets.all(6.sw),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: WidgetAppImage(
-                  imageUrl: category.image,
-                  placeholderWidget: SizedBox(),
-                ),
-              ),
-            ),
-            Gap(4.sw),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 110.sw),
-              child: Text(
-                category.name ?? "",
-                style: w500TextStyle(fontSize: 16.sw),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 110.sw),
-              child: Text(
-                category.description ?? '',
-                style:
-                    w400TextStyle(fontSize: 12.sw, color: hexColor('#F17228')),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
-          child: _WidgetTitle(
-            title: 'Popular Categories',
-            actions: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: appColorBorder),
-                ),
-                width: 48.sw,
-                height: 48.sw,
-                alignment: Alignment.center,
-                child: WidgetAppSVG(
-                  'Setting',
-                  width: 24.sw,
-                ),
-              )
-            ],
-          ),
-        ),
-        Gap(24.sw),
-        SizedBox(
-          height: 124.sw,
-          child: ListView.separated(
-            clipBehavior: Clip.none,
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
-            itemCount: categories.length,
-            separatorBuilder: (context, index) => Gap(8.sw),
-            itemBuilder: (context, index) {
-              return _buildCategoryItem(
-                index: index,
-                category: categories[index],
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Widget _buildRestaurantsNearYou(List<Shop>? shops) {
-  //   // Hiển thị shimmer nếu shops là null
-  //   if (shops == null) {
-  //     return _buildRestaurantsShimmer();
-  //   }
-
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Padding(
-  //         padding: EdgeInsets.symmetric(
-  //             horizontal: _horizontalPadding, vertical: 16),
-  //         child: Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Text(
-  //               'Restaurants near you',
-  //               style: TextStyle(
-  //                 fontSize: 18,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //             Icon(Icons.search),
-  //           ],
-  //         ),
-  //       ),
-  //       SizedBox(
-  //         height: 150,
-  //         child: shops.isEmpty
-  //             ? Center(child: Text('Không có cửa hàng gần đây'))
-  //             : ListView.builder(
-  //                 scrollDirection: Axis.horizontal,
-  //                 padding: EdgeInsets.symmetric(horizontal: 16),
-  //                 itemCount: shops.length,
-  //                 itemBuilder: (context, index) {
-  //                   final shop = shops[index];
-  //                   return _buildRestaurantCard(
-  //                     shop.name,
-  //                     shop.distance ?? '?km',
-  //                     shop.id,
-  //                     imageUrl: shop.image,
-  //                   );
-  //                 },
-  //               ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildRestaurantCard(
-    String name,
-    String distance,
-    String id, {
-    String? imageUrl,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        context.push('/restaurant-detail/$id');
-      },
-      child: Container(
-        width: 140,
-        margin: EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
-                ),
-                image: DecorationImage(
-                  image: imageUrl != null
-                      ? NetworkImage(imageUrl) as ImageProvider
-                      : AssetImage('assets/images/restaurant_placeholder.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(2),
-                  Text(
-                    distance,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDiscountGuaranteed() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Row(
-            children: [
-              Text(
-                'Discount Guaranteed! ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Icon(Icons.thumb_up, color: Colors.amber, size: 20),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 40,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildDiscountTag('Vegan'),
-              _buildDiscountTag('Pizza & Fast food'),
-              _buildDiscountTag('Sushi'),
-            ],
-          ),
-        ),
-        const Gap(12),
-        GestureDetector(
-          onTap: () {
-            // Điều hướng đến trang chi tiết nhà hàng
-            context.push('/restaurant-detail/rest1');
-          },
-          child: Container(
-            height: 140,
-            margin: EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: AssetImage('assets/images/chef_burger.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'TOP',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  left: 8,
-                  child: Text(
-                    'Chef Burgers London',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 16),
-                      Text(
-                        '5',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      const SizedBox(width: 2),
+                      Image.network(
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/2e52ece8ff2046a9cd87f0fcbb0cce173dcb2d83?placeholderIfAbsent=true',
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
                       ),
                     ],
                   ),
@@ -791,556 +300,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDiscountTag(String title) {
-    return Container(
-      margin: EdgeInsets.only(right: 12),
-      padding:
-          EdgeInsets.symmetric(horizontal: _horizontalPadding, vertical: 8),
-      decoration: BoxDecoration(
-        color: title == 'Pizza & Fast food' ? Colors.green : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: title == 'Pizza & Fast food'
-              ? Colors.green
-              : Colors.grey.shade300,
-        ),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: title == 'Pizza & Fast food' ? Colors.white : Colors.black,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  // Widget _buildBestSeller(List<Food>? popularItems) {
-  //   // Hiển thị shimmer nếu popularItems là null
-  //   if (popularItems == null) {
-  //     return _buildBestSellerShimmer();
-  //   }
-
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Padding(
-  //         padding: EdgeInsets.symmetric(
-  //             horizontal: _horizontalPadding, vertical: 16),
-  //         child: Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Text(
-  //               'Best Sellers',
-  //               style: TextStyle(
-  //                 fontSize: 18,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //             Text(
-  //               'See all',
-  //               style: TextStyle(
-  //                 color: Colors.blue,
-  //                 fontSize: 14,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //       SizedBox(
-  //         height: 220,
-  //         child: popularItems.isEmpty
-  //             ? Center(child: Text('Không có món ăn nổi bật'))
-  //             : ListView.builder(
-  //                 scrollDirection: Axis.horizontal,
-  //                 padding: EdgeInsets.symmetric(horizontal: 16),
-  //                 itemCount: popularItems.length,
-  //                 itemBuilder: (context, index) {
-  //                   final food = popularItems[index];
-  //                   return _buildFoodCard(
-  //                     food.name,
-  //                     food.price ?? 0,
-  //                     food.discountPrice,
-  //                     food.id,
-  //                     rating: food.rating ?? 0,
-  //                     reviewCount: food.reviewCount ?? 0,
-  //                     imageUrl: food.image,
-  //                   );
-  //                 },
-  //               ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildFoodCard(
-    String name,
-    double price,
-    double? discountPrice,
-    String id, {
-    double rating = 0,
-    int reviewCount = 0,
-    String? imageUrl,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        context.push('/food-detail/$id');
-      },
-      child: Container(
-        width: 160,
-        margin: EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    image: DecorationImage(
-                      image: imageUrl != null
-                          ? NetworkImage(imageUrl) as ImageProvider
-                          : AssetImage('assets/images/food_placeholder.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                if (discountPrice != null && discountPrice < price)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '${((price - discountPrice) / price * 100).toInt()}% OFF',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Text(
-                        '$rating',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        ' ($reviewCount)',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      if (discountPrice != null && discountPrice < price) ...[
-                        Text(
-                          '₫${discountPrice.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.green,
-                          ),
-                        ),
-                        const Gap(4),
-                        Text(
-                          '₫${price.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ] else
-                        Text(
-                          '₫${price.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecommendedForYou() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Recommended For You!',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text('View all'),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 220,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildRecommendedCard('Vegetarian Noodles', 20, 'food3'),
-              _buildRecommendedCard('Pizza Hut - Lumintui', 20, 'food4'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecommendedCard(String name, int discount, String id) {
-    return GestureDetector(
-      onTap: () {
-        // Điều hướng đến trang chi tiết món ăn
-        context.push('/food-detail/$id');
-      },
-      child: Container(
-        width: 160,
-        margin: EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                image: DecorationImage(
-                  image: AssetImage('assets/images/noodles.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '-$discount%',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      Text(
-                        'Olive Outdoor',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                      Spacer(),
-                      Text(
-                        '1.1km',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ],
-                  ),
-                  const Gap(4),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Text(
-                        ' 4.5 (1.1k)',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPartnershipSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Text(
-            'Let\'s be partners now!',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildPartnerCard(
-                  title: 'Partner with us',
-                  buttonText: 'Get Started',
-                  icon: Icons.store,
-                ),
-              ),
-              const Gap(16),
-              Expanded(
-                child: _buildPartnerCard(
-                  title: 'Ride with us',
-                  buttonText: 'Get Started',
-                  icon: Icons.delivery_dining,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPartnerCard({
-    required String title,
-    required String buttonText,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Sign up as a business',
-            style: TextStyle(fontSize: 10, color: Colors.grey),
-          ),
-          const Gap(8),
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          const Gap(16),
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 24),
-              ),
-              Spacer(),
-              Icon(Icons.check_circle, color: Colors.green),
-            ],
-          ),
-          const Gap(16),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              buttonText,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNewsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: _horizontalPadding, vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'News',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text('View all'),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              _buildNewsCard('Blueberry pancake'),
-              _buildNewsCard('Blueberry'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNewsCard(String title) {
-    return Container(
-      width: 180,
-      margin: EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: Image.asset(
-              'assets/images/pancake.png',
-              height: 80,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-                Text(
-                  'Lorem ipsum dolor sit amet consectetur...',
-                  style: TextStyle(fontSize: 8, color: Colors.grey),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Image.network(
+              'https://cdn.builder.io/api/v1/image/assets/TEMP/d0b25aa58ede91377611d3f24eef01ac7beb6672?placeholderIfAbsent=true',
+              width: 141,
+              fit: BoxFit.contain,
             ),
           ),
         ],
@@ -1349,23 +315,937 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _WidgetTitle extends StatelessWidget {
-  final String title;
-  final List<Widget>? actions;
-  const _WidgetTitle({super.key, required this.title, this.actions});
+class CategorySection extends StatelessWidget {
+  const CategorySection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: w500TextStyle(fontSize: 24.sw),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Popular Categories',
+              style: AppTextStyles.heading1,
+            ),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: AppColors.divider),
+                color: Colors.white,
+              ),
+              child: Center(
+                child: Image.network(
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/46077d169b8fe4f3bcf5223e5ba54a905d425ec9?placeholderIfAbsent=true',
+                  width: 24,
+                  height: 24,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildCategoryItem('Fast food',
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/e822d097aadea12787a2bd37e3b03955429c24ef?placeholderIfAbsent=true'),
+              _buildCategoryItem('Pizza',
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/1ff32d092e27f7da815fb412366e9b7dfa1dbb24?placeholderIfAbsent=true'),
+              _buildCategoryItem('Salads',
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/2c0135a4d0f9ab2d25c3250fe57ae4880eaa6754?placeholderIfAbsent=true'),
+              _buildCategoryItem('Pasta',
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/0608d453482ad8711c95c8ac779f52129c3b010d?placeholderIfAbsent=true'),
+              _buildCategoryItem('Pasta',
+                  'https://cdn.builder.io/api/v1/image/assets/TEMP/6f12e27793b20d57d6eaab5c6fbc361679070313?placeholderIfAbsent=true'),
+            ],
           ),
         ),
-        if (actions != null) ...actions!,
       ],
+    );
+  }
+
+  Widget _buildCategoryItem(String title, String imageUrl) {
+    return Container(
+      width: 84,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      child: Column(
+        children: [
+          Image.network(
+            imageUrl,
+            width: 48,
+            height: 48,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: AppTextStyles.caption,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RestaurantCard extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+  final String rating;
+  final String deliveryTime;
+  final String originalPrice;
+  final String discountedPrice;
+  final String discountPercentage;
+
+  const RestaurantCard({
+    Key? key,
+    required this.imageUrl,
+    required this.name,
+    required this.rating,
+    required this.deliveryTime,
+    required this.originalPrice,
+    required this.discountedPrice,
+    required this.discountPercentage,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 175,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl,
+                  height: 146,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                top: 5,
+                right: 5,
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(123),
+                  ),
+                  child: Center(
+                    child: Image.network(
+                      'https://cdn.builder.io/api/v1/image/assets/TEMP/ec2b7a9981a6520af27f53530b2498576b254006?placeholderIfAbsent=true',
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 5,
+                left: 5,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.discountBadge,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$discountPercentage off',
+                    style: AppTextStyles.caption.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Image.network(
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/473a7b3b713820da1587d9e18f45e3600a86de71?placeholderIfAbsent=true',
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    name,
+                    style: AppTextStyles.body2.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: AppColors.ratingColor,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    rating,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.ratingColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            name,
+            style: AppTextStyles.body1,
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.access_time,
+                    size: 16,
+                    color: Color(0xFFA6A0A0),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    deliveryTime,
+                    style: AppTextStyles.caption.copyWith(
+                      color: const Color(0xFFA6A0A0),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    originalPrice,
+                    style: AppTextStyles.caption.copyWith(
+                      color: const Color(0xFFA6A0A0),
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    discountedPrice,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NewsCard extends StatelessWidget {
+  final String imageUrl;
+  final String date;
+  final String title;
+
+  const NewsCard({
+    Key? key,
+    required this.imageUrl,
+    required this.date,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 287,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1EFE9),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              height: 145,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                'Blog',
+                style: AppTextStyles.caption.copyWith(
+                  color: const Color(0xFF939191),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 1,
+                height: 11,
+                color: const Color(0xFFD0D0D0),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                date,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.secondary,
+                  letterSpacing: 0.12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: AppTextStyles.body2.copyWith(
+              color: const Color(0xFF0B0B0B),
+              height: 1.4,
+              letterSpacing: 0.14,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FastestDeliverySection extends StatelessWidget {
+  const FastestDeliverySection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Fastest delivery',
+              style: AppTextStyles.heading1,
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: const [
+              RestaurantCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/7d07bcadbd5b9a672e0e03bc56c0838f9edb3dfc?placeholderIfAbsent=true',
+                name: 'Vegetarian Noodles',
+                rating: '4.5',
+                deliveryTime: '15-20m',
+                originalPrice: '\$ 3.30',
+                discountedPrice: '\$ 2.20',
+                discountPercentage: '20%',
+              ),
+              SizedBox(width: 12),
+              RestaurantCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
+                name: 'Pizza Hut - Lumintu',
+                rating: '4.5',
+                deliveryTime: '15-20m',
+                originalPrice: '\$ 3.30',
+                discountedPrice: '\$ 2.20',
+                discountPercentage: '20%',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DiscountSection extends StatelessWidget {
+  const DiscountSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Discount Guaranteed! 👌',
+          style: AppTextStyles.heading1,
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFilterChip('Vegan', false),
+              const SizedBox(width: 10),
+              _buildFilterChip('Pizza & Fast food', true),
+              const SizedBox(width: 10),
+              _buildFilterChip('Sushi', false),
+              const SizedBox(width: 10),
+              _buildFilterChip('others +', false),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildDiscountCard(
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/2c973547f4b25e32f0bf83b49a720ee383206fa5?placeholderIfAbsent=true',
+                '40% off',
+                '5',
+              ),
+              const SizedBox(width: 12),
+              _buildDiscountCard(
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/8a3959e64f4431841283cdb9191500efa585eff2?placeholderIfAbsent=true',
+                '40% off',
+                '5',
+                title: 'Chef Burgers London',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip(String label, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.greenButton : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSelected ? Colors.transparent : const Color(0xFFF1F1F1),
+        ),
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.body2.copyWith(
+          color: isSelected ? Colors.white : const Color(0xFF57585D),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDiscountCard(String imageUrl, String discount, String rating,
+      {String? title}) {
+    return Container(
+      width: 269,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    discount,
+                    style: AppTextStyles.caption.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (title != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.heading2,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      rating,
+                      style: AppTextStyles.body1.copyWith(
+                        color: AppColors.ratingColor,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.star,
+                      color: AppColors.ratingColor,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class RecommendedSection extends StatelessWidget {
+  const RecommendedSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recommended For You !',
+              style: AppTextStyles.heading1,
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: const [
+              RestaurantCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/7d07bcadbd5b9a672e0e03bc56c0838f9edb3dfc?placeholderIfAbsent=true',
+                name: 'Vegetarian Noodles',
+                rating: '4.5',
+                deliveryTime: '15-20m',
+                originalPrice: '\$ 3.30',
+                discountedPrice: '\$ 2.20',
+                discountPercentage: '20%',
+              ),
+              SizedBox(width: 12),
+              RestaurantCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
+                name: 'Pizza Hut - Lumintu',
+                rating: '4.5',
+                deliveryTime: '15-20m',
+                originalPrice: '\$ 3.30',
+                discountedPrice: '\$ 2.20',
+                discountPercentage: '20%',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BestSellerSection extends StatelessWidget {
+  const BestSellerSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Best seller',
+              style: AppTextStyles.heading1,
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildBestSellerCard(),
+              const SizedBox(width: 12),
+              _buildBestSellerCard(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBestSellerCard() {
+    return Container(
+      width: 287,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Image.network(
+                          'URL_TICKET_ICON',
+                          width: 14,
+                          height: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          '20% off',
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 13),
+                  Text(
+                    'Blueberry\npancake',
+                    style: AppTextStyles.heading1,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        '\$ 3.30',
+                        style: AppTextStyles.body1.copyWith(
+                          color: const Color(0xFFA6A0A0),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        '\$ 2.20',
+                        style: AppTextStyles.body1.copyWith(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
+              Image.network(
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/82c707a2dc11de621b524952c587df0767d67239?placeholderIfAbsent=true',
+                width: 138,
+                height: 138,
+                fit: BoxFit.cover,
+              ),
+            ],
+          ),
+          const Divider(height: 16),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundImage: NetworkImage(
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/faa0a8ddc8f18a4a4a6a54bb26a8e6610500992d?placeholderIfAbsent=true'),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Restaurant name',
+                      style: AppTextStyles.caption,
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 16,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '15-20m',
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: 1,
+                          height: 11,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(width: 4),
+                        Row(
+                          children: [
+                            Image.network(
+                              'URL_DELIVERY_ICON',
+                              width: 18,
+                              height: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '\$1.30',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: AppColors.ratingColor,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    '4.5',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.ratingColor,
+                    ),
+                  ),
+                  Text(
+                    ' (1.9k)',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textGrey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NewsSection extends StatelessWidget {
+  const NewsSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'News',
+              style: AppTextStyles.heading1.copyWith(
+                fontSize: 24,
+              ),
+            ),
+            Text(
+              'View all',
+              style: AppTextStyles.body1.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: const [
+              NewsCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/03c146378bbce8c0c7c42a41cf29a2d45ebbe72c?placeholderIfAbsent=true',
+                date: 'Mar 4, 2025',
+                title:
+                    'Introducing GrabAds and the Top 3 GrabAds Campaigns That Really ...',
+              ),
+              SizedBox(width: 12),
+              NewsCard(
+                imageUrl:
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/d5593d9d67a6d52326cdc1f261075c9e6ce6927d?placeholderIfAbsent=true',
+                date: 'Mar 4, 2025',
+                title:
+                    'Introducing GrabAds and the Top 3 GrabAds Campaigns That Really ...',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PartnerSection extends StatelessWidget {
+  const PartnerSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Let's be partners now!",
+          style: AppTextStyles.heading1,
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildPartnerCard(
+                'Signup as a business',
+                'Partner with us',
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/db5e0eca3384e72f7a39529714db31b33f57e8e8?placeholderIfAbsent=true',
+                'Get Started',
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/a8e942bb9e8e4bcdd697e2ab0313c08e987509ad?placeholderIfAbsent=true',
+              ),
+              const SizedBox(width: 12),
+              _buildPartnerCard(
+                'Ride with us',
+                'Ride with us',
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/ba2b483a577d0e0a267ca77ade923c2cc6780b5d?placeholderIfAbsent=true',
+                'Get Started',
+                'https://cdn.builder.io/api/v1/image/assets/TEMP/7975bd946fd7b618aff7120a93e603204ddfdea3?placeholderIfAbsent=true',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPartnerCard(
+    String subtitle,
+    String title,
+    String imageUrl,
+    String buttonText,
+    String arrowIconUrl,
+  ) {
+    return Container(
+      width: 175,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        image: const DecorationImage(
+          image: NetworkImage(
+              'https://cdn.builder.io/api/v1/image/assets/TEMP/8763ad78ab5cfb7bc215f643d78505101d659557?placeholderIfAbsent=true'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            subtitle,
+            style: AppTextStyles.caption.copyWith(
+              color: const Color(0xFF636363),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: AppTextStyles.heading1,
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Image.network(
+              imageUrl,
+              width: 118,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                buttonText,
+                style: AppTextStyles.body1.copyWith(
+                  color: AppColors.secondary,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              Image.network(
+                arrowIconUrl,
+                width: 24,
+                height: 24,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

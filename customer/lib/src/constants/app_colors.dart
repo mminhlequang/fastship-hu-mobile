@@ -27,7 +27,7 @@ class AppColors {
   Color get element =>
       appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);
 
-  Color get primary => appValueByTheme(hexColor('00BDF9'));
+  Color get primary => appValueByTheme(hexColor('74CA45'));
 
   Color get shimerHighlightColor => appValueByTheme(hexColor('#1C222C'));
 

@@ -1,5 +1,10 @@
+import 'package:app/src/presentation/restaurants/widgets/widget_restaurant_menu2.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/widgets/widget_commons.dart';
+
+import '../home/widgets/widget_dialog_filters.dart';
+import 'widgets/widget_restaurant_menu1.dart';
 
 class RestaurantsScreen extends StatelessWidget {
   const RestaurantsScreen({Key? key}) : super(key: key);
@@ -122,18 +127,23 @@ class RestaurantsScreen extends StatelessWidget {
               _buildFilterChip('Price'),
             ],
           ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Color(0xFFEEE)),
-            ),
-            child: Center(
-              child: Image.network(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/a7e295daaf2ab6767c0335df283dbfbe576b8816?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                  width: 24,
-                  height: 24),
+          GestureDetector(
+            onTap: () {
+              appOpenDialog(WidgetDialogFilters());
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Color(0xFFEEE)),
+              ),
+              child: Center(
+                child: WidgetAppSVG.network(
+                    'https://cdn.builder.io/api/v1/image/assets/TEMP/a7e295daaf2ab6767c0335df283dbfbe576b8816?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
+                    width: 24,
+                    height: 24),
+              ),
             ),
           ),
         ],
@@ -220,40 +230,45 @@ class RestaurantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Color(0xFFF9F8F6),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              restaurant.imageUrl,
-              width: 105,
-              height: 105,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        appOpenBottomSheet(RestaurantMenuScroll());
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Color(0xFFF9F8F6),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                restaurant.imageUrl,
+                width: 105,
+                height: 105,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                SizedBox(height: 9),
-                _buildInfo(),
-                SizedBox(height: 9),
-                Divider(color: Color(0xFFF1EFE9)),
-                SizedBox(height: 9),
-                _buildFooter(),
-              ],
+            SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  SizedBox(height: 9),
+                  _buildInfo(),
+                  SizedBox(height: 9),
+                  Divider(color: Color(0xFFF1EFE9)),
+                  SizedBox(height: 9),
+                  _buildFooter(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
