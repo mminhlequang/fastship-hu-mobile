@@ -1,6 +1,3 @@
- 
-import 'dart:nativewrappers/_internal/vm/lib/ffi_dynamic_library_patch.dart';
-
 import 'package:app/src/network_resources/category/model/category.dart';
 import 'package:app/src/network_resources/category/repo.dart';
 import 'package:app/src/network_resources/store/models/models.dart'; 

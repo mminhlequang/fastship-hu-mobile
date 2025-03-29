@@ -306,6 +306,9 @@ class _LoginScreenState extends State<LoginScreen> {
             hint: "Input your password".tr(),
             label: "Password".tr(),
             isPassword: true,
+            onChanged: (value) {
+              setState(() {});
+            },
             onSubmitted: (_) {
               if (_isValidPhoneNumber && _passwordController.text.length > 4) {
                 _login();
