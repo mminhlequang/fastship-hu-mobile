@@ -11,7 +11,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../presentation/account/cubit/account_cubit.dart';
-import '../presentation/food/cubit/food_cubit.dart';
 import '../presentation/home/cubit/home_cubit.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/orders/cubit/orders_cubit.dart';
@@ -50,7 +49,6 @@ final goRouter = GoRouter(
           builder: (context, state) => MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => HomeCubit()),
-              BlocProvider(create: (context) => FoodCubit()),
               BlocProvider(create: (context) => CartCubit()),
               BlocProvider(
                   create: (context) => CheckoutCubit(

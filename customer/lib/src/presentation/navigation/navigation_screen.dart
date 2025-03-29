@@ -5,10 +5,10 @@ import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
 import '../home/home_screen.dart';
-import '../food/food_screen.dart';
 import '../cart/cart_screen.dart';
 import '../orders/orders_screen.dart';
 import '../account/account_screen.dart';
+import '../restaurants/restaurants_screen.dart';
 import 'cubit/navigation_cubit.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -49,7 +49,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       case 0:
         return HomeScreen(key: ValueKey('home'));
       case 1:
-        return FoodScreen(key: ValueKey('food'));
+        return RestaurantsScreen(key: ValueKey('food'));
       case 2:
         return CartScreen(key: ValueKey('cart'));
       case 3:
