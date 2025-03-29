@@ -79,18 +79,18 @@ final goRouter = GoRouter(
       },
     ),
     // Thêm route cho trang checkout
-    GoRoute(
-      path: '/checkout',
-      builder: (context, state) {
-        // Đăng ký CheckoutCubit nếu chưa đăng ký
-        if (!getIt.isRegistered<CheckoutCubit>()) {
-          getIt.registerSingleton<CheckoutCubit>(
-            CheckoutCubit(cartCubit: getIt<CartCubit>()),
-          );
-        }
-        return const CheckoutScreen();
-      },
-    ),
+    // GoRoute(
+    //   path: '/checkout',
+    //   builder: (context, state) {
+    //     // Đăng ký CheckoutCubit nếu chưa đăng ký
+    //     if (!getIt.isRegistered<CheckoutCubit>()) {
+    //       getIt.registerSingleton<CheckoutCubit>(
+    //         CheckoutCubit(cartCubit: getIt<CartCubit>()),
+    //       );
+    //     }
+    //     return const CheckoutScreen();
+    //   },
+    // ),
     GoRoute(
       path: '/notifications',
       builder: (context, state) {

@@ -103,13 +103,11 @@ class _CustomBottomBar extends StatelessWidget {
             Row(
               spacing: 12.sw,
               children: [
-                _buildItem(0, 'home'),
-                _buildItem(1,
-                    'food-kitchenware-serving-dome--cook-tool-dome-kitchen-serving-paltter-dish-tools-food'),
-                _buildItem(2, 'cart'),
-                _buildItem(
-                    3, 'programming-script-1--language-programming-code'),
-                _buildItem(4, 'user'),
+                _buildItem(0, 'icon_home'),
+                _buildItem(1, 'icon_food'),
+                _buildItem(2, 'icon_cart'),
+                _buildItem(3, 'icon_order'),
+                _buildItem(4, 'icon_account'),
               ],
             ),
           ],

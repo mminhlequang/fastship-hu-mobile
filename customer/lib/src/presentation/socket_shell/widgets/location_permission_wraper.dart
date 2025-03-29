@@ -1,3 +1,4 @@
+import 'package:app/src/presentation/widgets/widget_location_blocked.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -128,62 +129,6 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
   }
 
   Widget _buildPermissionDeniedScreen() {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.location_off,
-                size: 80,
-                color: Colors.red,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Quyền vị trí bị từ chối',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Ứng dụng cần quyền truy cập vị trí để hoạt động chính xác. Vị trí của bạn được sử dụng để nhận đơn hàng gần đó và theo dõi hành trình giao hàng.',
-                style: TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  await openAppSettings();
-                  // Kiểm tra lại quyền sau khi người dùng quay lại từ cài đặt
-                  setState(() {
-                    _permissionCheckFuture = _checkLocationPermission();
-                  });
-                },
-                icon: const Icon(Icons.settings),
-                label: const Text('Mở cài đặt hệ thống'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _permissionCheckFuture = _checkLocationPermission();
-                  });
-                },
-                child: const Text('Kiểm tra lại quyền'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return WidgetLocationPermissionBlocked();
   }
 }
