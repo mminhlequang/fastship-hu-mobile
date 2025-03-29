@@ -25,6 +25,7 @@ import '../network_resources/store/models/models.dart';
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/report/report_page.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
 import '../presentation/store_registration/widgets/widget_store_category.dart';
@@ -227,7 +228,18 @@ final goRouter = GoRouter(
             transitionDuration: const Duration(milliseconds: 300),
           ),
         ),
-         
+        GoRoute(
+          path: '/report',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const ReportPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        ),
       ],
     ),
   ],

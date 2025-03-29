@@ -12,7 +12,7 @@ import 'package:internal_core/internal_core.dart';
 enum HomeItem {
   orders,
   menu,
-  banner,
+  // banner,
   statistics,
   wallet,
   rating,
@@ -22,7 +22,7 @@ enum HomeItem {
   String get displayName => switch (this) {
         orders => 'Orders'.tr(),
         menu => 'Menu'.tr(),
-        banner => 'Banner'.tr(),
+        // banner => 'Banner'.tr(),
         statistics => 'Statistics'.tr(),
         wallet => 'Wallet'.tr(),
         rating => 'Rating'.tr(),
@@ -33,7 +33,7 @@ enum HomeItem {
   String get icon => switch (this) {
         orders => 'ic_home_order',
         menu => 'ic_home_menu',
-        banner => 'ic_home_banner',
+        // banner => 'ic_home_banner',
         statistics => 'ic_home_statistics',
         wallet => 'ic_home_wallet',
         rating => 'ic_home_rating',
@@ -44,8 +44,8 @@ enum HomeItem {
   String get route => switch (this) {
         orders => '',
         menu => '/menu',
-        banner => '',
-        statistics => '',
+        // banner => '',
+        statistics => '/report',
         wallet => '',
         rating => '',
         support => '/help-center',
@@ -55,7 +55,7 @@ enum HomeItem {
   Color get backgroundColor => switch (this) {
         orders => hexColor('#FFF2E5'),
         menu => hexColor('#E9FFF4'),
-        banner => hexColor('#F5EDFF'),
+        // banner => hexColor('#F5EDFF'),
         statistics => hexColor('#FFEEEE'),
         wallet => hexColor('#F2FFF8'),
         rating => hexColor('#FFF7E5'),
@@ -66,7 +66,7 @@ enum HomeItem {
   Color get borderColor => switch (this) {
         orders => hexColor('#FFE8D2'),
         menu => hexColor('#D5FAE7'),
-        banner => hexColor('#EDE3FB'),
+        // banner => hexColor('#EDE3FB'),
         statistics => hexColor('#FFE4E4'),
         wallet => hexColor('#E5FAEE'),
         rating => hexColor('#FFF2D6'),
@@ -147,121 +147,87 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8.sw),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                4,
-                (index) {
-                  final topItem = HomeItem.values[index];
-                  final bottomItem = HomeItem.values[index + 4];
-                  bool isRating = bottomItem == HomeItem.rating;
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      WidgetInkWellTransparent(
-                          onTap: () {
-                            appHaptic();
-                            if (topItem == HomeItem.orders) {
-                              navigationCubit.changeIndex(2);
-                            } else if (topItem.route.isNotEmpty) {
-                              appContext.push(topItem.route);
-                            }
-                          },
-                          enableInkWell: false,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                height: 40.sw,
-                                width: 40.sw,
-                                decoration: BoxDecoration(
-                                  color: topItem.backgroundColor,
-                                  borderRadius: BorderRadius.circular(12.sw),
-                                  border:
-                                      Border.all(color: topItem.borderColor),
-                                ),
-                                child: Center(
-                                  child: WidgetAppSVG(topItem.icon),
-                                ),
-                              ),
-                              Gap(4.sw),
-                              Text(
-                                topItem.displayName,
-                                style: w400TextStyle(fontSize: 12.sw),
-                              ),
-                            ],
-                          )),
-                      Gap(16.sw),
-                      WidgetInkWellTransparent(
-                          onTap: () {
-                            appHaptic();
-                            if (bottomItem.route.isNotEmpty) {
-                              appContext.push(bottomItem.route);
-                            }
-                          },
-                          enableInkWell: false,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Container(
-                                    height: 40.sw,
-                                    width: 40.sw,
-                                    decoration: BoxDecoration(
-                                      color: bottomItem.backgroundColor,
-                                      borderRadius:
-                                          BorderRadius.circular(12.sw),
-                                      border: Border.all(
-                                          color: bottomItem.borderColor),
-                                    ),
-                                    child: Center(
-                                      child: WidgetAppSVG(bottomItem.icon),
-                                    ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Tính toán chiều rộng của mỗi item
+                // 4 items + 3 khoảng trống = 7 phần
+                final itemWidth = (constraints.maxWidth - (3 * 16.sw)) / 4;
+                return Wrap(
+                  spacing: 16.sw,
+                  runSpacing: 16.sw,
+                  children: HomeItem.values.map((item) {
+                    bool isRating = item == HomeItem.rating;
+                    return SizedBox(
+                      width: itemWidth,
+                      child: WidgetInkWellTransparent(
+                        onTap: () {
+                          appHaptic();
+                          if (item == HomeItem.orders) {
+                            navigationCubit.changeIndex(2);
+                          } else if (item.route.isNotEmpty) {
+                            appContext.push(item.route);
+                          }
+                        },
+                        enableInkWell: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  height: 40.sw,
+                                  width: 40.sw,
+                                  decoration: BoxDecoration(
+                                    color: item.backgroundColor,
+                                    borderRadius: BorderRadius.circular(12.sw),
+                                    border: Border.all(color: item.borderColor),
                                   ),
-                                  if (isRating)
-                                    Positioned(
-                                      top: -3.sw,
-                                      right: -5.sw,
-                                      child: Container(
-                                        height: 15.sw,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 4.sw),
-                                        decoration: BoxDecoration(
-                                          color: hexColor('#FF8832'),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border:
-                                              Border.all(color: Colors.white),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            '10',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 10.sw,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.white,
-                                              height: 1.4,
-                                            ),
+                                  child: Center(
+                                    child: WidgetAppSVG(item.icon),
+                                  ),
+                                ),
+                                if (isRating)
+                                  Positioned(
+                                    top: -3.sw,
+                                    right: -5.sw,
+                                    child: Container(
+                                      height: 15.sw,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 4.sw),
+                                      decoration: BoxDecoration(
+                                        color: hexColor('#FF8832'),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.white),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '10',
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 10.sw,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            height: 1.4,
                                           ),
                                         ),
                                       ),
                                     ),
-                                ],
-                              ),
-                              Gap(4.sw),
-                              Text(
-                                bottomItem.displayName,
-                                style: w400TextStyle(fontSize: 12.sw),
-                              ),
-                            ],
-                          ))
-                    ],
-                  );
-                },
-              ),
+                                  ),
+                              ],
+                            ),
+                            Gap(4.sw),
+                            Text(
+                              item.displayName,
+                              style: w400TextStyle(fontSize: 12.sw),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ),
         ],
