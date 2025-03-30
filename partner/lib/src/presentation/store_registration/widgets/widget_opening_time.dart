@@ -26,7 +26,7 @@ class _OpeningTimeScreenState extends State<OpeningTimeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => context.pop(openingTimes),
+          onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
         title: Text(

@@ -2,6 +2,13 @@ import 'package:app/src/base/bloc.dart';
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/network_resources/banners/models/models.dart';
+import 'package:app/src/network_resources/banners/repo.dart';
+import 'package:app/src/network_resources/category/model/category.dart';
+import 'package:app/src/network_resources/category/repo.dart';
+import 'package:app/src/network_resources/news/models/models.dart';
+import 'package:app/src/network_resources/news/repo.dart';
+import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -40,9 +47,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 17),
               const SearchBar(),
               const SizedBox(height: 17),
-              const PromoBanner(),
+              const _PromoBanner(),
               const SizedBox(height: 24),
-              const CategorySection(),
+              const _CategorySection(),
               const SizedBox(height: 24),
               const FastestDeliverySection(),
               const SizedBox(height: 32),
@@ -54,7 +61,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 32),
               const PartnerSection(),
               const SizedBox(height: 32),
-              const NewsSection(),
+              const _NewsSection(),
               const SizedBox(height: 110),
             ],
           ),
@@ -99,8 +106,33 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-class PromoBanner extends StatelessWidget {
-  const PromoBanner({super.key});
+List<BannerModel>? _banners;
+
+class _PromoBanner extends StatefulWidget {
+  const _PromoBanner({super.key});
+
+  @override
+  State<_PromoBanner> createState() => __PromoBannerState();
+}
+
+class __PromoBannerState extends State<_PromoBanner> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchBanners();
+  }
+
+  void _fetchBanners() async {
+    final response = await BannersRepo()
+        .getBanners({"country_code": locationCubit.countryCode});
+    if (response.isSuccess) {
+      _banners = response.data;
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,94 +147,72 @@ class PromoBanner extends StatelessWidget {
         enlargeCenterPage: true,
       ),
       items: List.generate(
-        3,
-        (index) => Container(
-          decoration: BoxDecoration(
-            color: appColorPrimary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 14,
-                top: 13,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '30% Discount only valid for today!',
-                      style: w600TextStyle(
-                        fontSize: 18.sw,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Get special discount',
-                      style: w400TextStyle(
-                        fontSize: 14.sw,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$ 12.88',
-                      style: w700TextStyle(
-                        fontSize: 22.sw,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Order now',
-                            style: w500TextStyle(
-                              fontSize: 14.sw,
-                              color: appColorPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 2),
-                          WidgetAppSVG.network(
-                            'https://cdn.builder.io/api/v1/image/assets/TEMP/2e52ece8ff2046a9cd87f0fcbb0cce173dcb2d83?placeholderIfAbsent=true',
-                            width: 24,
-                            height: 24,
-                            fit: BoxFit.contain,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+        _banners == null ? 3 : _banners!.length,
+        (index) => _banners == null
+            ? _buildShimmerBanner()
+            : GestureDetector(
+                onTap: () {
+                  appHaptic();
+                  if (_banners![index].externalLink != null &&
+                      _banners![index].externalLink!.isNotEmpty) {
+                    launchUrl(Uri.parse(_banners![index].externalLink!));
+                  } else {
+                    //TODO: check logic
+                  }
+                },
+                child: WidgetAppImage(
+                  imageUrl: _banners![index].image ?? '',
+                  width: double.infinity,
+                  height: 146.sw,
+                  fit: BoxFit.cover,
+                  radius: 12.sw,
                 ),
               ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Image.network(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/d0b25aa58ede91377611d3f24eef01ac7beb6672?placeholderIfAbsent=true',
-                  width: 141,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ],
-          ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBanner() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: 146.sw,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );
   }
 }
 
-class CategorySection extends StatelessWidget {
-  const CategorySection({super.key});
+List<CategoryModel>? _categories;
+
+class _CategorySection extends StatefulWidget {
+  const _CategorySection({super.key});
+
+  @override
+  State<_CategorySection> createState() => __CategorySectionState();
+}
+
+class __CategorySectionState extends State<_CategorySection> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  void _fetchCategories() async {
+    final response = await CategoryRepo()
+        .getCategories({});
+    if (response.isSuccess) {
+      _categories = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +223,7 @@ class CategorySection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Popular Categories',
+              'Popular Categories'.tr(),
               style: w400TextStyle(fontSize: 20.sw),
             ),
             GestureDetector(
@@ -246,38 +256,25 @@ class CategorySection extends StatelessWidget {
           clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
-              WidgetCategoryCard(
-                title: 'Fast food',
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/a8be57d563f93ab9da52030d499ceec3468bfd5e?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-              ),
-              WidgetCategoryCard(
-                title: 'Pizza',
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/1ff32d092e27f7da815fb412366e9b7dfa1dbb24?placeholderIfAbsent=true',
-              ),
-              WidgetCategoryCard(
-                title: 'Salads',
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/2c0135a4d0f9ab2d25c3250fe57ae4880eaa6754?placeholderIfAbsent=true',
-              ),
-              WidgetCategoryCard(
-                title: 'Pasta',
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/0608d453482ad8711c95c8ac779f52129c3b010d?placeholderIfAbsent=true',
-              ),
-              WidgetCategoryCard(
-                title: 'Pasta',
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/6f12e27793b20d57d6eaab5c6fbc361679070313?placeholderIfAbsent=true',
-              ),
-            ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _categories == null
+                ? List.generate(
+                    5,
+                    (index) => const WidgetCategoryCardShimmer(),
+                  )
+                : _categories!.map((category) {
+                    return WidgetCategoryCard(
+                      title: category.name ?? '',
+                      imageUrl: category.image ?? '',
+                    );
+                  }).toList(),
           ),
         ),
       ],
     );
   }
+
+   
 }
 
 class FastestDeliverySection extends StatelessWidget {
@@ -308,27 +305,14 @@ class FastestDeliverySection extends StatelessWidget {
           clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: const [
+            children:   [
               WidgetDishCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/7d07bcadbd5b9a672e0e03bc56c0838f9edb3dfc?placeholderIfAbsent=true',
-                name: 'Vegetarian Noodles',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
+                product: ProductModel(),
               ),
               SizedBox(width: 12),
               WidgetDishCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
-                name: 'Pizza Hut - Lumintu',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
+                
+                product: ProductModel(),
               ),
             ],
           ),
@@ -439,27 +423,15 @@ class RecommendedSection extends StatelessWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: const [
+            children:   [
               WidgetDishCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/7d07bcadbd5b9a672e0e03bc56c0838f9edb3dfc?placeholderIfAbsent=true',
-                name: 'Vegetarian Noodles',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
+                
+                product: ProductModel(),
               ),
               SizedBox(width: 12),
               WidgetDishCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
-                name: 'Pizza Hut - Lumintu',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
+                
+                product: ProductModel(),
               ),
             ],
           ),
@@ -532,8 +504,32 @@ class BestSellerSection extends StatelessWidget {
   }
 }
 
-class NewsSection extends StatelessWidget {
-  const NewsSection({super.key});
+List<NewsModel>? _news;
+
+class _NewsSection extends StatefulWidget {
+  const _NewsSection({super.key});
+
+  @override
+  State<_NewsSection> createState() => __NewsSectionState();
+}
+
+class __NewsSectionState extends State<_NewsSection> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchNews();
+  }
+
+  void _fetchNews() async {
+    final response =
+        await NewsRepo().getNews({"country_code": locationCubit.countryCode});
+    if (response.isSuccess) {
+      _news = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -544,11 +540,11 @@ class NewsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'News',
+              'News'.tr(),
               style: w400TextStyle(fontSize: 20.sw),
             ),
             Text(
-              'View all',
+              'View all'.tr(),
               style: w400TextStyle(
                 fontSize: 14.sw,
                 color: appColorPrimary,
@@ -560,27 +556,49 @@ class NewsSection extends StatelessWidget {
         const SizedBox(height: 16),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Row(
-            children: const [
-              WidgetNewsCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/03c146378bbce8c0c7c42a41cf29a2d45ebbe72c?placeholderIfAbsent=true',
-                date: 'Mar 4, 2025',
-                title:
-                    'Introducing GrabAds and the Top 3 GrabAds Campaigns That Really ...',
-              ),
-              SizedBox(width: 12),
-              WidgetNewsCard(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/d5593d9d67a6d52326cdc1f261075c9e6ce6927d?placeholderIfAbsent=true',
-                date: 'Mar 4, 2025',
-                title:
-                    'Introducing GrabAds and the Top 3 GrabAds Campaigns That Really ...',
-              ),
-            ],
-          ),
+          child: _news == null
+              ? Row(
+                  children: [
+                    _buildShimmerNewsCard(),
+                    const SizedBox(width: 12),
+                    _buildShimmerNewsCard(),
+                  ],
+                )
+              : Row(
+                  children: _news!.map((news) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 12),
+                      child: GestureDetector(
+                        onTap: () {
+                          appHaptic();
+                          launchUrl(Uri.parse(news.link ?? ''));
+                        },
+                        child: WidgetNewsCard(
+                          imageUrl: news.image ?? '',
+                          date: news.createdAt ?? '',
+                          title: news.name ?? '',
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
         ),
       ],
+    );
+  }
+
+  Widget _buildShimmerNewsCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: 280,
+        height: 180,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }
@@ -731,7 +749,7 @@ class LocationHeader extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: 200.sw),
                           child: Text(
-                            state.formattedAddress ?? '',
+                            state.addressDetail?.title ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: w400TextStyle(

@@ -1,3 +1,4 @@
+import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/topping/models/models.dart';
 
 class MenuModel {
@@ -68,60 +69,4 @@ class MenuModel {
   }
 }
 
-class ProductModel {
-  int? id;
-  String? name;
-  String? description;
-  String? image;
-  double? price;
-  double? pricePromotion;
-  int? isPromotion;
-  int? isPopular;
-  int? status;
-  String? createdAt;
-  String? updatedAt;
-
-  ProductModel({
-    this.id,
-    this.name,
-    this.description,
-    this.image,
-    this.price,
-    this.pricePromotion,
-    this.isPromotion,
-    this.isPopular,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  ProductModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    description = json['description'];
-    image = json['image'];
-    price = json['price']?.toDouble();
-    pricePromotion = json['price_promotion']?.toDouble();
-    isPromotion = json['is_promotion'];
-    isPopular = json['is_popular'];
-    status = json['status'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['description'] = description;
-    data['image'] = image;
-    data['price'] = price;
-    data['price_promotion'] = pricePromotion;
-    data['is_promotion'] = isPromotion;
-    data['is_popular'] = isPopular;
-    data['status'] = status;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
-  }
-}
+ 

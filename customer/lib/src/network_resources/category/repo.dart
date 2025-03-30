@@ -16,8 +16,7 @@ class CategoryRepo {
 
   late CategoryApi _api;
 
-  Future<List<CategoryModel>?> getCategories() async {
-    NetworkResponse response = await _api.getCategories();
-    return response.data;
+  Future<NetworkResponse> getCategories(Map<String, dynamic> params) async {
+    return await _api.getCategories(params);
   }
 }

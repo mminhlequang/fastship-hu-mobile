@@ -1,28 +1,17 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/store/models/store.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 
 class WidgetRestaurantCard extends StatelessWidget {
-  final String name;
-  final String imageUrl;
-  final String logoUrl;
-  final String category;
-  final double rating;
-  final double deliveryFee;
-  final String? discount;
-  final String deliveryTime;
+  final StoreModel store;
+  final VoidCallback? onTap;
 
   const WidgetRestaurantCard({
     super.key,
-    required this.name,
-    required this.imageUrl,
-    required this.logoUrl,
-    required this.category,
-    required this.rating,
-    required this.deliveryFee,
-    this.discount,
-    required this.deliveryTime,
+    required this.store,
+    this.onTap,
   });
 
   @override
@@ -44,13 +33,12 @@ class WidgetRestaurantCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Container(
-                width: 105,
-                height: 105,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+              child: WidgetAppImage(
+                imageUrl: store.avatarImage ?? '',
+                width: 105.sw,
+                height: 105.sw,
+                fit: BoxFit.cover,
+                radius: 8.sw,
               ),
             ),
             SizedBox(width: 8),
@@ -60,14 +48,9 @@ class WidgetRestaurantCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      WidgetAvatar.withoutBorder(
-                        radius: 11.5,
-                        imageUrl: logoUrl,
-                      ),
-                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          name,
+                          store.name ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: w500TextStyle(
@@ -78,61 +61,14 @@ class WidgetRestaurantCard extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 9),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Salads",
-                            style: w400TextStyle(
-                              fontSize: 14.sw,
-                              color: Color(0xFF847D79),
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Container(
-                            width: 1,
-                            height: 16,
-                            color: Color(0xFFF1EFE9),
-                          ),
-                          SizedBox(width: 12),
-                          Row(
-                            children: [
-                              WidgetAppSVG(
-                                'icon33',
-                                width: 14.sw,
-                                height: 14.sw,
-                              ),
-                              SizedBox(width: 3),
-                              Text(
-                                rating.toString(),
-                                style: w500TextStyle(
-                                  fontSize: 12.sw,
-                                  color: Color(0xFFFC8A06),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          WidgetAppSVG.network(
-                            'https://cdn.builder.io/api/v1/image/assets/TEMP/e2823b525107b0083e65551c21cd6bf62a92eae8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                            width: 20,
-                            height: 20,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            '\$${deliveryFee.toStringAsFixed(2)}',
-                            style: w400TextStyle(
-                              fontSize: 14.sw,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Text(
+                    store.categories?.map((e) => e.name).join(', ') ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: w400TextStyle(
+                      fontSize: 14.sw,
+                      color: Color(0xFF847D79),
+                    ),
                   ),
                   SizedBox(height: 9),
                   DottedLine(
@@ -188,7 +124,7 @@ class WidgetRestaurantCard extends StatelessWidget {
                                 height: 16),
                             SizedBox(width: 2),
                             Text(
-                              deliveryTime,
+                              '15-20m',
                               style: w400TextStyle(
                                 color: Color(0xFFFFAB17),
                                 fontSize: 14.sw,
@@ -196,6 +132,41 @@ class WidgetRestaurantCard extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                      Spacer(),
+                      Row(
+                        children: [
+                          WidgetAppSVG(
+                            'icon33',
+                            width: 14.sw,
+                            height: 14.sw,
+                          ),
+                          SizedBox(width: 3),
+                          Text(
+                            store.rating.toString(),
+                            style: w500TextStyle(
+                              fontSize: 12.sw,
+                              color: Color(0xFFFC8A06),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 8.sw),
+                      Row(
+                        children: [
+                          WidgetAppSVG.network(
+                            'https://cdn.builder.io/api/v1/image/assets/TEMP/e2823b525107b0083e65551c21cd6bf62a92eae8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
+                            width: 20,
+                            height: 20,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            '\$8.0',
+                            style: w400TextStyle(
+                              fontSize: 14.sw,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class InformationScreen extends StatefulWidget {
   const InformationScreen({super.key});
@@ -20,21 +21,16 @@ class InformationScreen extends StatefulWidget {
 class _InformationScreenState extends State<InformationScreen> {
   final _storeRepo = StoreRepo();
   bool _isLoading = false;
-  String? _name;
-  String? _address;
+  late TextEditingController _nameController =
+      TextEditingController(text: authCubit.state.store!.name);
+  late TextEditingController _addressController =
+      TextEditingController(text: authCubit.state.store!.address);
+  late PhoneNumber? _phoneNumber =
+      PhoneNumber(phoneNumber: authCubit.state.store!.phone);
   XFile? _avatarImage;
   XFile? _coverImage;
-  String? _currentAvatarUrl;
-  String? _currentCoverUrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _name = authCubit.state.store!.name;
-    _address = authCubit.state.store!.address;
-    _currentAvatarUrl = authCubit.state.store!.avatarImage;
-    _currentCoverUrl = authCubit.state.store!.bannerImages?.first.image;
-  }
+  String? _currentAvatarUrl = authCubit.state.store!.avatarImage;
+  String? _currentCoverUrl = authCubit.state.store!.bannerImages?.first.image;
 
   Future<void> _saveChanges() async {
     setState(() => _isLoading = true);
@@ -64,6 +60,7 @@ class _InformationScreenState extends State<InformationScreen> {
       final response = await _storeRepo.updateStore({
         if (newAvatarUrl != null) 'avatar': newAvatarUrl,
         if (newCoverUrl != null) 'cover_image': newCoverUrl,
+        'name': _nameController.text,
       });
 
       if (response.isSuccess) {
@@ -84,6 +81,13 @@ class _InformationScreenState extends State<InformationScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    super.dispose();
   }
 
   @override
@@ -114,33 +118,45 @@ class _InformationScreenState extends State<InformationScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'NAME'.tr(),
-                    style: w400TextStyle(
-                        fontSize: 12.sw, color: hexColor('#B0B0B0')),
+                  AppTextField(
+                    readOnly: true,
+                    controller: _nameController,
+                    title: 'Name'.tr(),
+                    hintText: 'Enter name'.tr(),
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                   ),
-                  Gap(4.sw),
-                  Text(
-                    _name ?? '',
-                    style: w400TextStyle(fontSize: 16.sw),
+                  Gap(12.sw),
+                  WidgetAppTextFieldPhone(
+                    initialValue: _phoneNumber,
+                    readOnly: true,
+                    isRequired: true,
+                    title: 'Phone number'.tr(),
+                    hintText: 'Enter phone number'.tr(),
+                    onChanged: (_) {
+                      _phoneNumber = _;
+                      setState(() {});
+                    },
                   ),
-                  AppDivider(padding: EdgeInsets.symmetric(vertical: 12.sw)),
-                  Text(
-                    'ADDRESS'.tr(),
-                    style: w400TextStyle(
-                        fontSize: 12.sw, color: hexColor('#B0B0B0')),
-                  ),
-                  Gap(4.sw),
-                  Text(
-                    _address ?? '',
-                    style: w400TextStyle(fontSize: 16.sw),
+                  Gap(12.sw),
+                  AppTextField(
+                    readOnly: true,
+                    controller: _addressController,
+                    title: 'Address'.tr(),
+                    hintText: 'Enter address'.tr(),
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                   ),
                   AppDivider(padding: EdgeInsets.symmetric(vertical: 12.sw)),
                   AppUploadImage(
                     title: 'Avatar'.tr(),
                     imageUrl: _currentAvatarUrl,
                     subTitle: Padding(
-                      padding: EdgeInsets.only(bottom: 8.sw),
+                      padding: EdgeInsets.only(bottom: 8.sw, top: 4.sw),
                       child: Text(
                         '550x550px',
                         style: w400TextStyle(fontSize: 12.sw, color: grey1),
@@ -154,10 +170,10 @@ class _InformationScreenState extends State<InformationScreen> {
                   AppUploadImage(
                     title: 'Cover image'.tr(),
                     imageUrl: _currentCoverUrl,
-                    height: 110.sw,
+                    height: 140.sw,
                     width: context.width,
                     subTitle: Padding(
-                      padding: EdgeInsets.only(bottom: 8.sw),
+                      padding: EdgeInsets.only(bottom: 8.sw, top: 4.sw),
                       child: Text(
                         '960x550px',
                         style: w400TextStyle(fontSize: 12.sw, color: grey1),

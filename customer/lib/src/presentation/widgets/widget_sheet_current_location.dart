@@ -93,10 +93,10 @@ class _WidgetSheetCurrentLocationState
                           height: 1.4,
                         ),
                       ),
-                      if (locationCubit.state.formattedAddress != null) ...[
+                      if (locationCubit.state.addressDetail != null) ...[
                         const SizedBox(height: 12),
                         Text(
-                          locationCubit.state.formattedAddress!,
+                          locationCubit.state.addressDetail!.title ??"",
                           style: w400TextStyle(
                               fontSize: 16.sw,
                               height: 1.4,

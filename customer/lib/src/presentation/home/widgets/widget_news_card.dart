@@ -1,4 +1,5 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 
@@ -29,8 +30,8 @@ class WidgetNewsCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imageUrl,
+            child: WidgetAppImage(
+              imageUrl: imageUrl,
               width: double.infinity,
               height: 145,
               fit: BoxFit.cover,
@@ -40,7 +41,7 @@ class WidgetNewsCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Blog',
+                'Blog'.tr(),
                 style: w400TextStyle(
                   fontSize: 12.sw,
                   color: const Color(0xFF939191),
@@ -54,7 +55,7 @@ class WidgetNewsCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                date,
+                string2DateTime(date)!.formatDate(),
                 style: w400TextStyle(
                   fontSize: 12.sw,
                   color: hexColor('#F17228'),

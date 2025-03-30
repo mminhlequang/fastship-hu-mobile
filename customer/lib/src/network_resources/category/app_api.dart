@@ -10,16 +10,16 @@ class _CategoryEndpoint {
 }
 
 abstract class CategoryApi {
-  Future<NetworkResponse> getCategories();
+  Future<NetworkResponse> getCategories(Map<String, dynamic> params);
 }
 
 class CategoryApiImp extends CategoryApi {
   @override
-  Future<NetworkResponse> getCategories() async {
+  Future<NetworkResponse> getCategories(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response =
-            await AppClient().get(_CategoryEndpoint.getCategories());
+            await AppClient().get(_CategoryEndpoint.getCategories(), queryParameters: params);
         return NetworkResponse.fromResponse(response,
             converter: (json) =>
                 (json as List).map((e) => CategoryModel.fromJson(e)).toList());

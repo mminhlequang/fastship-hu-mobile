@@ -1,15 +1,18 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 import 'utils.dart';
-// import 'dart:html' as html;
 
-// setFriendlyRouteName({required String title, required String url}) {
-//   html.document.title = title;
-//   html.window.history.pushState(null, title, url);
-// }
+String currencyFormatted(double? amount) {
+  return NumberFormat.currency(
+    locale: 'vi_VN',
+    symbol: AppPrefs.instance.currencySymbol,
+    decimalDigits: 2,
+  ).format(amount ?? 0);
+}
 
 bool appIsBottomSheetOpen = false;
 appOpenBottomSheet(

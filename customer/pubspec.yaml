@@ -75,6 +75,8 @@ dependencies:
   geolocator: ^13.0.3
   avatar_glow: ^3.0.1
   dotted_line: ^3.2.3
+  country_codes: ^3.3.0
+  geocoding: ^3.0.0
 
 dependency_overrides:
   http: ^1.3.0

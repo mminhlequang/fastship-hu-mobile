@@ -21,7 +21,7 @@ class WidgetOpeningTime extends StatefulWidget {
 
 class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
   late List<OpeningTimeModel> openingTimes;
-  final _monday = ValueNotifier<bool>(false);
+  final _monday = ValueNotifier<bool>(true);
   final _tuesday = ValueNotifier<bool>(true);
   final _wednesday = ValueNotifier<bool>(true);
   final _thursday = ValueNotifier<bool>(true);
@@ -32,7 +32,8 @@ class _WidgetOpeningTimeState extends State<WidgetOpeningTime> {
   @override
   void initState() {
     super.initState();
-    openingTimes = OpeningTimeModel.getDefaultOpeningTimes();
+    openingTimes =
+        widget.initialData ?? OpeningTimeModel.getDefaultOpeningTimes();
     _initializeValueNotifiers();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       widget.onChanged?.call(openingTimes);

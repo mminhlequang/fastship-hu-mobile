@@ -2,14 +2,15 @@ part of 'location_cubit.dart';
 
 class LocationState {
   LatLng? currentLocation;
-  String? formattedAddress;
+  HereSearchResult? addressDetail;
 
-  LocationState({this.currentLocation, this.formattedAddress});
+  LocationState({this.currentLocation, this.addressDetail});
 
-  LocationState copyWith({LatLng? currentLocation, String? formattedAddress}) {
+  LocationState copyWith(
+      {LatLng? currentLocation, HereSearchResult? addressDetail}) {
     return LocationState(
       currentLocation: currentLocation ?? this.currentLocation,
-      formattedAddress: formattedAddress ?? this.formattedAddress,
+      addressDetail: addressDetail ?? this.addressDetail,
     );
   }
 }

@@ -1,17 +1,23 @@
+import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/network_resources/category/model/category.dart';
+import 'package:app/src/network_resources/category/repo.dart';
+import 'package:app/src/network_resources/product/model/product.dart';
+import 'package:app/src/network_resources/product/repo.dart';
+import 'package:app/src/network_resources/store/models/menu.dart';
+import 'package:app/src/network_resources/store/models/store.dart';
+import 'package:app/src/network_resources/store/repo.dart';
 import 'package:app/src/presentation/restaurants/widgets/widget_restaurant_menu2.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/widgets/widget_commons.dart';
-
-import '../home/home_screen.dart';
 import '../home/widgets/widget_category_card.dart';
 import '../home/widgets/widget_dialog_filters.dart';
 import '../home/widgets/widget_dish_card.dart';
 import '../home/widgets/widget_restaurant_card.dart';
-import 'widgets/widget_restaurant_menu.dart';
+
+List<CategoryModel>? _categories;
 
 class RestaurantsScreen extends StatefulWidget {
   const RestaurantsScreen({super.key});
@@ -22,6 +28,75 @@ class RestaurantsScreen extends StatefulWidget {
 
 class _RestaurantsScreenState extends State<RestaurantsScreen> {
   bool isRestaurant = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  CategoryModel? _selectedCategory;
+  CategoryModel? _selectedSubCategory;
+
+  void _fetchCategories() async {
+    final response = await CategoryRepo().getCategories({});
+    if (response.isSuccess) {
+      _categories = response.data;
+      _selectedCategory = _categories?.first;
+      if (_selectedCategory?.children?.isNotEmpty ?? false) {
+        _selectedSubCategory = _selectedCategory?.children?.first;
+      }
+
+      if (isRestaurant) {
+        _fetchRestaurants();
+      } else {
+        _fetchFoods();
+      }
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  List<StoreModel>? _restaurants;
+  List<ProductModel>? _foods;
+  void _fetchRestaurants() async {
+    _restaurants = null;
+    setState(() {});
+    final response = await StoreRepo().getStores({
+      "lat": locationCubit.latitude,
+      "lng": locationCubit.longitude,
+      "category_ids": [
+        _selectedCategory?.id,
+        if (_selectedSubCategory?.id != null) _selectedSubCategory?.id
+      ].join(','),
+    });
+    if (response.isSuccess) {
+      _restaurants = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _fetchFoods() async {
+    _foods = null;
+    setState(() {});
+    final response = await ProductRepo().getProducts({
+      "lat": locationCubit.latitude,
+      "lng": locationCubit.longitude,
+      "category_ids": [
+        _selectedCategory?.id,
+        if (_selectedSubCategory?.id != null) _selectedSubCategory?.id
+      ].join(','),
+    });
+    if (response.isSuccess) {
+      _foods = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,39 +112,41 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  children: [
-                    WidgetCategoryCard(
-                      title: 'Fast food',
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/a8be57d563f93ab9da52030d499ceec3468bfd5e?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                    ),
-                    WidgetCategoryCard(
-                      title: 'Pizza',
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/1ff32d092e27f7da815fb412366e9b7dfa1dbb24?placeholderIfAbsent=true',
-                    ),
-                    WidgetCategoryCard(
-                      title: 'Salads',
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/2c0135a4d0f9ab2d25c3250fe57ae4880eaa6754?placeholderIfAbsent=true',
-                    ),
-                    WidgetCategoryCard(
-                      title: 'Pasta',
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/0608d453482ad8711c95c8ac779f52129c3b010d?placeholderIfAbsent=true',
-                    ),
-                    WidgetCategoryCard(
-                      title: 'Pasta',
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/6f12e27793b20d57d6eaab5c6fbc361679070313?placeholderIfAbsent=true',
-                    ),
-                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _categories == null
+                      ? List.generate(
+                          5,
+                          (index) => const WidgetCategoryCardShimmer(),
+                        )
+                      : _categories!.map((category) {
+                          return WidgetCategoryCard(
+                            title: category.name ?? '',
+                            imageUrl: category.image ?? '',
+                            isSelected: _selectedCategory?.id == category.id,
+                            onTap: () {
+                              appHaptic();
+                              setState(() {
+                                _selectedCategory = category;
+                                if (_selectedCategory?.children?.isNotEmpty ??
+                                    false) {
+                                  _selectedSubCategory =
+                                      _selectedCategory?.children?.first;
+                                }
+                                if (isRestaurant) {
+                                  _fetchRestaurants();
+                                } else {
+                                  _fetchFoods();
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
                 ),
               ),
               SizedBox(height: 16),
               _buildFilters(),
               SizedBox(height: 12),
-              _buildRestaurantList(),
+              _buildList(),
             ],
           ),
         ),
@@ -121,13 +198,16 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Wrap(
-            spacing: 10,
-            children: [
-              _buildFilterChip('Promotion', isSelected: true),
-              _buildFilterChip('shipping fee'),
-              _buildFilterChip('Price'),
-            ],
+          Expanded(
+            child: Wrap(
+              spacing: 10.sw,
+              runSpacing: 12.sw,
+              children: _selectedCategory?.children
+                      ?.map((e) => _buildFilterChip(e,
+                          isSelected: e.id == _selectedSubCategory?.id))
+                      .toList() ??
+                  [],
+            ),
           ),
           GestureDetector(
             onTap: () {
@@ -154,27 +234,38 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, {bool isSelected = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      decoration: BoxDecoration(
-        color: Color(0xFFF9F8F6),
-        borderRadius: BorderRadius.circular(12),
-        border: isSelected ? Border.all(color: Color(0xFF74CA45)) : null,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: 'Fredoka',
-          fontSize: 14,
-          color: Colors.black,
-          fontWeight: FontWeight.w400,
+  Widget _buildFilterChip(CategoryModel category, {bool isSelected = false}) {
+    return GestureDetector(
+      onTap: () {
+        appHaptic();
+        setState(() {
+          _selectedSubCategory = category;
+        });
+        if (isRestaurant) {
+          _fetchRestaurants();
+        } else {
+          _fetchFoods();
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? appColorPrimary : Color(0xFFF9F8F6),
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected ? Border.all(color: appColorPrimary) : null,
+        ),
+        child: Text(
+          category.name ?? '',
+          style: w400TextStyle(
+            fontSize: 14.sw,
+            color: isSelected ? Colors.white : appColorText,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildRestaurantList() {
+  Widget _buildList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -193,6 +284,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                         setState(() {
                           isRestaurant = true;
                         });
+                        _fetchRestaurants();
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.sw),
@@ -217,6 +309,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                         setState(() {
                           isRestaurant = false;
                         });
+                        _fetchFoods();
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.sw),
@@ -248,44 +341,84 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
           ),
           SizedBox(height: 16),
           if (isRestaurant)
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: WidgetRestaurantCard(
-                    name: 'Restaurant $index',
-                    imageUrl:
-                        'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                    logoUrl: '',
-                    category: '',
-                    rating: 4.5,
-                    deliveryFee: 10,
-                    deliveryTime: '30',
-                  ),
-                );
-              },
-            )
+            _restaurants == null
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            height: 120.sw,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.sw),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _restaurants?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: WidgetRestaurantCard(
+                          store: _restaurants![index],
+                          onTap: () {
+                            appHaptic();
+                            // appOpenBottomSheet(WidgetRestaurantMenu2(
+                            //   store: _restaurants![index],
+                            // ));
+                          },
+                        ),
+                      );
+                    },
+                  )
           else
-            Wrap(
-              spacing: 16.sw,
-              runSpacing: 20.sw,
-              children: List.generate(
-                  12,
-                  (index) => WidgetDishCard(
-                        width: context.width / 2 - 16 - 8.sw,
-                        imageUrl:
-                            'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
-                        name: 'Pizza Hut - Lumintu',
-                        rating: '4.5',
-                        deliveryTime: '15-20m',
-                        originalPrice: '\$ 3.30',
-                        discountedPrice: '\$ 2.20',
-                        discountPercentage: '20%',
-                      )),
-            ),
+            _foods == null
+                ? Wrap(
+                    spacing: 16.sw,
+                    runSpacing: 20.sw,
+                    children: List.generate(
+                      8,
+                      (index) => Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: context.width / 2 - 16 - 8.sw,
+                          height: 180.sw,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.sw),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Wrap(
+                    spacing: 16.sw,
+                    runSpacing: 20.sw,
+                    children: List.generate(
+                        _foods?.length ?? 0,
+                        (index) => WidgetDishCard(
+                              width: context.width / 2 - 16 - 8.sw,
+                              product: _foods![index],
+                              onTap: () {
+                                appHaptic();
+                                // appOpenBottomSheet(WidgetRestaurantMenu2(
+                                //   store: _restaurants![index],
+                                // ));
+                              },
+                            )),
+                  ),
           SizedBox(height: 110),
         ],
       ),
