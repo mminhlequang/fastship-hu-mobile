@@ -107,7 +107,6 @@ class _WidgetSheetCurrentLocationState
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: SizedBox(
-                          width: 361,
                           height: 361 / 1.97, // Maintaining aspect ratio
                           child: WidgetAppFlutterMap(
                             initialCenter: widget.latlng,

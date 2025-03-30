@@ -1,13 +1,27 @@
+import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/restaurants/widgets/widget_restaurant_menu2.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widget_commons.dart';
 
+import '../home/home_screen.dart';
+import '../home/widgets/widget_category_card.dart';
 import '../home/widgets/widget_dialog_filters.dart';
+import '../home/widgets/widget_dish_card.dart';
+import '../home/widgets/widget_restaurant_card.dart';
 import 'widgets/widget_restaurant_menu.dart';
 
-class RestaurantsScreen extends StatelessWidget {
-  const RestaurantsScreen({Key? key}) : super(key: key);
+class RestaurantsScreen extends StatefulWidget {
+  const RestaurantsScreen({super.key});
+
+  @override
+  State<RestaurantsScreen> createState() => _RestaurantsScreenState();
+}
+
+class _RestaurantsScreenState extends State<RestaurantsScreen> {
+  bool isRestaurant = true;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +32,43 @@ class RestaurantsScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildHeader(),
-              _buildCategories(),
+              SingleChildScrollView(
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    WidgetCategoryCard(
+                      title: 'Fast food',
+                      imageUrl:
+                          'https://cdn.builder.io/api/v1/image/assets/TEMP/a8be57d563f93ab9da52030d499ceec3468bfd5e?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
+                    ),
+                    WidgetCategoryCard(
+                      title: 'Pizza',
+                      imageUrl:
+                          'https://cdn.builder.io/api/v1/image/assets/TEMP/1ff32d092e27f7da815fb412366e9b7dfa1dbb24?placeholderIfAbsent=true',
+                    ),
+                    WidgetCategoryCard(
+                      title: 'Salads',
+                      imageUrl:
+                          'https://cdn.builder.io/api/v1/image/assets/TEMP/2c0135a4d0f9ab2d25c3250fe57ae4880eaa6754?placeholderIfAbsent=true',
+                    ),
+                    WidgetCategoryCard(
+                      title: 'Pasta',
+                      imageUrl:
+                          'https://cdn.builder.io/api/v1/image/assets/TEMP/0608d453482ad8711c95c8ac779f52129c3b010d?placeholderIfAbsent=true',
+                    ),
+                    WidgetCategoryCard(
+                      title: 'Pasta',
+                      imageUrl:
+                          'https://cdn.builder.io/api/v1/image/assets/TEMP/6f12e27793b20d57d6eaab5c6fbc361679070313?placeholderIfAbsent=true',
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
               _buildFilters(),
+              SizedBox(height: 12),
               _buildRestaurantList(),
             ],
           ),
@@ -34,16 +83,6 @@ class RestaurantsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '9:41',
-            style: TextStyle(
-              fontFamily: 'Urbanist',
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-              letterSpacing: 0.2,
-            ),
-          ),
-          SizedBox(height: 14),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
@@ -76,43 +115,6 @@ class RestaurantsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategories() {
-    final categories = [
-      Category(
-          name: 'Salads',
-          imageUrl:
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/2a0c54a2ec86a9cbdd54508194d7f3434a2df59d?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-      Category(
-          name: 'Pizza',
-          imageUrl:
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/a8be57d563f93ab9da52030d499ceec3468bfd5e?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-      Category(
-          name: 'Pasta',
-          imageUrl:
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/3ef9b98aa2315232548cf50a6da47e2f3c185e46?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-      Category(
-          name: 'Coffee',
-          imageUrl:
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/93bc2016eece939954046d8b4b52a1daeb167472?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-      Category(
-          name: 'Fast food',
-          imageUrl:
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/9611f8cc5c5c616f15994de1189fbc0ca2d3e4fe?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-    ];
-
-    return Container(
-      height: 114,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          return CategoryItem(category: categories[index]);
-        },
-      ),
-    );
-  }
-
   Widget _buildFilters() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -129,6 +131,7 @@ class RestaurantsScreen extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
+              appHaptic();
               appOpenDialog(WidgetDialogFilters());
             },
             child: Container(
@@ -172,312 +175,120 @@ class RestaurantsScreen extends StatelessWidget {
   }
 
   Widget _buildRestaurantList() {
-    final restaurants = [
-      Restaurant(
-        name: 'Kentucky Fried Chicken..',
-        imageUrl:
-            'https://cdn.builder.io/api/v1/image/assets/TEMP/bbe1e4f8d2b9d79f9eeea09a274c707915ee6a43?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-        logoUrl:
-            'https://cdn.builder.io/api/v1/image/assets/TEMP/72af6b15cd389d7c8ae0fac0c6ad5d0d71b801e8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-        category: 'Pizza',
-        rating: 4.5,
-        deliveryFee: 1.00,
-        discount: '20% off',
-        deliveryTime: '20-30 Mins',
-      ),
-      // Add more restaurants here
-    ];
-
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'All restaurants',
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: restaurants.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: RestaurantCard(restaurant: restaurants[index]),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class RestaurantCard extends StatelessWidget {
-  final Restaurant restaurant;
-
-  const RestaurantCard({
-    Key? key,
-    required this.restaurant,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        appOpenBottomSheet(RestaurantMenu());
-      },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Color(0xFFF9F8F6),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                restaurant.imageUrl,
-                width: 105,
-                height: 105,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildHeader(),
-                  SizedBox(height: 9),
-                  _buildInfo(),
-                  SizedBox(height: 9),
-                  Divider(color: Color(0xFFF1EFE9)),
-                  SizedBox(height: 9),
-                  _buildFooter(),
+                  Expanded(
+                    child: WidgetInkWellTransparent(
+                      onTap: () {
+                        appHaptic();
+                        setState(() {
+                          isRestaurant = true;
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.sw),
+                        child: Center(
+                          child: Text(
+                            'All restaurants',
+                            style: w400TextStyle(
+                                fontSize: 18.sw,
+                                color: isRestaurant
+                                    ? appColorText
+                                    : Color(0xFF847D79)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: WidgetInkWellTransparent(
+                      onTap: () {
+                        appHaptic();
+                        setState(() {
+                          isRestaurant = false;
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.sw),
+                        child: Center(
+                          child: Text(
+                            'All foods',
+                            style: w400TextStyle(
+                                fontSize: 18.sw,
+                                color: !isRestaurant
+                                    ? appColorText
+                                    : Color(0xFF847D79)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 11.5,
-          backgroundImage: NetworkImage(restaurant.logoUrl),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            restaurant.name,
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 18,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Text(
-              restaurant.category,
-              style: TextStyle(
-                fontFamily: 'Fredoka',
-                fontSize: 14,
-                color: Color(0xFF847D79),
-              ),
-            ),
-            SizedBox(width: 12),
-            Container(
-              width: 1,
-              height: 16,
-              color: Color(0xFFF1EFE9),
-            ),
-            SizedBox(width: 12),
-            Row(
-              children: [
-                Icon(
-                  Icons.star,
-                  size: 14,
-                  color: Color(0xFFFC8A06),
+              AnimatedPositioned(
+                duration: Duration(milliseconds: 300),
+                left: isRestaurant ? 0 : context.width / 2 - 16 + 12,
+                child: Container(
+                  width: context.width / 2 - 16 - 12,
+                  height: 2,
+                  color: appColorText2,
                 ),
-                SizedBox(width: 3),
-                Text(
-                  restaurant.rating.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFFC8A06),
-                    letterSpacing: 0.06,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            WidgetAppSVG.network(
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/e2823b525107b0083e65551c21cd6bf62a92eae8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-              width: 20,
-              height: 20,
-            ),
-            SizedBox(width: 4),
-            Text(
-              '\$${restaurant.deliveryFee.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontFamily: 'Fredoka',
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFooter() {
-    return Row(
-      children: [
-        if (restaurant.discount != null)
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Color(0xFFF17228),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                WidgetAppSVG.network('URL_DISCOUNT_ICON',
-                    width: 14, height: 14),
-                SizedBox(width: 2),
-                Text(
-                  restaurant.discount!,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'Fredoka',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        SizedBox(width: 12),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Color(0xFFFFAB17)),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              WidgetAppSVG.network('URL_CLOCK_ICON', width: 16, height: 16),
-              SizedBox(width: 2),
-              Text(
-                restaurant.deliveryTime,
-                style: TextStyle(
-                  color: Color(0xFFFFAB17),
-                  fontSize: 14,
-                  fontFamily: 'Fredoka',
-                ),
-              ),
+              )
             ],
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class CategoryItem extends StatelessWidget {
-  final Category category;
-
-  const CategoryItem({
-    Key? key,
-    required this.category,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 84,
-      padding: EdgeInsets.all(6),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          WidgetAppSVG.network(
-            category.imageUrl,
-            width: 48,
-            height: 48,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 4),
-          Text(
-            category.name,
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 12,
-              color: Color(0xFF03081F),
-              fontWeight: FontWeight.w500,
+          SizedBox(height: 16),
+          if (isRestaurant)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: WidgetRestaurantCard(
+                    name: 'Restaurant $index',
+                    imageUrl:
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
+                    logoUrl: '',
+                    category: '',
+                    rating: 4.5,
+                    deliveryFee: 10,
+                    deliveryTime: '30',
+                  ),
+                );
+              },
+            )
+          else
+            Wrap(
+              spacing: 16.sw,
+              runSpacing: 20.sw,
+              children: List.generate(
+                  12,
+                  (index) => WidgetDishCard(
+                        width: context.width / 2 - 16 - 8.sw,
+                        imageUrl:
+                            'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
+                        name: 'Pizza Hut - Lumintu',
+                        rating: '4.5',
+                        deliveryTime: '15-20m',
+                        originalPrice: '\$ 3.30',
+                        discountedPrice: '\$ 2.20',
+                        discountPercentage: '20%',
+                      )),
             ),
-            textAlign: TextAlign.center,
-          ),
+          SizedBox(height: 110),
         ],
       ),
     );
   }
-}
-
-class Restaurant {
-  final String name;
-  final String imageUrl;
-  final String logoUrl;
-  final String category;
-  final double rating;
-  final double deliveryFee;
-  final String? discount;
-  final String deliveryTime;
-
-  Restaurant({
-    required this.name,
-    required this.imageUrl,
-    required this.logoUrl,
-    required this.category,
-    required this.rating,
-    required this.deliveryFee,
-    this.discount,
-    required this.deliveryTime,
-  });
-}
-
-class Category {
-  final String name;
-  final String imageUrl;
-
-  Category({
-    required this.name,
-    required this.imageUrl,
-  });
 }

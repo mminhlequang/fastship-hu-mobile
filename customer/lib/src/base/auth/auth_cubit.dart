@@ -22,11 +22,11 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   load({Duration delayRedirect = const Duration(seconds: 1)}) async {
-    try {
-      emit(state.update(stateType: AuthStateType.logged));
-    } catch (e) {
-      emit(state.update(stateType: AuthStateType.none));
-    }
+    // try {
+    //   emit(state.update(stateType: AuthStateType.logged));
+    // } catch (e) {
+    //   emit(state.update(stateType: AuthStateType.none));
+    // }
     if (state.stateType == AuthStateType.logged) {
       // state.user = user;
       // _subscription?.cancel();
@@ -50,9 +50,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   _redirect() {
     appContext.pushReplacement("/navigation");
-    if (state.stateType == AuthStateType.logged) {
-      // Get.offAllNamed(Routes.nav);
-    } else {}
+    // if (state.stateType == AuthStateType.logged) {
+    //   // Get.offAllNamed(Routes.nav);
+    // } else {}
   }
 }
 

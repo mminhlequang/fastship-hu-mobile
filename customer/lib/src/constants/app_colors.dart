@@ -21,8 +21,8 @@ class AppColors {
 
   static AppColors get instance => _instance;
 
-  Color get text => appValueByTheme(Colors.black, kdark: Colors.white);
-  
+  Color get text => appValueByTheme(hexColor('#0B0B0B'), kdark: Colors.white);
+
   Color get text2 => appValueByTheme(hexColor('#54535A'), kdark: Colors.white);
 
   Color get background => appValueByTheme(Colors.white, kdark: Colors.black);
@@ -32,9 +32,12 @@ class AppColors {
 
   Color get primary => appValueByTheme(hexColor('74CA45'));
 
-  Color get shimerHighlightColor => appValueByTheme(hexColor('#1C222C'));
+  Color get shimmerHighlightColor => appValueByTheme(hexColor('#1C222C'));
 
   Color get shimmerBaseColor => appValueByTheme(hexColor('#1C222C'));
+
+  Color get hoverColor =>
+      appValueByTheme(hexColor('#F5F5F5'), kdark: hexColor('#2C2C2C'));
 }
 
 appValueByTheme(klight, {kdark}) {
@@ -43,4 +46,3 @@ appValueByTheme(klight, {kdark}) {
   }
   return klight;
 }
- 

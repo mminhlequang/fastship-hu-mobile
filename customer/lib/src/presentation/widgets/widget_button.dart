@@ -6,20 +6,31 @@ import 'package:flutter/material.dart';
 class WidgetButtonCancel extends StatelessWidget {
   final String? text;
   final VoidCallback onPressed;
-  const WidgetButtonCancel({super.key, required this.onPressed, this.text});
-
+  final double? width;
+  final double? height;
+  const WidgetButtonCancel({
+    super.key,
+    required this.onPressed,
+    this.text,
+    this.width,
+    this.height});
   @override
   Widget build(BuildContext context) {
     return _buildButton(
       text: text ?? 'Cancel'.tr(),
       isOutlined: true,
       onPressed: onPressed,
+      width: width,
+      height: height,
     );
   }
 }
 
 class WidgetButtonConfirm extends StatelessWidget {
   final String? text;
+  final double? width;
+  final double? height;
+
   final VoidCallback onPressed;
 
   final bool isLoading;
@@ -30,7 +41,9 @@ class WidgetButtonConfirm extends StatelessWidget {
       this.text,
       required this.onPressed,
       this.isLoading = false,
-      this.isEnabled = true});
+      this.isEnabled = true,
+      this.width,
+      this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +53,8 @@ class WidgetButtonConfirm extends StatelessWidget {
       onPressed: onPressed,
       isLoading: isLoading,
       isEnabled: isEnabled,
+      width: width,
+      height: height,
     );
   }
 }
@@ -50,6 +65,8 @@ Widget _buildButton({
   required VoidCallback onPressed,
   bool isLoading = false,
   bool isEnabled = true,
+  double? width,
+  double? height,
 }) {
   return GestureDetector(
     onTap: isEnabled
@@ -59,7 +76,8 @@ Widget _buildButton({
           }
         : null,
     child: Container(
-      height: 50.sw,
+      width: width,
+      height: height ?? 50.sw,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         border: Border.all(
@@ -77,7 +95,7 @@ Widget _buildButton({
                 text,
                 style: w600TextStyle(
                   fontSize: 18.sw,
-                  color: isOutlined ? appColorBackground : Colors.white,
+                  color: isOutlined ? appColorText2 : Colors.white,
                 ),
               ),
       ),

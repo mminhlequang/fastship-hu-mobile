@@ -13,132 +13,100 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       body: Container(
         color: Colors.white,
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Status Bar
-              Container(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 23, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
+                    EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Time and System Icons
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        SizedBox(width: 12),
                         Text(
-                          '9:41',
+                          'My cart',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.2,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.signal_cellular_4_bar, size: 18),
-                            SizedBox(width: 8),
-                            Icon(Icons.wifi, size: 18),
-                            SizedBox(width: 8),
-                            Icon(Icons.battery_full, size: 18),
-                          ],
                         ),
                       ],
                     ),
-                    // Navigation Bar
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.chevron_left, size: 24),
-                              SizedBox(width: 12),
-                              Text(
-                                'My cart',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(Icons.more_vert, size: 28),
-                        ],
-                      ),
-                    ),
+                    Icon(Icons.more_vert, size: 28),
                   ],
                 ),
               ),
-              // Cart Items List
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.all(16),
-                  children: [
-                    CartItem(
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/274dad09f12da0d3892fc999ee19595d57f77470',
-                      title: 'Pork cutlet burger and drink .',
-                      description:
-                          'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                      price: 2.20,
-                      quantity: 3,
-                      showQuantityControls: false,
-                    ),
-                    CartItem(
-                      title: 'Mentaiko and cheese chicken ...',
-                      description:
-                          'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                      price: 2.20,
-                      quantity: 3,
-                      showQuantityControls: true,
-                    ),
-                    CartItem(
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                      title: 'Mentaiko and cheese chicken ...',
-                      description:
-                          'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                      price: 2.20,
-                      quantity: 3,
-                      showQuantityControls: false,
-                    ),
-                    CartItem(
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                      title: 'Mentaiko and cheese chicken ...',
-                      description:
-                          'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                      price: 2.20,
-                      quantity: 3,
-                      showQuantityControls: false,
-                    ),
-                    CartItem(
-                      imageUrl:
-                          'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                      title: 'Mentaiko and cheese chicken ...',
-                      description:
-                          'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                      price: 2.20,
-                      quantity: 3,
-                      showQuantityControls: false,
-                    ),
-                  ],
-                ),
+            ),
+            // Cart Items List
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.all(16),
+                children: [
+                  CartItem(
+                    imageUrl:
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/274dad09f12da0d3892fc999ee19595d57f77470',
+                    title: 'Pork cutlet burger and drink .',
+                    description:
+                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                    price: 2.20,
+                    quantity: 3,
+                    showQuantityControls: false,
+                  ),
+                  CartItem(
+                    title: 'Mentaiko and cheese chicken ...',
+                    description:
+                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                    price: 2.20,
+                    quantity: 3,
+                    showQuantityControls: true,
+                  ),
+                  CartItem(
+                    imageUrl:
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                    title: 'Mentaiko and cheese chicken ...',
+                    description:
+                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                    price: 2.20,
+                    quantity: 3,
+                    showQuantityControls: false,
+                  ),
+                  CartItem(
+                    imageUrl:
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                    title: 'Mentaiko and cheese chicken ...',
+                    description:
+                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                    price: 2.20,
+                    quantity: 3,
+                    showQuantityControls: false,
+                  ),
+                  CartItem(
+                    imageUrl:
+                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                    title: 'Mentaiko and cheese chicken ...',
+                    description:
+                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                    price: 2.20,
+                    quantity: 3,
+                    showQuantityControls: false,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

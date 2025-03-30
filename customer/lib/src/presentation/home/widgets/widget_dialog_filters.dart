@@ -1,4 +1,9 @@
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
 
 class WidgetDialogFilters extends StatefulWidget {
   const WidgetDialogFilters({Key? key}) : super(key: key);
@@ -73,34 +78,36 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
         margin: MediaQuery.of(context)
             .padding
             .add(const EdgeInsets.symmetric(horizontal: 16)),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
+          borderRadius: BorderRadius.circular(24.sw),
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 24, 12, 0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 16),
-                _buildSearchBar(),
-                const SizedBox(height: 12),
-                _buildSortBySection(),
-                _buildDivider(),
-                _buildTypeFoodSection(),
-                _buildSeeAllFilter(),
-                _buildDivider(),
-                _buildPriceRangeSection(),
-                _buildDivider(),
-                _buildBottomButtons(),
-              ],
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 24, 12, 12),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 16),
+                      _buildSearchBar(),
+                      const SizedBox(height: 12),
+                      _buildSortBySection(),
+                      _buildDivider(),
+                      _buildTypeFoodSection(),
+                      _buildSeeAllFilter(),
+                      _buildDivider(),
+                      _buildPriceRangeSection(),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+            _buildBottomButtons(),
+          ],
         ),
       ),
     );
@@ -110,18 +117,9 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Filter',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Fredoka',
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF363853)),
-          onPressed: () {},
+          style: w500TextStyle(fontSize: 20.sw),
         ),
       ],
     );
@@ -137,9 +135,13 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Color(0xFF636F7E), size: 24),
+          WidgetAppSVG(
+            'icon29',
+            width: 24.sw,
+            height: 24.sw,
+          ),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
               'Search food, restaurant ...',
               style: TextStyle(
@@ -173,17 +175,14 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Sort by',
-          style: TextStyle(
-            color: Color(0xFF120F0F),
-            fontFamily: 'Fredoka',
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: w500TextStyle(fontSize: 18.sw),
         ),
         const SizedBox(height: 12),
-        Column(
+        Wrap(
+          spacing: 10.sw,
+          runSpacing: 10.sw,
           children:
               sortOptions.map((option) => _buildSortOption(option)).toList(),
         ),
@@ -192,33 +191,36 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
   }
 
   Widget _buildSortOption(String option) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: selectedSort == option
-                    ? const Color(0xFF74CA45)
-                    : const Color(0xFFBDBDBD),
-                width: 1.5,
+    return SizedBox(
+      width: context.width * 0.4,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selectedSort == option
+                      ? const Color(0xFF74CA45)
+                      : const Color(0xFFBDBDBD),
+                  width: 1.5,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            option,
-            style: const TextStyle(
-              color: Color(0xFF120F0F),
-              fontFamily: 'Fredoka',
-              fontSize: 16,
+            const SizedBox(width: 8),
+            Text(
+              option,
+              style: const TextStyle(
+                color: Color(0xFF120F0F),
+                fontFamily: 'Fredoka',
+                fontSize: 16,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -227,14 +229,9 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Type food',
-          style: TextStyle(
-            color: Color(0xFF120F0F),
-            fontFamily: 'Fredoka',
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: w500TextStyle(fontSize: 18.sw),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -291,21 +288,15 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Price',
-              style: TextStyle(
-                color: Color(0xFF120F0F),
-                fontFamily: 'Fredoka',
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
+              style: w500TextStyle(fontSize: 18.sw),
             ),
             Text(
               '\$${priceRange.start.toStringAsFixed(2)} - \$${priceRange.end.toStringAsFixed(2)}',
-              style: const TextStyle(
+              style: w400TextStyle(
+                fontSize: 16.sw,
                 color: Color(0xFF453D3D),
-                fontFamily: 'Fredoka',
-                fontSize: 16,
               ),
             ),
           ],
@@ -313,12 +304,11 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
         const SizedBox(height: 16),
         Row(
           children: [
-            const Text(
+            Text(
               '\$1.00',
-              style: TextStyle(
+              style: w400TextStyle(
                 color: Color(0xFF847D79),
-                fontFamily: 'Fredoka',
-                fontSize: 14,
+                fontSize: 14.sw,
               ),
             ),
             Expanded(
@@ -344,12 +334,11 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
                 ),
               ),
             ),
-            const Text(
+            Text(
               '\$100.0',
-              style: TextStyle(
+              style: w400TextStyle(
                 color: Color(0xFF847D79),
-                fontFamily: 'Fredoka',
-                fontSize: 14,
+                fontSize: 14.sw,
               ),
             ),
           ],
@@ -361,9 +350,17 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Container(
-        height: 1,
-        color: const Color(0xFFD1D1D1),
+      child: DottedLine(
+        direction: Axis.horizontal,
+        alignment: WrapAlignment.center,
+        lineLength: double.infinity,
+        lineThickness: 1.0,
+        dashLength: 4.0,
+        dashColor: hexColor('#D1D1D1'),
+        dashRadius: 0.0,
+        dashGapLength: 4.0,
+        dashGapColor: Colors.transparent,
+        dashGapRadius: 0.0,
       ),
     );
   }
@@ -371,11 +368,11 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
   Widget _buildBottomButtons() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+          bottomLeft: Radius.circular(24.sw),
+          bottomRight: Radius.circular(24.sw),
         ),
         boxShadow: [
           BoxShadow(
@@ -387,39 +384,20 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFCEC6C5)),
-                borderRadius: BorderRadius.circular(120),
-              ),
-              child: const Center(
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Color(0xFF120F0F),
-                    fontFamily: 'Fredoka',
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
+          WidgetButtonCancel(
+            text: 'Cancel',
+            onPressed: () {
+              context.pop();
+            },
+            width: 120.sw,
           ),
           const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF74CA45),
-              borderRadius: BorderRadius.circular(120),
-            ),
-            child: const Text(
-              'Apply ( 10 results found )',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-              ),
+          Expanded(
+            child: WidgetButtonConfirm(
+              text: 'Apply ( 10 results found )',
+              onPressed: () {
+                context.pop();
+              },
             ),
           ),
         ],

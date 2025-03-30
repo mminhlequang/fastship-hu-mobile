@@ -106,7 +106,7 @@ class _CustomBottomBar extends StatelessWidget {
                 _buildItem(0, 'icon_home'),
                 _buildItem(1, 'icon_food'),
                 _buildItem(2, 'icon_cart'),
-                _buildItem(3, 'icon_order'),
+                _buildItem(3, 'icon_programming'),
                 _buildItem(4, 'icon_account'),
               ],
             ),
