@@ -29,10 +29,10 @@ class OrderStatusWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const LinearProgressIndicator(
+            LinearProgressIndicator(
               value: null, // Indeterminate
-              backgroundColor: appLightGreyColor,
-              color: appGreenColor,
+              backgroundColor: appColorBorder,
+              color: appColorPrimary,
             ),
             const SizedBox(height: 16),
             Row(

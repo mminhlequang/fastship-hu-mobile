@@ -1,11 +1,11 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
- 
-import '../../../utils/app_prefs.dart';
+
 import '../models/socket_response.dart';
 
 enum CustomerOrderStatus {
@@ -45,8 +45,7 @@ class CustomerSocketController {
   Map<String, dynamic>? get currentOrder => _currentOrder;
   Map<String, dynamic>? get driverLocation => _driverLocation;
   Map<String, dynamic>? get driverInfo => _driverInfo;
-
-   
+ 
 
   void initializeSocket() {
     try {
@@ -333,10 +332,4 @@ class CustomerSocketController {
       );
     }
   }
-}
-
-// Function helper for DI
-CustomerSocketController findInstance<T>() {
-  // This is a temporary implementation. You should replace this with your actual DI implementation
-  return CustomerSocketController();
 }
