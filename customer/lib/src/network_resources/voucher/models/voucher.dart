@@ -1,3 +1,5 @@
+import 'package:app/src/network_resources/store/models/models.dart';
+
 class VoucherModel {
   int? id;
   String? code;
@@ -76,32 +78,4 @@ class VoucherModel {
   }
 }
 
-class StoreModel {
-  int? id;
-  String? name;
-  String? image;
-  String? address;
-
-  StoreModel({
-    this.id,
-    this.name,
-    this.image,
-    this.address,
-  });
-
-  StoreModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    image = json['image'];
-    address = json['address'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['image'] = image;
-    data['address'] = address;
-    return data;
-  }
-}
+ 

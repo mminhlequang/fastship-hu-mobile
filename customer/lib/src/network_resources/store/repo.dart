@@ -27,8 +27,8 @@ class StoreRepo {
     return await _api.getMyStores(params);
   }
 
-  Future<NetworkResponse> getStoreDetail(int id) async {
-    return await _api.getStoreDetail(id);
+  Future<NetworkResponse> getStoreDetail(Map<String, dynamic> params) async {
+    return await _api.getStoreDetail(params);
   }
 
   Future<NetworkResponse> getStoreRating(Map<String, dynamic> params) async {

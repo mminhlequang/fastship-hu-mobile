@@ -2,6 +2,7 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/network_resources/store/models/store.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 
 class WidgetRestaurantCard extends StatelessWidget {
@@ -17,11 +18,11 @@ class WidgetRestaurantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Sử dụng hàm từ utils
-        appHaptic();
-        // appOpenBottomSheet(const WidgetRestaurantMenu());
-      },
+      onTap: onTap ??
+          () {
+            appHaptic();
+            context.push('/restaurant-detail/${store.id}');
+          },
       child: Container(
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -183,18 +184,162 @@ class WidgetRestaurantCard extends StatelessWidget {
 /// Widget hiển thị thẻ giảm giá nhà hàng
 /// Được sử dụng để hiển thị các ưu đãi đặc biệt từ nhà hàng
 class WidgetRestaurantDiscountCard extends StatelessWidget {
-  final String imageUrl;
-  final String discount;
-  final String rating;
-  final String? title;
+  final StoreModel store;
+  final VoidCallback? onTap;
 
   const WidgetRestaurantDiscountCard({
-    Key? key,
-    required this.imageUrl,
-    required this.discount,
-    required this.rating,
-    this.title,
-  }) : super(key: key);
+    super.key,
+    required this.store,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap ??
+          () {
+            appHaptic();
+            context.push('/restaurant-detail/${store.id}');
+          },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: WidgetAppImage(
+                    imageUrl: store.avatarImage ?? '',
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    radius: 12.sw,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.sw, vertical: 6.sw),
+                    decoration: BoxDecoration(
+                      color: appColorPrimary,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '40% off',
+                      style: w400TextStyle(
+                        fontSize: 12.sw,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 8.sw),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                store.name ?? '',
+                style: w600TextStyle(
+                  fontSize: 16.sw,
+                ),
+              ),
+              Row(
+                children: [
+                  Text(
+                    store.rating.toString(),
+                    style: w500TextStyle(fontSize: 14.sw),
+                  ),
+                  SizedBox(width: 2.sw),
+                  WidgetAppSVG('icon33', width: 14.sw, height: 14.sw),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget hiển thị loading state cho thẻ nhà hàng
+class WidgetRestaurantCardShimmer extends StatelessWidget {
+  const WidgetRestaurantCardShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          WidgetAppShimmer(
+            width: 105.sw,
+            height: 105.sw,
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WidgetAppShimmer(
+                  width: 150.sw,
+                  height: 20.sw,
+                ),
+                SizedBox(height: 9),
+                WidgetAppShimmer(
+                  width: double.infinity,
+                  height: 16.sw,
+                ),
+                SizedBox(height: 9),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: Colors.white,
+                ),
+                SizedBox(height: 9),
+                Row(
+                  children: [
+                    WidgetAppShimmer(
+                      width: 60.sw,
+                      height: 30.sw,
+                    ),
+                    SizedBox(width: 12),
+                    WidgetAppShimmer(
+                      width: 80.sw,
+                      height: 30.sw,
+                    ),
+                    Spacer(),
+                    WidgetAppShimmer(
+                      width: 40.sw,
+                      height: 16.sw,
+                    ),
+                    SizedBox(width: 8.sw),
+                    WidgetAppShimmer(
+                      width: 50.sw,
+                      height: 16.sw,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget hiển thị loading state cho thẻ giảm giá nhà hàng
+class WidgetRestaurantDiscountCardShimmer extends StatelessWidget {
+  const WidgetRestaurantDiscountCardShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -204,67 +349,35 @@ class WidgetRestaurantDiscountCard extends StatelessWidget {
         Expanded(
           child: Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+              WidgetAppShimmer(
+                width: double.infinity,
+                height: double.infinity,
               ),
               Positioned(
                 top: 8,
                 right: 8,
-                child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 8.sw, vertical: 6.sw),
-                  decoration: BoxDecoration(
-                    color: appColorPrimary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    discount,
-                    style: w400TextStyle(
-                      fontSize: 12.sw,
-                      color: Colors.white,
-                    ),
-                  ),
+                child: WidgetAppShimmer(
+                  width: 60.sw,
+                  height: 24.sw,
                 ),
               ),
             ],
           ),
         ),
-        if (title != null) ...[
-          SizedBox(height: 8.sw),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title!,
-                style: w600TextStyle(
-                  fontSize: 16.sw,
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    rating,
-                    style: w500TextStyle(
-                      fontSize: 14.sw,
-                      color: hexColor('#F17228'),
-                    ),
-                  ),
-                  SizedBox(width: 2.sw),
-                  Icon(
-                    Icons.star,
-                    color: hexColor('#F17228'),
-                    size: 16.sw,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+        SizedBox(height: 8.sw),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            WidgetAppShimmer(
+              width: 120.sw,
+              height: 20.sw,
+            ),
+            WidgetAppShimmer(
+              width: 60.sw,
+              height: 16.sw,
+            ),
+          ],
+        ),
       ],
     );
   }

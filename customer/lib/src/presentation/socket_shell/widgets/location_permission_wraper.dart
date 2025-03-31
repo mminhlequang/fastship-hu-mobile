@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
@@ -29,6 +31,7 @@ class LocationPermissionWrapper extends StatefulWidget {
 class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
   PermissionStatus? _permissionStatus;
   bool _isLoading = true;
+  late final int indexImage = Random().nextBool() ? 1 : 2;
 
   @override
   void initState() {
@@ -215,12 +218,9 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
       constraints: const BoxConstraints(maxWidth: 361),
       child: AspectRatio(
         aspectRatio: 361 / 193,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: WidgetAppSVG(
-            'icon18', //TODO: need png
-            fit: BoxFit.cover,
-          ),
+        child: WidgetAssetImage.png(
+          'image$indexImage',
+          fit: BoxFit.scaleDown,
         ),
       ),
     );

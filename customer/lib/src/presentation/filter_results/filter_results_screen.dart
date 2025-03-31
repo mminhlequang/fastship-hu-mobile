@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/widget_search_field.dart';
+
 class ListFood extends StatelessWidget {
   const ListFood({Key? key}) : super(key: key);
 
@@ -45,8 +47,8 @@ class ListFood extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: CustomSearchBar(
-                            onSearch: (value) {
+                          child: WidgetSearchField(
+                            onTap: () {
                               // Handle search
                             },
                           ),
@@ -286,55 +288,7 @@ class ListFood extends StatelessWidget {
     );
   }
 }
-
-class CustomSearchBar extends StatelessWidget {
-  final Function(String) onSearch;
-
-  const CustomSearchBar({
-    Key? key,
-    required this.onSearch,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(56),
-        border: Border.all(
-          color: const Color(0xFFF1EFE9),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 12,
-      ),
-      child: Row(
-        children: [
-          Image.network(
-            'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-            width: 24,
-            height: 24,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'What are you craving?.....',
-              style: TextStyle(
-                color: const Color(0xFF847D79),
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.08,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+ 
 
 class FoodFilterChip extends StatelessWidget {
   final String label;

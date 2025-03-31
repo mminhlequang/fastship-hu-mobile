@@ -1,4 +1,11 @@
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internal_core/internal_core.dart';
+
+import 'cubit/cart_cubit.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -37,10 +44,9 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         SizedBox(width: 12),
                         Text(
-                          'My cart',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                          'My cart'.tr(),
+                          style: w500TextStyle(
+                            fontSize: 20.sw,
                           ),
                         ),
                       ],
@@ -50,61 +56,127 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
             ),
-            // Cart Items List
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.all(16),
-                children: [
-                  CartItem(
-                    imageUrl:
-                        'https://cdn.builder.io/api/v1/image/assets/TEMP/274dad09f12da0d3892fc999ee19595d57f77470',
-                    title: 'Pork cutlet burger and drink .',
-                    description:
-                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                    price: 2.20,
-                    quantity: 3,
-                    showQuantityControls: false,
-                  ),
-                  CartItem(
-                    title: 'Mentaiko and cheese chicken ...',
-                    description:
-                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                    price: 2.20,
-                    quantity: 3,
-                    showQuantityControls: true,
-                  ),
-                  CartItem(
-                    imageUrl:
-                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                    title: 'Mentaiko and cheese chicken ...',
-                    description:
-                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                    price: 2.20,
-                    quantity: 3,
-                    showQuantityControls: false,
-                  ),
-                  CartItem(
-                    imageUrl:
-                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                    title: 'Mentaiko and cheese chicken ...',
-                    description:
-                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                    price: 2.20,
-                    quantity: 3,
-                    showQuantityControls: false,
-                  ),
-                  CartItem(
-                    imageUrl:
-                        'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                    title: 'Mentaiko and cheese chicken ...',
-                    description:
-                        'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                    price: 2.20,
-                    quantity: 3,
-                    showQuantityControls: false,
-                  ),
-                ],
-              ),
+              child: BlocBuilder<CartCubit, CartState>(
+                  bloc: cartCubit,
+                  builder: (context, state) {
+                    if (state.isLoading) {
+                      // TODO: Show loading
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state.items.isEmpty) {
+                      return Center(
+                          child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          WidgetAppSVG(
+                            'icon8',
+                            width: 237,
+                            height: 232,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Empty',
+                            style: w500TextStyle(
+                              fontSize: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'You don\'t have any foods in cart at this time',
+                            textAlign: TextAlign.center,
+                            style: w400TextStyle(
+                              fontSize: 16,
+                              color: appColorText2,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 21),
+                          // Order Now Button
+                          SizedBox(
+                            width: context.width * .65,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                appHaptic();
+                                navigationCubit.changeIndex(1);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF74CA45),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(120),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                              child: Text(
+                                'Order Now',
+                                style: w500TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 48),
+                        ],
+                      ));
+                    }
+
+                    return ListView(
+                      padding: EdgeInsets.all(16),
+                      children: [
+                        CartItem(
+                          imageUrl:
+                              'https://cdn.builder.io/api/v1/image/assets/TEMP/274dad09f12da0d3892fc999ee19595d57f77470',
+                          title: 'Pork cutlet burger and drink .',
+                          description:
+                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                          price: 2.20,
+                          quantity: 3,
+                          showQuantityControls: false,
+                        ),
+                        CartItem(
+                          title: 'Mentaiko and cheese chicken ...',
+                          description:
+                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                          price: 2.20,
+                          quantity: 3,
+                          showQuantityControls: true,
+                        ),
+                        CartItem(
+                          imageUrl:
+                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                          title: 'Mentaiko and cheese chicken ...',
+                          description:
+                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                          price: 2.20,
+                          quantity: 3,
+                          showQuantityControls: false,
+                        ),
+                        CartItem(
+                          imageUrl:
+                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                          title: 'Mentaiko and cheese chicken ...',
+                          description:
+                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                          price: 2.20,
+                          quantity: 3,
+                          showQuantityControls: false,
+                        ),
+                        CartItem(
+                          imageUrl:
+                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
+                          title: 'Mentaiko and cheese chicken ...',
+                          description:
+                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
+                          price: 2.20,
+                          quantity: 3,
+                          showQuantityControls: false,
+                        ),
+                      ],
+                    );
+                  }),
             ),
           ],
         ),
@@ -310,275 +382,3 @@ class CartItem extends StatelessWidget {
     );
   }
 }
-
-
-
-// class CartScreen extends StatelessWidget {
-//   const CartScreen({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: Column(
-//         children: [
-//           // Custom App Bar with shadow
-//           Container(
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: Colors.black.withOpacity(0.1),
-//                   blurRadius: 20,
-//                   offset: const Offset(0, 4),
-//                 ),
-//               ],
-//             ),
-//             child: SafeArea(
-//               bottom: false,
-//               child: Column(
-//                 children: [
-//                   // Status Bar
-//                   SizedBox(
-//                     height: 44,
-//                     width: double.infinity,
-//                     child: Padding(
-//                       padding: const EdgeInsets.symmetric(horizontal: 23),
-//                       child: Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Text(
-//                             '9:41',
-//                             style: GoogleFonts.urbanist(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w600,
-//                               letterSpacing: 0.2,
-//                             ),
-//                           ),
-//                           Row(
-//                             children: [
-//                               // Signal Strength Icon
-//                               CustomPaint(
-//                                 size: const Size(18, 10),
-//                                 painter: SignalStrengthPainter(),
-//                               ),
-//                               const SizedBox(width: 8),
-//                               // WiFi Icon
-//                               CustomPaint(
-//                                 size: const Size(15, 11),
-//                                 painter: WifiIconPainter(),
-//                               ),
-//                               const SizedBox(width: 8),
-//                               // Battery Icon
-//                               CustomPaint(
-//                                 size: const Size(24, 12),
-//                                 painter: BatteryIconPainter(),
-//                               ),
-//                             ],
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   // Navigation Bar
-//                   Padding(
-//                     padding: const EdgeInsets.symmetric(
-//                       horizontal: 16,
-//                       vertical: 10,
-//                     ),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Row(
-//                           children: [
-//                             IconButton(
-//                               icon: const Icon(Icons.arrow_back_ios),
-//                               onPressed: () => Navigator.pop(context),
-//                             ),
-//                             Text(
-//                               'My cart',
-//                               style: GoogleFonts.fredoka(
-//                                 fontSize: 18,
-//                                 fontWeight: FontWeight.w500,
-//                                 color: const Color(0xFF120F0F),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                         IconButton(
-//                           icon: SvgPicture.string(
-//                             '''<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                               <path fill-rule="evenodd" clip-rule="evenodd" d="M14.0003 3.20844C19.9596 3.20844 24.792 8.0396 24.792 14.0001C24.792 19.9594 19.9596 24.7918 14.0003 24.7918C8.03978 24.7918 3.20862 19.9594 3.20862 14.0001C3.20862 8.04077 8.04095 3.20844 14.0003 3.20844Z" stroke="#212121" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-//                               <path d="M18.596 14.0152H18.6065" stroke="#212121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-//                               <path d="M13.9189 14.0152H13.9294" stroke="#212121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-//                               <path d="M9.24166 14.0152H9.25216" stroke="#212121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-//                             </svg>''',
-//                             width: 28,
-//                             height: 28,
-//                           ),
-//                           onPressed: () {},
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           // Empty State Content
-//           Expanded(
-//             child: Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 32),
-//               child: Column(
-//                 children: [
-//                   const SizedBox(height: 63),
-//                   // Empty Cart Illustration
-//                   SvgPicture.string(
-//                     '''<svg width="238" height="232" viewBox="0 0 238 232" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                       <!-- SVG content from the design -->
-//                     </svg>''',
-//                     width: 237,
-//                     height: 232,
-//                   ),
-//                   const SizedBox(height: 24),
-//                   Text(
-//                     'Empty',
-//                     style: GoogleFonts.fredoka(
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.w500,
-//                       color: const Color(0xFF212121),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 24),
-//                   Text(
-//                     'You don\'t have any foods in cart at this time',
-//                     textAlign: TextAlign.center,
-//                     style: GoogleFonts.fredoka(
-//                       fontSize: 16,
-//                       fontWeight: FontWeight.w400,
-//                       color: const Color(0xFF3C3836),
-//                       letterSpacing: 0.16,
-//                       height: 1.4,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 21),
-//                   // Order Now Button
-//                   SizedBox(
-//                     width: double.infinity,
-//                     child: ElevatedButton(
-//                       onPressed: () {},
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: const Color(0xFF74CA45),
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(120),
-//                         ),
-//                         padding: const EdgeInsets.symmetric(
-//                           horizontal: 16,
-//                           vertical: 14,
-//                         ),
-//                       ),
-//                       child: Text(
-//                         'Order Now',
-//                         style: GoogleFonts.fredoka(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.w500,
-//                           color: Colors.white,
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// // Custom Painters for Status Bar Icons
-// class SignalStrengthPainter extends CustomPainter {
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final paint = Paint()
-//       ..color = Colors.black
-//       ..style = PaintingStyle.fill;
-
-//     // Implementation of signal strength bars
-//     final barWidth = size.width / 5;
-//     for (var i = 0; i < 4; i++) {
-//       final height = size.height * ((i + 1) / 4);
-//       canvas.drawRect(
-//         Rect.fromLTWH(i * (barWidth + 1), size.height - height, barWidth, height),
-//         paint,
-//       );
-//     }
-//   }
-
-//   @override
-//   bool shouldRepaint(CustomPainter oldDelegate) => false;
-// }
-
-// class WifiIconPainter extends CustomPainter {
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final paint = Paint()
-//       ..color = Colors.black
-//       ..style = PaintingStyle.stroke
-//       ..strokeWidth = 1.5;
-
-//     // Implementation of WiFi arc lines
-//     for (var i = 0; i < 3; i++) {
-//       final radius = size.width - (i * size.width / 3);
-//       canvas.drawArc(
-//         Rect.fromCircle(
-//           center: Offset(size.width / 2, size.height),
-//           radius: radius,
-//         ),
-//         3.14,
-//         3.14,
-//         false,
-//         paint,
-//       );
-//     }
-//   }
-
-//   @override
-//   bool shouldRepaint(CustomPainter oldDelegate) => false;
-// }
-
-// class BatteryIconPainter extends CustomPainter {
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final paint = Paint()
-//       ..color = Colors.black
-//       ..style = PaintingStyle.stroke
-//       ..strokeWidth = 1;
-
-//     // Battery outline
-//     canvas.drawRRect(
-//       RRect.fromRectAndRadius(
-//         Rect.fromLTWH(0, 0, size.width - 2, size.height),
-//         const Radius.circular(2),
-//       ),
-//       paint,
-//     );
-
-//     // Battery level
-//     paint.style = PaintingStyle.fill;
-//     canvas.drawRect(
-//       Rect.fromLTWH(2, 2, (size.width - 6) * 0.8, size.height - 4),
-//       paint,
-//     );
-
-//     // Battery tip
-//     canvas.drawRect(
-//       Rect.fromLTWH(size.width - 2, size.height * 0.25, 2, size.height * 0.5),
-//       paint,
-//     );
-//   }
-
-//   @override
-//   bool shouldRepaint(CustomPainter oldDelegate) => false;
-// }

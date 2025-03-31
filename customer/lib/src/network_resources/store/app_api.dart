@@ -29,7 +29,7 @@ abstract class MyAppApi {
   Future<NetworkResponse> getStores(Map<String, dynamic> params);
   Future<NetworkResponse> getStoresByLatLng(Map<String, dynamic> params);
   Future<NetworkResponse> getMyStores(Map<String, dynamic> params);
-  Future<NetworkResponse> getStoreDetail(int id);
+  Future<NetworkResponse> getStoreDetail(Map<String, dynamic> params);
   Future<NetworkResponse> getStoreRating(Map<String, dynamic> params);
   Future<NetworkResponse> getStoreMenus(Map<String, dynamic> params);
   Future<NetworkResponse> createStore(Map<String, dynamic> data);
@@ -94,12 +94,12 @@ class MyAppApiImp extends MyAppApi {
   }
 
   @override
-  Future<NetworkResponse> getStoreDetail(int id) async {
+  Future<NetworkResponse> getStoreDetail(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await AppPrefs.instance.getNormalToken(),
-        ).get(_MyAppEndpoint.getStoreDetail(), queryParameters: {'id': id});
+        ).get(_MyAppEndpoint.getStoreDetail(), queryParameters: params);
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => StoreModel.fromJson(json),

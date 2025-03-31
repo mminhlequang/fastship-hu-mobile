@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'widget_restaurant_menu1.dart';
 import 'widget_restaurant_menu2.dart';
 
 // State management class

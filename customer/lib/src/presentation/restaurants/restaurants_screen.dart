@@ -4,12 +4,10 @@ import 'package:app/src/network_resources/category/model/category.dart';
 import 'package:app/src/network_resources/category/repo.dart';
 import 'package:app/src/network_resources/product/model/product.dart';
 import 'package:app/src/network_resources/product/repo.dart';
-import 'package:app/src/network_resources/store/models/menu.dart';
 import 'package:app/src/network_resources/store/models/store.dart';
 import 'package:app/src/network_resources/store/repo.dart';
-import 'package:app/src/presentation/restaurants/widgets/widget_restaurant_menu2.dart';
+import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import '../home/widgets/widget_category_card.dart';
@@ -106,7 +104,10 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildHeader(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: WidgetSearchField(onTap: () {}),
+              ),
               SingleChildScrollView(
                 clipBehavior: Clip.none,
                 scrollDirection: Axis.horizontal,
@@ -143,8 +144,8 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                         }).toList(),
                 ),
               ),
-              SizedBox(height: 16),
-              _buildFilters(),
+              SizedBox(height: 24),
+              _buildSubCatFilters(),
               SizedBox(height: 12),
               _buildList(),
             ],
@@ -154,45 +155,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-              color: Color(0xFFF4F4F4),
-              borderRadius: BorderRadius.circular(56),
-            ),
-            child: Row(
-              children: [
-                WidgetAppSVG.network(
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/ac736bec68a5c7fa808a24ff3a52270532506c44?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                    width: 24,
-                    height: 24),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'What are you craving?.....',
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      color: Color(0xFF847D79),
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.08,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilters() {
+  Widget _buildSubCatFilters() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -202,11 +165,27 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
             child: Wrap(
               spacing: 10.sw,
               runSpacing: 12.sw,
-              children: _selectedCategory?.children
-                      ?.map((e) => _buildFilterChip(e,
-                          isSelected: e.id == _selectedSubCategory?.id))
-                      .toList() ??
-                  [],
+              children: _selectedCategory == null
+                  ? List.generate(
+                      3,
+                      (index) => Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 80,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    )
+                  : _selectedCategory?.children
+                          ?.map((e) => _buildFilterChip(e,
+                              isSelected: e.id == _selectedSubCategory?.id))
+                          .toList() ??
+                      [],
             ),
           ),
           GestureDetector(
@@ -222,10 +201,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                 border: Border.all(color: Color(0xFFEEE)),
               ),
               child: Center(
-                child: WidgetAppSVG.network(
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/a7e295daaf2ab6767c0335df283dbfbe576b8816?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                    width: 24,
-                    height: 24),
+                child: WidgetAppSVG('icon30', width: 24, height: 24),
               ),
             ),
           ),
@@ -349,17 +325,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
-                          child: Container(
-                            height: 120.sw,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.sw),
-                            ),
-                          ),
-                        ),
+                        child: WidgetRestaurantCardShimmer(),
                       );
                     },
                   )
@@ -372,12 +338,6 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: WidgetRestaurantCard(
                           store: _restaurants![index],
-                          onTap: () {
-                            appHaptic();
-                            // appOpenBottomSheet(WidgetRestaurantMenu2(
-                            //   store: _restaurants![index],
-                            // ));
-                          },
                         ),
                       );
                     },
@@ -389,17 +349,9 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                     runSpacing: 20.sw,
                     children: List.generate(
                       8,
-                      (index) => Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: context.width / 2 - 16 - 8.sw,
-                          height: 180.sw,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12.sw),
-                          ),
-                        ),
+                      (index) => SizedBox(
+                        width: context.width / 2 - 16 - 8.sw,
+                        child: WidgetDishCardShimmer(),
                       ),
                     ),
                   )
@@ -407,17 +359,12 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                     spacing: 16.sw,
                     runSpacing: 20.sw,
                     children: List.generate(
-                        _foods?.length ?? 0,
-                        (index) => WidgetDishCard(
-                              width: context.width / 2 - 16 - 8.sw,
-                              product: _foods![index],
-                              onTap: () {
-                                appHaptic();
-                                // appOpenBottomSheet(WidgetRestaurantMenu2(
-                                //   store: _restaurants![index],
-                                // ));
-                              },
-                            )),
+                      _foods?.length ?? 0,
+                      (index) => WidgetDishCard(
+                        width: context.width / 2 - 16 - 8.sw,
+                        product: _foods![index],
+                      ),
+                    ),
                   ),
           SizedBox(height: 110),
         ],

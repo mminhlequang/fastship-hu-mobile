@@ -9,7 +9,11 @@ import 'package:app/src/network_resources/category/repo.dart';
 import 'package:app/src/network_resources/news/models/models.dart';
 import 'package:app/src/network_resources/news/repo.dart';
 import 'package:app/src/network_resources/product/model/product.dart';
+import 'package:app/src/network_resources/product/repo.dart';
+import 'package:app/src/network_resources/store/models/models.dart';
+import 'package:app/src/network_resources/store/repo.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
+import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -26,8 +30,50 @@ import 'widgets/widget_dish_card.dart';
 import 'widgets/widget_news_card.dart';
 import 'widgets/widget_restaurant_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ValueNotifier<CategoryModel?> _categoryNotifier =
+      ValueNotifier<CategoryModel?>(null);
+
+  @override
+  void dispose() {
+    _categoryNotifier.dispose();
+    super.dispose();
+  }
+
+  Widget _categoryNotifierBuilder(
+      {required Widget Function(String? categoryIds, CategoryModel? category)
+          builder}) {
+    return ValueListenableBuilder(
+      valueListenable: _categoryNotifier,
+      builder: (context, value, child) {
+        List<int> categoryIds = [];
+        if (value != null) {
+          List<int> tempCategoryIds = [];
+          tempCategoryIds.add(value.id!);
+
+          // Thêm tất cả child id vào list
+          if (value.children != null && value.children!.isNotEmpty) {
+            for (var child in value.children!) {
+              if (child.id != null) {
+                tempCategoryIds.add(child.id!);
+              }
+            }
+          }
+
+          categoryIds = tempCategoryIds;
+        }
+        return builder(
+            categoryIds.isEmpty ? null : categoryIds.join(','), value);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,64 +89,56 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const LocationHeader(),
+              const _LocationHeader(),
               const SizedBox(height: 17),
-              const SearchBar(),
+              WidgetSearchField(onTap: () {}),
               const SizedBox(height: 17),
               const _PromoBanner(),
               const SizedBox(height: 24),
-              const _CategorySection(),
+              _CategorySection(categoryNotifier: _categoryNotifier),
               const SizedBox(height: 24),
-              const FastestDeliverySection(),
+              _categoryNotifierBuilder(
+                builder: (categoryIds, category) => _FastestDeliverySection(
+                  key: Key('fastest_delivery_section_$categoryIds'),
+                  categoryIds: categoryIds,
+                ),
+              ),
               const SizedBox(height: 32),
-              const DiscountSection(),
+              _categoryNotifierBuilder(
+                builder: (categoryIds, category) => _RestaurantDiscountSection(
+                  key: Key('restaurant_discount_section_$categoryIds'),
+                  categoryIds: categoryIds,
+                  category: category,
+                ),
+              ),
               const SizedBox(height: 32),
-              const BestSellerSection(),
+              _categoryNotifierBuilder(
+                builder: (categoryIds, category) => _BestSellerSection(
+                  key: Key('best_seller_section_$categoryIds'),
+                  categoryIds: categoryIds,
+                ),
+              ),
               const SizedBox(height: 32),
-              const RecommendedSection(),
+              _categoryNotifierBuilder(
+                builder: (categoryIds, category) => _RestaurantHighRating(
+                  key: Key('restaurant_high_rating_section_$categoryIds'),
+                  categoryIds: categoryIds,
+                ),
+              ),
               const SizedBox(height: 32),
-              const PartnerSection(),
+              _categoryNotifierBuilder(
+                builder: (categoryIds, category) => _RecommendedSection(
+                  key: Key('recommended_section_$categoryIds'),
+                ),
+              ),
+              const SizedBox(height: 32),
+              const _PartnerSection(),
               const SizedBox(height: 32),
               const _NewsSection(),
               const SizedBox(height: 110),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class SearchBar extends StatelessWidget {
-  const SearchBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(56),
-      ),
-      child: Row(
-        children: [
-          WidgetAppSVG(
-            'icon29',
-            width: 24.sw,
-            height: 24.sw,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'What are you craving?.....'.tr(),
-              style: w400TextStyle(
-                fontSize: 16.sw,
-                color: const Color(0xFFACA9A9),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -164,7 +202,7 @@ class __PromoBannerState extends State<_PromoBanner> {
                   imageUrl: _banners![index].image ?? '',
                   width: double.infinity,
                   height: 146.sw,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                   radius: 12.sw,
                 ),
               ),
@@ -190,7 +228,8 @@ class __PromoBannerState extends State<_PromoBanner> {
 List<CategoryModel>? _categories;
 
 class _CategorySection extends StatefulWidget {
-  const _CategorySection({super.key});
+  final ValueNotifier<CategoryModel?> categoryNotifier;
+  const _CategorySection({super.key, required this.categoryNotifier});
 
   @override
   State<_CategorySection> createState() => __CategorySectionState();
@@ -204,10 +243,12 @@ class __CategorySectionState extends State<_CategorySection> {
   }
 
   void _fetchCategories() async {
-    final response = await CategoryRepo()
-        .getCategories({});
+    final response = await CategoryRepo().getCategories({});
     if (response.isSuccess) {
       _categories = response.data;
+      if (_categories != null && _categories!.isNotEmpty) {
+        widget.categoryNotifier.value = _categories!.first;
+      }
     }
     if (mounted) {
       setState(() {});
@@ -252,107 +293,219 @@ class __CategorySectionState extends State<_CategorySection> {
           ],
         ),
         const SizedBox(height: 16),
+        ValueListenableBuilder(
+            valueListenable: widget.categoryNotifier,
+            builder: (context, value, child) {
+              return SingleChildScrollView(
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _categories == null
+                      ? List.generate(
+                          5,
+                          (index) => const WidgetCategoryCardShimmer(),
+                        )
+                      : _categories!.map((category) {
+                          return WidgetCategoryCard(
+                            title: category.name ?? '',
+                            imageUrl: category.image ?? '',
+                            isSelected: value?.id == category.id,
+                            onTap: () {
+                              widget.categoryNotifier.value = category;
+                            },
+                          );
+                        }).toList(),
+                ),
+              );
+            }),
+      ],
+    );
+  }
+}
+
+List<ProductModel>? _fastestDeliveryProducts;
+
+class _FastestDeliverySection extends StatefulWidget {
+  final String? categoryIds;
+  const _FastestDeliverySection({super.key, this.categoryIds});
+
+  @override
+  State<_FastestDeliverySection> createState() =>
+      __FastestDeliverySectionState();
+}
+
+class __FastestDeliverySectionState extends State<_FastestDeliverySection> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchFastestDeliveryProducts();
+  }
+
+  void _fetchFastestDeliveryProducts() async {
+    final response = await ProductRepo().getProducts({
+      if (widget.categoryIds != null) "category_ids": widget.categoryIds,
+    });
+    if (response.isSuccess) {
+      _fastestDeliveryProducts = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _WidgetTitle(
+          title: 'Fastest Delivery'.tr(),
+          onTap: () {},
+        ),
         SingleChildScrollView(
           clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _categories == null
+            spacing: 12.sw,
+            children: _fastestDeliveryProducts == null
                 ? List.generate(
                     5,
-                    (index) => const WidgetCategoryCardShimmer(),
-                  )
-                : _categories!.map((category) {
-                    return WidgetCategoryCard(
-                      title: category.name ?? '',
-                      imageUrl: category.image ?? '',
-                    );
+                    (index) => const WidgetDishCardShimmer(),
+                  ).toList()
+                : _fastestDeliveryProducts!.map((product) {
+                    return WidgetDishCard(product: product);
                   }).toList(),
           ),
         ),
       ],
     );
   }
-
-   
 }
 
-class FastestDeliverySection extends StatelessWidget {
-  const FastestDeliverySection({super.key});
+List<StoreModel>? _restaurantHighRating;
+
+class _RestaurantHighRating extends StatefulWidget {
+  final String? categoryIds;
+  const _RestaurantHighRating({super.key, this.categoryIds});
+
+  @override
+  State<_RestaurantHighRating> createState() => __RestaurantHighRatingState();
+}
+
+class __RestaurantHighRatingState extends State<_RestaurantHighRating> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchRestaurantHighRating();
+  }
+
+  void _fetchRestaurantHighRating() async {
+    final response = await StoreRepo().getStores({
+      if (widget.categoryIds != null) "category_ids": widget.categoryIds,
+    });
+    if (response.isSuccess) {
+      _restaurantHighRating = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Fastest delivery',
-              style: w400TextStyle(fontSize: 20.sw),
-            ),
-            WidgetAppSVG(
-              'icon28',
-              width: 24.sw,
-              height: 24.sw,
-              fit: BoxFit.contain,
-            ),
-          ],
+        _WidgetTitle(
+          title: 'High Rated Restaurants'.tr(),
+          onTap: () {},
         ),
-        const SizedBox(height: 24),
-        SingleChildScrollView(
-          clipBehavior: Clip.none,
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children:   [
-              WidgetDishCard(
-                product: ProductModel(),
-              ),
-              SizedBox(width: 12),
-              WidgetDishCard(
-                
-                product: ProductModel(),
-              ),
-            ],
-          ),
-        ),
+        ..._restaurantHighRating == null
+            ? List.generate(
+                3,
+                (index) => const WidgetRestaurantCardShimmer(),
+              ).toList()
+            : _restaurantHighRating!.map((store) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.sw),
+                  child: WidgetRestaurantCard(store: store),
+                );
+              }).toList()
       ],
     );
   }
 }
 
-class DiscountSection extends StatelessWidget {
-  const DiscountSection({super.key});
+List<StoreModel>? _restaurantDiscounts;
+
+class _RestaurantDiscountSection extends StatefulWidget {
+  final String? categoryIds;
+  final CategoryModel? category;
+  const _RestaurantDiscountSection(
+      {super.key, this.categoryIds, this.category});
+
+  @override
+  State<_RestaurantDiscountSection> createState() =>
+      __RestaurantDiscountSectionState();
+}
+
+class __RestaurantDiscountSectionState
+    extends State<_RestaurantDiscountSection> {
+  late CategoryModel? _subCategorySelected =
+      widget.category?.children?.isNotEmpty == true
+          ? widget.category?.children?.first
+          : null;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRestaurantDiscounts();
+  }
+
+  void _fetchRestaurantDiscounts() async {
+    final response = await StoreRepo().getStores({
+      if (widget.category != null)
+        "category_ids": [
+          widget.category?.id,
+          if (_subCategorySelected != null) _subCategorySelected?.id
+        ],
+    });
+    if (response.isSuccess) {
+      _restaurantDiscounts = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Discount Guaranteed! 👌',
-          style: w400TextStyle(fontSize: 20.sw),
+        _WidgetTitle(
+          title: 'Discount Guaranteed! 👌'.tr(),
+          onTap: () {},
         ),
-        const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildFilterChip('Vegan', false),
-              const SizedBox(width: 10),
-              _buildFilterChip('Pizza & Fast food', true),
-              const SizedBox(width: 10),
-              _buildFilterChip('Sushi', false),
-              const SizedBox(width: 10),
-              _buildFilterChip('others +', false),
-            ],
+        if (widget.category != null &&
+            widget.category!.children != null &&
+            widget.category!.children!.isNotEmpty) ...[
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: Row(
+              spacing: 10.sw,
+              children: widget.category!.children!.map((category) {
+                return _buildFilterChip(category);
+              }).toList(),
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
+          const SizedBox(height: 24)
+        ],
         CarouselSlider(
           options: CarouselOptions(
-            height: 220.sw,
+            height: 210.sw,
             viewportFraction: 0.68,
             enableInfiniteScroll: true,
             autoPlay: true,
@@ -361,79 +514,101 @@ class DiscountSection extends StatelessWidget {
             enlargeCenterPage: true,
             scrollDirection: Axis.horizontal,
           ),
-          items: List.generate(
-            3,
-            (index) => WidgetRestaurantDiscountCard(
-              imageUrl:
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/8a3959e64f4431841283cdb9191500efa585eff2?placeholderIfAbsent=true',
-              discount: '40% off',
-              rating: '5',
-              title: 'Chef Burgers London',
-            ),
-          ),
+          items: _restaurantDiscounts == null
+              ? List.generate(
+                  3,
+                  (index) => WidgetRestaurantDiscountCardShimmer(),
+                )
+              : _restaurantDiscounts!.map((store) {
+                  return WidgetRestaurantDiscountCard(store: store);
+                }).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildFilterChip(String label, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? appColorPrimary : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isSelected ? Colors.transparent : const Color(0xFFF1F1F1),
+  Widget _buildFilterChip(CategoryModel category) {
+    bool isSelected = _subCategorySelected?.id == category.id;
+    return GestureDetector(
+      onTap: () {
+        appHaptic();
+        setState(() {
+          _subCategorySelected = category;
+        });
+        _fetchRestaurantDiscounts();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? appColorPrimary : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : const Color(0xFFF1F1F1),
+          ),
         ),
-      ),
-      child: Text(
-        label,
-        style: w400TextStyle(
-          fontSize: 14.sw,
-          color: isSelected ? Colors.white : const Color(0xFF57585D),
+        child: Text(
+          category.name ?? '',
+          style: w400TextStyle(
+            fontSize: 14.sw,
+            color: isSelected ? Colors.white : const Color(0xFF57585D),
+          ),
         ),
       ),
     );
   }
 }
 
-class RecommendedSection extends StatelessWidget {
-  const RecommendedSection({super.key});
+List<ProductModel>? _recommendedProducts;
+
+class _RecommendedSection extends StatefulWidget {
+  final String? categoryIds;
+  const _RecommendedSection({super.key, this.categoryIds});
+
+  @override
+  State<_RecommendedSection> createState() => __RecommendedSectionState();
+}
+
+class __RecommendedSectionState extends State<_RecommendedSection> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecommendedProducts();
+  }
+
+  void _fetchRecommendedProducts() async {
+    final response = await ProductRepo().getProducts({
+      "is_popular": 1,
+      if (widget.categoryIds != null) "category_ids": widget.categoryIds,
+    });
+    if (response.isSuccess) {
+      _recommendedProducts = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Recommended For You !',
-              style: w400TextStyle(fontSize: 20.sw),
-            ),
-            WidgetAppSVG(
-              'icon28',
-              width: 24.sw,
-              height: 24.sw,
-            ),
-          ],
+        _WidgetTitle(
+          title: 'Recommended For You !'.tr(),
+          onTap: () {},
         ),
-        const SizedBox(height: 24),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children:   [
-              WidgetDishCard(
-                
-                product: ProductModel(),
-              ),
-              SizedBox(width: 12),
-              WidgetDishCard(
-                
-                product: ProductModel(),
-              ),
-            ],
+            spacing: 12.sw,
+            children: _recommendedProducts == null
+                ? List.generate(
+                    5,
+                    (index) => const WidgetDishCardShimmer(),
+                  ).toList()
+                : _recommendedProducts!.map((product) {
+                    return WidgetDishCard(product: product);
+                  }).toList(),
           ),
         ),
       ],
@@ -441,62 +616,57 @@ class RecommendedSection extends StatelessWidget {
   }
 }
 
-class BestSellerSection extends StatelessWidget {
-  const BestSellerSection({super.key});
+List<ProductModel>? _bestSellerProducts;
+
+class _BestSellerSection extends StatefulWidget {
+  final String? categoryIds;
+  const _BestSellerSection({super.key, this.categoryIds});
+
+  @override
+  State<_BestSellerSection> createState() => __BestSellerSectionState();
+}
+
+class __BestSellerSectionState extends State<_BestSellerSection> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchBestSellerProducts();
+  }
+
+  void _fetchBestSellerProducts() async {
+    final response = await ProductRepo().getProducts({
+      "is_topseller": 1,
+      if (widget.categoryIds != null) "category_ids": widget.categoryIds,
+    });
+    if (response.isSuccess) {
+      _bestSellerProducts = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Best seller',
-              style: w400TextStyle(fontSize: 20.sw),
-            ),
-            WidgetAppSVG(
-              'icon28',
-              width: 24.sw,
-              height: 24.sw,
-              fit: BoxFit.contain,
-            ),
-          ],
+        _WidgetTitle(
+          title: 'Best seller'.tr(),
+          onTap: () {},
         ),
-        const SizedBox(height: 24),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
-              WidgetDishCardV2(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
-                name: 'Pizza Hut - Lumintu',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
-                restaurantName: 'Pizza Hut',
-                reviewCount: '100',
-                deliveryFee: '\$ 1.00',
-              ),
-              const SizedBox(width: 12),
-              WidgetDishCardV2(
-                imageUrl:
-                    'https://cdn.builder.io/api/v1/image/assets/TEMP/685b03b5e849fe57da8a7292cedbbff9c23976ac?placeholderIfAbsent=true',
-                name: 'Pizza Hut - Lumintu',
-                rating: '4.5',
-                deliveryTime: '15-20m',
-                originalPrice: '\$ 3.30',
-                discountedPrice: '\$ 2.20',
-                discountPercentage: '20%',
-                restaurantName: 'Pizza Hut',
-                reviewCount: '100',
-                deliveryFee: '\$ 1.00',
-              ),
-            ],
+            spacing: 12.sw,
+            children: _bestSellerProducts == null
+                ? List.generate(
+                    5,
+                    (index) => const WidgetDishCardShimmer(),
+                  )
+                : _bestSellerProducts!.map((product) {
+                    return WidgetDishCard(product: product);
+                  }).toList(),
           ),
         ),
       ],
@@ -603,8 +773,8 @@ class __NewsSectionState extends State<_NewsSection> {
   }
 }
 
-class PartnerSection extends StatelessWidget {
-  const PartnerSection({super.key});
+class _PartnerSection extends StatelessWidget {
+  const _PartnerSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -700,8 +870,8 @@ class PartnerSection extends StatelessWidget {
   }
 }
 
-class LocationHeader extends StatelessWidget {
-  const LocationHeader({super.key});
+class _LocationHeader extends StatelessWidget {
+  const _LocationHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -807,6 +977,44 @@ class LocationHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _WidgetTitle extends StatelessWidget {
+  final String title;
+  final VoidCallback? onTap;
+  const _WidgetTitle({super.key, required this.title, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return WidgetInkWellTransparent(
+      onTap: onTap,
+      enableInkWell: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: w400TextStyle(fontSize: 20.sw),
+                ),
+              ),
+              WidgetAppSVG(
+                'icon28',
+                width: 24.sw,
+                height: 24.sw,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 }
