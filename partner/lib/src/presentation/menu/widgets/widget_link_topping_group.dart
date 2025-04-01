@@ -1,8 +1,8 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/store/models/menu.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/store/models/menu.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widget_loading_wrapper.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';

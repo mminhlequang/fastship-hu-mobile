@@ -1,7 +1,7 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/transaction/models/models.dart';
-import 'package:app/src/network_resources/transaction/repo.dart';
+import 'package:network_resources/transaction/models/models.dart';
+import 'package:network_resources/transaction/repo.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';

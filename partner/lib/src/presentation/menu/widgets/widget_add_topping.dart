@@ -1,6 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/topping/models/models.dart';
+import 'package:network_resources/topping/models/models.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';

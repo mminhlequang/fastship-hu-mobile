@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/auth/models/models.dart';
-import 'package:app/src/network_resources/driver/repo.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/driver/repo.dart';
 import 'package:app/src/presentation/driver_register/widgets/widget_form_profile_3.dart';
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';

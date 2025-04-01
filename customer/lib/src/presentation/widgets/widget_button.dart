@@ -8,12 +8,8 @@ class WidgetButtonCancel extends StatelessWidget {
   final VoidCallback onPressed;
   final double? width;
   final double? height;
-  const WidgetButtonCancel({
-    super.key,
-    required this.onPressed,
-    this.text,
-    this.width,
-    this.height});
+  const WidgetButtonCancel(
+      {super.key, required this.onPressed, this.text, this.width, this.height});
   @override
   Widget build(BuildContext context) {
     return _buildButton(
@@ -31,7 +27,7 @@ class WidgetButtonConfirm extends StatelessWidget {
   final double? width;
   final double? height;
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   final bool isLoading;
   final bool isEnabled;
@@ -62,7 +58,7 @@ class WidgetButtonConfirm extends StatelessWidget {
 Widget _buildButton({
   required String text,
   required bool isOutlined,
-  required VoidCallback onPressed,
+  required VoidCallback? onPressed,
   bool isLoading = false,
   bool isEnabled = true,
   double? width,
@@ -72,7 +68,7 @@ Widget _buildButton({
     onTap: isEnabled
         ? () {
             appHaptic();
-            onPressed();
+            onPressed?.call();
           }
         : null,
     child: Container(

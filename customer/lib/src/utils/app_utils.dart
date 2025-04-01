@@ -1,3 +1,4 @@
+import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:internal_core/internal_core.dart';
@@ -6,11 +7,19 @@ import 'package:flutter/material.dart';
 
 import 'utils.dart';
 
-String currencyFormatted(double? amount) {
+requestLoginWrapper(Function function) {
+  if (authCubit.state.stateType != AuthStateType.logged) {
+    clearAllRouters('/auth');
+  } else {
+    function();
+  }
+}
+
+String currencyFormatted(num? amount, {int? decimalDigits}) {
   return NumberFormat.currency(
     locale: 'vi_VN',
     symbol: AppPrefs.instance.currencySymbol,
-    decimalDigits: 2,
+    decimalDigits: decimalDigits ?? 2,
   ).format(amount ?? 0);
 }
 
@@ -68,9 +77,8 @@ appHideKeyboard() {
 }
 
 appChangedTheme() {
-  AppPrefs.instance.themeModel = AppPrefs.instance.isDarkTheme
-      ? keyThemeModeLight
-      : keyThemeModeDark;
+  AppPrefs.instance.themeModel =
+      AppPrefs.instance.isDarkTheme ? keyThemeModeLight : keyThemeModeDark;
   WidgetsBinding.instance.performReassemble();
 }
 
@@ -80,15 +88,38 @@ appCatchLog(e) {
 
 enum AppSnackBarType { error, success, notitfication }
 
-appShowSnackBar({context, required msg, Duration? duration}) {
-  ScaffoldMessenger.of(context).showSnackBar(
+appShowSnackBar({
+  context,
+  required msg,
+  Duration? duration,
+  AppSnackBarType type = AppSnackBarType.notitfication,
+}) {
+  Color color;
+  Duration duration;
+
+  switch (type) {
+    case AppSnackBarType.error:
+      color = Colors.red;
+      duration = const Duration(seconds: 6);
+      break;
+    case AppSnackBarType.success:
+      color = Colors.green;
+      duration = const Duration(seconds: 3);
+      break;
+    case AppSnackBarType.notitfication:
+      color = Colors.blue;
+      duration = const Duration(seconds: 4);
+      break;
+  }
+
+  ScaffoldMessenger.of(context ?? appContext).showSnackBar(
     SnackBar(
       content: Text(
         msg,
-        style: w300TextStyle(color: appColorBackground),
+        style: w400TextStyle(color: Colors.white, fontSize: 16.sw),
       ),
-      duration: duration ?? const Duration(seconds: 1),
-      backgroundColor: appColorText,
+      duration: duration,
+      backgroundColor: color,
     ),
   );
 }

@@ -1,11 +1,11 @@
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/category/model/category.dart';
-import 'package:app/src/network_resources/category/repo.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
-import 'package:app/src/network_resources/product/repo.dart';
-import 'package:app/src/network_resources/store/models/store.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/category/model/category.dart';
+import 'package:network_resources/category/repo.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/product/repo.dart';
+import 'package:network_resources/store/models/store.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:flutter/material.dart';

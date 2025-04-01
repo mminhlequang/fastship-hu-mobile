@@ -1,19 +1,22 @@
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
+import 'package:network_resources/product/model/product.dart';
 import 'package:app/src/presentation/home/widgets/widget_sheet_dish_detail.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/store/models/models.dart';
 
 class WidgetDishCardInMenu extends StatelessWidget {
   final ProductModel product;
+  final StoreModel? store;
   final VoidCallback? onTap;
   final double? width;
   const WidgetDishCardInMenu({
     super.key,
     required this.product,
+      this.store,
     this.onTap,
     this.width,
   });
@@ -24,7 +27,7 @@ class WidgetDishCardInMenu extends StatelessWidget {
       onTap: onTap ??
           () {
             appHaptic();
-            appOpenBottomSheet(WidgetSheetDishDetail(product: product));
+            appOpenBottomSheet(WidgetSheetDishDetail(product: product, store: store));
           },
       child: Container(
         height: 220.sw,
@@ -106,11 +109,13 @@ class WidgetDishCardInMenu extends StatelessWidget {
 /// Được sử dụng để hiển thị thông tin chi tiết về món ăn với bố cục ngang
 class WidgetDishCardV2 extends StatelessWidget {
   final ProductModel product;
+  final StoreModel? store;
   final VoidCallback? onTap;
 
   const WidgetDishCardV2({
     super.key,
     required this.product,
+    this.store,
     this.onTap,
   });
 
@@ -120,7 +125,7 @@ class WidgetDishCardV2 extends StatelessWidget {
       onTap: onTap ??
           () {
             appHaptic();
-            appOpenBottomSheet(WidgetSheetDishDetail(product: product));
+            appOpenBottomSheet(WidgetSheetDishDetail(product: product, store: store));
           },
       child: Container(
         height: 185.sw,
@@ -448,15 +453,17 @@ class WidgetDishCardV2Shimmer extends StatelessWidget {
 
 class WidgetDishCard extends StatelessWidget {
   final ProductModel product;
+  final StoreModel? store;
   final VoidCallback? onTap;
   final double? width;
 
   const WidgetDishCard({
-    Key? key,
+    super.key,
     required this.product,
+    this.store,
     this.onTap,
     this.width,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -464,7 +471,7 @@ class WidgetDishCard extends StatelessWidget {
       onTap: onTap ??
           () {
             appHaptic();
-            appOpenBottomSheet(WidgetSheetDishDetail(product: product));
+            appOpenBottomSheet(WidgetSheetDishDetail(product: product, store: store));
           },
       child: Container(
         width: width ?? 175.sw,

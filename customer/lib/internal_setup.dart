@@ -21,8 +21,7 @@ internalSetup() {
         responsePrefixData: 'data',
         // errorInterceptor: (e) {
         //   print(e);
-        // },
-        loggingrequestHeader: true,
+        // }
       ),
     ),
   );

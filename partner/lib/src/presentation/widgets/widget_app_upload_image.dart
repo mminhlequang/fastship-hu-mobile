@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/internal_core.dart';
 
@@ -13,6 +15,7 @@ void _showImageSourceOptions(
     BuildContext context, Function(XFile) onImagePicked) {
   Future<void> _pickImage(
       ImageSource source, Function(XFile) onImagePicked) async {
+    context.pop();
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: source);
@@ -28,24 +31,61 @@ void _showImageSourceOptions(
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
-      return SafeArea(
-        child: Wrap(
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: Text('Take a photo'.tr()),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera, onImagePicked);
-              },
+      return WidgetAppBottomSheet(
+        title: 'Choose image source'.tr(),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: GestureDetector(
+                onTap: () => _pickImage(ImageSource.camera, onImagePicked),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Gap(32.sw),
+                    Container(
+                      height: 72.sw,
+                      width: 72.sw,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: grey8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: const WidgetAppSVG('ic_camera'),
+                      ),
+                    ),
+                    Gap(16.sw),
+                    Text('Take a photo'.tr(), style: w400TextStyle()),
+                    Gap(56.sw),
+                  ],
+                ),
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: Text('Choose from gallery'.tr()),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery, onImagePicked);
-              },
+            Expanded(
+              flex: 3,
+              child: GestureDetector(
+                onTap: () => _pickImage(ImageSource.gallery, onImagePicked),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Gap(32.sw),
+                    Container(
+                      height: 72.sw,
+                      width: 72.sw,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: grey8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: const WidgetAppSVG('ic_gallery'),
+                      ),
+                    ),
+                    Gap(16.sw),
+                    Text('Choose from gallery'.tr(), style: w400TextStyle()),
+                    Gap(56.sw),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

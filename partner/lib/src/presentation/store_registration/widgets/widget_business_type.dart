@@ -1,6 +1,6 @@
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/service/models/models.dart';
-import 'package:app/src/network_resources/service/repo.dart';
+import 'package:network_resources/service/models/models.dart';
+import 'package:network_resources/service/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

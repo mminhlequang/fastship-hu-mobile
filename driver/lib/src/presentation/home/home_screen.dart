@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
@@ -54,15 +54,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Completer<AnimatedMapController> mapController = Completer<AnimatedMapController>();
+  Completer<AnimatedMapController> mapController =
+      Completer<AnimatedMapController>();
   final ValueNotifier<int> _seconds = ValueNotifier(30);
-  final ValueNotifier<DeliveryStatus> _status = ValueNotifier(DeliveryStatus.waitingToAccept);
+  final ValueNotifier<DeliveryStatus> _status =
+      ValueNotifier(DeliveryStatus.waitingToAccept);
 
   @override
   void initState() {
     super.initState();
     _checkNotificationPermission().then((_) async {
-      AuthRepo().updateDeviceToken({'device_token': await FirebaseMessaging.instance.getToken()});
+      AuthRepo().updateDeviceToken(
+          {'device_token': await FirebaseMessaging.instance.getToken()});
     });
   }
 
@@ -96,7 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(bottom: 24.sw + context.mediaQueryPadding.bottom),
+          padding:
+              EdgeInsets.only(bottom: 24.sw + context.mediaQueryPadding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -200,12 +204,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ValueListenableBuilder<DeliveryStatus>(
         valueListenable: _status,
         builder: (context, statusValue, child) {
-          bool isWaitingToConfirm = statusValue == DeliveryStatus.waitingToAccept;
+          bool isWaitingToConfirm =
+              statusValue == DeliveryStatus.waitingToAccept;
           return Stack(
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                    16.sw, 16.sw, 16.sw, 16.sw + context.mediaQueryPadding.bottom),
+                padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 16.sw,
+                    16.sw + context.mediaQueryPadding.bottom),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Gap(24.sw),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 8.sw),
-                        child: WidgetAnimatedStepper(currentStep: statusValue.value),
+                        child: WidgetAnimatedStepper(
+                            currentStep: statusValue.value),
                       ),
                       Gap(33.sw),
                     ],
@@ -272,7 +278,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               Gap(4.sw),
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 4.sw, vertical: 2.sw),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(99),
                                   border: Border.all(color: grey9),
@@ -298,7 +305,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             alignment: Alignment.centerLeft,
                             child: Column(
                               children: [
-                                CircleAvatar(radius: 4.sw, backgroundColor: appColorText),
+                                CircleAvatar(
+                                    radius: 4.sw,
+                                    backgroundColor: appColorText),
                                 Expanded(
                                   child: DottedLine(
                                     direction: Axis.vertical,
@@ -307,7 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     dashColor: grey1,
                                   ),
                                 ),
-                                CircleAvatar(radius: 4.sw, backgroundColor: appColorText),
+                                CircleAvatar(
+                                    radius: 4.sw,
+                                    backgroundColor: appColorText),
                               ],
                             ),
                           ),
@@ -325,7 +336,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Gap(4.sw),
                     Container(
                       margin: EdgeInsets.only(left: 24.sw),
-                      padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 4.sw, vertical: 2.sw),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(99),
                         border: Border.all(color: grey9),
@@ -352,7 +364,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context, value, child) {
                                     return Text(
                                       '${'Accept order'.tr()} (${value}s)',
-                                      style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
+                                      style: w500TextStyle(
+                                          fontSize: 16.sw, color: Colors.white),
                                     );
                                   },
                                 ),
@@ -366,7 +379,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             label: Text(
                               _nextStatus.displayName,
-                              style: w500TextStyle(fontSize: 18.sw, color: Colors.white),
+                              style: w500TextStyle(
+                                  fontSize: 18.sw, color: Colors.white),
                             ),
                             icon: Center(
                               child: Icon(
@@ -483,7 +497,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   top: -6,
                                   right: -4,
                                   child: Container(
-                                    padding: EdgeInsets.fromLTRB(4.sw, 2.53.sw, 4.sw, 0.47.sw),
+                                    padding: EdgeInsets.fromLTRB(
+                                        4.sw, 2.53.sw, 4.sw, 0.47.sw),
                                     decoration: BoxDecoration(
                                       color: hexColor('#F58737'),
                                       borderRadius: BorderRadius.circular(7.sw),
@@ -519,8 +534,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   key: ValueKey(isOnline),
                   width: context.width,
                   color: Colors.white,
-                  padding: EdgeInsets.fromLTRB(
-                      16.sw, 10.sw, 16.sw, 16.sw + MediaQuery.paddingOf(context).bottom),
+                  padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
+                      16.sw + MediaQuery.paddingOf(context).bottom),
                   child: isOnline
                       ? SliderButton(
                           direction: DismissDirection.endToStart,
@@ -548,10 +563,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           buttonSize: 40.sw,
                           width: context.width,
                           radius: 99.sw,
-                          border: Border.all(color: appColorPrimary.withValues(alpha: .23)),
+                          border: Border.all(
+                              color: appColorPrimary.withValues(alpha: .23)),
                           alignLabel: Alignment.center,
                           buttonColor: appColorPrimary,
-                          backgroundColor: appColorPrimary.withValues(alpha: .2),
+                          backgroundColor:
+                              appColorPrimary.withValues(alpha: .2),
                           highlightedColor: darkGreen,
                           baseColor: Colors.white,
                           shimmer: false,

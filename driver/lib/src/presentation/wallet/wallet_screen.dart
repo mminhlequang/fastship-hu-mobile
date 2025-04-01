@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/transaction/models/models.dart';
-import 'package:app/src/network_resources/transaction/repo.dart';
+import 'package:network_resources/transaction/models/models.dart';
+import 'package:network_resources/transaction/repo.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';

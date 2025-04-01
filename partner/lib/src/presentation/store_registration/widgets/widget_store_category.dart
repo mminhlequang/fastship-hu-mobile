@@ -1,8 +1,8 @@
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/category/model/category.dart';
-import 'package:app/src/network_resources/category/repo.dart';
-import 'package:app/src/network_resources/service/models/models.dart';
-import 'package:app/src/network_resources/service/repo.dart';
+import 'package:network_resources/category/model/category.dart';
+import 'package:network_resources/category/repo.dart';
+import 'package:network_resources/service/models/models.dart';
+import 'package:network_resources/service/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +32,11 @@ class _WidgetStoreCategoryState extends State<WidgetStoreCategory> {
   }
 
   Future<void> _fetchTypes() async {
-    final result = await CategoryRepo().getCategories();
-    if (result != null) {
+    final response = await CategoryRepo().getCategories({});
+    if (response.isSuccess) {
       if (mounted) {
         setState(() {
-          _items = result;
+          _items = response.data;
         });
       }
     } else {

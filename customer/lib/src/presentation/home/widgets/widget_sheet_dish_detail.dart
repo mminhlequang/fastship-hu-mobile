@@ -1,5 +1,5 @@
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
+import 'package:network_resources/product/model/product.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -7,63 +7,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
-
-// Menu Item Widget
-// class MenuItem extends StatelessWidget {
-//   final String title;
-//   final String price;
-//   final bool isSelected;
-
-//   const MenuItem({
-//     Key? key,
-//     required this.title,
-//     required this.price,
-//     this.isSelected = false,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: const EdgeInsets.only(bottom: 10),
-//       decoration: isSelected
-//           ? InputDesignStyles.selectedMenuItemDecoration
-//           : InputDesignStyles.unselectedMenuItemDecoration,
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Expanded(
-//               child: Text(
-//                 title,
-//                 style: TextStyle(
-//                   color: isSelected ? Colors.black : InputDesignStyles.grayText,
-//                   fontSize: 14,
-//                   fontWeight: FontWeight.w400,
-//                 ),
-//               ),
-//             ),
-//             Text(
-//               price,
-//               style: TextStyle(
-//                 color: isSelected
-//                     ? InputDesignStyles.darkGreen
-//                     : InputDesignStyles.disabledGray,
-//                 fontSize: 14,
-//                 fontWeight: FontWeight.w400,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'package:network_resources/store/models/models.dart';
 
 class WidgetSheetDishDetail extends StatefulWidget {
   final ProductModel product;
-  const WidgetSheetDishDetail({Key? key, required this.product})
-      : super(key: key);
+  final StoreModel? store;
+  const WidgetSheetDishDetail({super.key, required this.product, this.store});
 
   @override
   State<WidgetSheetDishDetail> createState() => _WidgetSheetDishDetailState();
@@ -71,6 +20,21 @@ class WidgetSheetDishDetail extends StatefulWidget {
 
 class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
   int quantity = 1;
+
+  List<VariationValue> selectedVariationValues = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product.variations?.isNotEmpty ?? false) {
+      selectedVariationValues = widget.product.variations
+              ?.map((e) => e.values!.firstWhere(
+                  (element) => element.isDefault == 1,
+                  orElse: () => e.values!.first))
+              .toList() ??
+          [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,17 +69,16 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                 const SizedBox(height: 16),
                 Stack(
                   children: [
-                    Center(
-                      child: WidgetAppImage(
-                        imageUrl: widget.product.image ?? '',
-                        fit: BoxFit.contain,
-                        height: 100.sw,
-                        radius: 12.sw,
-                      ),
+                    WidgetAppImage(
+                      imageUrl: widget.product.image ?? '',
+                      fit: BoxFit.cover,
+                      height: 220.sw,
+                      width: 240.sw,
+                      radius: 12.sw,
                     ),
                     Positioned(
-                      right: 36,
-                      bottom: 0,
+                      right: 16,
+                      bottom: 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -209,62 +172,53 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: hexColor('#E7E7E7')),
-                    borderRadius: BorderRadius.circular(16),
+                if (widget.product.variations?.isNotEmpty ?? false)
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: hexColor('#E7E7E7')),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 12.sw,
+                      children: [
+                        ...widget.product.variations!.map((e) =>
+                            _buildMenuSection(
+                              e.name ?? '',
+                              e.values?.map(
+                                    (e) {
+                                      bool isSelected = selectedVariationValues
+                                          .any((element) => element.id == e.id);
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (isSelected) {
+                                            selectedVariationValues.removeWhere(
+                                                (element) =>
+                                                    element.id == e.id);
+                                          } else {
+                                            selectedVariationValues.removeWhere(
+                                                (element) =>
+                                                    element.parentId ==
+                                                    e.parentId);
+                                            selectedVariationValues.add(e);
+                                          }
+                                          setState(() {});
+                                        },
+                                        child: _MenuItem(
+                                          title: e.value ?? '',
+                                          price:
+                                              "+${currencyFormatted(e.price?.toDouble())}",
+                                          isSelected: isSelected,
+                                        ),
+                                      );
+                                    },
+                                  ).toList() ??
+                                  [],
+                            )),
+                      ],
+                    ),
                   ),
-                  padding: const EdgeInsets.all(12),
-                  // child: Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     _buildMenuSection(
-                  //       'Please select the side menu',
-                  //       [
-                  //         MenuItem(
-                  //           title: 'French fries medium',
-                  //           price: '+ \$5',
-                  //           isSelected: true,
-                  //         ),
-                  //         MenuItem(
-                  //           title: 'Onipote (french fries and fried onions)',
-                  //           price: '+ \$5',
-                  //         ),
-                  //       ],
-                  //     ),
-                  //     const SizedBox(height: 8),
-                  //     _buildMenuSection(
-                  //       'Please choose favorite drink',
-                  //       [
-                  //         MenuItem(
-                  //           title: 'French fries medium',
-                  //           price: '+ \$5',
-                  //           isSelected: true,
-                  //         ),
-                  //         MenuItem(
-                  //           title: 'Onipote (french fries and fried onions)',
-                  //           price: '+ \$5',
-                  //         ),
-                  //       ],
-                  //     ),
-                  //     const SizedBox(height: 8),
-                  //     _buildMenuSection(
-                  //       'Please choose favorite drink',
-                  //       [
-                  //         MenuItem(
-                  //           title: 'French fries medium',
-                  //           price: '+ \$5',
-                  //           isSelected: true,
-                  //         ),
-                  //         MenuItem(
-                  //           title: 'Onipote (french fries and fried onions)',
-                  //           price: '+ \$5',
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ],
-                  // ),
-                ),
               ],
             ),
           ),
@@ -334,9 +288,10 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                       appHaptic();
                       context.pop();
                       cartCubit.addToCart(
-                        widget.product.store!,
+                        widget.store ?? widget.product.store!,
                         widget.product,
                         quantity,
+                        selectedVariationValues: selectedVariationValues,
                       );
                     },
                     child: Container(
@@ -361,7 +316,12 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                           ),
                           Text(
                             currencyFormatted(
-                                (widget.product.price! * quantity).toDouble()),
+                                (widget.product.price! * quantity +
+                                        selectedVariationValues.fold(
+                                            0,
+                                            (previousValue, element) =>
+                                                previousValue + element.price!))
+                                    .toDouble()),
                             style: w600TextStyle(
                               color: Colors.white,
                               fontSize: 18.sw,
@@ -380,14 +340,69 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
     );
   }
 
-  // Widget _buildMenuSection(String title, List<Widget> items) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text(title, style: InputDesignStyles.menuTitleStyle),
-  //       const SizedBox(height: 8),
-  //       ...items,
-  //     ],
-  //   );
-  // }
+  Widget _buildMenuSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: w600TextStyle(fontSize: 16.sw)),
+        const SizedBox(height: 8),
+        ...items,
+      ],
+    );
+  }
+}
+
+// Menu Item Widget
+class _MenuItem extends StatelessWidget {
+  final String title;
+  final String price;
+  final bool isSelected;
+
+  const _MenuItem({
+    Key? key,
+    required this.title,
+    required this.price,
+    this.isSelected = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: isSelected
+          ? BoxDecoration(
+              border: Border.all(color: appColorPrimary),
+              color: hexColor('#E6FBDA'),
+              borderRadius: BorderRadius.circular(12),
+            )
+          : BoxDecoration(
+              color: hexColor('#F9F8F6'),
+              borderRadius: BorderRadius.circular(12),
+            ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: w400TextStyle(
+                  color: isSelected ? Colors.black : hexColor('#7D7575'),
+                  fontSize: 14.sw,
+                ),
+              ),
+            ),
+            Text(
+              price,
+              style: w500TextStyle(
+                color: isSelected ? hexColor('#538D33') : hexColor('#B6B6B6'),
+                fontSize: 14.sw,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

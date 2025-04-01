@@ -1,9 +1,9 @@
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
-import 'package:app/src/network_resources/store/models/menu.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/store/models/menu.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:app/src/utils/utils.dart';
@@ -157,14 +157,11 @@ class _MenuScreenState extends State<MenuScreen>
         final menu = menus[index];
         onAddDish() async {
           appHaptic();
-          final r = await appContext.push('/add-dish',
+          await appContext.push('/add-dish',
               extra: AddDishParams(
                 categoryIds: [menu.id!],
               ));
-          if (r is ProductModel) {
-            menu.products!.add(r);
-            setState(() {});
-          }
+          _fetchData();
         }
 
         return Column(
@@ -194,15 +191,12 @@ class _MenuScreenState extends State<MenuScreen>
                   final product = menu.products![productIndex];
                   return WidgetRippleButton(
                     onTap: () async {
-                      final r = await appContext.push('/add-dish',
+                      await appContext.push('/add-dish',
                           extra: AddDishParams(
                             model: product,
                             categoryIds: [menu.id!],
                           ));
-                      if (r is ProductModel) {
-                        menu.products![productIndex] = r;
-                        setState(() {});
-                      }
+                      _fetchData();
                     },
                     radius: 0,
                     child: Padding(

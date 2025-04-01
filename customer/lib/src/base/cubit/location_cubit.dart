@@ -1,7 +1,6 @@
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
 part 'location_state.dart';
@@ -21,6 +20,12 @@ class LocationCubit extends Cubit<LocationState> {
   }
 
   void updateAddressDetail(HereSearchResult? address) {
+    var deliveryAddresses = AppPrefs.instance.deliveryAddresses;
+    deliveryAddresses.removeWhere((element) =>
+        element.position!.lat == address!.position!.lat &&
+        element.position!.lng == address.position!.lng);
+    deliveryAddresses.add(address!);
+    AppPrefs.instance.deliveryAddresses = deliveryAddresses;
     emit(state.copyWith(addressDetail: address));
   }
 }

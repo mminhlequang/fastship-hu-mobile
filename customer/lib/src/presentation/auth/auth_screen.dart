@@ -1,145 +1,47 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:math';
 
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_network/options.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../widgets/widget_infinity_slider.dart';
+import 'widgets/widget_otp.dart';
+
+class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  PhoneNumber? phoneNumber;
+  bool isPhoneNumberValid = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildStatusBar(),
-              _buildImageGrid(),
-              _buildHeaderText(),
-              _buildCountryPhoneSection(),
-              _buildSocialLoginSection(),
-              _buildTermsSection(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusBar() {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 22),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '9:41',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-              color: Colors.black,
-              fontFamily: GoogleFonts.fredoka().fontFamily,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 380,
+              child: WidgetCarouselImages(is4Column: false),
             ),
-          ),
-          Row(
-            children: [
-              // Signal Icon
-              _buildSignalIcon(),
-              const SizedBox(width: 10),
-              // Battery Icon
-              _buildBatteryIcon(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageGrid() {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            children: [
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/39684c089be5dac8dcfa95f471919edf34a91039',
-                  172),
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/211b69a6d6f4767f60dbb6c04b27cd0235a595d1',
-                  182),
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/01cfdf06543ef096b77989231a0dd4b45c84b0ea',
-                  172),
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/b512552d279b049f054655c77ef53206f743a51c',
-                  172),
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/5a9f99af11b847e195fd62d2838e93c53c08c157',
-                  182),
-              _buildGridImage(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/502af263e8143bab221efc4c4b69db2ae9afbdb2',
-                  172),
-            ],
-          ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 89,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  Colors.white.withOpacity(0),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 139,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  Colors.white.withOpacity(0),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGridImage(String url, double height) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-        ),
-        child: Image.network(
-          url,
-          fit: BoxFit.cover,
+            _buildHeaderText(),
+            _buildCountryPhoneSection(),
+            _buildSocialLoginSection(),
+            _buildTermsSection(),
+          ],
         ),
       ),
     );
@@ -151,24 +53,20 @@ class OnboardingScreen extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your Favorite Food Delivery Partner',
-            style: TextStyle(
+            'Your Favorite Food Delivery Partner'.tr(),
+            style: w700TextStyle(
               fontSize: 33,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF0E0D0A),
-              height: 1.2,
-              fontFamily: GoogleFonts.fredoka().fontFamily,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            'We are the fastest and most popular delivery service across the city.',
-            style: TextStyle(
+            'We are the fastest and most popular delivery service across the city.'
+                .tr(),
+            style: w400TextStyle(
               fontSize: 18,
               color: const Color(0xFF847D79),
               height: 1.4,
-              fontFamily: GoogleFonts.fredoka().fontFamily,
             ),
             textAlign: TextAlign.center,
           ),
@@ -180,86 +78,102 @@ class OnboardingScreen extends StatelessWidget {
   Widget _buildCountryPhoneSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Country',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: const Color(0xFFB6AFAE),
-                    letterSpacing: 0.14,
-                    fontFamily: GoogleFonts.fredoka().fontFamily,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F4F4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Hungary',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: const Color(0xFFF17228),
-                          fontFamily: GoogleFonts.fredoka().fontFamily,
-                        ),
-                      ),
-                      Icon(
-                        Icons.keyboard_arrow_down,
-                        color: const Color(0xFFF17228),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: InternationalPhoneNumberInput(
+        spaceBetweenSelectorAndTextField: 12,
+        keyboardType: TextInputType.phone,
+        formatInput: true,
+        keyboardAction: TextInputAction.done,
+        cursorColor: appColorText,
+        countries:
+            ["VN"] + euroCounries.map((e) => e['code'].toString()).toList(),
+        selectorConfig: SelectorConfig(
+          bgColor: Colors.white,
+          selectorTextStyle: w500TextStyle(fontSize: 16),
+        ),
+        builderTextField: (child) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Number phone'.tr(),
+              style: w400TextStyle(
+                fontSize: 14.sw,
+                color: const Color(0xFFB6AFAE),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Number phone',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: const Color(0xFFB6AFAE),
-                    letterSpacing: 0.14,
-                    fontFamily: GoogleFonts.fredoka().fontFamily,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFF1EFE9)),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '+ 43',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: const Color(0xFF120F0F),
-                      letterSpacing: 0.16,
-                      fontFamily: GoogleFonts.fredoka().fontFamily,
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 8),
+            Container(
+              height: 52.sw,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFF1EFE9)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: child,
             ),
+          ],
+        ),
+        builderButtonSelector: (child) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Country',
+              style: TextStyle(
+                fontSize: 14,
+                color: const Color(0xFFB6AFAE),
+                letterSpacing: 0.14,
+                fontFamily: GoogleFonts.fredoka().fontFamily,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 52.sw,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF4F4F4),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: child,
+            ),
+          ],
+        ),
+        onInputChanged: (PhoneNumber number) {
+          appHaptic();
+          setState(() {
+            phoneNumber = number;
+          });
+        },
+        onInputValidated: (bool isValid) {
+          setState(() {
+            isPhoneNumberValid = isValid;
+          });
+        },
+        onSubmit: () {
+          if (isPhoneNumberValid) {
+            pushWidget(
+              child: PhoneVerificationScreen(
+                phoneNumber: phoneNumber!,
+              ),
+            );
+          }
+        },
+        textStyle: w400TextStyle(fontSize: 16.sw),
+        inputDecoration: InputDecoration(
+          isDense: true,
+          isCollapsed: true,
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+          filled: true,
+          fillColor: appColorBackground,
+          hintText: '87 878 7878',
+          hintStyle: w400TextStyle(
+            fontSize: 16.sw,
+            color: const Color(0xFF8A8C91),
           ),
-        ],
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(8.sw),
+          ),
+        ),
       ),
     );
   }
@@ -287,32 +201,37 @@ class OnboardingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSocialButton(
-                  'Google',
-                  Icons.g_mobiledata,
-                ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: _buildSocialButton(
+          //         'Google',
+          //         Icons.g_mobiledata,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 8),
+          //     Expanded(
+          //       child: _buildSocialButton(
+          //         'Apple',
+          //         Icons.apple,
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 12),
+          WidgetInkWellTransparent(
+            onTap: () {
+              appHaptic();
+              clearAllRouters('/');
+            },
+            child: Text(
+              'Continue as a guest'.tr(),
+              style: w500TextStyle(
+                fontSize: 18,
+                color: appColorPrimary,
+                decoration: TextDecoration.underline,
+                decorationColor: appColorPrimary,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildSocialButton(
-                  'Apple',
-                  Icons.apple,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Continue as a guest',
-            style: TextStyle(
-              fontSize: 18,
-              color: const Color(0xFF538D33),
-              decoration: TextDecoration.underline,
-              decorationColor: const Color(0xFF538D33),
-              fontFamily: GoogleFonts.fredoka().fontFamily,
             ),
           ),
         ],
@@ -320,66 +239,57 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialButton(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFF1EFE9)),
-        borderRadius: BorderRadius.circular(62),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              color: const Color(0xFF303030),
-              fontFamily: GoogleFonts.fredoka().fontFamily,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildSocialButton(String text, IconData icon) {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(vertical: 12),
+  //     decoration: BoxDecoration(
+  //       border: Border.all(color: const Color(0xFFF1EFE9)),
+  //       borderRadius: BorderRadius.circular(62),
+  //     ),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Icon(icon),
+  //         const SizedBox(width: 12),
+  //         Text(
+  //           text,
+  //           style: TextStyle(
+  //             fontSize: 16,
+  //             color: const Color(0xFF303030),
+  //             fontFamily: GoogleFonts.fredoka().fontFamily,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildTermsSection() {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF17228),
-              shape: BoxShape.circle,
-            ),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: GoogleFonts.fredoka().fontFamily,
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: GoogleFonts.fredoka().fontFamily,
-                ),
-                children: const [
-                  TextSpan(
-                    text: 'You must accept the ',
-                    style: TextStyle(color: Color(0xFF847D79)),
-                  ),
-                  TextSpan(
-                    text: 'terms and conditions',
-                    style: TextStyle(color: Color(0xFFF17228)),
-                  ),
-                ],
-              ),
+          children: [
+            TextSpan(
+              text: 'When continue, you agree to our '.tr(),
+              style: w400TextStyle(color: appColorText2),
             ),
-          ),
-        ],
+            TextSpan(
+              text: 'terms and conditions'.tr(),
+              style: w500TextStyle(color: appColorPrimaryOrange),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  appHaptic();
+                  launchUrl(Uri.parse(
+                      "${appBaseUrl!}/terms-and-conditions")); // TODO: change to terms and conditions
+                },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -420,6 +330,128 @@ class OnboardingScreen extends StatelessWidget {
             color: Colors.black,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class WidgetCarouselImages extends StatelessWidget {
+  final bool is4Column;
+  const WidgetCarouselImages({super.key, this.is4Column = true});
+
+  //length collection
+  int get _count => 5;
+
+  Widget _buildColumn(
+      {int column = 1, Duration duration = const Duration(milliseconds: 60)}) {
+    return WidgetInfinitySlider(
+      duration: duration,
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: List.generate(
+          _count - 1,
+          (index) => Padding(
+            padding: EdgeInsets.only(bottom: 12.sw),
+            child: _WidgetImageAsset(
+              prefix: "welcome_${column}_",
+              index: index,
+              radius: 16.sw,
+              height: is4Column ? 145.sw : 172.sw,
+              boxShadow: const [],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Row(
+          children: [
+            Gap(16.sw),
+            Expanded(
+              child: _buildColumn(
+                  column: 1, duration: const Duration(milliseconds: 60)),
+            ),
+            Gap(12.sw),
+            Expanded(
+              child: _buildColumn(
+                  column: 2, duration: const Duration(milliseconds: 45)),
+            ),
+            Gap(12.sw),
+            Expanded(
+              child: _buildColumn(
+                  column: 1, duration: const Duration(milliseconds: 120)),
+            ),
+            // if (is4Column) ...[
+            //   Gap(12.sw),
+            //   Expanded(
+            //     child: _buildColumn(
+            //         column: 1, duration: const Duration(milliseconds: 85)),
+            //   ),
+            // ],
+            Gap(16.sw),
+          ],
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 100.sw,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Colors.white,
+                Colors.white.withOpacity(.8),
+                Colors.white.withOpacity(.35),
+                Colors.white.withOpacity(.00001),
+              ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+int _randomSizeInRange(int min, int max) => min + Random().nextInt(max - min);
+
+class _WidgetImageAsset extends StatelessWidget {
+  final String prefix;
+  final int index;
+  final double? height;
+  final double radius;
+  final List<BoxShadow>? boxShadow;
+  const _WidgetImageAsset({
+    required this.index,
+    this.height,
+    required this.radius,
+    this.boxShadow,
+    required this.prefix,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+              "assets/images/jpg/$prefix${index == 0 ? 5 : index}.jpg"),
+          fit: BoxFit.cover,
+        ),
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: boxShadow ??
+            [
+              BoxShadow(
+                  color: Colors.black.withOpacity(.3),
+                  blurRadius: 12.sw,
+                  offset: Offset(5.sw, 5.sw))
+            ],
       ),
     );
   }

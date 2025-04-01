@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:app/src/network_resources/auth/models/models.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
-import 'package:app/src/network_resources/transaction/models/models.dart';
-import 'package:app/src/network_resources/transaction/repo.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/auth/repo.dart';
+import 'package:network_resources/transaction/models/models.dart';
+import 'package:network_resources/transaction/repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';

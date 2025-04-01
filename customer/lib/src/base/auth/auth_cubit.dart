@@ -4,14 +4,15 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:internal_network/network_resources/model/model.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/auth/repo.dart';
 
 enum AuthStateType { none, logged }
 
 AuthCubit get authCubit => findInstance<AuthCubit>();
 
 class AuthCubit extends Cubit<AuthState> {
-  StreamSubscription? _subscription;
-
   AuthCubit() : super(AuthState());
   update(user) async {
     state.user = user;
@@ -21,12 +22,28 @@ class AuthCubit extends Cubit<AuthState> {
     // }
   }
 
-  load({Duration delayRedirect = const Duration(seconds: 1)}) async {
-    // try {
-    //   emit(state.update(stateType: AuthStateType.logged));
-    // } catch (e) {
-    //   emit(state.update(stateType: AuthStateType.none));
-    // }
+  load({
+    Duration delayRedirect = const Duration(seconds: 1),
+    AccountModel? user,
+  }) async {
+    try {
+      if (user != null) {
+        state.user = user;
+        AppPrefs.instance.user = user;
+        emit(state.update(stateType: AuthStateType.logged));
+      } else {
+        NetworkResponse response = await AuthRepo().getProfile();
+        if (response.isSuccess) {
+          state.user = response.data;
+          AppPrefs.instance.user = response.data;
+          emit(state.update(stateType: AuthStateType.logged));
+        } else {
+          emit(state.update(stateType: AuthStateType.none));
+        }
+      }
+    } catch (e) {
+      emit(state.update(stateType: AuthStateType.none));
+    }
     if (state.stateType == AuthStateType.logged) {
       // state.user = user;
       // _subscription?.cancel();
@@ -41,18 +58,15 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   logout() async {
-    _subscription?.cancel();
     try {
-      emit(state.update(stateType: AuthStateType.none));
-      _redirect();
-    } catch (e) {}
+      AppPrefs.instance.clear();
+    } catch (_) {}
+    emit(state.update(stateType: AuthStateType.none));
+    _redirect();
   }
 
   _redirect() {
     appContext.pushReplacement("/navigation");
-    // if (state.stateType == AuthStateType.logged) {
-    //   // Get.offAllNamed(Routes.nav);
-    // } else {}
   }
 }
 

@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/models/opening_time_model.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/models/opening_time_model.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -162,8 +162,7 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         }
       } catch (e) {
         print('Error uploading image: $e');
-        emit(state.copyWith(
-          isLoading: false         ));
+        emit(state.copyWith(isLoading: false));
         processor.value = 'error';
       }
 
@@ -217,15 +216,12 @@ class StoreRegistrationCubit extends Cubit<StoreRegistrationState> {
         emit(state.copyWith(isLoading: false));
         processor.value = 'success';
       } else {
-        emit(state.copyWith(
-          isLoading: false         ));
+        emit(state.copyWith(isLoading: false));
         processor.value = 'error';
       }
     } catch (e) {
       print('Error updating profile: $e');
-      emit(state.copyWith(
-        isLoading: false
-      ));
+      emit(state.copyWith(isLoading: false));
       processor.value = 'error';
     }
   }

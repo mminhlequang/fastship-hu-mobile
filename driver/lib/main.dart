@@ -89,7 +89,6 @@ class _AppState extends State<_App> {
             titleTextStyle: w500TextStyle(
               fontSize: 20.sw,
               color: Colors.white,
-              height: 1.2,
             ),
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),

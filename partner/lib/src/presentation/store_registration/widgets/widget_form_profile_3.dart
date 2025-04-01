@@ -1,6 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/models/opening_time_model.dart';
+import 'package:network_resources/models/opening_time_model.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:app/src/presentation/widgets/widget_app_upload_image.dart';
 import 'package:app/src/utils/app_go_router.dart';
@@ -139,7 +139,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
               title: 'Opening hours'.tr(),
               route: '/opening-time',
               extra: _openTimes,
-              onReturn: (value) { 
+              onReturn: (value) {
                 if (value != null) {
                   setState(() {
                     _openTimes = value;

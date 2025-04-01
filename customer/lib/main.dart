@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:app/firebase_options.dart';
+import 'package:app/src/constants/constants.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -67,9 +68,18 @@ class _AppState extends State<_App> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        theme: AppPrefs.instance.isDarkTheme
-            ? ThemeData.dark()
-            : ThemeData.light(),
+        theme: (AppPrefs.instance.isDarkTheme
+                ? ThemeData.dark()
+                : ThemeData.light())
+            .copyWith(
+          scaffoldBackgroundColor: appColorBackground,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: appColorPrimary,
+            brightness: AppPrefs.instance.isDarkTheme
+                ? Brightness.dark
+                : Brightness.light,
+          ),
+        ),
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       ),

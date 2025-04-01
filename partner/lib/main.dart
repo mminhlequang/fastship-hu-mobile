@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_portal/flutter_portal.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 
@@ -83,11 +82,9 @@ class _AppState extends State<_App> {
           appBarTheme: AppBarTheme(
             backgroundColor: appColorPrimary,
             titleSpacing: 0,
-            titleTextStyle: GoogleFonts.inter(
+            titleTextStyle: w500TextStyle(
               fontSize: 20.sw,
               color: Colors.white,
-              height: 1.2,
-              fontWeight: FontWeight.w500,
             ),
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),

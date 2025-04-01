@@ -1,7 +1,7 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/store/models/models.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/store/models/models.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -101,8 +101,13 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
           runSpacing: 12.sw,
           children: [
             if (menu.products != null)
-              ...menu.products!.map((e) => WidgetDishCardInMenu(
-                  width: context.width / 2 - 16 - 6.sw, product: e)),
+              ...menu.products!.map(
+                (e) => WidgetDishCardInMenu(
+                  width: context.width / 2 - 16 - 6.sw,
+                  product: e,
+                  store: store,
+                ),
+              ),
           ],
         )
       ],

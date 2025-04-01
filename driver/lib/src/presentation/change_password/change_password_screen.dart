@@ -1,5 +1,5 @@
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

@@ -2,7 +2,8 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:app/src/constants/app_constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:internal_core/setup/app_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
@@ -10,7 +11,6 @@ import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../network_resources/auth/models/models.dart';
 
 class AppPrefs {
   AppPrefs._();
@@ -124,7 +124,8 @@ class AppPrefs {
 
   set currency(String? value) => _boxData.put('currency', value);
 
-  String? get currencySymbol => _boxData.get('currency_symbol') ?? appCurrencySymbol;
+  String? get currencySymbol =>
+      _boxData.get('currency_symbol') ?? appCurrencySymbol;
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
 }

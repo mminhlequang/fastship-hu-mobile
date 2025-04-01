@@ -3,7 +3,7 @@ import 'package:app/src/utils/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/home/home_screen.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/navigation/widgets/custom_bottom_bar.dart';
@@ -167,7 +167,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
         return Scaffold(
           appBar: AppBar(
             centerTitle: false,
-            title: Text(title),
+            title: GestureDetector(
+              onTap: () => clearAllRouters('/merchant-onboarding'),
+              child: Text(title),
+            ),
             titleSpacing: 16.sw,
             actionsPadding: EdgeInsets.only(right: 8.sw),
             actions: [

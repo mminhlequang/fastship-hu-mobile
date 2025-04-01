@@ -2,16 +2,16 @@ import 'package:app/src/base/bloc.dart';
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/banners/models/models.dart';
-import 'package:app/src/network_resources/banners/repo.dart';
-import 'package:app/src/network_resources/category/model/category.dart';
-import 'package:app/src/network_resources/category/repo.dart';
-import 'package:app/src/network_resources/news/models/models.dart';
-import 'package:app/src/network_resources/news/repo.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
-import 'package:app/src/network_resources/product/repo.dart';
-import 'package:app/src/network_resources/store/models/models.dart';
-import 'package:app/src/network_resources/store/repo.dart';
+import 'package:network_resources/banners/models/models.dart';
+import 'package:network_resources/banners/repo.dart';
+import 'package:network_resources/category/model/category.dart';
+import 'package:network_resources/category/repo.dart';
+import 'package:network_resources/news/models/models.dart';
+import 'package:network_resources/news/repo.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/product/repo.dart';
+import 'package:network_resources/store/models/models.dart';
+import 'package:network_resources/store/repo.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
@@ -177,6 +177,7 @@ class __PromoBannerState extends State<_PromoBanner> {
     return CarouselSlider(
       options: CarouselOptions(
         height: 146.sw,
+        clipBehavior: Clip.none,
         viewportFraction: 0.8,
         enableInfiniteScroll: true,
         autoPlay: true,

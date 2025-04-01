@@ -78,6 +78,9 @@ dependencies:
       path: network/
       ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
 
+  network_resources:
+    path: ../network_resources
+
 dependency_overrides:
   http: ^1.3.0
   intl: ^0.20.2

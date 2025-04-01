@@ -1,19 +1,22 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/models/opening_time_model.dart';
-import 'package:app/src/network_resources/product/model/product.dart';
-import 'package:app/src/network_resources/product/repo.dart';
-import 'package:app/src/network_resources/store/models/menu.dart';
-import 'package:app/src/network_resources/topping/models/models.dart';
+import 'package:network_resources/models/opening_time_model.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/product/repo.dart';
+import 'package:network_resources/store/models/menu.dart';
+import 'package:network_resources/topping/models/models.dart';
+import 'package:network_resources/topping/repo.dart';
 import 'package:app/src/presentation/widgets/widget_loading_wrapper.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -48,6 +51,8 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
 
   List<OpeningTimeModel> _openTimes = OpeningTimeModel.getDefaultOpeningTimes();
   List<MenuModel> _toppingGroups = [];
+  late List<VariationModel> variations = widget.params.model?.variations ?? [];
+  List<int> deleteVariationIds = [];
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _priceFocusNode = FocusNode();
@@ -76,6 +81,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
       _openTimes =
           OpeningTimeModel.fromListOperatingHours(product.operatingHours ?? []);
       _toppingGroups = product.toppings ?? [];
+      variations = product.variations ?? [];
     }
   }
 
@@ -103,12 +109,32 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
     }
 
     if (widget.params.model == null) {
+      // Chờ tạo variation
+      final List<int> variationIds = [];
+      await Future.wait(variations.map((variation) async {
+        final result = await ToppingRepo().createVariation({
+          "name": variation.name,
+          "values": variation.values
+              ?.map((value) => {"value": value.value, "price": value.price})
+              .toList(),
+          "arrange": variation.arrange,
+          "is_active": variation.isActive ?? 1,
+          "is_default": variation.isDefault ?? 0,
+          "store_id": authCubit.storeId,
+        });
+
+        if (result.data != null && result.data is VariationModel) {
+          variationIds.add((result.data as VariationModel).id ?? 0);
+        }
+      }));
+
       final r = await ProductRepo().createProduct({
         'name': _nameController.text,
         'price': currencyFromEditController(_priceController),
         'description': _describeController.text,
         'image': imageUrl,
         'store_id': authCubit.storeId,
+        'variation_ids': variationIds,
         'category_ids': widget.params.categoryIds,
         'group_topping_ids': _toppingGroups.map((e) => e.id!).toList(),
         "operating_hours": _openTimes
@@ -134,6 +160,49 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         );
       }
     } else {
+      // Xử lý cập nhật variation
+      final List<int> variationIds = [];
+
+      await Future.wait(deleteVariationIds.map((id) async {
+        await ToppingRepo().deleteVariation(id);
+      }));
+
+      // Xử lý các topping đã có và topping mới
+      await Future.wait(variations.map((variation) async {
+        if (variation.id != null) {
+          ToppingRepo().updateVariation({
+            "id": variation.id,
+            "name": variation.name,
+            "values": variation.values
+                ?.map((value) => {"value": value.value, "price": value.price})
+                .toList(),
+            "arrange": variation.arrange,
+            "is_active": variation.isActive ?? 1,
+            "is_default": variation.isDefault ?? 0,
+            "store_id": authCubit.storeId,
+          });
+
+          // Topping đã có id, thêm vào danh sách
+          variationIds.add(variation.id!);
+        } else {
+          // Topping mới cần tạo
+          final result = await ToppingRepo().createVariation({
+            "name": variation.name,
+            "values": variation.values
+                ?.map((value) => {"value": value.value, "price": value.price})
+                .toList(),
+            "arrange": variation.arrange,
+            "is_active": variation.isActive ?? 1,
+            "is_default": variation.isDefault ?? 0,
+            "store_id": authCubit.storeId,
+          });
+
+          if (result.data != null && result.data is VariationModel) {
+            variationIds.add((result.data as VariationModel).id ?? 0);
+          }
+        }
+      }));
+
       final r = await ProductRepo().updateProduct({
         'id': widget.params.model!.id,
         'name': _nameController.text,
@@ -141,6 +210,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
         'description': _describeController.text,
         'image': imageUrl ?? widget.params.model!.image,
         'store_id': authCubit.storeId,
+        'variation_ids': variationIds,
         'category_ids': widget.params.categoryIds,
         "operating_hours": _openTimes
             .map((e) => {
@@ -271,6 +341,120 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                           onChanged: (value) {
                             setState(() {});
                           },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Gap(5.sw),
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Gap(16.sw),
+                        Text(
+                          'Dish options'.tr(),
+                          style: w400TextStyle(
+                              fontSize: 12.sw, color: hexColor('#B0B0B0')),
+                        ),
+                        Gap(11.sw),
+                        const AppDivider(),
+                        if (variations.isNotEmpty)
+                          ReorderableListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: variations.length,
+                            onReorder: (oldIndex, newIndex) {
+                              setState(() {
+                                if (oldIndex < newIndex) {
+                                  newIndex -= 1;
+                                }
+                                final VariationModel item =
+                                    variations.removeAt(oldIndex);
+                                variations.insert(newIndex, item);
+
+                                // Cập nhật arrange cho tất cả topping
+                                for (int i = 0; i < variations.length; i++) {
+                                  variations[i].arrange = i + 1;
+                                }
+
+                                // Gọi API để cập nhật thứ tự
+                                // ToppingRepo().sortToppings({
+                                //   "ids": toppings.map((e) => e.id).toList(),
+                                //   "arranges":
+                                //       toppings.map((e) => e.arrange).toList(),
+                                // });
+                              });
+                            },
+                            itemBuilder: (context, index) {
+                              return KeyedSubtree(
+                                key: ValueKey(variations[index]),
+                                child: Column(
+                                  children: [
+                                    _buildItemVariation(variations[index]),
+                                    const AppDivider(),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        else
+                          Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 24.sw),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const WidgetAppSVG('empty_store'),
+                                  Gap(16.sw),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'No have any dish options'.tr(),
+                                        style: w400TextStyle(fontSize: 15.sw),
+                                      ),
+                                      Gap(4.sw),
+                                      Text(
+                                        'Let\'s create your first\ndish options'
+                                            .tr(),
+                                        style: w400TextStyle(
+                                            fontSize: 12.sw, color: grey1),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        const AppDivider(),
+                        WidgetInkWellTransparent(
+                          onTap: () async {
+                            final result =
+                                await appContext.push('/add-variation');
+                            if (result != null && result is VariationModel) {
+                              variations.add(result);
+                            }
+                          },
+                          enableInkWell: false,
+                          child: SizedBox(
+                            height: 34.sw,
+                            width: context.width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                WidgetAppSVG('ic_add'),
+                                Gap(4.sw),
+                                Text(
+                                  'Add option'.tr(),
+                                  style: w400TextStyle(),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -463,6 +647,95 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                   ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildItemVariation(VariationModel variation) {
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const StretchMotion(),
+        extentRatio: .16,
+        children: [
+          Theme(
+            data: Theme.of(context).copyWith(
+              outlinedButtonTheme: const OutlinedButtonThemeData(
+                style: ButtonStyle(
+                  iconColor: WidgetStatePropertyAll(Colors.white),
+                ),
+              ),
+            ),
+            child: SlidableAction(
+              onPressed: (_) {
+                if (variation.id != null) {
+                  deleteVariationIds.add(variation.id ?? 0);
+                }
+                variations.removeWhere((e) => e == variation);
+                setState(() {});
+              },
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              icon: CupertinoIcons.delete,
+            ),
+          ),
+        ],
+      ),
+      child: WidgetInkWellTransparent(
+        onTap: () async {
+          final result =
+              await appContext.push('/add-variation', extra: variation);
+          if (result != null) {
+            if (result is VariationModel) {
+              variations.removeWhere((e) => e == variation);
+              variations.add(result);
+            } else if (result == -1) {
+              deleteVariationIds.add(variation.id ?? 0);
+            }
+          }
+        },
+        enableInkWell: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.sw),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      variation.name ?? '',
+                      style: w400TextStyle(),
+                    ),
+                    Gap(2.sw),
+                    if (variation.values != null &&
+                        variation.values!.isNotEmpty)
+                      Text(
+                        variation.values!
+                            .map((value) =>
+                                '${value.value} (${currencyFormatted(value.price ?? 0)})')
+                            .join(', '),
+                        style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                      ),
+                  ],
+                ),
+              ),
+              AdvancedSwitch(
+                controller: ValueNotifier<bool>(variation.isActive == 1),
+                initialValue: variation.isActive == 1,
+                height: 22.sw,
+                width: 40.sw,
+                activeColor: appColorPrimary,
+                inactiveColor: hexColor('#E2E2EF'),
+                onChanged: (value) {
+                  appHaptic();
+                  setState(() {
+                    variation.isActive = value ? 1 : 0;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

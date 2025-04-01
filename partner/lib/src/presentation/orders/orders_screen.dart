@@ -1,7 +1,7 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/network_resources/order/models/order.dart';
-import 'package:app/src/network_resources/order/repo.dart';
+import 'package:network_resources/order/models/order.dart';
+import 'package:network_resources/order/repo.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:app/src/presentation/widgets/widget_app_tabbar.dart';
 import 'package:app/src/presentation/widgets/widget_order_shimmer.dart';

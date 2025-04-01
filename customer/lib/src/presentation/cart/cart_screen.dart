@@ -1,11 +1,16 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/home/widgets/widget_restaurant_card.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/product/model/product.dart';
 
 import 'cubit/cart_cubit.dart';
+import 'widgets/widget_preview_order.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -123,58 +128,93 @@ class _CartScreenState extends State<CartScreen> {
                       ));
                     }
 
+                    // Nhóm các mặt hàng theo cửa hàng
+                    final groupedItems = <dynamic, List<CartItemModel>>{};
+
+                    // Nhóm các mặt hàng theo ID cửa hàng
+                    for (var item in state.items) {
+                      final storeId = item.store.id!;
+                      if (!groupedItems.containsKey(storeId)) {
+                        groupedItems[storeId] = [];
+                      }
+                      groupedItems[storeId]!.add(item);
+                    }
+
+                    // Tính tổng giá trị đơn hàng
+                    final totalAmount = state.items.fold<double>(
+                      0,
+                      (sum, item) =>
+                          sum + (item.product.price ?? 0) * item.quantity,
+                    );
+
                     return ListView(
-                      padding: EdgeInsets.all(16),
-                      children: [
-                        CartItem(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/274dad09f12da0d3892fc999ee19595d57f77470',
-                          title: 'Pork cutlet burger and drink .',
-                          description:
-                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                          price: 2.20,
-                          quantity: 3,
-                          showQuantityControls: false,
-                        ),
-                        CartItem(
-                          title: 'Mentaiko and cheese chicken ...',
-                          description:
-                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                          price: 2.20,
-                          quantity: 3,
-                          showQuantityControls: true,
-                        ),
-                        CartItem(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                          title: 'Mentaiko and cheese chicken ...',
-                          description:
-                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                          price: 2.20,
-                          quantity: 3,
-                          showQuantityControls: false,
-                        ),
-                        CartItem(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                          title: 'Mentaiko and cheese chicken ...',
-                          description:
-                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                          price: 2.20,
-                          quantity: 3,
-                          showQuantityControls: false,
-                        ),
-                        CartItem(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/aa07a702781a4c1191b25a0f3614dd9f5cb64de5',
-                          title: 'Mentaiko and cheese chicken ...',
-                          description:
-                              'We cannot respond to requests such as increase / decrease or non-use of ingredients.',
-                          price: 2.20,
-                          quantity: 3,
-                          showQuantityControls: false,
-                        ),
-                      ],
+                      padding: EdgeInsets.all(16.sw),
+                      children: groupedItems.keys
+                          .map((e) => Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: Radius.circular(12),
+                                  padding: EdgeInsets.all(6),
+                                  dashPattern: [10, 5],
+                                  color: hexColor('#CEC6C5'),
+                                  child: Column(
+                                    children: [
+                                      WidgetRestaurantCard(
+                                          store: groupedItems[e]!.first.store),
+                                      ...groupedItems[e]!.map(
+                                        (e) => CartItem(
+                                          product: e.product,
+                                          quantity: e.quantity,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Spacer(),
+                                          SizedBox(
+                                            width: context.width * .35,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                appHaptic();
+                                                requestLoginWrapper(() {
+                                                  appOpenBottomSheet(
+                                                      WidgetPreviewOrder(
+                                                          cartItems:
+                                                              groupedItems[
+                                                                  e]!));
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color(0xFF74CA45),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          120),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 16,
+                                                  vertical: 14,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Checkout now',
+                                                style: w500TextStyle(
+                                                  fontSize: 18,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                  ),
+                                ),
+                              ))
+                          .toList(),
                     );
                   }),
             ),
@@ -186,36 +226,20 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class CartItem extends StatelessWidget {
-  final String? imageUrl;
-  final String title;
-  final String description;
-  final double price;
+  final ProductModel product;
   final int quantity;
-  final bool showQuantityControls;
 
   const CartItem({
     Key? key,
-    this.imageUrl,
-    required this.title,
-    required this.description,
-    required this.price,
+    required this.product,
     required this.quantity,
-    required this.showQuantityControls,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFFD1D1D1),
-            width: 1,
-            style: BorderStyle.solid,
-          ),
-        ),
-      ),
+      padding: EdgeInsets.only(bottom: 8, top: 8, left: 12.sw, right: 12.sw),
+      decoration: BoxDecoration(),
       margin: EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,54 +249,30 @@ class CartItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (imageUrl != null) ...[
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          imageUrl!,
-                          width: 60,
-                          height: 48,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF7F7F7),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: Color(0xFF363853),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 8),
-                ],
+                WidgetAppImage(
+                  imageUrl: product.image ?? '',
+                  width: 60.sw,
+                  height: 48.sw,
+                  radius: 8,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF14142A),
+                        product.name ?? '',
+                        style: w400TextStyle(
+                          fontSize: 16.sw,
                         ),
                       ),
                       SizedBox(height: 5),
                       Text(
-                        description,
-                        style: TextStyle(
+                        product.description ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: w400TextStyle(
                           fontSize: 12,
                           color: Color(0xFF7D7575),
                         ),
@@ -282,7 +282,7 @@ class CartItem extends StatelessWidget {
                         children: [
                           Text(
                             'Over 15 mins',
-                            style: TextStyle(
+                            style: w400TextStyle(
                               fontSize: 12,
                               color: Color(0xFF7D7575),
                             ),
@@ -290,17 +290,16 @@ class CartItem extends StatelessWidget {
                           _buildDivider(),
                           Text(
                             '1,8 km',
-                            style: TextStyle(
+                            style: w400TextStyle(
                               fontSize: 12,
                               color: Color(0xFF7D7575),
                             ),
                           ),
                           _buildDivider(),
                           Text(
-                            '\$ ${price.toStringAsFixed(2)}',
-                            style: TextStyle(
+                            '\$ ${product.price?.toStringAsFixed(2)}',
+                            style: w500TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w500,
                               color: Color(0xFFF17228),
                             ),
                           ),
@@ -313,59 +312,60 @@ class CartItem extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12),
-          if (showQuantityControls)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE7E7E7)),
-                borderRadius: BorderRadius.circular(46),
-                color: Colors.white,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      '+',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color(0xFF120F0F),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      '$quantity',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      '-',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color(0xFF120F0F),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(46),
-                color: Color(0xFFF2F1F1),
-              ),
-              child: Text(
-                '$quantity',
-                style: TextStyle(fontSize: 14),
-              ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE7E7E7)),
+              borderRadius: BorderRadius.circular(46),
+              color: Colors.white,
             ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 4,
+              vertical: 2,
+            ),
+            child: Row(
+              children: [
+                WidgetInkWellTransparent(
+                  onTap: () {
+                    appHaptic();
+                    // setState(() {
+                    //   quantity--;
+                    // });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: WidgetAppSVG(
+                      'icon52',
+                      width: 24.sw,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    '$quantity',
+                    style: w400TextStyle(fontSize: 18.sw),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                WidgetInkWellTransparent(
+                  onTap: () {
+                    appHaptic();
+                    // setState(() {
+                    //   quantity++;
+                    // });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: WidgetAppSVG(
+                      'icon53',
+                      width: 24.sw,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

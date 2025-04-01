@@ -1,4 +1,7 @@
-import 'package:app/src/network_resources/topping/models/models.dart';
+import 'package:network_resources/models/opening_time_model.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/store/models/models.dart';
+import 'package:network_resources/topping/models/models.dart';
 import 'package:app/src/presentation/detail_order/detail_order_screen.dart';
 import 'package:app/src/presentation/help_center/help_center_screen.dart';
 import 'package:app/src/presentation/menu/menu_screen.dart';
@@ -19,10 +22,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../network_resources/cart/models/cart.dart';
-import '../network_resources/models/opening_time_model.dart';
-import '../network_resources/store/models/models.dart';
 import '../presentation/auth/auth_screen.dart';
+import '../presentation/menu/widgets/widget_add_dish_variation.dart';
 import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/report/report_page.dart';
@@ -134,6 +135,11 @@ final goRouter = GoRouter(
           path: '/add-topping',
           builder: (context, state) =>
               WidgetAddTopping(topping: state.extra as ToppingModel?),
+        ),
+        GoRoute(
+          path: '/add-variation',
+          builder: (context, state) =>
+              WidgetAddVariation(variation: state.extra as VariationModel?),
         ),
         GoRoute(
           path: '/link-topping-group',

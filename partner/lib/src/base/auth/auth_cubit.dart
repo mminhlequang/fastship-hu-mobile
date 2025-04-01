@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:app/src/network_resources/auth/models/models.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
-import 'package:app/src/network_resources/store/models/models.dart';
-import 'package:app/src/network_resources/store/repo.dart';
-import 'package:app/src/network_resources/transaction/models/models.dart';
-import 'package:app/src/network_resources/transaction/repo.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/auth/repo.dart';
+import 'package:network_resources/store/models/models.dart';
+import 'package:network_resources/store/repo.dart';
+import 'package:network_resources/transaction/models/models.dart';
+import 'package:network_resources/transaction/repo.dart';
 import 'package:bloc/bloc.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
@@ -16,11 +16,9 @@ enum AuthStateType { none, logged }
 AuthCubit get authCubit => findInstance<AuthCubit>();
 
 class AuthCubit extends Cubit<AuthState> {
-
   AuthCubit() : super(AuthState());
 
   int get storeId => state.store?.id ?? 0;
-
 
   update(user) async {
     state.user = user;
@@ -99,8 +97,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   refreshStore() async {
-    NetworkResponse response =
-        await StoreRepo().getStoreDetail(state.store!.id!);
+    NetworkResponse response = await StoreRepo().getStoreDetail({
+      "id": state.store!.id,
+    });
     if (response.isSuccess) {
       state.store = response.data;
     }

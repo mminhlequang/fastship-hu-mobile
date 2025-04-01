@@ -1,10 +1,11 @@
-import 'package:app/src/network_resources/store/models/models.dart';
+import 'package:network_resources/store/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WidgetSheetRestaurantInfo extends StatelessWidget {
   final StoreModel store;
-  const WidgetSheetRestaurantInfo({Key? key, required this.store}) : super(key: key);
+  const WidgetSheetRestaurantInfo({Key? key, required this.store})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/store/models/models.dart';
+import 'package:network_resources/store/models/models.dart';
 import 'package:app/src/presentation/widgets/widget_app_tabbar.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';

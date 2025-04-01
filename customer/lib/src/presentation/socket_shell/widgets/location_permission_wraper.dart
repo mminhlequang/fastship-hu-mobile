@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/cart/widgets/widget_sheet_locations.dart';
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
 import 'package:app/src/presentation/widgets/widget_sheet_current_location.dart';
 import 'package:app/src/utils/utils.dart';
@@ -10,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:internal_core/internal_core.dart';
@@ -267,6 +269,15 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               }
             },
           ),
+          Gap(12),
+          _buildActionButton(
+            icon: 'icon53',
+            alsoLoading: false,
+            label: 'Add other location'.tr(),
+            onTap: () {
+              appOpenBottomSheet(WidgetSheetLocations());
+            },
+          ),
         ],
       ),
     );
@@ -276,6 +287,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
     required String icon,
     required String label,
     required VoidCallback onTap,
+    bool alsoLoading = true,
   }) {
     return Container(
       height: 52.sw,
@@ -294,7 +306,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (_isLoading)
+                if (_isLoading && alsoLoading)
                   SizedBox(
                     width: 24,
                     height: 24,

@@ -1,9 +1,10 @@
-import 'package:app/src/network_resources/store/models/models.dart';
+import 'package:network_resources/store/models/models.dart';
 import 'package:flutter/material.dart';
 
 class WidgetSheetRestaurantReviews extends StatelessWidget {
   final StoreModel store;
-  const WidgetSheetRestaurantReviews({Key? key, required this.store}) : super(key: key);
+  const WidgetSheetRestaurantReviews({Key? key, required this.store})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

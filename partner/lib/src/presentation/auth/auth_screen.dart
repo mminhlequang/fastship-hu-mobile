@@ -15,7 +15,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 

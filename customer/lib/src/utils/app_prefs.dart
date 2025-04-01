@@ -2,15 +2,15 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:app/src/constants/app_constants.dart';
-import 'package:app/src/network_resources/auth/repo.dart';
+import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
+import 'package:network_resources/auth/models/models.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:internal_core/setup/app_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:path_provider/path_provider.dart';
-
-import '../network_resources/auth/models/models.dart';
 
 class AppPrefs {
   AppPrefs._();
@@ -128,4 +128,18 @@ class AppPrefs {
       _boxData.get('currency_symbol') ?? appCurrencySymbol;
 
   set currencySymbol(String? value) => _boxData.put('currency_symbol', value);
+
+  List<HereSearchResult> get deliveryAddresses {
+    final objectString = _boxData.get('delivery_addresses');
+    if (objectString != null) {
+      final jsonMap = jsonDecode(objectString);
+      if (jsonMap is List) {
+        return jsonMap.map((e) => HereSearchResult.fromJson(e)).toList();
+      }
+    }
+    return <HereSearchResult>[];
+  }
+
+  set deliveryAddresses(List<HereSearchResult> value) => _boxData.put(
+      'delivery_addresses', jsonEncode(value.map((e) => e.toJson()).toList()));
 }
