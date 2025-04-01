@@ -1,6 +1,6 @@
 import 'package:app/src/presentation/restaurant_detail/restaurant_detail_screen.dart';
 import 'package:app/src/presentation/splash/splash_screen.dart';
-import 'package:app/src/presentation/checkout/checkout_screen.dart';
+import 'package:app/src/presentation/checkout/checkout_tracking_screen.dart';
 import 'package:app/src/presentation/checkout/cubit/checkout_cubit.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';

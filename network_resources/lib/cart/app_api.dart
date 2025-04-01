@@ -8,7 +8,7 @@ import 'models/models.dart';
 
 class _MyAppEndpoint {
   _MyAppEndpoint._();
-  static String getCarts() => "/api/v1/cart";
+  static String getCarts() => "/api/v1/cart/get_carts_by_user";
   static String createCart() => "/api/v1/cart/create";
   static String updateCart() => "/api/v1/cart/update";
   static String deleteCart() => "/api/v1/cart/delete";

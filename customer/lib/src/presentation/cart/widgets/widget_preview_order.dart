@@ -1,6 +1,7 @@
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
+import 'package:app/src/presentation/checkout/checkout_tracking_screen.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -48,48 +49,51 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              spacing: 20.sw,
-              children: [
-                WidgetAppBar(
-                  title: widget.cartItems.first.store.name ?? "",
-                  actions: [
-                    WidgetAppSVG('icon20', width: 18.sw, height: 18.sw),
-                    const SizedBox(width: 4),
-                    Text(
-                      "0.6 Km",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: w400TextStyle(
-                        fontSize: 14.sw,
-                        color: Color(0xFFF17228),
+          Align(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              child: Column(
+                spacing: 20.sw,
+                children: [
+                  WidgetAppBar(
+                    title: widget.cartItems.first.store.name ?? "",
+                    actions: [
+                      WidgetAppSVG('icon20', width: 18.sw, height: 18.sw),
+                      const SizedBox(width: 4),
+                      Text(
+                        "0.6 Km",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: w400TextStyle(
+                          fontSize: 14.sw,
+                          color: Color(0xFFF17228),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    spacing: 20.sw,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAddressSection(),
-                      // _buildShippingOptions(),
-                      _buildOrderItems(),
-                      // _buildPaymentMethod(),
-                      _buildCourierTip(),
-                      _buildOrderSummary(),
-                      _buildDiscountSection(),
-                      SizedBox(
-                          height: 150 +
-                              MediaQuery.of(context)
-                                  .padding
-                                  .bottom), // Space for bottom bar
                     ],
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      spacing: 20.sw,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildAddressSection(),
+                        // _buildShippingOptions(),
+                        _buildOrderItems(),
+                        // _buildPaymentMethod(),
+                        _buildCourierTip(),
+                        _buildOrderSummary(),
+                        _buildDiscountSection(),
+                        SizedBox(
+                            height: 150 +
+                                MediaQuery.of(context)
+                                    .padding
+                                    .bottom), // Space for bottom bar
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           _buildBottomCheckout(context),
@@ -843,7 +847,10 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                appHaptic();
+                appOpenBottomSheet(const CheckoutTrackingScreen());
+              },
               child: Text(
                 'Check out'.tr(),
                 style: w500TextStyle(
