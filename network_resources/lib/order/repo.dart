@@ -1,7 +1,6 @@
 import 'package:internal_network/network_resources/resources.dart';
 
 import 'app_api.dart';
-import 'models/order.dart';
 
 class OrderRepo {
   OrderRepo._();
@@ -16,23 +15,31 @@ class OrderRepo {
 
   late OrderApi _api;
 
-  Future<NetworkResponse> getOrders(Map<String, dynamic> params) async {
-    return await _api.getOrders(params);
+  Future<NetworkResponse> getOrdersByUser(Map<String, dynamic> params) async {
+    return await _api.getOrdersByUser(params);
   }
 
-  Future<NetworkResponse> getOrderDetail(int id) async {
-    return await _api.getOrderDetail(id);
+  Future<NetworkResponse> getOrdersByStore(Map<String, dynamic> params) async {
+    return await _api.getOrdersByStore(params);
   }
 
-  Future<NetworkResponse> updateOrderStatus(Map<String, dynamic> data) async {
-    return await _api.updateOrderStatus(data);
+  Future<NetworkResponse> getOrderDetail(Map<String, dynamic> params) async {
+    return await _api.getOrderDetail(params);
   }
 
-  Future<NetworkResponse> cancelOrder(int id) async {
-    return await _api.cancelOrder(id);
+  Future<NetworkResponse> getApproves() async {
+    return await _api.getApproves();
   }
 
-  Future<NetworkResponse> completeOrder(int id) async {
-    return await _api.completeOrder(id);
+  Future<NetworkResponse> createOrder(Map<String, dynamic> params) async {
+    return await _api.createOrder(params);
+  }
+
+  Future<NetworkResponse> updateOrder(Map<String, dynamic> params) async {
+    return await _api.updateOrder(params);
+  }
+
+  Future<NetworkResponse> cancelOrder(Map<String, dynamic> params) async {
+    return await _api.cancelOrder(params);
   }
 }

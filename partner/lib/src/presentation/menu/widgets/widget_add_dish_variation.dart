@@ -29,7 +29,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
   final FocusNode _nameFocusNode = FocusNode();
   final List<FocusNode> _valueNameFocusNodes = [];
   final List<FocusNode> _valuePriceFocusNodes = [];
-  bool _isDefault = false;
+  // bool _isDefault = false;
   bool _isActive = true;
 
   bool get enableSave =>
@@ -42,7 +42,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
   void initState() {
     super.initState();
     _nameController.text = _variation?.name ?? '';
-    _isDefault = _variation?.isDefault == 1;
+    // _isDefault = _variation?.isDefault == 1;
     _isActive = _variation?.isActive == 1;
 
     if (_variation?.values != null && _variation!.values!.isNotEmpty) {
@@ -150,32 +150,32 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
                   ],
                 ),
                 Gap(24.sw),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'This option is default'.tr(),
-                        style: w400TextStyle(),
-                      ),
-                    ),
-                    Gap(8.sw),
-                    AdvancedSwitch(
-                      controller: ValueNotifier<bool>(_isDefault),
-                      initialValue: _isDefault,
-                      height: 22.sw,
-                      width: 40.sw,
-                      activeColor: appColorPrimary,
-                      inactiveColor: hexColor('#E2E2EF'),
-                      onChanged: (value) {
-                        appHaptic();
-                        setState(() {
-                          _isDefault = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                Gap(24.sw),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: Text(
+                //         'This option is default'.tr(),
+                //         style: w400TextStyle(),
+                //       ),
+                //     ),
+                //     Gap(8.sw),
+                //     AdvancedSwitch(
+                //       controller: ValueNotifier<bool>(_isDefault),
+                //       initialValue: _isDefault,
+                //       height: 22.sw,
+                //       width: 40.sw,
+                //       activeColor: appColorPrimary,
+                //       inactiveColor: hexColor('#E2E2EF'),
+                //       onChanged: (value) {
+                //         appHaptic();
+                //         setState(() {
+                //           _isDefault = value;
+                //         });
+                //       },
+                //     ),
+                //   ],
+                // ),
+                // Gap(24.sw),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -296,7 +296,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
                                   _valuePriceControllers[index]),
                             ),
                           ),
-                          isDefault: _isDefault ? 1 : 0,
+                          // isDefault: _isDefault ? 1 : 0,
                           isActive: _isActive ? 1 : 0,
                           arrange: 0,
                         ),
@@ -356,7 +356,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
                                         _valuePriceControllers[index]),
                                   ),
                                 ),
-                                isDefault: _isDefault ? 1 : 0,
+                                // isDefault: _isDefault ? 1 : 0,
                                 isActive: _isActive ? 1 : 0,
                                 arrange: _variation?.arrange ?? 0,
                               ),

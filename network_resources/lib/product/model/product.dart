@@ -208,12 +208,15 @@ class VariationValue {
   int? isDefault;
   int? parentId;
 
+  VariationModel? variation;
+
   VariationValue({
     this.id,
     this.value,
     this.price,
     this.parentId,
     this.isDefault,
+    this.variation,
   });
 
   VariationValue.fromJson(Map<String, dynamic> json) {
@@ -222,6 +225,9 @@ class VariationValue {
     price = json['price']?.toDouble();
     parentId = json['parent_id'];
     isDefault = json['is_default'];
+    variation = json['variation'] != null
+        ? VariationModel.fromJson(json['variation'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -231,6 +237,9 @@ class VariationValue {
     data['price'] = price;
     data['parent_id'] = parentId;
     data['is_default'] = isDefault;
+    if (variation != null) {
+      data['variation'] = variation?.toJson();
+    }
     return data;
   }
 }

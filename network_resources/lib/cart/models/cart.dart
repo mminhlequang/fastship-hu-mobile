@@ -4,69 +4,94 @@ import 'package:network_resources/topping/models/models.dart';
 
 class CartModel {
   int? id;
-  int? userId;
-  int? storeId;
-  int? productId;
-  int? quantity;
-  List<VariationModel>? variations;
-  List<ToppingModel>? toppings;
-  ProductModel? product;
   StoreModel? store;
-  String? createdAt;
-  String? updatedAt;
+  List<CartItemModel>? cartItems;
 
-  CartModel({
-    this.id,
-    this.userId,
-    this.storeId,
-    this.productId,
-    this.quantity,
-    this.variations,
-    this.toppings,
-    this.product,
-    this.store,
-    this.createdAt,
-    this.updatedAt,
-  });
+  CartModel({this.id, this.store, this.cartItems});
 
   CartModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    userId = json['user_id'];
-    storeId = json['store_id'];
-    productId = json['product_id'];
-    quantity = json['quantity'];
-    if (json['variations'] != null) {
-      variations = <VariationModel>[];
-      json['variations'].forEach((v) {
-        variations!.add(VariationModel.fromJson(v));
-      });
-    }
-    if (json['toppings'] != null) {
-      toppings = <ToppingModel>[];
-      json['toppings'].forEach((v) {
-        toppings!.add(ToppingModel.fromJson(v));
-      });
-    }
-    product =
-        json['product'] != null ? ProductModel.fromJson(json['product']) : null;
-    store = json['store'] != null ? StoreModel.fromJson(json['store']) : null;
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    id = json["id"];
+    store = json["store"] == null ? null : StoreModel.fromJson(json["store"]);
+    cartItems =
+        json["cart_items"] == null
+            ? null
+            : (json["cart_items"] as List)
+                .map((e) => CartItemModel.fromJson(e))
+                .toList();
+  }
+
+  static List<CartModel> fromList(List<Map<String, dynamic>> list) {
+    return list.map(CartModel.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (id != null) data['id'] = id;
-    data['store_id'] = storeId;
-    data['product_id'] = productId;
-    data['quantity'] = quantity;
-    if (variations != null) {
-      data['variations'] = variations!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    if (store != null) {
+      _data["store"] = store?.toJson();
     }
-    if (toppings != null) {
-      data['topping_ids'] = toppings!.map((v) => v.toJson()).toList();
+    if (cartItems != null) {
+      _data["cart_items"] = cartItems?.map((e) => e.toJson()).toList();
     }
-    return data;
+    return _data;
   }
 }
- 
+
+class CartItemModel {
+  int? id;
+  ProductModel? product;
+  List<VariationValue>? variations;
+  List<ToppingModel>? toppings;
+  int? quantity;
+  num? price;
+
+  CartItemModel({
+    this.id,
+    this.product,
+    this.variations,
+    this.toppings,
+    this.quantity,
+    this.price,
+  });
+
+  CartItemModel.fromJson(Map<String, dynamic> json) {
+    id = json["id"];
+    product =
+        json["product"] == null ? null : ProductModel.fromJson(json["product"]);
+    variations =
+        json["variations"] == null
+            ? null
+            : (json["variations"] as List)
+                .map((e) => VariationValue.fromJson(e))
+                .toList();
+    toppings =
+        json["toppings"] == null
+            ? null
+            : (json["toppings"] as List)
+                .map((e) => ToppingModel.fromJson(e))
+                .toList();
+    quantity = json["quantity"];
+    price = json["price"];
+  }
+
+  static List<CartItemModel> fromList(List<Map<String, dynamic>> list) {
+    return list.map(CartItemModel.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    if (product != null) {
+      _data["product"] = product?.toJson();
+    }
+    if (variations != null) {
+      _data["variations"] = variations?.map((e) => e.toJson()).toList();
+    }
+    if (toppings != null) {
+      _data["toppings"] = toppings?.map((e) => e.toJson()).toList();
+    }
+    _data["quantity"] = quantity;
+    _data["price"] = price;
+    return _data;
+  }
+}

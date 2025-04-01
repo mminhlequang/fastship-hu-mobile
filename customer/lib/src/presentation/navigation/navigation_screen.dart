@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
+import '../cart/cubit/cart_cubit.dart';
 import '../home/home_screen.dart';
 import '../cart/cart_screen.dart';
 import '../orders/orders_screen.dart';
@@ -19,6 +20,12 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NavigationScreen> {
+  @override
+  void initState() {
+    cartCubit.getCarts();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigationCubit, NavigationState>(

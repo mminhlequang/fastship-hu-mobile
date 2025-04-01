@@ -76,7 +76,10 @@ class MyAppApiImp extends MyAppApi {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
         ).post(_MyAppEndpoint.deleteCart(), data: {'id': id});
-        return NetworkResponse.fromResponse(response);
+        return NetworkResponse.fromResponse(
+          response,
+          value: response.data['status'] == true,
+        );
       },
     );
   }

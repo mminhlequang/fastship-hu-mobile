@@ -1,46 +1,85 @@
-import 'package:network_resources/store/models/store.dart';
+class CreateOrderResponse {
+  String? clientSecret;
+  OrderModel? order;
+
+  CreateOrderResponse({this.clientSecret, this.order});
+
+  CreateOrderResponse.fromJson(Map<String, dynamic> json) {
+    if (json['clientSecret'] == null) {
+      order = OrderModel.fromJson(json);
+    } else {
+      clientSecret = json['clientSecret'];
+      order = json['order'] != null ? OrderModel.fromJson(json['order']) : null;
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['clientSecret'] = clientSecret;
+    data['order'] = order?.toJson();
+    return data;
+  }
+}
 
 class OrderModel {
   int? id;
   String? code;
-  int? userId;
   int? storeId;
-  int? driverId;
-  String? status;
-  String? paymentMethod;
-  String? paymentStatus;
-  double? totalAmount;
-  double? deliveryFee;
-  double? discountAmount;
-  double? finalAmount;
-  String? deliveryAddress;
-  String? deliveryNote;
-  String? deliveryTime;
-  int? itemCount;
-  List<OrderItemModel>? items;
-  StoreModel? store;
+  String? storeName;
+  String? storeImage;
+  String? storeAddress;
+  String? storePhone;
+  String? storeLat;
+  String? storeLng;
+  int? userId;
+  String? userName;
+  String? userPhone;
+  String? userAddress;
+  String? userLat;
+  String? userLng;
+  String? paymentType;
+  int? paymentId;
+  String? paymentName;
+  int? voucherId;
+  String? voucherCode;
+  int? voucherValue;
+  double? priceTip;
+  double? fee;
+  String? note;
+  int? approveId;
+  String? approveName;
+  String? cancelNote;
   String? createdAt;
   String? updatedAt;
 
   OrderModel({
     this.id,
     this.code,
-    this.userId,
     this.storeId,
-    this.driverId,
-    this.status,
-    this.paymentMethod,
-    this.paymentStatus,
-    this.totalAmount,
-    this.deliveryFee,
-    this.discountAmount,
-    this.finalAmount,
-    this.deliveryAddress,
-    this.deliveryNote,
-    this.deliveryTime,
-    this.itemCount,
-    this.items,
-    this.store,
+    this.storeName,
+    this.storeImage,
+    this.storeAddress,
+    this.storePhone,
+    this.storeLat,
+    this.storeLng,
+    this.userId,
+    this.userName,
+    this.userPhone,
+    this.userAddress,
+    this.userLat,
+    this.userLng,
+    this.paymentType,
+    this.paymentId,
+    this.paymentName,
+    this.voucherId,
+    this.voucherCode,
+    this.voucherValue,
+    this.priceTip,
+    this.fee,
+    this.note,
+    this.approveId,
+    this.approveName,
+    this.cancelNote,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,213 +87,66 @@ class OrderModel {
   OrderModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     code = json['code'];
-    userId = json['user_id'];
     storeId = json['store_id'];
-    driverId = json['driver_id'];
-    status = json['status'];
-    paymentMethod = json['payment_method'];
-    paymentStatus = json['payment_status'];
-    totalAmount = json['total_amount']?.toDouble();
-    deliveryFee = json['delivery_fee']?.toDouble();
-    discountAmount = json['discount_amount']?.toDouble();
-    finalAmount = json['final_amount']?.toDouble();
-    deliveryAddress = json['delivery_address'];
-    deliveryNote = json['delivery_note'];
-    deliveryTime = json['delivery_time'];
-    itemCount = json['item_count'];
-    if (json['items'] != null) {
-      items = <OrderItemModel>[];
-      json['items'].forEach((v) {
-        items!.add(OrderItemModel.fromJson(v));
-      });
-    }
-    store = json['store'] != null ? StoreModel.fromJson(json['store']) : null;
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['code'] = code;
-    data['user_id'] = userId;
-    data['store_id'] = storeId;
-    data['driver_id'] = driverId;
-    data['status'] = status;
-    data['payment_method'] = paymentMethod;
-    data['payment_status'] = paymentStatus;
-    data['total_amount'] = totalAmount;
-    data['delivery_fee'] = deliveryFee;
-    data['discount_amount'] = discountAmount;
-    data['final_amount'] = finalAmount;
-    data['delivery_address'] = deliveryAddress;
-    data['delivery_note'] = deliveryNote;
-    data['delivery_time'] = deliveryTime;
-    data['item_count'] = itemCount;
-    if (items != null) {
-      data['items'] = items!.map((v) => v.toJson()).toList();
-    }
-    if (store != null) {
-      data['store'] = store!.toJson();
-    }
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
-  }
-}
-
-class OrderItemModel {
-  int? id;
-  int? orderId;
-  int? productId;
-  int? quantity;
-  double? price;
-  double? totalPrice;
-  String? note;
-  List<OrderItemVariationModel>? variations;
-  List<OrderItemToppingModel>? toppings;
-  String? createdAt;
-  String? updatedAt;
-
-  OrderItemModel({
-    this.id,
-    this.orderId,
-    this.productId,
-    this.quantity,
-    this.price,
-    this.totalPrice,
-    this.note,
-    this.variations,
-    this.toppings,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  OrderItemModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    orderId = json['order_id'];
-    productId = json['product_id'];
-    quantity = json['quantity'];
-    price = json['price']?.toDouble();
-    totalPrice = json['total_price']?.toDouble();
+    storeName = json['store_name'];
+    storeImage = json['store_image'];
+    storeAddress = json['store_address'];
+    storePhone = json['store_phone'];
+    storeLat = json['store_lat'];
+    storeLng = json['store_lng'];
+    userId = json['user_id'];
+    userName = json['user_name'];
+    userPhone = json['user_phone'];
+    userAddress = json['user_address'];
+    userLat = json['user_lat'];
+    userLng = json['user_lng'];
+    paymentType = json['payment_type'];
+    paymentId = json['payment_id'];
+    paymentName = json['payment_name'];
+    voucherId = json['voucher_id'];
+    voucherCode = json['voucher_code'];
+    voucherValue = json['voucher_value'];
+    priceTip = json['price_tip']?.toDouble();
+    fee = json['fee']?.toDouble();
     note = json['note'];
-    if (json['variations'] != null) {
-      variations = <OrderItemVariationModel>[];
-      json['variations'].forEach((v) {
-        variations!.add(OrderItemVariationModel.fromJson(v));
-      });
-    }
-    if (json['toppings'] != null) {
-      toppings = <OrderItemToppingModel>[];
-      json['toppings'].forEach((v) {
-        toppings!.add(OrderItemToppingModel.fromJson(v));
-      });
-    }
+    approveId = json['approve_id'];
+    approveName = json['approve_name'];
+    cancelNote = json['cancel_note'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['order_id'] = orderId;
-    data['product_id'] = productId;
-    data['quantity'] = quantity;
-    data['price'] = price;
-    data['total_price'] = totalPrice;
-    data['note'] = note;
-    if (variations != null) {
-      data['variations'] = variations!.map((v) => v.toJson()).toList();
-    }
-    if (toppings != null) {
-      data['toppings'] = toppings!.map((v) => v.toJson()).toList();
-    }
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
-  }
-}
-
-class OrderItemVariationModel {
-  int? id;
-  int? orderItemId;
-  int? variationId;
-  String? name;
-  double? price;
-  String? createdAt;
-  String? updatedAt;
-
-  OrderItemVariationModel({
-    this.id,
-    this.orderItemId,
-    this.variationId,
-    this.name,
-    this.price,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  OrderItemVariationModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    orderItemId = json['order_item_id'];
-    variationId = json['variation_id'];
-    name = json['name'];
-    price = json['price']?.toDouble();
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['order_item_id'] = orderItemId;
-    data['variation_id'] = variationId;
-    data['name'] = name;
-    data['price'] = price;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    return data;
-  }
-}
-
-class OrderItemToppingModel {
-  int? id;
-  int? orderItemId;
-  int? toppingId;
-  String? name;
-  double? price;
-  String? createdAt;
-  String? updatedAt;
-
-  OrderItemToppingModel({
-    this.id,
-    this.orderItemId,
-    this.toppingId,
-    this.name,
-    this.price,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  OrderItemToppingModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    orderItemId = json['order_item_id'];
-    toppingId = json['topping_id'];
-    name = json['name'];
-    price = json['price']?.toDouble();
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['order_item_id'] = orderItemId;
-    data['topping_id'] = toppingId;
-    data['name'] = name;
-    data['price'] = price;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    if (id != null) data['id'] = id;
+    if (code != null) data['code'] = code;
+    if (storeId != null) data['store_id'] = storeId;
+    if (storeName != null) data['store_name'] = storeName;
+    if (storeImage != null) data['store_image'] = storeImage;
+    if (storeAddress != null) data['store_address'] = storeAddress;
+    if (storePhone != null) data['store_phone'] = storePhone;
+    if (storeLat != null) data['store_lat'] = storeLat;
+    if (storeLng != null) data['store_lng'] = storeLng;
+    if (userId != null) data['user_id'] = userId;
+    if (userName != null) data['user_name'] = userName;
+    if (userPhone != null) data['user_phone'] = userPhone;
+    if (userAddress != null) data['user_address'] = userAddress;
+    if (userLat != null) data['user_lat'] = userLat;
+    if (userLng != null) data['user_lng'] = userLng;
+    if (paymentType != null) data['payment_type'] = paymentType;
+    if (paymentId != null) data['payment_id'] = paymentId;
+    if (paymentName != null) data['payment_name'] = paymentName;
+    if (voucherId != null) data['voucher_id'] = voucherId;
+    if (voucherCode != null) data['voucher_code'] = voucherCode;
+    if (voucherValue != null) data['voucher_value'] = voucherValue;
+    if (priceTip != null) data['price_tip'] = priceTip;
+    if (fee != null) data['fee'] = fee;
+    if (note != null) data['note'] = note;
+    if (approveId != null) data['approve_id'] = approveId;
+    if (approveName != null) data['approve_name'] = approveName;
+    if (cancelNote != null) data['cancel_note'] = cancelNote;
+    if (createdAt != null) data['created_at'] = createdAt;
+    if (updatedAt != null) data['updated_at'] = updatedAt;
     return data;
   }
 }

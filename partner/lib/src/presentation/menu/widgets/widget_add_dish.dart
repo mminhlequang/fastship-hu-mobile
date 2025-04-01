@@ -119,7 +119,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
               .toList(),
           "arrange": variation.arrange,
           "is_active": variation.isActive ?? 1,
-          "is_default": variation.isDefault ?? 0,
+          // "is_default": variation.isDefault ?? 0,
           "store_id": authCubit.storeId,
         });
 
@@ -178,7 +178,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                 .toList(),
             "arrange": variation.arrange,
             "is_active": variation.isActive ?? 1,
-            "is_default": variation.isDefault ?? 0,
+            // "is_default": variation.isDefault ?? 0,
             "store_id": authCubit.storeId,
           });
 
@@ -193,7 +193,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                 .toList(),
             "arrange": variation.arrange,
             "is_active": variation.isActive ?? 1,
-            "is_default": variation.isDefault ?? 0,
+            // "is_default": variation.isDefault ?? 0,
             "store_id": authCubit.storeId,
           });
 

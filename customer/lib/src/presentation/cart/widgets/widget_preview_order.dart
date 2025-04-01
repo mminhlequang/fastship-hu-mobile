@@ -1,23 +1,29 @@
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:app/src/presentation/checkout/checkout_tracking_screen.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
+import 'package:app/src/presentation/widgets/widget_button.dart';
+import 'package:app/src/presentation/widgets/widget_sheet_process.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/cart/models/models.dart';
+import 'package:network_resources/transaction/models/models.dart';
 
+import 'package:network_resources/order/repo.dart';
 import 'widget_sheet_locations.dart';
 import 'widget_sheet_vouchers.dart';
 
 class WidgetPreviewOrder extends StatefulWidget {
-  final List<CartItemModel> cartItems;
-  const WidgetPreviewOrder({Key? key, required this.cartItems})
-      : super(key: key);
+  final CartModel cart;
+  const WidgetPreviewOrder({super.key, required this.cart});
 
   @override
   _WidgetPreviewOrderState createState() => _WidgetPreviewOrderState();
@@ -26,22 +32,135 @@ class WidgetPreviewOrder extends StatefulWidget {
 class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
   double tip = 0;
   bool isPickupYourself = false;
-  double get subtotal => widget.cartItems.fold(
+  double get subtotal =>
+      widget.cart.cartItems?.fold(
         0,
         (sum, cartItem) =>
-            sum +
-            (cartItem.product.price! * cartItem.quantity +
-                cartItem.selectedVariationValues.fold(
+            sum! +
+            (cartItem.product!.price! * cartItem.quantity! +
+                cartItem.variations!.fold(
                       0,
                       (sum, variation) => sum + variation.price!.toInt(),
                     ) *
                     2),
-      );
+      ) ??
+      0;
 
   double get applicationFee => subtotal * 0.1; //TODO: Get from backend
   double get discount => 0.5; //TODO: Get from backend;
 
   double get total => subtotal + applicationFee + tip - discount;
+
+  late int selectedPaymentWalletProvider = paymentWalletProviders.first.id!;
+  List<PaymentWalletProvider> get paymentWalletProviders => [
+        PaymentWalletProvider(
+          id: 4,
+          name: "Stripe",
+          iconUrl: "storage/images/news/stripe.jpg",
+          isActive: 1,
+        ),
+        PaymentWalletProvider(
+          id: 5,
+          name: "Cash",
+          iconUrl: "storage/images/news/cash.png",
+          isActive: 1,
+        ),
+      ];
+
+  void _createOrder() async {
+    appHaptic();
+    final processer =
+        ValueNotifier<SheetProcessStatus>(SheetProcessStatus.loading);
+
+    callback() async {
+      processer.value = SheetProcessStatus.loading;
+      final r = await OrderRepo().createOrder({
+        "store_id": widget.cart.store!.id!,
+        "payment_type": "ship",
+        "payment_id": selectedPaymentWalletProvider,
+        // "voucher_id": 0,
+        // "voucher_value": 0,
+        "price_tip": tip,
+        "fee": applicationFee,
+        // "note": "string",
+        // "phone": "123456",
+        "address": locationCubit.addressDetail ?? '',
+        "lat": locationCubit.latitude,
+        "lng": locationCubit.longitude,
+        "street": locationCubit.state.addressDetail!.address?.street,
+        "zip": locationCubit.state.addressDetail!.address?.postalCode,
+        "city": locationCubit.state.addressDetail!.address?.city,
+        "state": locationCubit.state.addressDetail!.address?.state,
+        "country": locationCubit.state.addressDetail!.address?.countryName,
+        "country_code": locationCubit.state.addressDetail!.address?.countryCode
+      });
+      if (r.isSuccess) {
+        if (selectedPaymentWalletProvider == 4 &&
+            r.data?.clientSecret != null) {
+          try {
+            // Hiển thị giao diện thanh toán
+            await Stripe.instance.initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                paymentIntentClientSecret: r.data?.clientSecret,
+                merchantDisplayName: 'FastshipHu', // Tên app của Minh
+                customerId:
+                    AppPrefs.instance.user?.uid, // ID khách hàng từ Stripe
+                // customerEphemeralKeySecret:
+                //     ephemeralKeySecret, // Khóa tạm thời để xác thực
+                // Cấu hình bổ sung cho khách hàng
+                billingDetails: BillingDetails(
+                  name: AppPrefs.instance.user?.name,
+                  email: AppPrefs.instance.user?.email,
+                  phone: AppPrefs.instance.user?.phone,
+                  // address: const Address(
+                  //   city: 'Hà Nội',
+                  //   country: 'VN',
+                  //   line1: 'Địa chỉ nhà, phố',
+                  //   line2: 'Quận/Huyện',
+                  //   postalCode: '100000',
+                  //   state: 'Hà Nội',
+                  // ),
+                ),
+                applePay: PaymentSheetApplePay(
+                  merchantCountryCode: 'US', // Thay bằng mã quốc gia hợp lệ
+                ),
+                googlePay: PaymentSheetGooglePay(
+                  merchantCountryCode: 'US', // Thay bằng mã quốc gia hợp lệ
+                  testEnv: kDebugMode, // Bỏ `testEnv: true` khi lên production
+                ),
+              ),
+            );
+
+            // Mở Payment Sheet
+            await Stripe.instance.presentPaymentSheet();
+
+            await appShowSnackBar(
+              context: context,
+              msg: "We received your payment!",
+              type: AppSnackBarType.success,
+            );
+          } catch (e) {
+            print(e);
+          }
+        }
+
+        context.pop();
+        context.pop();
+        appOpenBottomSheet(const CheckoutTrackingScreen());
+      } else {
+        processer.value = SheetProcessStatus.error;
+      }
+    }
+
+    callback();
+
+    appOpenBottomSheet(WidgetBottomSheetProcess(
+      processer: processer,
+      onTryAgain: callback,
+    ));
+    // context.pop();
+    // appOpenBottomSheet(const CheckoutTrackingScreen());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +175,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                 spacing: 20.sw,
                 children: [
                   WidgetAppBar(
-                    title: widget.cartItems.first.store.name ?? "",
+                    title: widget.cart.store?.name ?? "",
                     actions: [
                       WidgetAppSVG('icon20', width: 18.sw, height: 18.sw),
                       const SizedBox(width: 4),
@@ -80,7 +199,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                         _buildAddressSection(),
                         // _buildShippingOptions(),
                         _buildOrderItems(),
-                        // _buildPaymentMethod(),
+                        _buildPaymentMethod(),
                         _buildCourierTip(),
                         _buildOrderSummary(),
                         _buildDiscountSection(),
@@ -380,9 +499,10 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           color: Color(0xFFCEC6C5),
           child: Column(
             spacing: 12.sw,
-            children: widget.cartItems
-                .map((cartItem) => _buildOrderItem(cartItem))
-                .toList(),
+            children: widget.cart.cartItems
+                    ?.map((cartItem) => _buildOrderItem(cartItem))
+                    .toList() ??
+                [],
           ),
         ),
       ],
@@ -427,7 +547,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                         border: Border.all(color: Color(0xFFF8F1F0)),
                       ),
                       child: WidgetAppImage(
-                        imageUrl: cartItem.product.image,
+                        imageUrl: cartItem.product?.image ?? '',
                         width: 44.sw,
                         height: 44.sw,
                         radius: 8,
@@ -440,7 +560,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            cartItem.product.name ?? "",
+                            cartItem.product?.name ?? "",
                             style: w500TextStyle(
                               fontSize: 14.sw,
                               color: Color(0xFF3C3836),
@@ -452,21 +572,21 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                               children: [
                                 TextSpan(
                                   text: currencyFormatted(cartItem
-                                              .product.price! *
-                                          cartItem.quantity +
-                                      cartItem.selectedVariationValues.fold(
+                                              .product!.price! *
+                                          cartItem.quantity! +
+                                      cartItem.variations!.fold(
                                               0,
                                               (sum, variation) =>
                                                   sum +
                                                   variation.price!.toInt()) *
-                                          cartItem.quantity),
+                                          cartItem.quantity!),
                                   style: w500TextStyle(
                                     fontSize: 14.sw,
                                   ),
                                 ),
                                 TextSpan(
                                   text:
-                                      " (${currencyFormatted(cartItem.product.price!)} x ${cartItem.quantity} + ${currencyFormatted(cartItem.selectedVariationValues.fold(0, (sum, variation) => sum + variation.price!.toInt()) * cartItem.quantity)})",
+                                      " (${currencyFormatted(cartItem.product!.price!)} x ${cartItem.quantity} + ${currencyFormatted(cartItem.variations!.fold(0, (sum, variation) => sum + variation.price!.toInt()) * cartItem.quantity!)})",
                                   style: w400TextStyle(
                                       fontSize: 14.sw, color: appColorText2),
                                 ),
@@ -478,23 +598,22 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                     ),
                   ],
                 ),
-                ...cartItem.product.variations!.map((e) => _buildMenuSection(
+                ...cartItem.product!.variations!.map((e) => _buildMenuSection(
                       e.name ?? '',
                       e.values?.map(
                             (e) {
-                              bool isSelected = cartItem.selectedVariationValues
+                              bool isSelected = cartItem.variations!
                                   .any((element) => element.id == e.id);
                               return GestureDetector(
                                 onTap: () {
                                   if (isSelected) {
-                                    cartItem.selectedVariationValues
-                                        .removeWhere(
-                                            (element) => element.id == e.id);
+                                    cartItem.variations!.removeWhere(
+                                        (element) => element.id == e.id);
                                   } else {
-                                    cartItem.selectedVariationValues
-                                        .removeWhere((element) =>
+                                    cartItem.variations!.removeWhere(
+                                        (element) =>
                                             element.parentId == e.parentId);
-                                    cartItem.selectedVariationValues.add(e);
+                                    cartItem.variations!.add(e);
                                   }
                                   setState(() {});
                                 },
@@ -517,123 +636,117 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     );
   }
 
-  // Widget _buildPaymentMethod() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           Text(
-  //             'Payment method',
-  //             style: TextStyle(
-  //               fontSize: 16,
-  //               color: Color(0xFF14142A),
-  //             ),
-  //           ),
-  //           Row(
-  //             children: [
-  //               Icon(Icons.add, color: Color(0xFF74CA45)),
-  //               Text(
-  //                 'Add more',
-  //                 style: TextStyle(
-  //                   fontSize: 16,
-  //                   color: Color(0xFF74CA45),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //       const SizedBox(height: 12),
-  //       Container(
-  //         padding: const EdgeInsets.all(16),
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(16),
-  //           color: Color(0xFFF9F8F6),
-  //         ),
-  //         child: Column(
-  //           children: [
-  //             _buildPaymentOption(
-  //               title: 'Cash',
-  //               isSelected: true,
-  //             ),
-  //             Divider(color: Color(0xFFF1EFE9)),
-  //             _buildPaymentOption(
-  //               title: 'Bank Transfer',
-  //               showImage: true,
-  //             ),
-  //             Divider(color: Color(0xFFF1EFE9)),
-  //             _buildPaymentOption(
-  //               title: 'Sepa',
-  //               showIcon: true,
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Widget _buildPaymentMethod() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Payment method',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF14142A),
+              ),
+            ),
+            Row(
+              children: [
+                Icon(Icons.add, color: Color(0xFF74CA45)),
+                Text(
+                  'Add more',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF74CA45),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Color(0xFFF9F8F6),
+          ),
+          child: Column(
+            children: [
+              _buildPaymentOption(
+                m: paymentWalletProviders[0],
+              ),
+              Divider(color: Color(0xFFF1EFE9)),
+              _buildPaymentOption(
+                m: paymentWalletProviders[1],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
-  // Widget _buildPaymentOption({
-  //   required String title,
-  //   bool isSelected = false,
-  //   bool showImage = false,
-  //   bool showIcon = false,
-  // }) {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     children: [
-  //       Row(
-  //         children: [
-  //           Container(
-  //             width: 24,
-  //             height: 24,
-  //             decoration: BoxDecoration(
-  //               shape: BoxShape.circle,
-  //               border: Border.all(
-  //                 color: isSelected ? Color(0xFF333333) : Color(0xFFCEC6C5),
-  //               ),
-  //             ),
-  //             child: isSelected
-  //                 ? Center(
-  //                     child: Container(
-  //                       width: 10,
-  //                       height: 10,
-  //                       decoration: BoxDecoration(
-  //                         shape: BoxShape.circle,
-  //                         color: Color(0xFF333333),
-  //                       ),
-  //                     ),
-  //                   )
-  //                 : null,
-  //           ),
-  //           const SizedBox(width: 8),
-  //           Text(
-  //             title,
-  //             style: TextStyle(
-  //               fontSize: 14,
-  //               color: Color(0xFF333333),
-  //               letterSpacing: 0.28,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       if (showImage)
-  //         Container(
-  //           width: 49,
-  //           height: 24,
-  //           color: Colors.grey[200],
-  //         )
-  //       else if (showIcon)
-  //         Icon(
-  //           Icons.payment,
-  //           size: 24,
-  //           color: Color(0xFF0B4A8E),
-  //         ),
-  //     ],
-  //   );
-  // }
+  Widget _buildPaymentOption({required PaymentWalletProvider m}) {
+    bool isSelected = selectedPaymentWalletProvider == m.id;
+    return WidgetInkWellTransparent(
+      onTap: () {
+        appHaptic();
+        setState(() {
+          selectedPaymentWalletProvider = m.id!;
+        });
+      },
+      enableInkWell: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            const SizedBox(width: 12),
+            WidgetAppImage(
+              imageUrl: m.iconUrl ?? '',
+              fit: BoxFit.scaleDown,
+              height: 24,
+              width: 24,
+              radius: 4,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                m.name ?? '',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF333333),
+                  letterSpacing: 0.28,
+                ),
+              ),
+            ),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? Color(0xFF333333) : Color(0xFFCEC6C5),
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildCourierTip() {
     return Column(
@@ -846,26 +959,9 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
               ],
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                appHaptic();
-                appOpenBottomSheet(const CheckoutTrackingScreen());
-              },
-              child: Text(
-                'Check out'.tr(),
-                style: w500TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF74CA45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(120),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                minimumSize: Size(double.infinity, 0),
-              ),
+            WidgetButtonConfirm(
+              onPressed: _createOrder,
+              text: 'Check out'.tr(),
             ),
           ],
         ),

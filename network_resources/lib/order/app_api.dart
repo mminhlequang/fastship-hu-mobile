@@ -1,27 +1,39 @@
 import 'package:internal_core/internal_core.dart';
-import 'package:dio/dio.dart';
-import 'package:internal_network/network_resources/resources.dart';
 import 'package:internal_network/internal_network.dart';
 import 'package:internal_network/network_resources/resources.dart';
+import 'package:dio/dio.dart';
 
-import 'models/order.dart';
+import 'models/models.dart';
+
+class _OrderEndpoint {
+  _OrderEndpoint._();
+  static String getOrdersByUser() => "/api/v1/order/get_orders_by_user";
+  static String getOrdersByStore() => "/api/v1/order/get_orders_by_store";
+  static String getOrderDetail() => "/api/v1/order/detail";
+  static String getApproves() => "/api/v1/order/get_approves";
+  static String createOrder() => "/api/v1/order/create";
+  static String updateOrder() => "/api/v1/order/update";
+  static String cancelOrder() => "/api/v1/order/cancel";
+}
 
 abstract class OrderApi {
-  Future<NetworkResponse> getOrders(Map<String, dynamic> params);
-  Future<NetworkResponse> getOrderDetail(int id);
-  Future<NetworkResponse> updateOrderStatus(Map<String, dynamic> data);
-  Future<NetworkResponse> cancelOrder(int id);
-  Future<NetworkResponse> completeOrder(int id);
+  Future<NetworkResponse> getOrdersByUser(Map<String, dynamic> params);
+  Future<NetworkResponse> getOrdersByStore(Map<String, dynamic> params);
+  Future<NetworkResponse> getOrderDetail(Map<String, dynamic> params);
+  Future<NetworkResponse> getApproves();
+  Future<NetworkResponse> createOrder(Map<String, dynamic> params);
+  Future<NetworkResponse> updateOrder(Map<String, dynamic> params);
+  Future<NetworkResponse> cancelOrder(Map<String, dynamic> params);
 }
 
 class OrderApiImp extends OrderApi {
   @override
-  Future<NetworkResponse> getOrders(Map<String, dynamic> params) async {
+  Future<NetworkResponse> getOrdersByUser(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).get(_OrderEndpoint.getOrders(), queryParameters: params);
+        ).get(_OrderEndpoint.getOrdersByUser(), queryParameters: params);
         return NetworkResponse.fromResponse(
           response,
           converter:
@@ -33,12 +45,29 @@ class OrderApiImp extends OrderApi {
   }
 
   @override
-  Future<NetworkResponse> getOrderDetail(int id) async {
+  Future<NetworkResponse> getOrdersByStore(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).get(_OrderEndpoint.getOrderDetail(), queryParameters: {'id': id});
+        ).get(_OrderEndpoint.getOrdersByStore(), queryParameters: params);
+        return NetworkResponse.fromResponse(
+          response,
+          converter:
+              (json) =>
+                  (json as List).map((e) => OrderModel.fromJson(e)).toList(),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<NetworkResponse> getOrderDetail(Map<String, dynamic> params) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await appPrefs.getNormalToken(),
+        ).get(_OrderEndpoint.getOrderDetail(), queryParameters: params);
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => OrderModel.fromJson(json),
@@ -48,55 +77,67 @@ class OrderApiImp extends OrderApi {
   }
 
   @override
-  Future<NetworkResponse> updateOrderStatus(Map<String, dynamic> data) async {
+  Future<NetworkResponse> getApproves() async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).post(_OrderEndpoint.updateOrderStatus(), data: data);
+        ).get(
+          _OrderEndpoint.getApproves(),
+          options: Options(headers: {'Accept-Language': 'vi'}),
+        );
         return NetworkResponse.fromResponse(
           response,
-          value: response.data['status'] == true,
+          converter:
+              (json) =>
+                  (json as List).map((e) => ApproveModel.fromJson(e)).toList(),
         );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> cancelOrder(int id) async {
+  Future<NetworkResponse> createOrder(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).post(_OrderEndpoint.cancelOrder(), data: {'id': id});
+        ).post(_OrderEndpoint.createOrder(), data: params);
         return NetworkResponse.fromResponse(
           response,
-          value: response.data['status'] == true,
+          converter: (json) => CreateOrderResponse.fromJson(json),
         );
       },
     );
   }
 
   @override
-  Future<NetworkResponse> completeOrder(int id) async {
+  Future<NetworkResponse> updateOrder(Map<String, dynamic> params) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).post(_OrderEndpoint.completeOrder(), data: {'id': id});
+        ).post(_OrderEndpoint.updateOrder(), data: params);
         return NetworkResponse.fromResponse(
           response,
-          value: response.data['status'] == true,
+          converter: (json) => OrderModel.fromJson(json),
         );
       },
     );
   }
-}
 
-class _OrderEndpoint {
-  static String getOrders() => '/orders';
-  static String getOrderDetail() => '/orders/detail';
-  static String updateOrderStatus() => '/orders/status';
-  static String cancelOrder() => '/orders/cancel';
-  static String completeOrder() => '/orders/complete';
+  @override
+  Future<NetworkResponse> cancelOrder(Map<String, dynamic> params) async {
+    return await handleNetworkError(
+      proccess: () async {
+        Response response = await AppClient(
+          token: await appPrefs.getNormalToken(),
+        ).post(_OrderEndpoint.cancelOrder(), data: params);
+        return NetworkResponse.fromResponse(
+          response,
+          converter: (json) => OrderModel.fromJson(json),
+        );
+      },
+    );
+  }
 }

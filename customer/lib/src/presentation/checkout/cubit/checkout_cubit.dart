@@ -79,7 +79,6 @@ class CheckoutCubit extends Cubit<CheckoutState> {
       // ));
 
       // Xóa giỏ hàng sau khi đặt hàng thành công
-      cartCubit.clearCart();
     } catch (e) {
       emit(state.copyWith(
         status: CheckoutStatus.failed,

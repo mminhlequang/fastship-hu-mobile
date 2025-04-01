@@ -10,7 +10,7 @@ import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/product/model/product.dart';
 
 import 'cubit/cart_cubit.dart';
-import 'widgets/widget_preview_order.dart';
+import 'widgets/widget_cart_item.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -20,206 +20,155 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  int? cartId;
+
+  @override
+  void initState() {
+    super.initState();
+    cartCubit.getCarts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+      backgroundColor: hexColor('#F9F8F6'),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(width: 12),
+                      Text(
+                        'My cart'.tr(),
+                        style: w500TextStyle(
+                          fontSize: 20.sw,
+                        ),
+                      ),
+                    ],
                   ),
+                  Icon(Icons.more_vert, size: 28),
                 ],
               ),
-              child: Padding(
-                padding:
-                    EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<CartCubit, CartState>(
+                bloc: cartCubit,
+                builder: (context, state) {
+                  if (state.isLoading && state.items.isEmpty) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: WidgetRestaurantCardShimmer(),
+                        );
+                      },
+                    );
+                  } else if (state.items.isEmpty) {
+                    return Center(
+                        child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(width: 12),
+                        WidgetAppSVG(
+                          'icon8',
+                          width: 237,
+                          height: 232,
+                        ),
+                        const SizedBox(height: 24),
                         Text(
-                          'My cart'.tr(),
+                          'Empty',
                           style: w500TextStyle(
-                            fontSize: 20.sw,
+                            fontSize: 24,
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'You don\'t have any foods in cart at this time',
+                          textAlign: TextAlign.center,
+                          style: w400TextStyle(
+                            fontSize: 16,
+                            color: appColorText2,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 21),
+                        // Order Now Button
+                        SizedBox(
+                          width: context.width * .65,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              appHaptic();
+                              navigationCubit.changeIndex(1);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF74CA45),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(120),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                            child: Text(
+                              'Order Now',
+                              style: w500TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 48),
                       ],
-                    ),
-                    Icon(Icons.more_vert, size: 28),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: BlocBuilder<CartCubit, CartState>(
-                  bloc: cartCubit,
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      // TODO: Show loading
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state.items.isEmpty) {
-                      return Center(
-                          child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          WidgetAppSVG(
-                            'icon8',
-                            width: 237,
-                            height: 232,
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Empty',
-                            style: w500TextStyle(
-                              fontSize: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'You don\'t have any foods in cart at this time',
-                            textAlign: TextAlign.center,
-                            style: w400TextStyle(
-                              fontSize: 16,
-                              color: appColorText2,
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: 21),
-                          // Order Now Button
-                          SizedBox(
-                            width: context.width * .65,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                appHaptic();
-                                navigationCubit.changeIndex(1);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF74CA45),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(120),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                              ),
-                              child: Text(
-                                'Order Now',
-                                style: w500TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 48),
-                        ],
-                      ));
-                    }
+                    ));
+                  }
 
-                    // Nhóm các mặt hàng theo cửa hàng
-                    final groupedItems = <dynamic, List<CartItemModel>>{};
-
-                    // Nhóm các mặt hàng theo ID cửa hàng
-                    for (var item in state.items) {
-                      final storeId = item.store.id!;
-                      if (!groupedItems.containsKey(storeId)) {
-                        groupedItems[storeId] = [];
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                    itemBuilder: (context, index) {
+                      if (index == state.items.length) {
+                        return Container(
+                          height: 120 + MediaQuery.of(context).padding.bottom,
+                        );
                       }
-                      groupedItems[storeId]!.add(item);
-                    }
-
-                    // Tính tổng giá trị đơn hàng
-                    final totalAmount = state.items.fold<double>(
-                      0,
-                      (sum, item) =>
-                          sum + (item.product.price ?? 0) * item.quantity,
-                    );
-
-                    return ListView(
-                      padding: EdgeInsets.all(16.sw),
-                      children: groupedItems.keys
-                          .map((e) => Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: DottedBorder(
-                                  borderType: BorderType.RRect,
-                                  radius: Radius.circular(12),
-                                  padding: EdgeInsets.all(6),
-                                  dashPattern: [10, 5],
-                                  color: hexColor('#CEC6C5'),
-                                  child: Column(
-                                    children: [
-                                      WidgetRestaurantCard(
-                                          store: groupedItems[e]!.first.store),
-                                      ...groupedItems[e]!.map(
-                                        (e) => CartItem(
-                                          product: e.product,
-                                          quantity: e.quantity,
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Spacer(),
-                                          SizedBox(
-                                            width: context.width * .35,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                appHaptic();
-                                                requestLoginWrapper(() {
-                                                  appOpenBottomSheet(
-                                                      WidgetPreviewOrder(
-                                                          cartItems:
-                                                              groupedItems[
-                                                                  e]!));
-                                                });
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xFF74CA45),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          120),
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 16,
-                                                  vertical: 14,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Checkout now',
-                                                style: w500TextStyle(
-                                                  fontSize: 18,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                    ],
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                    );
-                  }),
-            ),
-          ],
-        ),
+                      return GestureDetector(
+                        onTap: () {
+                          appHaptic();
+                          setState(() {
+                            cartId = state.items[index].id;
+                          });
+                        },
+                        child: WidgetCartItem(
+                          cart: state.items[index],
+                          isSelected: cartId == state.items[index].id,
+                        ),
+                      );
+                    },
+                    itemCount: state.items.length + 1,
+                  );
+                }),
+          ),
+        ],
       ),
     );
   }

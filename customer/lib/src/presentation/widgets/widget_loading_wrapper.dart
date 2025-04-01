@@ -1,5 +1,6 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:internal_core/internal_core.dart';
 
 abstract class BaseLoadingState<T extends StatefulWidget> extends State<T> {
   bool _isLoading = false;
@@ -23,16 +24,19 @@ abstract class BaseLoadingState<T extends StatefulWidget> extends State<T> {
       children: [
         buildContent(context),
         if (_isLoading)
-          Container(
-            color: Colors.black.withOpacity(0.3),
-            child: const Center(
-              child: WidgetAppLoader(),
+          Positioned.fill(
+            child: WidgetGlassBackground(
+              backgroundColor: Colors.black.withOpacity(0.1),
+              child: const Center(
+                child: WidgetAppLoader(),
+              ),
             ),
           ),
       ],
     );
   }
 }
+
 class WidgetAppLoader extends StatelessWidget {
   const WidgetAppLoader({super.key});
 
