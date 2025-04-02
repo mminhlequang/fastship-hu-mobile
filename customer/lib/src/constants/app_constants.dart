@@ -14,7 +14,8 @@ String get appMapUrlTemplateHERE =>
 const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
-const String socketIOUrl = "http://138.197.136.45:3000";
+// const String socketIOUrl = "http://138.197.136.45:3000";
+const String socketIOUrl = "http://192.168.1.12:3000";
 
 const List<Map> euroCounries = [
   {"name": "Andorra", "code": "AD"},

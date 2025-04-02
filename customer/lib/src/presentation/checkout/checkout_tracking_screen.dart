@@ -215,8 +215,8 @@ class CheckoutTrackingScreen extends StatelessWidget {
               ),
             ],
           ),
-          SvgPicture.asset('assets/cooking_animation.svg',
-              width: 76, height: 73),
+          // SvgPicture.asset('assets/cooking_animation.svg',
+          //     width: 76, height: 73),
         ],
       ),
     );

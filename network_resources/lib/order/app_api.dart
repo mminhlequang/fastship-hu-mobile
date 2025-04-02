@@ -10,7 +10,6 @@ class _OrderEndpoint {
   static String getOrdersByUser() => "/api/v1/order/get_orders_by_user";
   static String getOrdersByStore() => "/api/v1/order/get_orders_by_store";
   static String getOrderDetail() => "/api/v1/order/detail";
-  static String getApproves() => "/api/v1/order/get_approves";
   static String createOrder() => "/api/v1/order/create";
   static String updateOrder() => "/api/v1/order/update";
   static String cancelOrder() => "/api/v1/order/cancel";
@@ -20,7 +19,6 @@ abstract class OrderApi {
   Future<NetworkResponse> getOrdersByUser(Map<String, dynamic> params);
   Future<NetworkResponse> getOrdersByStore(Map<String, dynamic> params);
   Future<NetworkResponse> getOrderDetail(Map<String, dynamic> params);
-  Future<NetworkResponse> getApproves();
   Future<NetworkResponse> createOrder(Map<String, dynamic> params);
   Future<NetworkResponse> updateOrder(Map<String, dynamic> params);
   Future<NetworkResponse> cancelOrder(Map<String, dynamic> params);
@@ -71,26 +69,6 @@ class OrderApiImp extends OrderApi {
         return NetworkResponse.fromResponse(
           response,
           converter: (json) => OrderModel.fromJson(json),
-        );
-      },
-    );
-  }
-
-  @override
-  Future<NetworkResponse> getApproves() async {
-    return await handleNetworkError(
-      proccess: () async {
-        Response response = await AppClient(
-          token: await appPrefs.getNormalToken(),
-        ).get(
-          _OrderEndpoint.getApproves(),
-          options: Options(headers: {'Accept-Language': 'vi'}),
-        );
-        return NetworkResponse.fromResponse(
-          response,
-          converter:
-              (json) =>
-                  (json as List).map((e) => ApproveModel.fromJson(e)).toList(),
         );
       },
     );

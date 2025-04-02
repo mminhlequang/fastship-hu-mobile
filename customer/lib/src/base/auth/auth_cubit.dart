@@ -14,6 +14,9 @@ AuthCubit get authCubit => findInstance<AuthCubit>();
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthState());
+
+  bool get isLoggedIn => state.stateType == AuthStateType.logged;
+
   update(user) async {
     state.user = user;
     emit(state.update());

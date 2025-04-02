@@ -27,10 +27,6 @@ class OrderRepo {
     return await _api.getOrderDetail(params);
   }
 
-  Future<NetworkResponse> getApproves() async {
-    return await _api.getApproves();
-  }
-
   Future<NetworkResponse> createOrder(Map<String, dynamic> params) async {
     return await _api.createOrder(params);
   }

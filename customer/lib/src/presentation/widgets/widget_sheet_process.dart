@@ -38,15 +38,14 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
       child: ValueListenableBuilder(
         valueListenable: widget.processer,
         builder: (context, value, child) {
-          print('value: $value');
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: switch (value) {
               SheetProcessStatus.loading => [
-                  WidgetAppSVG(
-                    'ic_loading', //TODO: replace
-                    width: 72.sw,
-                  ),
+                  // WidgetAppSVG(
+                  //   'ic_loading', //TODO: replace
+                  //   width: 72.sw,
+                  // ),
                   Gap(32.sw),
                   Text(
                     "Processing...",
@@ -90,13 +89,13 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
                   ),
                 ],
               SheetProcessStatus.error => [
-                  WidgetAppSVG(
-                    'ic_error', //TODO: replace
-                    width: 72.sw,
-                  ),
+                  // WidgetAppSVG(
+                  //   'ic_error', //TODO: replace
+                  //   width: 72.sw,
+                  // ),
                   Gap(32.sw),
                   Text(
-                    "Incomplete!",
+                    "Error!",
                     style: w500TextStyle(fontSize: 24.sw),
                   ),
                   Gap(16.sw),

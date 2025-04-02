@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/checkout/checkout_tracking_screen.dart';
+import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:app/src/presentation/widgets/widget_sheet_process.dart';
@@ -15,6 +18,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/cart/models/models.dart';
+import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/transaction/models/models.dart';
 
 import 'package:network_resources/order/repo.dart';
@@ -51,7 +55,9 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
 
   double get total => subtotal + applicationFee + tip - discount;
 
-  late int selectedPaymentWalletProvider = paymentWalletProviders.first.id!;
+  late int selectedPaymentWalletProvider = kDebugMode
+      ? paymentWalletProviders.last.id!
+      : paymentWalletProviders.first.id!;
   List<PaymentWalletProvider> get paymentWalletProviders => [
         PaymentWalletProvider(
           id: 4,
@@ -95,13 +101,15 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "country_code": locationCubit.state.addressDetail!.address?.countryCode
       });
       if (r.isSuccess) {
+        CreateOrderResponse orderResponse = r.data!;
+
         if (selectedPaymentWalletProvider == 4 &&
-            r.data?.clientSecret != null) {
+            orderResponse.clientSecret != null) {
           try {
             // Hiển thị giao diện thanh toán
             await Stripe.instance.initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
-                paymentIntentClientSecret: r.data?.clientSecret,
+                paymentIntentClientSecret: orderResponse.clientSecret,
                 merchantDisplayName: 'FastshipHu', // Tên app của Minh
                 customerId:
                     AppPrefs.instance.user?.uid, // ID khách hàng từ Stripe
@@ -139,14 +147,35 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
               msg: "We received your payment!",
               type: AppSnackBarType.success,
             );
-          } catch (e) {
-            print(e);
+          } on StripeException catch (e) {
+            print(e.error.message);
+            await appShowSnackBar(
+              context: context,
+              msg: e.error.message,
+              type: AppSnackBarType.error,
+            );
+            processer.value = SheetProcessStatus.error;
+            return;
           }
         }
 
-        context.pop();
-        context.pop();
-        appOpenBottomSheet(const CheckoutTrackingScreen());
+        final socketResult =
+            await socketController.createOrder(orderResponse.order!);
+        if (socketResult) {
+          processer.value = SheetProcessStatus.success;
+          Timer(
+            const Duration(seconds: 3),
+            () {
+              context.pop();
+              if (socketResult) {
+                // context.pop();
+                // appOpenBottomSheet(const CheckoutTrackingScreen());
+              }
+            },
+          );
+        } else {
+          processer.value = SheetProcessStatus.error;
+        }
       } else {
         processer.value = SheetProcessStatus.error;
       }
@@ -154,10 +183,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
 
     callback();
 
-    appOpenBottomSheet(WidgetBottomSheetProcess(
-      processer: processer,
-      onTryAgain: callback,
-    ));
+    appOpenBottomSheet(
+      WidgetBottomSheetProcess(
+        processer: processer,
+        onTryAgain: callback,
+      ),
+      isDismissible: kDebugMode,
+    );
     // context.pop();
     // appOpenBottomSheet(const CheckoutTrackingScreen());
   }
