@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../constants/app_colors.dart';
-import '../../utils/app_prefs.dart';
+import 'controllers/socket_controller.dart';
 import 'widgets/order_status_widget.dart';
 import 'widgets/order_tracking_widget.dart';
 import 'widgets/order_complete_widget.dart';
@@ -23,13 +21,11 @@ enum OrderStatus {
 
 class SocketShellWrapper extends StatefulWidget {
   final Widget child;
-  final VoidCallback? onOrderReceived;
 
   const SocketShellWrapper({
-    Key? key,
+    super.key,
     required this.child,
-    this.onOrderReceived,
-  }) : super(key: key);
+  });
 
   @override
   State<SocketShellWrapper> createState() => _SocketShellWrapperState();
@@ -41,6 +37,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   Map<String, dynamic>? _driverLocation;
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isOrderVisible = false;
+  bool _isMinimized = false;
   Timer? _notificationTimer;
 
   @override
@@ -65,8 +62,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   }
 
   Future<void> _setupSocketListeners() async {
-    // TODO: Implement socket connection
-    // Giả lập dữ liệu để test UI
+    socketController.initializeSocket();
     await Future.delayed(const Duration(seconds: 3));
     _simulateOrderData();
   }
@@ -134,11 +130,11 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   }
 
   Future<void> _playNotificationSound() async {
-    try {
-      await _audioPlayer.play(AssetSource('sounds/notification.mp3'));
-    } catch (e) {
-      debugPrint('Error playing notification sound: $e');
-    }
+    // try {
+    //   await _audioPlayer.play(AssetSource('sounds/notification.mp3'));
+    // } catch (e) {
+    //   debugPrint('Error playing notification sound: $e');
+    // }
   }
 
   void _showNotificationPermissionDialog() {
@@ -223,6 +219,104 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
     _closeOrderView();
   }
 
+  void _toggleMinimize() {
+    setState(() {
+      _isMinimized = !_isMinimized;
+    });
+  }
+
+  Widget _buildMinimizedWidget() {
+    if (_currentOrder == null || _currentStatus == null)
+      return const SizedBox.shrink();
+
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _toggleMinimize,
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                _getStatusIcon(),
+                color: _getStatusColor(),
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _getStatusText(),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getStatusIcon() {
+    switch (_currentStatus) {
+      case OrderStatus.accepted:
+        return Icons.check_circle;
+      case OrderStatus.delivery:
+        return Icons.delivery_dining;
+      case OrderStatus.completed:
+        return Icons.check_circle_outline;
+      case OrderStatus.canceled:
+        return Icons.cancel;
+      default:
+        return Icons.info;
+    }
+  }
+
+  Color _getStatusColor() {
+    switch (_currentStatus) {
+      case OrderStatus.accepted:
+        return Colors.orange;
+      case OrderStatus.delivery:
+        return Colors.blue;
+      case OrderStatus.completed:
+        return Colors.green;
+      case OrderStatus.canceled:
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getStatusText() {
+    switch (_currentStatus) {
+      case OrderStatus.accepted:
+        return 'Đã nhận đơn';
+      case OrderStatus.delivery:
+        return 'Đang giao';
+      case OrderStatus.completed:
+        return 'Hoàn thành';
+      case OrderStatus.canceled:
+        return 'Đã hủy';
+      default:
+        return 'Không xác định';
+    }
+  }
+
   Widget _buildOrderStatusWidget() {
     if (!_isOrderVisible || _currentOrder == null || _currentStatus == null) {
       return const SizedBox.shrink();
@@ -269,38 +363,38 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Main app content
         widget.child,
 
         // Order status overlay
-        // if (_isOrderVisible && _currentOrder != null)
-        //   Positioned(
-        //     bottom: 0,
-        //     left: 0,
-        //     right: 0,
-        //     child: Container(
-        //       margin: const EdgeInsets.all(16),
-        //       child: _buildOrderStatusWidget(),
-        //     ),
-        //   ),
+        if (_isOrderVisible && _currentOrder != null)
+          Positioned(
+            bottom: 16 + MediaQuery.paddingOf(context).bottom,
+            left: 16,
+            right: 16,
+            child: _isMinimized
+                ? Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildMinimizedWidget(),
+                  )
+                : Material(
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.minimize,
+                              color: Colors.grey[600],
+                            ),
+                            onPressed: _toggleMinimize,
+                          ),
+                        ),
+                        _buildOrderStatusWidget(),
+                      ],
+                    ),
+                  ),
+          ),
       ],
     );
   }
-}
-
-// Placeholder cho AudioPlayer
-class AudioPlayer {
-  Future<void> play(AssetSource source) async {
-    // Giả lập phát nhạc
-    print('Playing sound: ${source.path}');
-  }
-
-  void dispose() {
-    // Giả lập giải phóng tài nguyên
-  }
-}
-
-class AssetSource {
-  final String path;
-  AssetSource(this.path);
 }

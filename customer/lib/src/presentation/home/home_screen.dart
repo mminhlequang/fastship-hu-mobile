@@ -1,7 +1,10 @@
-import 'package:app/src/base/bloc.dart';
-import 'package:app/src/base/cubit/location_cubit.dart';
-import 'package:app/src/constants/app_colors.dart';
-import 'package:app/src/constants/app_sizes.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/widgets/widgets.dart';
 import 'package:network_resources/banners/models/models.dart';
 import 'package:network_resources/banners/repo.dart';
 import 'package:network_resources/category/model/category.dart';
@@ -12,17 +15,15 @@ import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/product/repo.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:network_resources/store/repo.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:app/src/base/bloc.dart';
+import 'package:app/src/base/cubit/location_cubit.dart';
+import 'package:app/src/constants/app_colors.dart';
+import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/widgets/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/widget_category_card.dart';
 import 'widgets/widget_dialog_filters.dart';
@@ -79,66 +80,63 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColorBackground,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-              16.sw,
-              12.sw + context.mediaQueryPadding.top,
-              16.sw,
-              16.sw + context.mediaQueryPadding.bottom),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _LocationHeader(),
-              const SizedBox(height: 17),
-              WidgetSearchField(onTap: () {}),
-              const SizedBox(height: 17),
-              const _PromoBanner(),
-              const SizedBox(height: 24),
-              _CategorySection(categoryNotifier: _categoryNotifier),
-              const SizedBox(height: 24),
-              _categoryNotifierBuilder(
-                builder: (categoryIds, category) => _FastestDeliverySection(
-                  key: Key('fastest_delivery_section_$categoryIds'),
-                  categoryIds: categoryIds,
-                ),
-              ),
-              const SizedBox(height: 32),
-              _categoryNotifierBuilder(
-                builder: (categoryIds, category) => _RestaurantDiscountSection(
-                  key: Key('restaurant_discount_section_$categoryIds'),
-                  categoryIds: categoryIds,
-                  category: category,
-                ),
-              ),
-              const SizedBox(height: 32),
-              _categoryNotifierBuilder(
-                builder: (categoryIds, category) => _BestSellerSection(
-                  key: Key('best_seller_section_$categoryIds'),
-                  categoryIds: categoryIds,
-                ),
-              ),
-              const SizedBox(height: 32),
-              _categoryNotifierBuilder(
-                builder: (categoryIds, category) => _RestaurantHighRating(
-                  key: Key('restaurant_high_rating_section_$categoryIds'),
-                  categoryIds: categoryIds,
-                ),
-              ),
-              const SizedBox(height: 32),
-              _categoryNotifierBuilder(
-                builder: (categoryIds, category) => _RecommendedSection(
-                  key: Key('recommended_section_$categoryIds'),
-                ),
-              ),
-              const SizedBox(height: 32),
-              const _PartnerSection(),
-              const SizedBox(height: 32),
-              const _NewsSection(),
-              const SizedBox(height: 110),
-            ],
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 16.sw),
+        children: [
+          SizedBox(
+            height: 12.sw + context.mediaQueryPadding.top,
           ),
-        ),
+          const _LocationHeader(),
+          const SizedBox(height: 17),
+          WidgetSearchField(onTap: () {}),
+          const SizedBox(height: 17),
+          const _PromoBanner(),
+          const SizedBox(height: 24),
+          _CategorySection(
+            categoryNotifier: _categoryNotifier,
+          ),
+          const SizedBox(height: 24),
+          _categoryNotifierBuilder(
+            builder: (categoryIds, category) => _FastestDeliverySection(
+              key: Key('fastest_delivery_section_$categoryIds'),
+              categoryIds: categoryIds,
+            ),
+          ),
+          const SizedBox(height: 32),
+          _categoryNotifierBuilder(
+            builder: (categoryIds, category) => _RestaurantDiscountSection(
+              key: Key('restaurant_discount_section_$categoryIds'),
+              categoryIds: categoryIds,
+              category: category,
+            ),
+          ),
+          const SizedBox(height: 32),
+          _categoryNotifierBuilder(
+            builder: (categoryIds, category) => _BestSellerSection(
+              key: Key('best_seller_section_$categoryIds'),
+              categoryIds: categoryIds,
+            ),
+          ),
+          const SizedBox(height: 32),
+          _categoryNotifierBuilder(
+            builder: (categoryIds, category) => _RestaurantHighRating(
+              key: Key('restaurant_high_rating_section_$categoryIds'),
+              categoryIds: categoryIds,
+            ),
+          ),
+          const SizedBox(height: 32),
+          _categoryNotifierBuilder(
+            builder: (categoryIds, category) => _RecommendedSection(
+              key: Key('recommended_section_$categoryIds'),
+              categoryIds: categoryIds,
+            ),
+          ),
+          const SizedBox(height: 32),
+          const _PartnerSection(),
+          const SizedBox(height: 32),
+          const _NewsSection(),
+          SizedBox(height: 140 + context.mediaQueryPadding.bottom),
+        ],
       ),
     );
   }
@@ -227,6 +225,7 @@ class __PromoBannerState extends State<_PromoBanner> {
 }
 
 List<CategoryModel>? _categories;
+int? _categoryIdSelected;
 
 class _CategorySection extends StatefulWidget {
   final ValueNotifier<CategoryModel?> categoryNotifier;
@@ -248,7 +247,11 @@ class __CategorySectionState extends State<_CategorySection> {
     if (response.isSuccess) {
       _categories = response.data;
       if (_categories != null && _categories!.isNotEmpty) {
-        widget.categoryNotifier.value = _categories!.first;
+        widget.categoryNotifier.value = _categories!.firstWhere(
+          (category) => category.id == _categoryIdSelected,
+          orElse: () => _categories!.first,
+        );
+        _categoryIdSelected = widget.categoryNotifier.value?.id;
       }
     }
     if (mounted) {
@@ -313,7 +316,9 @@ class __CategorySectionState extends State<_CategorySection> {
                             imageUrl: category.image ?? '',
                             isSelected: value?.id == category.id,
                             onTap: () {
+                              appHaptic();
                               widget.categoryNotifier.value = category;
+                              _categoryIdSelected = category.id;
                             },
                           );
                         }).toList(),
@@ -340,7 +345,7 @@ class __FastestDeliverySectionState extends State<_FastestDeliverySection> {
   @override
   void initState() {
     super.initState();
-    _fetchFastestDeliveryProducts();
+    if (widget.categoryIds != null) _fetchFastestDeliveryProducts();
   }
 
   void _fetchFastestDeliveryProducts() async {
@@ -398,7 +403,7 @@ class __RestaurantHighRatingState extends State<_RestaurantHighRating> {
   @override
   void initState() {
     super.initState();
-    _fetchRestaurantHighRating();
+    if (widget.categoryIds != null) _fetchRestaurantHighRating();
   }
 
   void _fetchRestaurantHighRating() async {
@@ -461,7 +466,7 @@ class __RestaurantDiscountSectionState
   @override
   void initState() {
     super.initState();
-    _fetchRestaurantDiscounts();
+    if (widget.category != null) _fetchRestaurantDiscounts();
   }
 
   void _fetchRestaurantDiscounts() async {
@@ -573,7 +578,7 @@ class __RecommendedSectionState extends State<_RecommendedSection> {
   @override
   void initState() {
     super.initState();
-    _fetchRecommendedProducts();
+    if (widget.categoryIds != null) _fetchRecommendedProducts();
   }
 
   void _fetchRecommendedProducts() async {
@@ -631,7 +636,7 @@ class __BestSellerSectionState extends State<_BestSellerSection> {
   @override
   void initState() {
     super.initState();
-    _fetchBestSellerProducts();
+    if (widget.categoryIds != null) _fetchBestSellerProducts();
   }
 
   void _fetchBestSellerProducts() async {
@@ -900,7 +905,7 @@ class _LocationHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Deliver to',
+                'Deliver to'.tr(),
                 style:
                     w400TextStyle(fontSize: 14.sw, color: hexColor('#757575')),
               ),
