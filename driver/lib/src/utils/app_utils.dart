@@ -6,12 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
-// import 'dart:html' as html;
 
-// setFriendlyRouteName({required String title, required String url}) {
-//   html.document.title = title;
-//   html.window.history.pushState(null, title, url);
-// }
+
 
 bool appIsBottomSheetOpen = false;
 Future<T> appOpenBottomSheet<T>(
@@ -61,7 +57,8 @@ appOpenDialog(Widget child, {bool barrierDismissible = true}) async {
     },
     transitionBuilder: (context, anim1, anim2, child) {
       return SlideTransition(
-        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(anim1),
+        position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0))
+            .animate(anim1),
         child: child,
       );
     },
@@ -142,7 +139,8 @@ void appOpenDateTimePicker(DateTime? date, Function(DateTime date) onConfirm,
   }
 }
 
-void appOpenTimePicker(DateTime? date, Function(DateTime date) onConfirm, {title}) async {
+void appOpenTimePicker(DateTime? date, Function(DateTime date) onConfirm,
+    {title}) async {
   date ??= DateTime.now();
   final rs = await appOpenBottomSheet(
       WidgetBottomPickTime(

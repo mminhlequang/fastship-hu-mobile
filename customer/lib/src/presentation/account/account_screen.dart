@@ -1,7 +1,14 @@
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_dialog_confirm.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
+
+import '../widgets/widget_appbar.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -21,185 +28,120 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          margin: EdgeInsets.symmetric(horizontal: 16.sw),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(),
-              _buildOrangeBanner(),
-              _buildProfileSection(),
-              _buildPointsAndVouchersSection(),
-              _buildMenuSection(),
-              _buildSupportSection(),
-              _buildLogoutButton(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.only(top: 11, left: 16, right: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
         children: [
-          Text(
-            '9:41',
-            style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Urbanist',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-              height: 1.4,
+          WidgetAppBar(
+            showBackButton: false,
+            title: 'Profile Settings'.tr(),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildProfileSection(),
+                  _buildMenuSection(),
+                  _buildSupportSection(),
+                  _buildLogoutButton(),
+                  SizedBox(height: 120),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 14),
-          Text(
-            'Profile Settings',
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 22,
-              color: const Color(0xFF120F0F),
-              fontWeight: FontWeight.w500,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Image.network(
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/02f7ebb29b0d1a1a4f19a44cc7e0dc293b2be4f9?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-              width: double.infinity,
-              fit: BoxFit.contain),
         ],
-      ),
-    );
-  }
-
-  Widget _buildOrangeBanner() {
-    return Container(
-      height: 139,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF17228),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
       ),
     );
   }
 
   Widget _buildProfileSection() {
-    return Container(
-      // margin: const EdgeInsets.only(top:  118),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Image.network(
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/cd4af61ec1e39056015f3d9a2ad523c06ff0480d?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-              width: 64,
-              height: 64,
-              fit: BoxFit.contain),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+    return Stack(
+      children: [
+        Container(
+          height: 140,
+          decoration: BoxDecoration(
+            color: appColorPrimaryOrange,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 20, left: 16, right: 16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  WidgetAvatar(
+                    imageUrl: AppPrefs.instance.user?.avatar ?? '',
+                    radius1: 64 / 2,
+                    radius2: 64 / 2 - 2,
+                    radius3: 64 / 2 - 2,
+                    borderColor: Colors.white,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Frances Swann',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Fredoka',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Silver',
-                                style: TextStyle(
-                                  color: const Color(0xFF878787),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  AppPrefs.instance.user?.name ?? '',
+                                  style: w500TextStyle(
+                                    fontSize: 22.sw,
+                                    color: Colors.white,
+                                  ),
                                 ),
+                                const SizedBox(width: 8),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppPrefs.instance.user?.phone ?? '',
+                              style: w400TextStyle(
+                                fontSize: 14.sw,
+                                color: const Color(0xFFF1EFE9),
                               ),
-                              const SizedBox(width: 4),
-                              Image.network(
-                                'https://cdn.builder.io/api/v1/image/assets/TEMP/8228b2d08d101e44d7d90fcdb742214cb41e82de?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.contain,
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                        SizedBox(width: 24, height: 24),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Albertstevano@gmail.com',
-                      style: TextStyle(
-                        color: const Color(0xFFF1EFE9),
-                        fontFamily: 'Fredoka',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                  ),
+                ],
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                SizedBox(width: 24, height: 24),
-              ],
-            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildInfoItem('Point', '10000 Point', 'icon74'),
+                    _buildInfoItem('Voucher', '400+ voucher', 'icon73'),
+                  ],
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPointsAndVouchersSection() {
-    return Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildInfoItem('Point', '10000 Point',
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/84039867190610438682158d072199e48e4ad534?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-          _buildInfoItem('Voucher', '400+ voucher',
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/41197bfbf2e94ee4832b859ad33d972aff3f3158?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -214,11 +156,10 @@ class _AccountScreenState extends State<AccountScreen> {
             borderRadius: BorderRadius.circular(100),
           ),
           child: Center(
-            child: Image.network(
+            child: WidgetAppSVG(
               imageUrl,
               width: 28,
               height: 28,
-              fit: BoxFit.contain,
             ),
           ),
         ),
@@ -228,21 +169,17 @@ class _AccountScreenState extends State<AccountScreen> {
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: w500TextStyle(
+                fontSize: 16.sw,
                 color: const Color(0xFF120F0F),
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               value,
-              style: TextStyle(
-                color: const Color(0xFFF17228),
-                fontFamily: 'Fredoka',
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+              style: w400TextStyle(
+                fontSize: 14.sw,
+                color: appColorPrimaryOrange,
               ),
             ),
           ],
@@ -253,7 +190,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _buildMenuSection() {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
+      margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -262,13 +199,18 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
       child: Column(
         children: [
-          _buildMenuItem('Personal Data', 'URL_profile'),
-          _buildMenuItem('My Favorite',
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/d26cbd321bbc8a48ace9503f5c2105a346ed5522?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-          _buildMenuItem('Extra Card',
-              'https://cdn.builder.io/api/v1/image/assets/TEMP/395e6fbd712c94bc29c9ac08a07ff4d118871b48?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-          _buildMenuItem('Settings', 'URL_settings'),
-          _buildMenuItem('Security', 'URL_shield'),
+          _buildMenuItem('Personal Data', 'icon70', () {
+            appContext.push("/personal-data");
+          }),
+          _buildMenuItem('My Favorite', 'icon65', () {
+            appContext.push("/my-favorite");
+          }),
+          _buildMenuItem('Settings', 'icon71', () {
+            appContext.push("/settings");
+          }),
+          _buildMenuItem('Security', 'icon72', () {
+            appContext.push("/security");
+          }),
         ],
       ),
     );
@@ -279,20 +221,17 @@ class _AccountScreenState extends State<AccountScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 16, left: 16),
+          padding: const EdgeInsets.only(top: 16, left: 24),
           child: Text(
-            'Support',
-            style: TextStyle(
+            'Support'.tr(),
+            style: w400TextStyle(
+              fontSize: 14.sw,
               color: const Color(0xFF878787),
-              fontFamily: 'Fredoka',
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.14,
             ),
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(top: 7),
+          margin: const EdgeInsets.only(top: 7, left: 16, right: 16),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -301,10 +240,20 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           child: Column(
             children: [
-              _buildMenuItem('Help Center',
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/5e0a2751b550a8b4f5d31439eea07e0030c576cc?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215'),
-              _buildMenuItem('Request Account Deletion', 'URL_profile'),
-              _buildMenuItem('Add another account', 'URL_profile'),
+              _buildMenuItem('Help Center', 'icon67', () {
+                appContext.push("/help-center");
+              }),
+              _buildMenuItem('Request Account Deletion', 'icon70', () async {
+                final r = await appOpenDialog(WidgetDialogConfirm(
+                  title: "Request Account Deletion".tr(),
+                  message: "Are you sure you want to delete your account?".tr(),
+                ));
+                if (r) {
+                  // authCubit.logout();
+                  // appContext.pushReplacement("/auth");
+                }
+              }),
+              // _buildMenuItem('Add another account', 'icon70'),
             ],
           ),
         ),
@@ -312,49 +261,55 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildMenuItem(String title, String imageUrl) {
+  Widget _buildMenuItem(String title, String imageUrl, [VoidCallback? onTap]) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF4F4F4),
-              borderRadius: BorderRadius.circular(100),
-            ),
-            child: Center(
-              child: Image.network(
-                imageUrl,
-                width: 24,
-                height: 24,
-                fit: BoxFit.contain,
+      child: WidgetInkWellTransparent(
+        enableInkWell: false,
+        onTap: () {
+          appHaptic();
+          if (onTap != null) {
+            onTap();
+          }
+        },
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF4F4F4),
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Center(
+                child: WidgetAppSVG(
+                  imageUrl,
+                  width: 24,
+                  height: 24,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: w400TextStyle(
+                  fontSize: 16.sw,
+                  color: const Color(0xFF3C3836),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
                 color: const Color(0xFF3C3836),
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
               ),
             ),
-          ),
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: const Color(0xFF3C3836),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -363,31 +318,40 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       child: TextButton(
-        onPressed: () {},
+        onPressed: () async {
+          appHaptic();
+          final r = await appOpenDialog(WidgetDialogConfirm(
+            title: "Log out".tr(),
+            message: "Are you sure you want to log out?".tr(),
+          ));
+          if (r) {
+            authCubit.logout();
+            appContext.pushReplacement("/auth");
+          }
+        },
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(120),
-            side: BorderSide(color: const Color(0xFFF17228)),
+            side: BorderSide(color: appColorPrimaryOrange),
           ),
           backgroundColor: Colors.white,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.logout,
-              color: const Color(0xFFF17228),
-              size: 24,
+            WidgetAppSVG(
+              'icon69',
+              color: appColorPrimaryOrange,
+              width: 24,
+              height: 24,
             ),
             const SizedBox(width: 10),
             Text(
-              'Log out',
-              style: TextStyle(
-                color: const Color(0xFFF17228),
-                fontFamily: 'Fredoka',
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
+              'Log out'.tr(),
+              style: w400TextStyle(
+                fontSize: 18.sw,
+                color: appColorPrimaryOrange,
               ),
             ),
           ],

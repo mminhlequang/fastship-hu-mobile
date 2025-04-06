@@ -89,10 +89,11 @@ class WidgetRestaurantCard extends StatelessWidget {
                     children: [
                       // if (discount != null)
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        height: 28.sw,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: Color(0xFFF17228),
+                          border: Border.all(color: Color(0xFFF17228)),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -111,8 +112,8 @@ class WidgetRestaurantCard extends StatelessWidget {
                       ),
                       SizedBox(width: 12),
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        height: 28.sw,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           border: Border.all(color: Color(0xFFFFAB17)),
                           borderRadius: BorderRadius.circular(12),
@@ -125,7 +126,7 @@ class WidgetRestaurantCard extends StatelessWidget {
                                 height: 16),
                             SizedBox(width: 2),
                             Text(
-                              '15-20m',
+                              '15m',
                               style: w400TextStyle(
                                 color: Color(0xFFFFAB17),
                                 fontSize: 14.sw,

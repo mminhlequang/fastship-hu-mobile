@@ -1,17 +1,22 @@
+import 'package:network_resources/enums.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:network_resources/order/models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetailScreen extends StatefulWidget {
-  const OrderDetailScreen({super.key});
+  const OrderDetailScreen({super.key, required this.order});
+
+  final OrderModel order;
 
   @override
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
@@ -45,7 +50,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
       };
 
   Future<void> _onPhoneCall() async {
-    var url = Uri.parse('tel:+36 9830268966');
+    var url = Uri.parse('tel:${widget.order.phone ?? '+36 9830268966'}');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -348,12 +353,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Gong Cha Bubble Tea',
+                              widget.order.store?.name ?? 'Gong Cha Bubble Tea',
                               style: w400TextStyle(),
                             ),
                             Gap(2.sw),
                             Text(
-                              '41 Quang Trung, Ward 3, Go Vap District',
+                              widget.order.store?.address ??
+                                  '41 Quang Trung, Ward 3, Go Vap District',
                               style: w400TextStyle(color: grey1),
                             ),
                           ],
@@ -362,7 +368,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       Gap(12.sw),
                       WidgetRippleButton(
                         onTap: () {
-                          // Todo:
+                          // TODO: Implement store direction
                         },
                         radius: 99,
                         borderSide: BorderSide(color: hexColor('#E3E3E3')),
@@ -386,7 +392,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                       children: [
                         TextSpan(
-                          text: '\$0',
+                          text: currencyFormatted(widget.order.total),
                           style: w400TextStyle(color: darkGreen),
                         ),
                       ],
@@ -397,7 +403,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.sw),
                   child: Text(
-                    '${'Status'.tr()}: Order received',
+                    '${'Status'.tr()}: ${widget.order.processStatus ?? 'Order received'}',
                     style: w400TextStyle(color: grey1),
                   ),
                 ),
@@ -468,7 +474,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       ),
                       Gap(2.sw),
                       Text(
-                        'Đơn hàng đã được chuẩn bị',
+                        widget.order.note?.toString() ??
+                            'Đơn hàng đã được chuẩn bị',
                         style: w400TextStyle(),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -490,87 +497,52 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 ),
                 Gap(4.sw),
                 Text(
-                  '${'Quantity'.tr()}: 3',
+                  '${'Quantity'.tr()}: ${widget.order.items?.length ?? 0}',
                   style: w400TextStyle(),
                 ),
                 Gap(8.sw),
                 ...List.generate(
-                  2,
+                  widget.order.items?.length ?? 0,
                   (index) {
+                    final item = widget.order.items![index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.sw),
-                          child: Text(
-                            'CATEGORY ${index + 1}',
-                            style: w600TextStyle(fontSize: 12.sw),
-                          ),
+                        Gap(8.sw),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 6,
+                              child: Text(
+                                '${index + 1}. ${item.toString()}',
+                                style: w400TextStyle(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  '1',
+                                  style: w400TextStyle(color: darkGreen),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  currencyFormatted(widget.order.total),
+                                  style: w400TextStyle(),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
-                        ...List.generate(2, (index) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Gap(8.sw),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 6,
-                                    child: Text(
-                                      '0${index + 1}. PRODUCT ${index + 1}',
-                                      style: w400TextStyle(),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Center(
-                                      child: Text(
-                                        '1',
-                                        style: w400TextStyle(color: darkGreen),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        '\$15',
-                                        style: w400TextStyle(),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Gap(2.sw),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Size M. Less ice',
-                                      style: w400TextStyle(
-                                        fontSize: 12.sw,
-                                        color: grey1,
-                                      ),
-                                    ),
-                                  ),
-                                  if (index == 1)
-                                    Text(
-                                      '\$12',
-                                      style: w400TextStyle(
-                                        fontSize: 12.sw,
-                                        color: grey1,
-                                        decoration: TextDecoration.lineThrough,
-                                      ),
-                                    )
-                                ],
-                              ),
-                              Gap(8.sw),
-                              if (index != 1) const AppDivider(),
-                            ],
-                          );
-                        })
+                        Gap(8.sw),
+                        if (index != (widget.order.items?.length ?? 0) - 1)
+                          const AppDivider(),
                       ],
                     );
                   },
@@ -597,7 +569,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -611,7 +583,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.discount),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -625,7 +597,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -639,7 +611,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
@@ -666,7 +638,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
@@ -693,11 +665,27 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$5',
+                      currencyFormatted(widget.order.shipFee),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
                 ),
+                if (widget.order.tip != null && widget.order.tip! > 0) ...[
+                  Gap(4.sw),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tiền tip'.tr(),
+                        style: w400TextStyle(color: grey1),
+                      ),
+                      Text(
+                        currencyFormatted(widget.order.tip),
+                        style: w400TextStyle(color: darkGreen),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -724,12 +712,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Hai Dang',
+                              widget.order.customer?.name ?? 'Hai Dang',
                               style: w400TextStyle(),
                             ),
                             Gap(2.sw),
                             Text(
-                              '41 Quang Trung, Ward 3, Go Vap District',
+                              widget.order.address ??
+                                  '41 Quang Trung, Ward 3, Go Vap District',
                               style: w400TextStyle(color: grey1),
                             ),
                           ],
@@ -738,7 +727,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       Gap(12.sw),
                       WidgetRippleButton(
                         onTap: () {
-                          // Todo:
+                          // TODO: Implement customer direction
                         },
                         radius: 99,
                         borderSide: BorderSide(color: hexColor('#E3E3E3')),
@@ -762,7 +751,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                       children: [
                         TextSpan(
-                          text: '\$15',
+                          text: currencyFormatted(widget.order.total),
                           style: w400TextStyle(color: darkGreen),
                         ),
                       ],
@@ -794,70 +783,58 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   'Order Details'.tr(),
                   style: w600TextStyle(),
                 ),
-                ...List.generate(4, (index) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Gap(8.sw),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 6,
-                            child: Text(
-                              '0${index + 1}. PRODUCT ${index + 1}',
-                              style: w400TextStyle(),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Center(
+                Gap(4.sw),
+                Text(
+                  '${'Quantity'.tr()}: ${widget.order.items?.length ?? 0}',
+                  style: w400TextStyle(),
+                ),
+                Gap(8.sw),
+                ...List.generate(
+                  widget.order.items?.length ?? 0,
+                  (index) {
+                    final item = widget.order.items![index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Gap(8.sw),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 6,
                               child: Text(
-                                '1',
-                                style: w400TextStyle(color: darkGreen),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                '\$15',
+                                '${index + 1}. ${item.toString()}',
                                 style: w400TextStyle(),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                      Gap(2.sw),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Size M. Less ice',
-                              style: w400TextStyle(
-                                fontSize: 12.sw,
-                                color: grey1,
+                            Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  '1',
+                                  style: w400TextStyle(color: darkGreen),
+                                ),
                               ),
                             ),
-                          ),
-                          if (index == 1)
-                            Text(
-                              '\$12',
-                              style: w400TextStyle(
-                                fontSize: 12.sw,
-                                color: grey1,
-                                decoration: TextDecoration.lineThrough,
+                            Expanded(
+                              flex: 1,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  currencyFormatted(widget.order.total),
+                                  style: w400TextStyle(),
+                                ),
                               ),
                             )
-                        ],
-                      ),
-                      Gap(8.sw),
-                      if (index != 3) const AppDivider(),
-                    ],
-                  );
-                }),
+                          ],
+                        ),
+                        Gap(8.sw),
+                        if (index != (widget.order.items?.length ?? 0) - 1)
+                          const AppDivider(),
+                      ],
+                    );
+                  },
+                )
               ],
             ),
           ),
@@ -880,7 +857,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -894,7 +871,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.discount),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -908,7 +885,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: grey1),
                     ),
                   ],
@@ -922,7 +899,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
@@ -949,7 +926,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$0',
+                      currencyFormatted(widget.order.total),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
@@ -976,11 +953,27 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       style: w400TextStyle(color: grey1),
                     ),
                     Text(
-                      '\$5',
+                      currencyFormatted(widget.order.shipFee),
                       style: w400TextStyle(color: darkGreen),
                     ),
                   ],
                 ),
+                if (widget.order.tip != null && widget.order.tip! > 0) ...[
+                  Gap(4.sw),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tiền tip'.tr(),
+                        style: w400TextStyle(color: grey1),
+                      ),
+                      Text(
+                        currencyFormatted(widget.order.tip),
+                        style: w400TextStyle(color: darkGreen),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

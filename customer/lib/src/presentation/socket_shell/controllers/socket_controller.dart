@@ -2,8 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/checkout/widgets/widget_rating_driver.dart';
+import 'package:app/src/presentation/widgets/widget_dialog_notification.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/network_resources/model/model.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/enums.dart';
@@ -21,7 +26,8 @@ class CustomerSocketController {
 
   OrderModel? order;
 
-  // ValueNotifier để theo dõi trạng thái kết nối socket
+  final ValueNotifier<AppOrderProcessStatus?> orderStatus =
+      ValueNotifier<AppOrderProcessStatus?>(null);
   final ValueNotifier<bool> socketConnected = ValueNotifier<bool>(false);
   final ValueNotifier<LatLng?> driverLocation = ValueNotifier<LatLng?>(null);
 
@@ -74,22 +80,83 @@ class CustomerSocketController {
 
       // Xử lý khi trạng thái đơn hàng thay đổi
       socket?.on('order_status_updated', (data) {
-        debugPrint('Debug socket: Trạng thái đơn hàng đã cập nhật');
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess && socketResponse.data != null) {
+          orderStatus.value = AppOrderProcessStatus.values
+              .byName(socketResponse.data!['processStatus']);
+
+          debugPrint(
+              '[Debug socket] order_status_updated: ${socketResponse.data}');
+
+          appShowSnackBar(
+            context: appContext,
+            msg: orderStatus.value?.textNotification ?? "Unknown",
+            type: AppSnackBarType.notitfication,
+          );
+        }
+      });
+
+      socket?.on('order_completed', (data) async {
+        debugPrint('Debug socket: order_completed: $data');
         appShowSnackBar(
           context: appContext,
-          msg: "order_status_updated: $data",
+          msg: "order_completed: $data",
           type: AppSnackBarType.notitfication,
         );
+
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess && socketResponse.data != null) {
+          orderStatus.value = AppOrderProcessStatus.values
+              .byName(socketResponse.data!['processStatus']);
+
+          debugPrint(
+              '[Debug socket] order_status_updated: ${socketResponse.data}');
+
+          appContext.pop();
+          await appOpenDialog(WidgetDialogNotification(
+              icon: 'icon58',
+              title: "Driver Has Arrived!".tr(),
+              message: "Enjoy your meal!\nSee you in the next order :)",
+              buttonText: "Done".tr(),
+              onPressed: () {
+                appHaptic();
+                appContext.pop();
+              }));
+          appOpenBottomSheet(WidgetRatingDriver());
+
+          appShowSnackBar(
+            context: appContext,
+            msg: orderStatus.value?.textNotification ?? "Unknown",
+            type: AppSnackBarType.notitfication,
+          );
+        }
       });
 
       // Xử lý khi đơn hàng bị hủy
-      socket?.on('order_cancelled', (data) {
+      socket?.on('order_cancelled', (data) async {
         debugPrint('Debug socket: Đơn hàng đã bị hủy');
         appShowSnackBar(
           context: appContext,
           msg: "order_cancelled: $data",
           type: AppSnackBarType.notitfication,
         );
+
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess && socketResponse.data != null) {
+          orderStatus.value = AppOrderProcessStatus.values
+              .byName(socketResponse.data!['processStatus']);
+
+          appContext.pop();
+          await appOpenDialog(WidgetDialogNotification(
+              icon: 'icon60',
+              title: "Order Cancelled!".tr(),
+              message: "Your order has been cancelled.\nPlease try again.",
+              buttonText: "Done".tr(),
+              onPressed: () {
+                appHaptic();
+                appContext.pop();
+              }));
+        }
       });
 
       // Xử lý lỗi
@@ -173,6 +240,7 @@ class CustomerSocketController {
     socket?.dispose();
     socketConnected.dispose();
     driverLocation.dispose();
+    orderStatus.dispose();
   }
 
   // Phương thức trợ giúp phân tích phản hồi từ socket
@@ -203,5 +271,47 @@ class CustomerSocketController {
 
   void onNoSocketConnection() {
     debugPrint("debug socket: No socket connection");
+  }
+}
+
+extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
+  String get textNotification {
+    switch (this) {
+      case AppOrderProcessStatus.pending:
+        return "Pending";
+      case AppOrderProcessStatus.findDriver:
+        return "Finding driver";
+      case AppOrderProcessStatus.driverArrivedStore:
+        return "Driver arrived at store";
+      case AppOrderProcessStatus.driverPicked:
+        return "Driver picked up";
+      case AppOrderProcessStatus.driverArrivedDestination:
+        return "Driver arrived at destination";
+      case AppOrderProcessStatus.completed:
+        return "Order completed";
+      case AppOrderProcessStatus.cancelled:
+        return "Order cancelled";
+      default:
+        return "Unknown";
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case AppOrderProcessStatus.driverAccepted:
+        return "Driver accepted your order";
+      case AppOrderProcessStatus.driverArrivedStore:
+        return "Driver arrived at store, waiting to pick up";
+      case AppOrderProcessStatus.driverPicked:
+        return "Driver picked up your order";
+      case AppOrderProcessStatus.driverArrivedDestination:
+        return "Driver arrived at destination, waiting to deliver";
+      case AppOrderProcessStatus.completed:
+        return "Order completed";
+      case AppOrderProcessStatus.cancelled:
+        return "Order cancelled";
+      default:
+        return "Unknown";
+    }
   }
 }

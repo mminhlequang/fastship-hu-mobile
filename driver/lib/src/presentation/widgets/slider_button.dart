@@ -49,6 +49,7 @@ class SliderButton extends StatefulWidget {
   final DismissDirection direction;
 
   SliderButton({
+    super.key,
     required this.action,
     this.radius = 100,
     this.border,

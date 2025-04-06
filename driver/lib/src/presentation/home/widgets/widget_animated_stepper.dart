@@ -5,58 +5,40 @@ import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'dart:async';
 
-class WidgetAnimatedStepper extends StatefulWidget {
-  const WidgetAnimatedStepper({super.key, required this.currentStep});
+import 'package:network_resources/enums.dart';
 
-  final double currentStep;
+class WidgetAnimatedStepper extends StatefulWidget {
+  const WidgetAnimatedStepper({super.key, required this.status});
+
+  final AppOrderProcessStatus status;
 
   @override
   State<WidgetAnimatedStepper> createState() => _WidgetAnimatedStepperState();
 }
 
 class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
-  double progress = 0.0;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startProgressAnimation();
-  }
-
-  void _startProgressAnimation() {
-    _timer = Timer.periodic(Duration(milliseconds: 50), (timer) {
-      setState(() {
-        progress += 0.025;
-        if (progress >= 1.0) {
-          progress = 0.0;
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
+  final List<AppOrderProcessStatus> totalStep = [
+    AppOrderProcessStatus.driverArrivedStore,
+    AppOrderProcessStatus.driverPicked,
+    AppOrderProcessStatus.driverArrivedDestination,
+    AppOrderProcessStatus.completed,
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(3, (index) {
-        bool isCompleted = widget.currentStep >= index;
-        bool isInProgress = widget.currentStep >= index && widget.currentStep < index + 1;
-
-        return index == 2
+      children: List.generate(totalStep.length, (index) {
+        bool isCompleted = widget.status.index >= totalStep[index].index;
+        return index == totalStep.length - 1
             ? Stack(
                 clipBehavior: Clip.none,
                 alignment: Alignment.bottomCenter,
                 children: [
                   WidgetAppSVG(
-                    _getStepIcon(index, isCompleted: isCompleted),
+                    _getStepIcon(totalStep[index]),
                     width: 24.sw,
+                    color: isCompleted ? darkGreen : grey1,
                   ),
                   Positioned(
                     bottom: -19.sw,
@@ -78,13 +60,14 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
                       alignment: Alignment.bottomCenter,
                       children: [
                         WidgetAppSVG(
-                          _getStepIcon(index, isCompleted: isCompleted),
+                          _getStepIcon(totalStep[index]),
                           width: 24.sw,
+                          color: isCompleted ? darkGreen : grey1,
                         ),
                         Positioned(
                           bottom: -19.sw,
                           child: Text(
-                            index == 0 ? 'Picked'.tr() : 'Delivery'.tr(),
+                            _getStepText(totalStep[index]),
                             style: w400TextStyle(
                               fontSize: 12.sw,
                               color: isCompleted ? darkGreen : grey1,
@@ -94,17 +77,13 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
                       ],
                     ),
                     Expanded(
-                      child: !isInProgress
-                          ? Container(
-                              height: 3.sw,
-                              color: isCompleted ? darkGreen : hexColor('#E0E0E0'),
-                            )
-                          : LinearProgressIndicator(
-                              value: progress,
-                              backgroundColor: darkGreen.withValues(alpha: .15),
-                              valueColor: AlwaysStoppedAnimation<Color>(darkGreen),
-                              minHeight: 3.sw,
-                            ),
+                      child: Container(
+                        height: 3.sw,
+                        color:
+                            (widget.status.index >= totalStep[index + 1].index)
+                                ? darkGreen
+                                : hexColor('#E0E0E0'),
+                      ),
                     ),
                   ],
                 ),
@@ -113,14 +92,33 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
     );
   }
 
-  String _getStepIcon(int index, {bool isCompleted = false}) {
-    switch (index) {
-      case 0:
-        return assetsvg(isCompleted ? 'ic_picked_on' : 'ic_picked_off');
-      case 1:
-        return assetsvg(isCompleted ? 'ic_delivering_on' : 'ic_delivering_off');
+  String _getStepText(AppOrderProcessStatus status) {
+    switch (status) {
+      case AppOrderProcessStatus.driverArrivedStore:
+        return 'I\'m at store'.tr();
+      case AppOrderProcessStatus.driverPicked:
+        return 'Picked'.tr();
+      case AppOrderProcessStatus.driverArrivedDestination:
+        return 'I\'m at destination'.tr();
+      case AppOrderProcessStatus.completed:
+        return 'Completed'.tr();
       default:
-        return assetsvg(isCompleted ? 'ic_delivered_on' : 'ic_delivered_off');
+        return '';
+    }
+  }
+
+  String _getStepIcon(
+    AppOrderProcessStatus status,
+  ) {
+    switch (status) {
+      case AppOrderProcessStatus.driverArrivedStore:
+        return assetsvg('ic_picked_on'); //TODO: change icon
+      case AppOrderProcessStatus.driverPicked:
+        return assetsvg('ic_picked_on');
+      case AppOrderProcessStatus.driverArrivedDestination:
+        return assetsvg('ic_delivering_on');
+      default:
+        return assetsvg('ic_delivered_on');
     }
   }
 }

@@ -2,25 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:network_resources/enums.dart';
+import 'package:network_resources/order/models/models.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:vibration/vibration.dart';
 
 import '../../../constants/app_constants.dart';
 import '../models/socket_response.dart';
-import '../models/order_model.dart';
-
-enum DriverOrderStatus {
-  waiting, // Tài xế đang đợi đơn mới
-  newOrder, // Có đơn mới gửi đến
-  accepted, // Tài xế đã xác nhận nhận đơn
-  picked, // Tài xế đã lấy đơn
-  inProgress, // Tài xế đang di chuyển đến điểm giao
-  completed, // Đơn hoàn thành
-  canceled, // Đơn bị hủy
-}
 
 SocketController get socketController => findInstance<SocketController>();
 
@@ -28,41 +20,31 @@ class SocketController {
   IO.Socket? socket;
   Timer? _locationTimer;
   bool _isOnline = false;
-  Map<String, dynamic>? _currentOrder;
-  DriverOrderStatus _orderStatus = DriverOrderStatus.waiting;
+  OrderModel? currentOrder;
+
+  int? responseTimeout;
+  DateTime? timestampOrderReceived;
+
+  final ValueNotifier<AppOrderProcessStatus> orderStatus =
+      ValueNotifier<AppOrderProcessStatus>(AppOrderProcessStatus.pending);
   final ValueNotifier<bool> socketConnected = ValueNotifier<bool>(false);
   final ValueNotifier<LatLng?> currentLocation = ValueNotifier<LatLng?>(null);
 
-
   // Callback cho việc cập nhật UI
-  Function(Map<String, dynamic>)? onNewOrder;
-  Function(Map<String, dynamic>)? onOrderCanceled;
-  Function(Map<String, dynamic>)? onOrderStatusUpdated;
+  Function(OrderModel)? onNewOrder;
+  Function(OrderModel)? onOrderCanceled;
+  Function(OrderModel)? onOrderStatusUpdated;
   Function(bool)? onBlinkingChanged;
-  Function(DriverOrderStatus)? onOrderStatusChanged;
   Function()? onPlayNotification;
 
-  // Thêm callback cho phần profile và ví
-  Function(Map<String, dynamic>)? onProfileUpdated;
-  Function(Map<String, dynamic>)? onWalletUpdated;
-
-  // Thêm biến lưu thông tin profile và wallet
-  Map<String, dynamic>? _profile;
-  Map<String, dynamic>? _wallet;
-
-  Map<String, dynamic>? get profile => _profile;
-  Map<String, dynamic>? get wallet => _wallet;
-
   bool get isOnline => _isOnline;
-  DriverOrderStatus get orderStatus => _orderStatus;
-  Map<String, dynamic>? get currentOrder => _currentOrder;
 
   init() {
     _initializeSocket();
     if (AppPrefs.instance.autoActiveOnlineStatus) {
       setOnlineStatus(true);
     }
-  } 
+  }
 
   void _initializeSocket() {
     try {
@@ -80,6 +62,7 @@ class SocketController {
         debugPrint('Debug socket: Đã kết nối thành công');
         socketConnected.value = true;
         _authenticate();
+        socket?.emit("joinRoom", "driver_${AppPrefs.instance.user?.id}");
       });
 
       socket?.onDisconnect((_) {
@@ -87,20 +70,16 @@ class SocketController {
         socketConnected.value = false;
       });
 
-      socket?.on('new_order', (data) {
+      socket?.on('driver_new_order_request', (data) {
         debugPrint('Debug socket: Nhận đơn hàng mới');
         _handleNewOrder(data);
       });
 
-      socket?.on('order_canceled', (data) {
+      socket?.on('order_cancelled', (data) {
         debugPrint('Debug socket: Đơn hàng bị hủy');
-        _handleOrderCanceled(data);
-      });
-
-      socket?.on('order_status_updated', (data) {
-        debugPrint('Debug socket: Trạng thái đơn hàng cập nhật');
-        _handleOrderStatusUpdate(data);
-      });
+        //TODO: Xử lý đơn hàng bị hủy
+        // _handleOrderCanceled(data);
+      }); 
 
       // Thêm xử lý event nhận phản hồi xác thực thành công
       socket?.on('authentication_success', (data) {
@@ -108,22 +87,6 @@ class SocketController {
         final socketResponse = _parseSocketResponse(data);
 
         if (socketResponse.isSuccess) {
-          // Lưu thông tin profile và wallet
-          if (socketResponse.data != null &&
-              socketResponse.data['profile'] != null) {
-            _profile =
-                Map<String, dynamic>.from(socketResponse.data['profile']);
-            onProfileUpdated?.call(_profile!);
-            debugPrint('Debug socket: Đã nhận thông tin profile');
-          }
-
-          if (socketResponse.data != null &&
-              socketResponse.data['wallet'] != null) {
-            _wallet = Map<String, dynamic>.from(socketResponse.data['wallet']);
-            onWalletUpdated?.call(_wallet!);
-            debugPrint('Debug socket: Đã nhận thông tin wallet');
-          }
-
           // Khôi phục trạng thái online/offline
           if (_isOnline) {
             debugPrint('Debug socket: Khôi phục trạng thái online');
@@ -170,7 +133,7 @@ class SocketController {
 
   void setOnlineStatus(bool isOnline) {
     debugPrint('Debug socket: Đặt trạng thái online: $isOnline');
-    _isOnline = isOnline; 
+    _isOnline = isOnline;
 
     // Gửi trạng thái lên server
     _emitDriverStatus(isOnline);
@@ -188,19 +151,7 @@ class SocketController {
         'Debug socket: Gửi trạng thái tài xế: ${isOnline ? 'online' : 'offline'}');
     if (socket?.connected == true) {
       socket?.emit(
-          'driver_status_update', {'status': isOnline ? 'online' : 'offline'});
-
-      // Thêm xử lý phản hồi từ server
-      socket?.once('driver_status_updated', (data) {
-        final socketResponse = _parseSocketResponse(data);
-        if (socketResponse.isSuccess) {
-          debugPrint(
-              'Debug socket: Trạng thái đã được cập nhật: ${socketResponse.data?['status']}');
-        } else {
-          debugPrint(
-              'Debug socket: Lỗi cập nhật trạng thái: ${socketResponse.messageCode}');
-        }
-      });
+          'driver_update_status', {'status': isOnline ? 'online' : 'offline'});
     } else {
       debugPrint(
           'Debug socket: Không thể gửi trạng thái vì socket chưa kết nối');
@@ -210,7 +161,8 @@ class SocketController {
   void _startLocationUpdates() {
     debugPrint('Debug socket: Bắt đầu cập nhật vị trí');
     _locationTimer?.cancel();
-    _locationTimer = Timer.periodic(const Duration(seconds: kDebugMode ?60 : 30), (_) {
+    _locationTimer =
+        Timer.periodic(const Duration(seconds: kDebugMode ? 60 : 30), (_) {
       debugPrint('Debug socket: Timer cập nhật vị trí kích hoạt');
       _sendCurrentLocation();
     });
@@ -236,25 +188,17 @@ class SocketController {
       );
       currentLocation.value = LatLng(position.latitude, position.longitude);
 
+      //TODO: remove later
+      currentLocation.value = LatLng(47.495987, 19.0653861);
+
       debugPrint(
           'Debug socket: Đã lấy vị trí: ${position.latitude}, ${position.longitude}');
 
       if (socket?.connected == true && _isOnline) {
         debugPrint('Debug socket: Gửi vị trí lên server');
-        socket?.emit('update_location', {
+        socket?.emit('driver_update_location', {
           'latitude': position.latitude,
           'longitude': position.longitude,
-        });
-
-        // Đăng ký lắng nghe phản hồi từ server
-        socket?.once('location_updated', (data) {
-          final socketResponse = _parseSocketResponse(data);
-          if (socketResponse.isSuccess) {
-            debugPrint('Debug socket: Vị trí đã được cập nhật thành công');
-          } else {
-            debugPrint(
-                'Debug socket: Lỗi cập nhật vị trí: ${socketResponse.messageCode}');
-          }
         });
       } else {
         debugPrint(
@@ -266,27 +210,26 @@ class SocketController {
   }
 
   void _handleNewOrder(dynamic data) {
-    debugPrint('Debug socket: Xử lý đơn hàng mới');
     final socketResponse = _parseSocketResponse(data);
 
     if (socketResponse.isSuccess && socketResponse.data != null) {
       // Chuyển đổi dữ liệu thành đối tượng Order
-      final orderData = socketResponse.data is Map ? socketResponse.data : {};
-
-      // Đảm bảo trường orderId tồn tại
-      if (orderData['id'] != null && orderData['orderId'] == null) {
-        orderData['orderId'] = orderData['id'];
-      }
-
-      _currentOrder = Map<String, dynamic>.from(orderData);
-      _orderStatus = DriverOrderStatus.newOrder;
+      // {
+      //   order: order.getOrderData(),
+      //   responseTimeout: 30, // Thời gian chờ phản hồi (giây)
+      //   timestamp: new Date().toISOString()
+      // }
+      final driverNewOrder = DriverNewOrderModel.fromJson(socketResponse.data);
+      currentOrder = driverNewOrder.order;
+      responseTimeout = driverNewOrder.responseTimeout;
+      timestampOrderReceived = DateTime.parse(driverNewOrder.timestamp!);
+      orderStatus.value = AppOrderProcessStatus.findDriver;
       debugPrint(
-          'Debug socket: Thông tin đơn hàng mới: ${jsonEncode(_currentOrder)}');
+          'Debug socket: Thông tin đơn hàng mới: ${jsonEncode(currentOrder)}');
 
       // Thông báo cho UI
       debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
-      onOrderStatusChanged?.call(_orderStatus);
-      onNewOrder?.call(_currentOrder!);
+      onNewOrder?.call(currentOrder!);
       onPlayNotification?.call();
 
       // Bắt đầu nhấp nháy (thông qua callback)
@@ -302,95 +245,95 @@ class SocketController {
     }
   }
 
-  void _handleOrderCanceled(dynamic data) {
-    debugPrint('Debug socket: Xử lý đơn hàng bị hủy');
-    if (_orderStatus == DriverOrderStatus.inProgress ||
-        _orderStatus == DriverOrderStatus.accepted ||
-        _orderStatus == DriverOrderStatus.picked) {
-      final socketResponse = _parseSocketResponse(data);
+  // void _handleOrderCanceled(dynamic data) {
+  //   debugPrint('Debug socket: Xử lý đơn hàng bị hủy');
+  //   if (_orderStatus == AppOrderProcessStatus.inProgress ||
+  //       _orderStatus == AppOrderProcessStatus.accepted ||
+  //       _orderStatus == AppOrderProcessStatus.picked) {
+  //     final socketResponse = _parseSocketResponse(data);
 
-      if (socketResponse.isSuccess && socketResponse.data != null) {
-        // Chuẩn hóa dữ liệu đơn hàng
-        final orderData = socketResponse.data is Map ? socketResponse.data : {};
+  //     if (socketResponse.isSuccess && socketResponse.data != null) {
+  //       // Chuẩn hóa dữ liệu đơn hàng
+  //       final orderData = socketResponse.data is Map ? socketResponse.data : {};
 
-        // Đảm bảo trường orderId tồn tại
-        if (orderData['id'] != null && orderData['orderId'] == null) {
-          orderData['orderId'] = orderData['id'];
-        }
+  //       // Đảm bảo trường orderId tồn tại
+  //       if (orderData['id'] != null && orderData['orderId'] == null) {
+  //         orderData['orderId'] = orderData['id'];
+  //       }
 
-        _currentOrder = Map<String, dynamic>.from(orderData);
-        _orderStatus = DriverOrderStatus.canceled;
-        debugPrint(
-            'Debug socket: Thông tin đơn hàng bị hủy: ${jsonEncode(_currentOrder)}');
+  //       currentOrder = Map<String, dynamic>.from(orderData);
+  //       _orderStatus = AppOrderProcessStatus.canceled;
+  //       debugPrint(
+  //           'Debug socket: Thông tin đơn hàng bị hủy: ${jsonEncode(currentOrder)}');
 
-        // Thông báo cho UI
-        debugPrint('Debug socket: Gọi callback cho đơn hàng bị hủy');
-        onOrderStatusChanged?.call(_orderStatus);
-        onOrderCanceled?.call(_currentOrder!);
-        onPlayNotification?.call();
+  //       // Thông báo cho UI
+  //       debugPrint('Debug socket: Gọi callback cho đơn hàng bị hủy');
+  //       onOrderStatusChanged?.call(_orderStatus);
+  //       onOrderCanceled?.call(currentOrder!);
+  //       onPlayNotification?.call();
 
-        // Rung điện thoại
-        debugPrint('Debug socket: Kích hoạt rung cho đơn hủy');
-        Vibration.vibrate(pattern: [300, 300, 300, 300]);
-      } else {
-        debugPrint(
-            'Debug socket: Lỗi khi xử lý đơn hàng bị hủy: ${socketResponse.messageCode}');
-      }
-    } else {
-      debugPrint(
-          'Debug socket: Bỏ qua sự kiện hủy đơn vì trạng thái hiện tại không phải đang tiến hành: $_orderStatus');
-    }
-  }
+  //       // Rung điện thoại
+  //       debugPrint('Debug socket: Kích hoạt rung cho đơn hủy');
+  //       Vibration.vibrate(pattern: [300, 300, 300, 300]);
+  //     } else {
+  //       debugPrint(
+  //           'Debug socket: Lỗi khi xử lý đơn hàng bị hủy: ${socketResponse.messageCode}');
+  //     }
+  //   } else {
+  //     debugPrint(
+  //         'Debug socket: Bỏ qua sự kiện hủy đơn vì trạng thái hiện tại không phải đang tiến hành: $_orderStatus');
+  //   }
+  // }
 
-  void _handleOrderStatusUpdate(dynamic data) {
-    debugPrint('Debug socket: Xử lý cập nhật trạng thái đơn hàng');
-    final socketResponse = _parseSocketResponse(data);
+  // void _handleOrderStatusUpdate(dynamic data) {
+  //   debugPrint('Debug socket: Xử lý cập nhật trạng thái đơn hàng');
+  //   final socketResponse = _parseSocketResponse(data);
 
-    if (socketResponse.isSuccess && socketResponse.data != null) {
-      // Chuẩn hóa dữ liệu đơn hàng
-      final orderData = socketResponse.data is Map ? socketResponse.data : {};
+  //   if (socketResponse.isSuccess && socketResponse.data != null) {
+  //     // Chuẩn hóa dữ liệu đơn hàng
+  //     final orderData = socketResponse.data is Map ? socketResponse.data : {};
 
-      // Đảm bảo trường orderId tồn tại
-      if (orderData['id'] != null && orderData['orderId'] == null) {
-        orderData['orderId'] = orderData['id'];
-      }
+  //     // Đảm bảo trường orderId tồn tại
+  //     if (orderData['id'] != null && orderData['orderId'] == null) {
+  //       orderData['orderId'] = orderData['id'];
+  //     }
 
-      _currentOrder = Map<String, dynamic>.from(orderData);
+  //     currentOrder = Map<String, dynamic>.from(orderData);
 
-      // Cập nhật trạng thái UI dựa trên trạng thái đơn hàng từ server
-      if (_currentOrder!.containsKey('status')) {
-        final orderStatus = _currentOrder!['status'];
-        switch (orderStatus) {
-          case OrderStatus.accepted:
-            _orderStatus = DriverOrderStatus.accepted;
-            break;
-          case OrderStatus.picked:
-            _orderStatus = DriverOrderStatus.picked;
-            break;
-          case OrderStatus.inProgress:
-            _orderStatus = DriverOrderStatus.inProgress;
-            break;
-          case OrderStatus.completed:
-            _orderStatus = DriverOrderStatus.completed;
-            break;
-          case OrderStatus.cancelled:
-            _orderStatus = DriverOrderStatus.canceled;
-            break;
-        }
-        onOrderStatusChanged?.call(_orderStatus);
-      }
+  //     // Cập nhật trạng thái UI dựa trên trạng thái đơn hàng từ server
+  //     if (currentOrder!.containsKey('status')) {
+  //       final orderStatus = currentOrder!['status'];
+  //       switch (orderStatus) {
+  //         case OrderStatus.accepted:
+  //           _orderStatus = AppOrderProcessStatus.accepted;
+  //           break;
+  //         case OrderStatus.picked:
+  //           _orderStatus = AppOrderProcessStatus.picked;
+  //           break;
+  //         case OrderStatus.inProgress:
+  //           _orderStatus = AppOrderProcessStatus.inProgress;
+  //           break;
+  //         case OrderStatus.completed:
+  //           _orderStatus = AppOrderProcessStatus.completed;
+  //           break;
+  //         case OrderStatus.cancelled:
+  //           _orderStatus = AppOrderProcessStatus.canceled;
+  //           break;
+  //       }
+  //       onOrderStatusChanged?.call(_orderStatus);
+  //     }
 
-      debugPrint(
-          'Debug socket: Thông tin đơn hàng cập nhật: ${jsonEncode(_currentOrder)}');
+  //     debugPrint(
+  //         'Debug socket: Thông tin đơn hàng cập nhật: ${jsonEncode(currentOrder)}');
 
-      // Thông báo cho UI
-      debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
-      onOrderStatusUpdated?.call(_currentOrder!);
-    } else {
-      debugPrint(
-          'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
-    }
-  }
+  //     // Thông báo cho UI
+  //     debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
+  //     onOrderStatusUpdated?.call(currentOrder!);
+  //   } else {
+  //     debugPrint(
+  //         'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
+  //   }
+  // }
 
   // Xử lý nhấp nháy thông qua callback
   void _startBlinking() {
@@ -401,7 +344,7 @@ class SocketController {
       onBlinkingChanged?.call(isBlinking);
 
       // Dừng nhấp nháy khi đơn hàng không còn ở trạng thái mới
-      if (_orderStatus != DriverOrderStatus.newOrder) {
+      if (orderStatus != AppOrderProcessStatus.findDriver) {
         debugPrint(
             'Debug socket: Dừng hiệu ứng nhấp nháy vì trạng thái đơn hàng đã thay đổi');
         timer.cancel();
@@ -412,17 +355,20 @@ class SocketController {
 
   void acceptOrder() {
     debugPrint('Debug socket: Chấp nhận đơn hàng');
-    if (_currentOrder != null && socket?.connected == true) {
+    if (currentOrder != null && socket?.connected == true) {
       debugPrint(
-          'Debug socket: Gửi yêu cầu chấp nhận đơn hàng ID: ${_currentOrder!['orderId']}');
-      socket?.emit('accept_order', {'order_id': _currentOrder!['orderId']});
+          'Debug socket: Gửi yêu cầu chấp nhận đơn hàng ID: ${currentOrder!.id}');
+      socket?.emit('driver_new_order_response', {
+        'orderId': currentOrder!.id,
+        'status': 'accepted',
+      });
 
       // Lắng nghe phản hồi
-      socket?.once('order_response_confirmed', (data) {
+      socket?.once('driver_new_order_response_confirmed', (data) {
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess) {
-          _orderStatus = DriverOrderStatus.accepted;
-          onOrderStatusChanged?.call(_orderStatus);
+          orderStatus.value = AppOrderProcessStatus.driverAccepted;
+          // onOrderStatusChanged?.call(orderStatus);
           debugPrint('Debug socket: Đơn hàng đã được chấp nhận thành công');
         } else {
           debugPrint(
@@ -431,24 +377,27 @@ class SocketController {
       });
     } else {
       debugPrint(
-          'Debug socket: Không thể chấp nhận đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
+          'Debug socket: Không thể chấp nhận đơn - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
     }
   }
 
   void rejectOrder() {
     debugPrint('Debug socket: Từ chối đơn hàng');
-    if (_currentOrder != null && socket?.connected == true) {
+    if (currentOrder != null && socket?.connected == true) {
       debugPrint(
-          'Debug socket: Gửi yêu cầu từ chối đơn hàng ID: ${_currentOrder!['orderId']}');
-      socket?.emit('reject_order', {'order_id': _currentOrder!['orderId']});
+          'Debug socket: Gửi yêu cầu từ chối đơn hàng ID: ${currentOrder!.id}');
+      socket?.emit('driver_new_order_response', {
+        'orderId': currentOrder!.id,
+        'status': 'rejected',
+      });
 
       // Lắng nghe phản hồi
       socket?.once('order_response_confirmed', (data) {
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess) {
-          _orderStatus = DriverOrderStatus.waiting;
-          _currentOrder = null;
-          onOrderStatusChanged?.call(_orderStatus);
+          orderStatus.value = AppOrderProcessStatus.pending;
+          currentOrder = null;
+          // onOrderStatusChanged?.call(orderStatus);
           debugPrint('Debug socket: Đơn hàng đã được từ chối thành công');
         } else {
           debugPrint(
@@ -457,113 +406,86 @@ class SocketController {
       });
     } else {
       debugPrint(
-          'Debug socket: Không thể từ chối đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
+          'Debug socket: Không thể từ chối đơn - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
     }
   }
 
-  void updateOrderStatus(String status) {
-    debugPrint('Debug socket: Cập nhật trạng thái đơn hàng: $status');
-    if (_currentOrder != null && socket?.connected == true) {
+  void updateOrderStatus(AppOrderProcessStatus status) {
+    AppOrderProcessStatus currentStatus = orderStatus.value;
+    if (currentOrder != null && socket?.connected == true) {
       debugPrint(
-          'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: ${_currentOrder!['orderId']} -> $status');
+          'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: ${currentOrder!.id} -> $status');
+      orderStatus.value = status;
 
-      // Cập nhật trạng thái UI trước khi gửi lên server
-      switch (status) {
-        case OrderStatus.picked:
-          _orderStatus = DriverOrderStatus.picked;
-          break;
-        case OrderStatus.inProgress:
-          _orderStatus = DriverOrderStatus.inProgress;
-          break;
-        case OrderStatus.completed:
-          _orderStatus = DriverOrderStatus.completed;
-          break;
-        case OrderStatus.cancelled:
-          _orderStatus = DriverOrderStatus.canceled;
-          break;
+      if (status == AppOrderProcessStatus.completed) {
+        // Gửi cập nhật lên server
+        socket?.emit('complete_order', {
+          'orderId': currentOrder!.id,
+        });
+
+        // Lắng nghe phản hồi
+        socket?.once('order_completed_confirmation', (data) {
+          final socketResponse = _parseSocketResponse(data);
+          if (socketResponse.isSuccess) {
+            debugPrint(
+                'Debug socket: Trạng thái đơn hàng đã được hoàn thành thành công');
+
+            currentOrder = null;
+
+            Timer(const Duration(seconds: 5), () {
+              orderStatus.value = AppOrderProcessStatus.pending;
+            });
+          } else {
+            orderStatus.value = currentStatus;
+            debugPrint(
+                'Debug socket: Lỗi khi hoàn thành đơn hàng: ${socketResponse.messageCode}');
+            appShowSnackBar(msg: 'Error when complete order'.tr());
+          }
+        });
+      } else {
+        // Gửi cập nhật lên server
+        socket?.emit('update_order_status', {
+          'orderId': currentOrder!.id,
+          'processStatus': status.name,
+        });
+
+        // Lắng nghe phản hồi
+        socket?.once('order_status_updated_confirmation', (data) {
+          final socketResponse = _parseSocketResponse(data);
+          if (socketResponse.isSuccess) {
+            debugPrint(
+                'Debug socket: Trạng thái đơn hàng đã được cập nhật thành công');
+          } else {
+            orderStatus.value = currentStatus;
+            debugPrint(
+                'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
+            appShowSnackBar(msg: 'Error when update order status'.tr());
+          }
+        });
       }
-
-      // Thông báo cho UI
-      onOrderStatusChanged?.call(_orderStatus);
-
-      // Gửi cập nhật lên server
-      socket?.emit('update_order_status', {
-        'order_id': _currentOrder!['orderId'],
-        'status': status,
-      });
-
-      // Lắng nghe phản hồi
-      socket?.once('order_status_updated_confirmation', (data) {
-        final socketResponse = _parseSocketResponse(data);
-        if (socketResponse.isSuccess) {
-          debugPrint(
-              'Debug socket: Trạng thái đơn hàng đã được cập nhật thành công');
-        } else {
-          debugPrint(
-              'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
-        }
-      });
     } else {
       debugPrint(
-          'Debug socket: Không thể cập nhật trạng thái - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
-    }
-  }
-
-  // Phương thức mới cho trạng thái pickOrder
-  void pickOrder() {
-    debugPrint('Debug socket: Tài xế lấy đơn hàng');
-    updateOrderStatus(OrderStatus.picked);
-  }
-
-  // Phương thức mới cho trạng thái startDelivery
-  void startDelivery() {
-    debugPrint('Debug socket: Tài xế bắt đầu giao hàng');
-    updateOrderStatus(OrderStatus.inProgress);
-  }
-
-  // Phương thức cập nhật để hoàn thành đơn hàng
-  void completeOrder() {
-    debugPrint('Debug socket: Hoàn thành đơn hàng');
-    if (_currentOrder != null && socket?.connected == true) {
-      debugPrint(
-          'Debug socket: Gửi yêu cầu hoàn thành đơn hàng ID: ${_currentOrder!['orderId']}');
-
-      socket?.emit('complete_order', {'order_id': _currentOrder!['orderId']});
-
-      // Lắng nghe phản hồi
-      socket?.once('order_status_updated_confirmation', (data) {
-        final socketResponse = _parseSocketResponse(data);
-        if (socketResponse.isSuccess) {
-          _orderStatus = DriverOrderStatus.completed;
-          onOrderStatusChanged?.call(_orderStatus);
-          debugPrint('Debug socket: Đơn hàng đã được hoàn thành thành công');
-        } else {
-          debugPrint(
-              'Debug socket: Lỗi khi hoàn thành đơn hàng: ${socketResponse.messageCode}');
-        }
-      });
-    } else {
-      debugPrint(
-          'Debug socket: Không thể hoàn thành đơn - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
+          'Debug socket: Không thể cập nhật trạng thái - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
     }
   }
 
   // Cập nhật phương thức để hủy đơn hàng
   void cancelOrder(String reason) {
     debugPrint('Debug socket: Hủy đơn hàng với lý do: $reason');
-    if (_currentOrder != null && socket?.connected == true) {
-      debugPrint(
-          'Debug socket: Gửi yêu cầu hủy đơn hàng ID: ${_currentOrder!['orderId']}');
 
-      socket?.emit('cancel_order',
-          {'order_id': _currentOrder!['orderId'], 'reason': reason});
+    if (currentOrder != null && socket?.connected == true) {
+      debugPrint(
+          'Debug socket: Gửi yêu cầu hủy đơn hàng ID: ${currentOrder!.id}');
+
+      socket?.emit(
+          'cancel_order', {'orderId': currentOrder!.id, 'reason': reason});
 
       // Lắng nghe phản hồi
       socket?.once('order_cancelled_confirmation', (data) {
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess) {
-          _orderStatus = DriverOrderStatus.canceled;
-          onOrderStatusChanged?.call(_orderStatus);
+          orderStatus.value = AppOrderProcessStatus.cancelled;
+          // onOrderStatusChanged?.call(orderStatus);
           debugPrint('Debug socket: Đơn hàng đã được hủy thành công');
         } else {
           debugPrint(
@@ -572,22 +494,8 @@ class SocketController {
       });
     } else {
       debugPrint(
-          'Debug socket: Không thể hủy đơn hàng - đơn hàng hiện tại: ${_currentOrder != null}, socket kết nối: ${socket?.connected}');
+          'Debug socket: Không thể hủy đơn hàng - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
     }
-  }
-
-  void closeOrderComplete() {
-    debugPrint('Debug socket: Đóng đơn hàng đã hoàn thành');
-    _orderStatus = DriverOrderStatus.waiting;
-    _currentOrder = null;
-    onOrderStatusChanged?.call(_orderStatus);
-  }
-
-  void closeOrderCanceled() {
-    debugPrint('Debug socket: Đóng đơn hàng đã hủy');
-    _orderStatus = DriverOrderStatus.waiting;
-    _currentOrder = null;
-    onOrderStatusChanged?.call(_orderStatus);
   }
 
   void dispose() {
@@ -595,6 +503,7 @@ class SocketController {
     socket?.disconnect();
     socket?.dispose();
     _locationTimer?.cancel();
+    orderStatus.dispose();
     socketConnected.dispose();
   }
 

@@ -1,3 +1,6 @@
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_appbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -6,138 +9,85 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Back button and title
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back),
-                      ),
-                      const Text(
-                        'Notification',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF121212),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Action buttons
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.add),
-                        color: const Color(0xFF0C98E7),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_border),
-                        color: const Color(0xFF0C98E7),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.notifications),
-                        color: const Color(0xFF0C98E7),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_horiz),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      backgroundColor: appColorBackground,
+      body: Column(
+        children: [
+          WidgetAppBar(
+            title: 'Notification'.tr(),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Today section
+                _buildSection(
+                  title: 'Today',
+                  notifications: [
+                    _buildNotificationItem(
+                      icon: Icons.local_offer,
+                      iconColor: const Color(0xFFFFAB17),
+                      title: '30% Special Discount!',
+                      subtitle: 'Special promotion only valid today',
+                      isUnread: true,
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.delivery_dining,
+                      iconColor: const Color(0xFF52A533),
+                      title: 'Your Order Has Been Taken by the Driver',
+                      subtitle: 'Recently',
+                      isUnread: true,
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.cancel,
+                      iconColor: const Color(0xFFFB4069),
+                      title: 'Your Order Has Been Canceled',
+                      subtitle: '19 Jun 2023',
+                      isUnread: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Yesterday section
+                _buildSection(
+                  title: 'Yesterday',
+                  notifications: [
+                    _buildNotificationItem(
+                      icon: Icons.message,
+                      iconColor: const Color(0xFF848484),
+                      title: '35% Special Discount!',
+                      subtitle: 'Special promotion only valid today',
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.person,
+                      iconColor: const Color(0xFF848484),
+                      title: 'Account Setup Successfull!',
+                      subtitle: 'Special promotion only valid today',
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.local_offer,
+                      iconColor: const Color(0xFFFB4069),
+                      title: 'Special Offer! 60% Off',
+                      subtitle:
+                          'Special offer for new account, valid until 20 Nov 2022',
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.credit_card,
+                      iconColor: const Color(0xFFF17228),
+                      title: 'Credit Card Connected',
+                      subtitle: 'Special promotion only valid today',
+                    ),
+                    _buildNotificationItem(
+                      icon: Icons.credit_card,
+                      iconColor: const Color(0xFFF17228),
+                      title: 'Credit Card Connected',
+                      subtitle: 'Special promotion only valid today',
+                    ),
+                  ],
+                ),
+              ],
             ),
-            // Notification list
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  // Today section
-                  _buildSection(
-                    title: 'Today',
-                    notifications: [
-                      _buildNotificationItem(
-                        icon: Icons.local_offer,
-                        iconColor: const Color(0xFFFFAB17),
-                        title: '30% Special Discount!',
-                        subtitle: 'Special promotion only valid today',
-                        isUnread: true,
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.delivery_dining,
-                        iconColor: const Color(0xFF52A533),
-                        title: 'Your Order Has Been Taken by the Driver',
-                        subtitle: 'Recently',
-                        isUnread: true,
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.cancel,
-                        iconColor: const Color(0xFFFB4069),
-                        title: 'Your Order Has Been Canceled',
-                        subtitle: '19 Jun 2023',
-                        isUnread: true,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Yesterday section
-                  _buildSection(
-                    title: 'Yesterday',
-                    notifications: [
-                      _buildNotificationItem(
-                        icon: Icons.message,
-                        iconColor: const Color(0xFF848484),
-                        title: '35% Special Discount!',
-                        subtitle: 'Special promotion only valid today',
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.person,
-                        iconColor: const Color(0xFF848484),
-                        title: 'Account Setup Successfull!',
-                        subtitle: 'Special promotion only valid today',
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.local_offer,
-                        iconColor: const Color(0xFFFB4069),
-                        title: 'Special Offer! 60% Off',
-                        subtitle:
-                            'Special offer for new account, valid until 20 Nov 2022',
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.credit_card,
-                        iconColor: const Color(0xFFF17228),
-                        title: 'Credit Card Connected',
-                        subtitle: 'Special promotion only valid today',
-                      ),
-                      _buildNotificationItem(
-                        icon: Icons.credit_card,
-                        iconColor: const Color(0xFFF17228),
-                        title: 'Credit Card Connected',
-                        subtitle: 'Special promotion only valid today',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

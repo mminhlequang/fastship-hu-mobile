@@ -4,6 +4,28 @@ import 'package:network_resources/enums.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:network_resources/transaction/models/payment_provider.dart';
 
+class DriverNewOrderModel {
+  OrderModel? order;
+  int? responseTimeout;
+  String? timestamp;
+
+  DriverNewOrderModel({this.order, this.responseTimeout, this.timestamp});
+
+  DriverNewOrderModel.fromJson(Map<String, dynamic> json) {
+    order = json['order'] != null ? OrderModel.fromJson(json['order']) : null;
+    responseTimeout = json['responseTimeout'];
+    timestamp = json['timestamp'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['order'] = order?.toJson();
+    data['responseTimeout'] = responseTimeout;
+    data['timestamp'] = timestamp;
+    return data;
+  }
+}
+
 class CreateOrderResponse {
   String? clientSecret;
   OrderModel? order;
@@ -30,21 +52,18 @@ class CreateOrderResponse {
 class OrderModel {
   int? id;
   String? code;
-  num? totalPrice;
   String? currency;
   String? paymentType;
   String? paymentStatus;
   String? processStatus;
   dynamic note;
+  dynamic cancelNote;
   PaymentWalletProvider? payment;
   StoreModel? store;
   AccountModel? customer;
   AccountModel? driver;
   List<CartItemModel>? items;
-  num? fee;
-  num? priceTip;
-  num? distance;
-  String? phone;
+  dynamic phone;
   String? street;
   String? zip;
   String? city;
@@ -54,16 +73,23 @@ class OrderModel {
   double? lat;
   double? lng;
   String? address;
+  num? shipFee;
+  num? tip;
+  num? discount;
+  num? applicationFee;
+  num? subtotal;
+  num? total;
+  dynamic shipDistance;
+  dynamic shipEstimateTime;
+  dynamic shipPolyline;
+  dynamic shipHereRaw;
   dynamic voucher;
-  int? voucherValue;
   String? timeOrder;
   dynamic timePickupEstimate;
   dynamic timePickup;
   dynamic timeDelivery;
 
 
-  //Getters to handle
-  
   AppPaymentOrderStatus get paymentStatusEnum => AppPaymentOrderStatus.values
       .byName(paymentStatus ?? AppPaymentOrderStatus.pending.name);
 
@@ -73,20 +99,17 @@ class OrderModel {
   OrderModel({
     this.id,
     this.code,
-    this.totalPrice,
     this.currency,
     this.paymentType,
     this.paymentStatus,
     this.processStatus,
     this.note,
+    this.cancelNote,
     this.payment,
     this.store,
     this.customer,
     this.driver,
     this.items,
-    this.fee,
-    this.priceTip,
-    this.distance,
     this.phone,
     this.street,
     this.zip,
@@ -97,8 +120,17 @@ class OrderModel {
     this.lat,
     this.lng,
     this.address,
+    this.shipFee,
+    this.tip,
+    this.discount,
+    this.applicationFee,
+    this.subtotal,
+    this.total,
+    this.shipDistance,
+    this.shipEstimateTime,
+    this.shipPolyline,
+    this.shipHereRaw,
     this.voucher,
-    this.voucherValue,
     this.timeOrder,
     this.timePickupEstimate,
     this.timePickup,
@@ -108,32 +140,22 @@ class OrderModel {
   OrderModel.fromJson(Map<String, dynamic> json) {
     id = json["id"];
     code = json["code"];
-    totalPrice = json["total_price"];
     currency = json["currency"];
     paymentType = json["payment_type"];
     paymentStatus = json["payment_status"];
     processStatus = json["process_status"];
     note = json["note"];
+    cancelNote = json["cancel_note"];
     payment =
-        json["payment"] == null
-            ? null
-            : PaymentWalletProvider.fromJson(json["payment"]);
+        json["payment"] == null ? null : PaymentWalletProvider.fromJson(json["payment"]);
     store = json["store"] == null ? null : StoreModel.fromJson(json["store"]);
     customer =
-        json["customer"] == null
-            ? null
-            : AccountModel.fromJson(json["customer"]);
-    driver =
-        json["driver"] == null ? null : AccountModel.fromJson(json["driver"]);
+        json["customer"] == null ? null : AccountModel.fromJson(json["customer"]);
+    driver = json["driver"] == null ? null : AccountModel.fromJson(json["driver"]);
     items =
         json["items"] == null
             ? null
-            : (json["items"] as List)
-                .map((e) => CartItemModel.fromJson(e))
-                .toList();
-    fee = json["fee"];
-    priceTip = json["price_tip"];
-    distance = json["distance"];
+            : (json["items"] as List).map((e) => CartItemModel.fromJson(e)).toList();
     phone = json["phone"];
     street = json["street"];
     zip = json["zip"];
@@ -144,8 +166,17 @@ class OrderModel {
     lat = json["lat"];
     lng = json["lng"];
     address = json["address"];
+    shipFee = json["ship_fee"];
+    tip = json["tip"];
+    discount = json["discount"];
+    applicationFee = json["application_fee"];
+    subtotal = json["subtotal"];
+    total = json["total"];
+    shipDistance = json["ship_distance"];
+    shipEstimateTime = json["ship_estimate_time"];
+    shipPolyline = json["ship_polyline"];
+    shipHereRaw = json["ship_here_raw"];
     voucher = json["voucher"];
-    voucherValue = json["voucher_value"];
     timeOrder = json["time_order"];
     timePickupEstimate = json["time_pickup_estimate"];
     timePickup = json["time_pickup"];
@@ -160,12 +191,12 @@ class OrderModel {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["id"] = id;
     _data["code"] = code;
-    _data["total_price"] = totalPrice;
     _data["currency"] = currency;
     _data["payment_type"] = paymentType;
     _data["payment_status"] = paymentStatus;
     _data["process_status"] = processStatus;
     _data["note"] = note;
+    _data["cancel_note"] = cancelNote;
     if (payment != null) {
       _data["payment"] = payment?.toJson();
     }
@@ -181,9 +212,6 @@ class OrderModel {
     if (items != null) {
       _data["items"] = items?.map((e) => e.toJson()).toList();
     }
-    _data["fee"] = fee;
-    _data["price_tip"] = priceTip;
-    _data["distance"] = distance;
     _data["phone"] = phone;
     _data["street"] = street;
     _data["zip"] = zip;
@@ -194,12 +222,21 @@ class OrderModel {
     _data["lat"] = lat;
     _data["lng"] = lng;
     _data["address"] = address;
+    _data["ship_fee"] = shipFee;
+    _data["tip"] = tip;
+    _data["discount"] = discount;
+    _data["application_fee"] = applicationFee;
+    _data["subtotal"] = subtotal;
+    _data["total"] = total;
+    _data["ship_distance"] = shipDistance;
+    _data["ship_estimate_time"] = shipEstimateTime;
+    _data["ship_polyline"] = shipPolyline;
+    _data["ship_here_raw"] = shipHereRaw;
     _data["voucher"] = voucher;
-    _data["voucher_value"] = voucherValue;
     _data["time_order"] = timeOrder;
     _data["time_pickup_estimate"] = timePickupEstimate;
     _data["time_pickup"] = timePickup;
     _data["time_delivery"] = timeDelivery;
     return _data;
   }
-}
+} 

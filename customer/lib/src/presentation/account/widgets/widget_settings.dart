@@ -1,5 +1,8 @@
+import 'package:app/src/presentation/widgets/widget_appbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:app/src/constants/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -22,8 +25,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Column(
               children: [
-                const StatusBar(),
-                _buildHeader(),
+                WidgetAppBar(
+                  title: 'Settings'.tr(),
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -55,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: const Color(0xFFCEC6C5),
+            color: appColorBorder,
             width: 1,
           ),
         ),
@@ -64,15 +68,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_ios, size: 24),
+            child: Icon(Icons.arrow_back_ios, size: 24, color: appColorText),
           ),
           const SizedBox(width: 12),
           Text(
             'Settings',
-            style: GoogleFonts.fredoka(
+            style: w500TextStyle(
               fontSize: 22,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF120F0F),
+              color: appColorText,
             ),
           ),
         ],
@@ -86,18 +89,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Text(
           'Profile',
-          style: TextStyle(
-            color: const Color(0xFF878787),
+          style: w400TextStyle(
+            color: appColorText2,
             fontSize: 14,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.14,
           ),
         ),
         const SizedBox(height: 7),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFF1EFE9)),
+            border: Border.all(color: appColorBorder),
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,
           ),
@@ -131,16 +132,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFF101010),
+            style: w400TextStyle(
+              color: appColorText,
               fontSize: 16,
-              fontWeight: FontWeight.w400,
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF74CA45),
+            activeColor: appColorPrimary,
           ),
         ],
       ),
@@ -154,18 +154,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Language',
-              style: TextStyle(
-                color: Color(0xFF101010),
+              style: w400TextStyle(
+                color: appColorText,
                 fontSize: 16,
-                fontWeight: FontWeight.w400,
               ),
             ),
             Text(
               selectedLanguage,
-              style: const TextStyle(
-                color: Color(0xFF101010),
+              style: w400TextStyle(
+                color: appColorText,
                 fontSize: 16,
               ),
             ),
@@ -175,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9F8F6),
+            color: appColorBackground,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -210,18 +209,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Text(
           'Other',
-          style: TextStyle(
-            color: const Color(0xFF878787),
+          style: w400TextStyle(
+            color: appColorText2,
             fontSize: 14,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.14,
           ),
         ),
         const SizedBox(height: 7),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFF1EFE9)),
+            border: Border.all(color: appColorBorder),
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,
           ),
@@ -245,16 +242,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFF101010),
+            style: w400TextStyle(
+              color: appColorText,
               fontSize: 16,
-              fontWeight: FontWeight.w400,
             ),
           ),
           Icon(
-            Icons.arrow_forward_ios,
-            size: 20,
-            color: const Color(0xFF847D79),
+            Icons.chevron_right,
+            color: appColorText,
+            size: 24,
           ),
         ],
       ),
@@ -263,26 +259,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSaveButton() {
     return Positioned(
-      bottom: 34,
-      left: 16,
-      right: 16,
+      bottom: 0,
+      left: 0,
+      right: 0,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         decoration: BoxDecoration(
-          color: const Color(0xFF74CA45),
-          borderRadius: BorderRadius.circular(120),
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              offset: const Offset(17, 10),
-              blurRadius: 30,
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
           ],
         ),
-        child: const Center(
+        child: TextButton(
+          onPressed: () {
+            // Handle save action
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: appColorPrimary,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(120),
+            ),
+          ),
           child: Text(
             'Save',
-            style: TextStyle(
+            style: w500TextStyle(
               color: Colors.white,
               fontSize: 18,
             ),
@@ -293,81 +298,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// StatusBar Component
-class StatusBar extends StatelessWidget {
-  const StatusBar({Key? key}) : super(key: key);
+ 
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 23),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '9:41',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-            ),
-          ),
-          Row(
-            children: [
-              _buildSignalStrength(),
-              const SizedBox(width: 8),
-              _buildWifiIcon(),
-              const SizedBox(width: 8),
-              _buildBatteryIcon(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSignalStrength() {
-    return Row(
-      children: List.generate(
-        4,
-        (index) => Container(
-          width: 3,
-          height: (index + 1) * 3,
-          margin: const EdgeInsets.symmetric(horizontal: 1),
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWifiIcon() {
-    return const Icon(Icons.wifi, size: 20);
-  }
-
-  Widget _buildBatteryIcon() {
-    return Row(
-      children: [
-        Container(
-          width: 25,
-          height: 12,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        Container(
-          width: 2,
-          height: 4,
-          color: Colors.black,
-          margin: const EdgeInsets.only(left: 1),
-        ),
-      ],
-    );
-  }
-}
-
-// LanguageOption Component
 class LanguageOption extends StatelessWidget {
   final String language;
   final bool isSelected;
@@ -385,56 +317,27 @@ class LanguageOption extends StatelessWidget {
     return GestureDetector(
       onTap: onSelect,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: const Color(0xFFDEDEDE)),
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? appColorPrimary : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: 30,
-              height: 20,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFE3E3E3)),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(width: 10),
             Text(
               language,
-              style: const TextStyle(
-                color: Color(0xFF333333),
+              style: w400TextStyle(
+                color: isSelected ? Colors.white : appColorText,
                 fontSize: 16,
               ),
             ),
-            const Spacer(),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF74CA45)
-                      : const Color(0xFFBDBDBD),
-                  width: 1.5,
-                ),
+            if (isSelected)
+              const Icon(
+                Icons.check,
+                color: Colors.white,
+                size: 18,
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFF74CA45),
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
           ],
         ),
       ),

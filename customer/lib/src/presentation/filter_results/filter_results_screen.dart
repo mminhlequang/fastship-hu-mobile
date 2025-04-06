@@ -132,7 +132,7 @@ class ListFood extends StatelessWidget {
                               fontFamily: 'Fredoka',
                               fontSize: 18,
                               fontWeight: FontWeight.w400,
-                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -192,7 +192,7 @@ class ListFood extends StatelessWidget {
                           price: 2.20,
                           originalPrice: 3.30,
                           rating: 4.5,
-                          distance: '15-20m',
+                          distance: '20m',
                           restaurantName: 'Playa Outdoor',
                           restaurantLogo:
                               'https://cdn.builder.io/api/v1/image/assets/TEMP/760da60a84bac2411a9cdba824de49cbceef1398?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
@@ -218,7 +218,7 @@ class ListFood extends StatelessWidget {
                           price: 2.20,
                           originalPrice: 3.30,
                           rating: 4.5,
-                          distance: '15-20m',
+                          distance: '15m',
                           restaurantName: 'Playa Outdoor',
                           restaurantLogo:
                               'https://cdn.builder.io/api/v1/image/assets/TEMP/304767ab2aba27c75ce3c785ba548137a9f53f32?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
@@ -244,7 +244,7 @@ class ListFood extends StatelessWidget {
                           price: 2.20,
                           originalPrice: 3.30,
                           rating: 4.5,
-                          distance: '15-20m',
+                          distance: '15m',
                           restaurantName: 'Playa Outdoor',
                           restaurantLogo:
                               'https://cdn.builder.io/api/v1/image/assets/TEMP/0259121d8f2d3fb26cee5cc308191e970a347365?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
@@ -270,7 +270,7 @@ class ListFood extends StatelessWidget {
                           price: 2.20,
                           originalPrice: 3.30,
                           rating: 4.5,
-                          distance: '15-20m',
+                          distance: '15m',
                           restaurantName: 'Playa Outdoor',
                           restaurantLogo:
                               'https://cdn.builder.io/api/v1/image/assets/TEMP/0259121d8f2d3fb26cee5cc308191e970a347365?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
@@ -288,7 +288,6 @@ class ListFood extends StatelessWidget {
     );
   }
 }
- 
 
 class FoodFilterChip extends StatelessWidget {
   final String label;

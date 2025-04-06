@@ -15,14 +15,7 @@ requestLoginWrapper(Function function) {
   }
 }
 
-String currencyFormatted(num? amount, {int? decimalDigits}) {
-  return NumberFormat.currency(
-    locale: 'vi_VN',
-    symbol: AppPrefs.instance.currencySymbol,
-    decimalDigits: decimalDigits ?? 2,
-  ).format(amount ?? 0);
-}
-
+ 
 bool appIsBottomSheetOpen = false;
 appOpenBottomSheet(
   Widget child, {

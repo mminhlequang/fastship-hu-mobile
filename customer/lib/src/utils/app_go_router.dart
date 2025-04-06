@@ -7,7 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../presentation/account/widgets/widget_help_center.dart';
+import '../presentation/account/widgets/widget_my_favorite.dart';
+import '../presentation/account/widgets/widget_personal_data.dart';
+import '../presentation/account/widgets/widget_settings.dart';
 import '../presentation/auth/auth_screen.dart';
+import '../presentation/checkout/widgets/widget_cancel_order.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
@@ -94,6 +99,26 @@ final goRouter = GoRouter(
           builder: (context, state) {
             return const NotificationsScreen();
           },
+        ),
+        GoRoute(
+          path: '/help-center',
+          builder: (context, state) => const HelpCenterScreen(),
+        ),
+        GoRoute(
+          path: '/my-favorite',
+          builder: (context, state) => const MyFavoriteScreen(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: '/personal-data',
+          builder: (context, state) => const PersonalDataScreen(),
+        ),
+        GoRoute(
+          path: '/cancel-order',
+          builder: (context, state) => const CancelOrderScreen(),
         ),
       ],
     ),

@@ -1,4 +1,6 @@
+import 'package:network_resources/enums.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
@@ -8,6 +10,7 @@ import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:app/src/presentation/widgets/widget_sheet_process.dart';
 import 'package:app/src/utils/utils.dart';
+import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -36,6 +39,17 @@ class WidgetPreviewOrder extends StatefulWidget {
 class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
   double tip = 0;
   bool isPickupYourself = false;
+  double distance = 0.0;
+  String duration = '';
+  bool isCalculatingRoute = false;
+  final dio = Dio();
+  String ship_polyline = '';
+  int ship_distance = 0;
+  String ship_estimate_time = '';
+
+  // Các trường cần thiết cho HERE API
+  Map<String, dynamic>? routeData;
+
   double get subtotal =>
       widget.cart.cartItems?.fold(
         0,
@@ -73,10 +87,138 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         ),
       ];
 
+  @override
+  void initState() {
+    super.initState();
+    // Tính toán quãng đường và lộ trình khi khởi tạo widget
+    if (!isPickupYourself) {
+      _calculateRoute();
+    }
+  }
+
+  // Phương thức tính toán quãng đường và lộ trình sử dụng HERE API
+  Future<void> _calculateRoute() async {
+    if (widget.cart.store == null ||
+        widget.cart.store!.lat == null ||
+        widget.cart.store!.lng == null ||
+        locationCubit.latitude == null ||
+        locationCubit.longitude == null) {
+      _showRouteError(
+          'Không tìm thấy thông tin vị trí cửa hàng hoặc người dùng');
+      return;
+    }
+
+    setState(() {
+      isCalculatingRoute = true;
+    });
+
+    try {
+      // Tọa độ của cửa hàng
+      final storeLatitude = widget.cart.store!.lat;
+      final storeLongitude = widget.cart.store!.lng;
+
+      // Tọa độ của người dùng
+      final userLatitude = locationCubit.latitude;
+      final userLongitude = locationCubit.longitude;
+
+      // Gọi API HERE để tính toán lộ trình
+      final response = await dio.get(
+        'https://router.hereapi.com/v8/routes',
+        queryParameters: {
+          'apiKey': hereMapApiKey,
+          'transportMode': 'scooter', // Sử dụng scooter để mô phỏng xe máy/moto
+          'origin': '$storeLatitude,$storeLongitude',
+          'destination': '$userLatitude,$userLongitude',
+          'return': 'summary,polyline'
+        },
+      ).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException('Kết nối với HERE API quá thời gian');
+      });
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        print("calculate route data: $data");
+
+        // Lưu dữ liệu lộ trình
+        routeData = data;
+
+        // Lấy thông tin quãng đường và thời gian
+        if (data['routes'] != null && data['routes'].isNotEmpty) {
+          final route = data['routes'][0];
+          final sections = route['sections'];
+
+          if (sections != null && sections.isNotEmpty) {
+            final section = sections[0];
+            final summary = section['summary'];
+
+            // Quãng đường (mét)
+            distance = summary['length'] / 1000; // Chuyển đổi sang km
+            ship_distance =
+                summary['length']; // Lưu lại khoảng cách dưới dạng mét (int)
+
+            // Thời gian (giây)
+            final durationInSeconds = summary['duration'];
+            final durationInMinutes = (durationInSeconds / 60).ceil();
+            duration = '${durationInMinutes} min';
+            ship_estimate_time = duration; // Lưu lại thời gian ước tính
+
+            // Lấy polyline nếu có
+            if (section['polyline'] != null) {
+              ship_polyline = section['polyline'];
+            }
+
+            setState(() {
+              isCalculatingRoute = false;
+            });
+
+            // Cập nhật giá shipping dựa trên quãng đường
+            _updateShippingFee();
+          } else {
+            _showRouteError('Không tìm thấy chi tiết lộ trình');
+          }
+        } else {
+          _showRouteError('Không tìm thấy lộ trình phù hợp');
+        }
+      } else {
+        _showRouteError('Lỗi khi kết nối với HERE API: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showRouteError('Lỗi khi tính toán lộ trình: ${e.toString()}');
+    }
+  }
+
+  // Cập nhật phí shipping dựa trên quãng đường
+  void _updateShippingFee() {
+    // TODO: Thực hiện tính toán phí ship dựa trên quãng đường
+    // Đoạn này sẽ được thực hiện sau khi tích hợp với backend
+  }
+
+  // Hiển thị lỗi khi tính toán lộ trình
+  void _showRouteError(String message) {
+    print('HERE API Error: $message');
+    setState(() {
+      isCalculatingRoute = false;
+    });
+
+    if (mounted) {
+      appShowSnackBar(
+        context: context,
+        msg: message,
+        type: AppSnackBarType.error,
+      );
+    }
+  }
+
   void _createOrder() async {
     appHaptic();
     final processer =
         ValueNotifier<SheetProcessStatus>(SheetProcessStatus.loading);
+
+    // Nếu cần ship, tính toán lộ trình trước khi tạo đơn hàng
+    if (!isPickupYourself && distance == 0) {
+      await _calculateRoute();
+    }
 
     callback() async {
       processer.value = SheetProcessStatus.loading;
@@ -86,8 +228,12 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "payment_id": selectedPaymentWalletProvider,
         // "voucher_id": 0,
         // "voucher_value": 0,
-        "price_tip": tip,
-        "fee": applicationFee,
+        "tip": tip,
+        "ship_fee": tip,
+        "ship_distance": ship_distance,
+        "ship_estimate_time": ship_estimate_time,
+        "ship_polyline": ship_polyline,
+        "ship_here_raw": jsonEncode(routeData),
         // "note": "string",
         // "phone": "123456",
         "address": locationCubit.addressDetail ?? '',
@@ -98,7 +244,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "city": locationCubit.state.addressDetail!.address?.city,
         "state": locationCubit.state.addressDetail!.address?.state,
         "country": locationCubit.state.addressDetail!.address?.countryName,
-        "country_code": locationCubit.state.addressDetail!.address?.countryCode
+        "country_code": locationCubit.state.addressDetail!.address?.countryCode,
+        "is_pickup": isPickupYourself, // Xác định phương thức nhận hàng
       });
       if (r.isSuccess) {
         CreateOrderResponse orderResponse = r.data!;
@@ -168,8 +315,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             () {
               context.pop();
               if (socketResult) {
-                // context.pop();
-                // appOpenBottomSheet(const CheckoutTrackingScreen());
+                context.pop();
+                appOpenBottomSheet(const CheckoutTrackingScreen());
               }
             },
           );
@@ -264,6 +411,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             setState(() {
               isPickupYourself = false;
             });
+            // Tính toán lộ trình khi chuyển sang chế độ giao hàng
+            _calculateRoute();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -297,7 +446,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                                 onTap: () {
                                   appHaptic();
                                   appOpenBottomSheet(
-                                      const WidgetSheetLocations());
+                                          const WidgetSheetLocations())
+                                      .then((_) {
+                                    // Tính toán lại lộ trình khi thay đổi địa chỉ
+                                    if (!isPickupYourself) {
+                                      _calculateRoute();
+                                    }
+                                  });
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(4.0),
@@ -325,32 +480,51 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                     ),
                   ],
                 ),
-                // const SizedBox(height: 10),
-                // Container(
-                //   padding:
-                //       const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                //   decoration: BoxDecoration(
-                //     borderRadius: BorderRadius.circular(12),
-                //     color: Colors.white,
-                //   ),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       Text(
-                //         'Add detailed address and delivery instructions',
-                //         style: TextStyle(
-                //           fontSize: 12,
-                //           color: Color(0xFF847D79),
-                //         ),
-                //       ),
-                //       Icon(
-                //         Icons.edit,
-                //         color: Color(0xFF74CA45),
-                //         size: 24,
-                //       ),
-                //     ],
-                //   ),
-                // ),
+                // Hiển thị thông tin quãng đường và thời gian giao hàng
+                if (!isPickupYourself && (distance > 0 || isCalculatingRoute))
+                  Container(
+                    margin: EdgeInsets.only(top: 8.sw),
+                    decoration: BoxDecoration(
+                      color: hexColor('#F9F8F6'),
+                      borderRadius: BorderRadius.circular(8.sw),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(width: 2.sw),
+                            isCalculatingRoute
+                                ? SizedBox(
+                                    width: 16.sw,
+                                    height: 16.sw,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          appColorPrimaryOrange),
+                                    ),
+                                  )
+                                : WidgetAppSVG(
+                                    'icon38', // Biểu tượng thời gian
+                                    width: 16.sw,
+                                    color: appColorPrimaryOrange,
+                                  ),
+                            SizedBox(width: 12.sw),
+                            Text(
+                              isCalculatingRoute
+                                  ? 'Calculating route...'.tr()
+                                  : ('Estimated time'.tr() +
+                                      ': $duration (${distance.toStringAsFixed(1)} km)'),
+                              style: w500TextStyle(
+                                fontSize: 14.sw,
+                                color: hexColor('#F17228'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

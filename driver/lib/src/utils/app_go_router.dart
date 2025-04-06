@@ -10,6 +10,7 @@ import 'package:app/src/presentation/order_detail/order_detail_screen.dart';
 import 'package:app/src/presentation/report_order/report_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:network_resources/order/models/models.dart';
 
 import '../presentation/driver_register/driver_register_screen.dart';
 import '../presentation/driver_register/widgets/widget_form_profile.dart';
@@ -205,18 +206,8 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/order-detail',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const OrderDetailScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          builder: (context, state) =>
+              OrderDetailScreen(order: state.extra as OrderModel),
         ),
         GoRoute(
           path: '/order-detail/chat',

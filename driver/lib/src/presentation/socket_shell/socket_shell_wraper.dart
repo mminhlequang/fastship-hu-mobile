@@ -2,14 +2,13 @@ import 'dart:async';
 
 import 'package:app/src/utils/app_get.dart';
 import 'package:flutter/material.dart';
+import 'package:network_resources/enums.dart';
+import 'package:network_resources/order/models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../constants/app_constants.dart'; 
+import '../../constants/app_constants.dart';
 import 'controllers/socket_controller.dart';
-import 'widgets/order_action_widget.dart';
-import 'widgets/order_notification_widget.dart';
-import 'widgets/order_complete_widget.dart';
-import 'widgets/order_canceled_widget.dart';
+import 'widgets/order_states.dart';
 
 class SocketShellWrapper extends StatefulWidget {
   final Widget child;
@@ -22,10 +21,10 @@ class SocketShellWrapper extends StatefulWidget {
 class _SocketShellWrapperState extends State<SocketShellWrapper> {
   SocketController get _socketController => findInstance<SocketController>();
   bool _isBlinking = false;
-  Map<String, dynamic>? get _currentOrder => _socketController.currentOrder;
+  OrderModel? get _currentOrder => _socketController.currentOrder;
 
   // Controller để chơi âm thanh thông báo
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  // final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -42,28 +41,8 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
         });
       };
 
-      _socketController.onOrderStatusChanged = (status) {
-        setState(() {});
-      };
-
       _socketController.onPlayNotification = () {
         _playNotificationSound();
-      };
-
-      // Thêm xử lý cho profile được cập nhật
-      _socketController.onProfileUpdated = (profileData) {
-        setState(() {
-          // Có thể lưu profile vào state hoặc provider nếu cần
-          debugPrint('Đã nhận profile: ${profileData['name']}');
-        });
-      };
-
-      // Thêm xử lý cho wallet được cập nhật
-      _socketController.onWalletUpdated = (walletData) {
-        setState(() {
-          // Có thể lưu wallet vào state hoặc provider nếu cần
-          debugPrint('Đã nhận wallet: ${walletData['balance']}');
-        });
       };
     } catch (e) {
       debugPrint('Lỗi khi khởi tạo SocketController: $e');
@@ -71,17 +50,12 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   }
 
   Future<void> _playNotificationSound() async {
-    try {
-      await _audioPlayer.play(AssetSource('sounds/notification.mp3'));
-    } catch (e) {
-      print('Audio error: $e');
-    }
+    //TODO:
   }
 
   Future<void> _callCustomer() async {
-    if (_currentOrder != null && _currentOrder!['customer_phone'] != null) {
-      final phoneNumber = _currentOrder!['customer_phone'];
-      final Uri url = Uri.parse('tel:$phoneNumber');
+    if (_currentOrder != null && _currentOrder!.customer?.phone != null) {
+      final Uri url = Uri.parse('tel:${_currentOrder!.customer?.phone!}');
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
       }
@@ -89,9 +63,9 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   }
 
   Future<void> _sendSms(String message) async {
-    if (_currentOrder != null && _currentOrder!['customer_phone'] != null) {
-      final phoneNumber = _currentOrder!['customer_phone'];
-      final Uri url = Uri.parse('sms:$phoneNumber?body=$message');
+    if (_currentOrder != null && _currentOrder!.customer?.phone != null) {
+      final Uri url =
+          Uri.parse('sms:${_currentOrder!.customer?.phone}?body=$message');
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
       }
@@ -108,7 +82,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   @override
   void dispose() {
     _socketController.dispose();
-    _audioPlayer.dispose();
+    // _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -161,99 +135,22 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
           bottom: 0,
           left: 0,
           right: 0,
-          child: _buildOrderStatusWidget(),
+          child: ValueListenableBuilder<AppOrderProcessStatus>(
+            valueListenable: _socketController.orderStatus,
+            builder: (context, value, child) {
+              if (value == AppOrderProcessStatus.pending) {
+                return const SizedBox.shrink();
+              }
+
+              return WidgetOrderStates(
+                processStatus: value,
+                order: _currentOrder,
+                // onStatusChanged: _socketController.updateOrderStatus,
+              );
+            },
+          ),
         ),
       ],
     );
   }
-
-  Widget _buildOrderStatusWidget() {
-    switch (_socketController.orderStatus) {
-      case DriverOrderStatus.waiting:
-        return const SizedBox(); // Không hiển thị gì
-
-      case DriverOrderStatus.newOrder:
-        return OrderNotificationWidget(
-          order: _currentOrder!,
-          isBlinking: _isBlinking,
-          onAccept: _socketController.acceptOrder,
-          onReject: _socketController.rejectOrder,
-        );
-
-      case DriverOrderStatus.accepted:
-        // Sau khi chấp nhận đơn hàng, hiển thị widget cho phép tài xế xác nhận đã lấy hàng
-        return OrderActionWidget(
-          order: _currentOrder!,
-          onUpdateStatus: (status) {
-            if (status == 'picked_up') {
-              _socketController.pickOrder();
-            } else {
-              _socketController.updateOrderStatus(status);
-            }
-          },
-          onComplete: _socketController.completeOrder,
-          onCall: _callCustomer,
-          onSendSms: _sendSms,
-        );
-
-      case DriverOrderStatus.picked:
-        // Tài xế đã lấy hàng, hiển thị các tùy chọn cho việc giao hàng
-        return OrderActionWidget(
-          order: _currentOrder!,
-          onUpdateStatus: (status) {
-            if (status == 'arrived_at_customer') {
-              _socketController.startDelivery();
-            } else {
-              _socketController.updateOrderStatus(status);
-            }
-          },
-          onComplete: _socketController.completeOrder,
-          onCall: _callCustomer,
-          onSendSms: _sendSms,
-        );
-
-      case DriverOrderStatus.inProgress:
-        return OrderActionWidget(
-          order: _currentOrder!,
-          onUpdateStatus: _socketController.updateOrderStatus,
-          onComplete: _socketController.completeOrder,
-          onCall: _callCustomer,
-          onSendSms: _sendSms,
-        );
-
-      case DriverOrderStatus.completed:
-        return OrderCompleteWidget(
-          order: _currentOrder!,
-          onClose: _socketController.closeOrderComplete,
-        );
-
-      case DriverOrderStatus.canceled:
-        return OrderCanceledWidget(
-          order: _currentOrder!,
-          onClose: _socketController.closeOrderCanceled,
-          onContactSupport: _contactSupport,
-        );
-
-      default:
-        return const SizedBox(); // Fallback cho trường hợp không xác định
-    }
-  }
-}
-
-// Placeholder cho AudioPlayer. Trong dự án thực, bạn cần sử dụng thư viện thực
-class AudioPlayer {
-  Future<void> play(AssetSource source) async {
-    // Giả lập phát nhạc
-    print('Playing sound: ${source.path}');
-  }
-
-  void dispose() {
-    // Giả lập giải phóng tài nguyên
-  }
-}
-
-class AssetSource {
-  final String path;
-
-  AssetSource(this.path);
 }
