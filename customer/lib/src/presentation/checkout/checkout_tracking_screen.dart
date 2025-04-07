@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/utils/utils.dart';
-import 'package:app/src/utils/app_map_utils.dart';
-import 'package:app/src/utils/animated_polyline.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,12 +15,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/enums.dart';
+import 'package:network_resources/here_polyline_converter.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../socket_shell/controllers/socket_controller.dart';
 import '../widgets/widget_app_map.dart';
+import '../widgets/widget_appbar.dart';
 
 class CheckoutTrackingScreen extends StatefulWidget {
   const CheckoutTrackingScreen({super.key});
@@ -40,11 +40,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   final ValueNotifier<List<Polyline>> _polylinesNotifier =
       ValueNotifier<List<Polyline>>([]);
 
-  // Controller cho LiveAnimatedPolyline
-  LiveAnimatedPolyline? _polylineController;
-
   OrderModel get order => socketController.order!;
-  String get polyline => order.shipPolyline ?? '';
 
   @override
   void dispose() {
@@ -57,205 +53,139 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     return ValueListenableBuilder(
         valueListenable: socketController.orderStatus,
         builder: (context, value, child) {
-          if (value == null) return SizedBox();
+          if (socketController.order == null) return SizedBox();
           OrderModel order = socketController.order!;
           return Scaffold(
-            body: SafeArea(
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    appHaptic();
-                                    appContext.pop();
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: WidgetAppSVG('icon40',
-                                        width: 24, height: 24),
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    WidgetAppBar(
+                      title: value?.textNotification ?? '',
+                    ),
+                    Expanded(
+                      child: ValueListenableBuilder(
+                          valueListenable: socketController.driverLocation,
+                          builder: (context, driverLocation, child) {
+                            // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
+                            List<LatLng> polylinePoints = [];
+                            if (order.shipPolyline?.isNotEmpty ?? false) {
+                              try {
+                                polylinePoints =
+                                    FlexiblePolyline.decode(order.shipPolyline!)
+                                        .map((e) => LatLng(e.lat, e.lng))
+                                        .toList();
+                              } catch (e) {
+                                debugPrint('Error decoding polyline: $e');
+                              }
+                            }
+
+                            return WidgetAppFlutterMapAnimation(
+                              mapController: mapController,
+                              initialCenter: LatLng(
+                                order.lat!,
+                                order.lng!,
+                              ),
+                              markers: [
+                                Marker(
+                                  point: LatLng(
+                                    order.store!.lat!,
+                                    order.store!.lng!,
+                                  ),
+                                  width: 36.sw,
+                                  height: 36.sw,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.store!.avatarImage,
+                                    radius1: 18.sw,
+                                    radius2: 18.sw - 2,
+                                    radius3: 18.sw - 2,
+                                    borderColor: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  value?.textNotification ?? 'Processing'.tr(),
-                                  style: w400TextStyle(fontSize: 18.sw),
-                                ),
-                                const SizedBox(width: 12),
-                                // SizedBox(
-                                //   width: 20,
-                                //   height: 20,
-                                //   child: CircularProgressIndicator(
-                                //     backgroundColor: Colors.grey[100],
-                                //     color: appColorPrimaryOrange,
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                            Spacer(),
-                            TextButton(
-                              onPressed: () {
-                                appHaptic();
-                              },
-                              child: Text(
-                                'Cancel',
-                                style: w400TextStyle(
-                                  fontSize: 16,
-                                  color: const Color(0xFFF17228),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: ValueListenableBuilder(
-                            valueListenable: socketController.driverLocation,
-                            builder: (context, driverLocation, child) {
-                              // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
-                              List<LatLng> polylinePoints = [];
-                              if (polyline.isNotEmpty) {
-                                try {
-                                  polylinePoints =
-                                      AppMapUtils.decodePolyline(polyline);
-
-                                  // Cập nhật polyline controller
-                                  if (_polylineController == null &&
-                                      polylinePoints.isNotEmpty) {
-                                    _polylineController = LiveAnimatedPolyline(
-                                      points: polylinePoints,
-                                      polylinesNotifier: _polylinesNotifier,
-                                      color: appColorPrimary,
-                                      strokeWidth: 4.0,
+                                if (order.driver != null &&
+                                    driverLocation != null)
+                                  Marker(
+                                    point: LatLng(
+                                      driverLocation.latitude,
+                                      driverLocation.longitude,
+                                    ),
+                                    width: 36.sw,
+                                    height: 36.sw,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.driver!.avatar ?? '',
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
                                       borderColor: Colors.white,
-                                      borderStrokeWidth: 1.0,
-                                    );
-                                  }
-                                } catch (e) {
-                                  debugPrint('Error decoding polyline: $e');
-                                }
-                              }
-
-                              return Stack(
-                                children: [
-                                  ValueListenableBuilder<List<Polyline>>(
-                                      valueListenable: _polylinesNotifier,
-                                      builder: (context, polylines, _) {
-                                        return WidgetAppFlutterMapAnimation(
-                                          mapController: mapController,
-                                          initialCenter: LatLng(
-                                            order.lat!,
-                                            order.lng!,
-                                          ),
-                                          markers: [
-                                            Marker(
-                                              point: LatLng(
-                                                order.store!.lat!,
-                                                order.store!.lng!,
-                                              ),
-                                              width: 36.sw,
-                                              height: 36.sw,
-                                              child: WidgetAvatar(
-                                                imageUrl:
-                                                    order.store!.avatarImage,
-                                                radius1: 18.sw,
-                                                radius2: 18.sw - 2,
-                                                radius3: 18.sw - 2,
-                                                borderColor: Colors.white,
-                                              ),
-                                            ),
-                                            if (order.driver != null &&
-                                                driverLocation != null)
-                                              Marker(
-                                                point: LatLng(
-                                                  driverLocation.latitude,
-                                                  driverLocation.longitude,
-                                                ),
-                                                width: 36.sw,
-                                                height: 36.sw,
-                                                child: WidgetAvatar(
-                                                  imageUrl:
-                                                      order.driver!.avatar ??
-                                                          '',
-                                                  radius1: 18.sw,
-                                                  radius2: 18.sw - 2,
-                                                  radius3: 18.sw - 2,
-                                                  borderColor: Colors.white,
-                                                ),
-                                              ),
-                                            Marker(
-                                              point: LatLng(
-                                                order.lat!,
-                                                order.lng!,
-                                              ),
-                                              width: 36,
-                                              height: 36,
-                                              child: AvatarGlow(
-                                                glowColor: appColorPrimary,
-                                                duration: const Duration(
-                                                    milliseconds: 2000),
-                                                repeat: true,
-                                                child: WidgetAppSVG(
-                                                  'icon23',
-                                                  width: 28,
-                                                  height: 28,
-                                                  color: appColorPrimary,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                          polylines: polylines,
-                                          initialZoom: 15,
-                                          minZoom: 15,
-                                          maxZoom: 19,
-                                        );
-                                      }),
-
-                                  // Sử dụng controller nhưng không render
-                                  if (_polylineController != null)
-                                    _polylineController!,
-                                ],
-                              );
-                            }),
-                      ),
-                    ],
-                  ),
-                  SlidingUpPanel(
-                    controller: _panelController,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, -4),
-                      ),
-                    ],
-                    minHeight: 180.sw + MediaQuery.of(context).padding.bottom,
-                    maxHeight: 380.sw + MediaQuery.of(context).padding.bottom,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(16)),
-                    panel: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _buildProgressIndicator(value),
-                          SizedBox(height: 12.sw),
-                          _buildDriverInfo(order),
-                          _buildAddressCard(order),
-                          _buildOrderSummary(order),
-                        ],
-                      ),
+                                    ),
+                                  ),
+                                Marker(
+                                  point: LatLng(
+                                    order.lat!,
+                                    order.lng!,
+                                  ),
+                                  width: 36,
+                                  height: 36,
+                                  child: AvatarGlow(
+                                    glowColor: appColorPrimary,
+                                    duration:
+                                        const Duration(milliseconds: 2000),
+                                    repeat: true,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.customer!.avatar,
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              polylines: [
+                                Polyline(
+                                  pattern: const StrokePattern.dotted(
+                                    spacingFactor: 1.5,
+                                    patternFit: PatternFit.scaleUp,
+                                  ),
+                                  color: appColorPrimary,
+                                  strokeWidth: 6.0,
+                                  borderColor: Colors.white,
+                                  borderStrokeWidth: 1.0,
+                                  points: polylinePoints,
+                                )
+                              ],
+                              initialZoom: 14,
+                            );
+                          }),
                     ),
-                    body: Container(),
+                  ],
+                ),
+                SlidingUpPanel(
+                  controller: _panelController,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                  minHeight: 320.sw + MediaQuery.of(context).padding.bottom,
+                  maxHeight: 580.sw + MediaQuery.of(context).padding.bottom,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  panel: Column(
+                    children: [
+                      _buildProgressIndicator(
+                          value ?? AppOrderProcessStatus.pending),
+                      SizedBox(height: 12.sw),
+                      _buildDriverInfo(order),
+                      _buildAddressCard(order),
+                      _buildOrderSummary(order),
+                    ],
                   ),
-                ],
-              ),
+                  body: Container(),
+                ),
+              ],
             ),
           );
         });
@@ -382,7 +312,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                     style: w400TextStyle(
                         fontSize: 14.sw, color: hexColor('#847D79')),
                   ),
-                  Gap(4.sw),
+                  Gap(8.sw),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -398,6 +328,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                               shape: BoxShape.circle,
                               color: Colors.white,
                               border: Border.all(color: hexColor('#F1EFE9'))),
+                          alignment: Alignment.center,
                           child: WidgetAppSVG('icon49',
                               width: 24.sw, height: 24.sw),
                         ),
@@ -414,6 +345,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                               shape: BoxShape.circle,
                               color: Colors.white,
                               border: Border.all(color: hexColor('#F1EFE9'))),
+                          alignment: Alignment.center,
                           child: WidgetAppSVG('icon46',
                               width: 24.sw, height: 24.sw),
                         ),
@@ -430,10 +362,12 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                               shape: BoxShape.circle,
                               color: Colors.white,
                               border: Border.all(color: hexColor('#F1EFE9'))),
+                          alignment: Alignment.center,
                           child: WidgetAppSVG('icon45',
                               width: 24.sw, height: 24.sw),
                         ),
                       ),
+                      Gap(4.sw),
                     ],
                   )
                 ],

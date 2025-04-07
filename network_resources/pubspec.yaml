@@ -21,6 +21,7 @@ dependencies:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
       path: network/
       ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
+  tuple: ^2.0.2
 
 
 dev_dependencies:

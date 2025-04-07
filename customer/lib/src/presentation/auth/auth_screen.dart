@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
@@ -38,7 +39,121 @@ class _AuthScreenState extends State<AuthScreen> {
               child: WidgetCarouselImages(is4Column: false),
             ),
             _buildHeaderText(),
-            _buildCountryPhoneSection(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: InternationalPhoneNumberInput(
+                spaceBetweenSelectorAndTextField: 12,
+                keyboardType: TextInputType.phone,
+                formatInput: true,
+                keyboardAction: TextInputAction.done,
+                cursorColor: appColorText,
+                countries: ["VN"] +
+                    euroCounries.map((e) => e['code'].toString()).toList(),
+                selectorConfig: SelectorConfig(
+                  bgColor: Colors.white,
+                  selectorTextStyle: w500TextStyle(fontSize: 16),
+                ),
+                builderTextField: (child) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Number phone'.tr(),
+                      style: w400TextStyle(
+                        fontSize: 14.sw,
+                        color: const Color(0xFFB6AFAE),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 52.sw,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFF1EFE9)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: child,
+                    ),
+                  ],
+                ),
+                builderButtonSelector: (child) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Country',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: const Color(0xFFB6AFAE),
+                        letterSpacing: 0.14,
+                        fontFamily: GoogleFonts.fredoka().fontFamily,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 52.sw,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF4F4F4),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: child,
+                    ),
+                  ],
+                ),
+                onInputChanged: (PhoneNumber number) {
+                  appHaptic();
+                  setState(() {
+                    phoneNumber = number;
+                  });
+                },
+                onInputValidated: (bool isValid) {
+                  setState(() {
+                    isPhoneNumberValid = isValid;
+                  });
+                },
+                onSubmit: () {
+                  if (isPhoneNumberValid) {
+                    pushWidget(
+                      child: PhoneVerificationScreen(
+                        phoneNumber: phoneNumber!,
+                      ),
+                    );
+                  }
+                },
+                textStyle: w400TextStyle(fontSize: 16.sw),
+                inputDecoration: InputDecoration(
+                  isDense: true,
+                  isCollapsed: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
+                  filled: true,
+                  fillColor: appColorBackground,
+                  hintText: '87 878 7878',
+                  hintStyle: w400TextStyle(
+                    fontSize: 16.sw,
+                    color: const Color(0xFF8A8C91),
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(8.sw),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: WidgetButtonConfirm(
+                onPressed: () {
+                  appHaptic();
+                  pushWidget(
+                    child: PhoneVerificationScreen(
+                      phoneNumber: phoneNumber!,
+                    ),
+                  );
+                },
+                isEnabled: isPhoneNumberValid,
+                text: "Continue".tr(),
+              ),
+            ),
             _buildSocialLoginSection(),
             _buildTermsSection(),
           ],
@@ -71,109 +186,6 @@ class _AuthScreenState extends State<AuthScreen> {
             textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCountryPhoneSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: InternationalPhoneNumberInput(
-        spaceBetweenSelectorAndTextField: 12,
-        keyboardType: TextInputType.phone,
-        formatInput: true,
-        keyboardAction: TextInputAction.done,
-        cursorColor: appColorText,
-        countries:
-            ["VN"] + euroCounries.map((e) => e['code'].toString()).toList(),
-        selectorConfig: SelectorConfig(
-          bgColor: Colors.white,
-          selectorTextStyle: w500TextStyle(fontSize: 16),
-        ),
-        builderTextField: (child) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Number phone'.tr(),
-              style: w400TextStyle(
-                fontSize: 14.sw,
-                color: const Color(0xFFB6AFAE),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              height: 52.sw,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFF1EFE9)),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: child,
-            ),
-          ],
-        ),
-        builderButtonSelector: (child) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Country',
-              style: TextStyle(
-                fontSize: 14,
-                color: const Color(0xFFB6AFAE),
-                letterSpacing: 0.14,
-                fontFamily: GoogleFonts.fredoka().fontFamily,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              height: 52.sw,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF4F4F4),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: child,
-            ),
-          ],
-        ),
-        onInputChanged: (PhoneNumber number) {
-          appHaptic();
-          setState(() {
-            phoneNumber = number;
-          });
-        },
-        onInputValidated: (bool isValid) {
-          setState(() {
-            isPhoneNumberValid = isValid;
-          });
-        },
-        onSubmit: () {
-          if (isPhoneNumberValid) {
-            pushWidget(
-              child: PhoneVerificationScreen(
-                phoneNumber: phoneNumber!,
-              ),
-            );
-          }
-        },
-        textStyle: w400TextStyle(fontSize: 16.sw),
-        inputDecoration: InputDecoration(
-          isDense: true,
-          isCollapsed: true,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: 12.sw, vertical: 8.sw),
-          filled: true,
-          fillColor: appColorBackground,
-          hintText: '87 878 7878',
-          hintStyle: w400TextStyle(
-            fontSize: 16.sw,
-            color: const Color(0xFF8A8C91),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(8.sw),
-          ),
-        ),
       ),
     );
   }

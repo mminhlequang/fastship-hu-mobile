@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app/src/presentation/widgets/widget_loader.dart';
 import 'package:app/src/utils/app_get.dart';
 import 'package:flutter/material.dart';
 import 'package:network_resources/enums.dart';
@@ -149,6 +150,17 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
               );
             },
           ),
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: _socketController.socketConnected,
+          builder: (context, value, child) {
+            return !value
+                ? Container(
+                    color: Colors.black.withOpacity(0.1),
+                    child: const WidgetAppLoader(),
+                  )
+                : const SizedBox.shrink();
+          },
         ),
       ],
     );

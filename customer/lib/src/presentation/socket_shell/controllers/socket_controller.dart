@@ -36,7 +36,6 @@ class CustomerSocketController {
 
   void initializeSocket() {
     try {
-      debugPrint('Debug socket: Bắt đầu khởi tạo socket');
       socket = IO.io(
         socketIOUrl,
         IO.OptionBuilder()
@@ -47,7 +46,7 @@ class CustomerSocketController {
       );
 
       socket?.onConnect((_) {
-        debugPrint('Debug socket: Đã kết nối thành công');
+        debugPrint('Debug socket: connected');
         socketConnected.value = true;
         _authenticate();
 
@@ -55,12 +54,12 @@ class CustomerSocketController {
       });
 
       socket?.onDisconnect((_) {
-        debugPrint('Debug socket: Đã ngắt kết nối');
+        debugPrint('Debug socket: Disconnected');
         socketConnected.value = false;
       });
 
       socket?.on('authentication_success', (data) {
-        debugPrint('Debug socket: Đã xác thực');
+        debugPrint('Debug socket: authentication_success: $data');
         appShowSnackBar(
           context: appContext,
           msg: "Authentication success",
@@ -70,6 +69,7 @@ class CustomerSocketController {
 
       // Xử lý khi đơn hàng được tạo
       socket?.on('create_order_result', (data) {
+        debugPrint('Debug socket: create_order_result: $data');
         _onCreateOrderResult(data);
         appShowSnackBar(
           context: appContext,
@@ -80,13 +80,11 @@ class CustomerSocketController {
 
       // Xử lý khi trạng thái đơn hàng thay đổi
       socket?.on('order_status_updated', (data) {
+        debugPrint('[Debug socket] order_status_updated: $data');
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
           orderStatus.value = AppOrderProcessStatus.values
               .byName(socketResponse.data!['processStatus']);
-
-          debugPrint(
-              '[Debug socket] order_status_updated: ${socketResponse.data}');
 
           appShowSnackBar(
             context: appContext,
@@ -134,7 +132,7 @@ class CustomerSocketController {
 
       // Xử lý khi đơn hàng bị hủy
       socket?.on('order_cancelled', (data) async {
-        debugPrint('Debug socket: Đơn hàng đã bị hủy');
+        debugPrint('Debug socket: order_cancelled: $data');
         appShowSnackBar(
           context: appContext,
           msg: "order_cancelled: $data",
@@ -161,9 +159,8 @@ class CustomerSocketController {
 
       // Xử lý lỗi
       socket?.on('error', (data) {
+        debugPrint('Debug socket: error: $data');
         final socketResponse = _parseSocketResponse(data);
-        debugPrint(
-            'Debug socket: Lỗi: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}');
         appShowSnackBar(
           context: appContext,
           msg:
@@ -208,7 +205,6 @@ class CustomerSocketController {
 
   void _onCreateOrderResult(dynamic data) async {
     final socketResponse = _parseSocketResponse(data);
-    print('Debug socket: create_order_result: ${socketResponse.data}');
     if (socketResponse.isSuccess && socketResponse.data != null) {
       AppFindDriverStatus findDriverStatus = AppFindDriverStatus.values
           .byName(socketResponse.data!['find_driver_status']);
@@ -218,6 +214,10 @@ class CustomerSocketController {
         case AppFindDriverStatus.availableDrivers:
           break;
         case AppFindDriverStatus.found:
+          orderStatus.value = AppOrderProcessStatus.driverAccepted;
+          socket?.on('driver_${socketResponse.data!['driverInfo']?['profile']?['id']}', (data) {
+            debugPrint('Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
+          });
           await _refreshOrder();
           if (!_createOrderCompleter.isCompleted) {
             _createOrderCompleter.complete(true);
@@ -281,6 +281,8 @@ extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
         return "Pending";
       case AppOrderProcessStatus.findDriver:
         return "Finding driver";
+      case AppOrderProcessStatus.driverAccepted:
+        return "Driver accepted your order";
       case AppOrderProcessStatus.driverArrivedStore:
         return "Driver arrived at store";
       case AppOrderProcessStatus.driverPicked:

@@ -69,6 +69,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   _redirect() {
+    clearAllRouters();
     appContext.pushReplacement("/navigation");
   }
 }

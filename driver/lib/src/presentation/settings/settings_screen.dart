@@ -19,9 +19,9 @@ enum SettingsItem {
   incomeStatistics,
   customerReviews,
   changePassword,
-  vehicles,
+  // vehicles,
   helpCenter,
-  deleteAccount,
+  // deleteAccount,
   logout;
 
   String get title => switch (this) {
@@ -30,9 +30,9 @@ enum SettingsItem {
         incomeStatistics => 'Income statistics'.tr(),
         customerReviews => 'Customer’s reviews'.tr(),
         changePassword => 'Change password'.tr(),
-        vehicles => 'Vehicles'.tr(),
+        // vehicles => 'Vehicles'.tr(),
         helpCenter => 'Help center'.tr(),
-        deleteAccount => 'Delete account'.tr(),
+        // deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
 
@@ -42,9 +42,9 @@ enum SettingsItem {
         incomeStatistics => assetsvg('ic_income_statistics'),
         customerReviews => assetsvg('ic_review'),
         changePassword => assetsvg('ic_lock'),
-        vehicles => assetsvg('ic_vehicle'),
+        // vehicles => assetsvg('ic_vehicle'),
         helpCenter => assetsvg('ic_support'),
-        deleteAccount => assetsvg('ic_delete_acc'),
+        // deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
 
@@ -53,7 +53,7 @@ enum SettingsItem {
         incomeStatistics => '/statistics',
         customerReviews => '/customer-reviews',
         changePassword => '/change-password',
-        vehicles => '/vehicles',
+        // vehicles => '/vehicles',
         helpCenter => '/help-center',
         _ => null,
       };
@@ -151,9 +151,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void onTap(SettingsItem item) {
     switch (item) {
-      case SettingsItem.deleteAccount:
-        _deleteAccount();
-        break;
+      // case SettingsItem.deleteAccount:
+      //   _deleteAccount();
+      //   break;
       case SettingsItem.logout:
         _logout();
         break;

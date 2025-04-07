@@ -117,6 +117,10 @@ final goRouter = GoRouter(
           builder: (context, state) => const PersonalDataScreen(),
         ),
         GoRoute(
+          path: '/checkout-tracking',
+          builder: (context, state) => const CheckoutTrackingScreen(),
+        ),
+        GoRoute(
           path: '/cancel-order',
           builder: (context, state) => const CancelOrderScreen(),
         ),

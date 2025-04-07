@@ -312,11 +312,12 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           processer.value = SheetProcessStatus.success;
           Timer(
             const Duration(seconds: 3),
-            () {
+            () async {
               context.pop();
               if (socketResult) {
                 context.pop();
-                appOpenBottomSheet(const CheckoutTrackingScreen());
+                await Future.delayed(const Duration(milliseconds: 300));
+                context.push('/checkout-tracking'); 
               }
             },
           );
@@ -336,9 +337,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         onTryAgain: callback,
       ),
       isDismissible: kDebugMode,
-    );
-    // context.pop();
-    // appOpenBottomSheet(const CheckoutTrackingScreen());
+    ); 
   }
 
   @override

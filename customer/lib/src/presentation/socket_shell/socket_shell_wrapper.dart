@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'controllers/socket_controller.dart';
@@ -36,7 +37,9 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
   Future<void> _checkNotificationPermission() async {
     final status = await Permission.notification.status;
     if (status.isDenied) {
-      _showNotificationPermissionDialog();
+      if (!kDebugMode) {
+        _showNotificationPermissionDialog();
+      }
     }
   }
 

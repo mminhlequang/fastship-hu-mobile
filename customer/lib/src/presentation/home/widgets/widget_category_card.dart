@@ -24,7 +24,7 @@ class WidgetCategoryCard extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(right: 16.sw),
         width: 84.sw,
-        height: 12.sw + 50.sw + 3.sw + 12.sw * 1.2 * 2 + 1,
+        height: 12.sw + 50.sw + 3.sw + 12.sw * 1.2 * 2 + 5,
         decoration: isSelected
             ? BoxDecoration(
                 boxShadow: [

@@ -164,8 +164,6 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
 
   /// Widget hiển thị thông tin thu nhập của đơn hàng
   Widget _buildOrderHeader() {
-    final earnings = '\$15.00';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -175,7 +173,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
         ),
         Gap(2.sw),
         Text(
-          earnings,
+          currencyFormatted(widget.order!.shipFee! * .70),
           style: w600TextStyle(fontSize: 20.sw, color: darkGreen),
         ),
         Gap(12.sw),

@@ -76,13 +76,13 @@ Widget _buildButton({
       height: height ?? 50.sw,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(
-            color: isOutlined
-                ? hexColor('#DEDEDE')
-                : appColorPrimary.withOpacity(isEnabled ? 1 : 0.5)),
+        border: !isEnabled
+            ? Border()
+            : Border.all(
+                color: isOutlined ? hexColor('#DEDEDE') : appColorPrimary),
         color: isOutlined
             ? Colors.white
-            : appColorPrimary.withOpacity(isEnabled ? 1 : 0.5),
+            : appColorPrimary.withOpacity(isEnabled ? 1 : 0.25),
       ),
       child: Center(
         child: isLoading
@@ -91,7 +91,9 @@ Widget _buildButton({
                 text,
                 style: w600TextStyle(
                   fontSize: 18.sw,
-                  color: isOutlined ? appColorText2 : Colors.white,
+                  color: isOutlined
+                      ? appColorText2
+                      : Colors.white.withOpacity(isEnabled ? 1 : .65),
                 ),
               ),
       ),

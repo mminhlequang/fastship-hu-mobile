@@ -48,7 +48,6 @@ class SocketController {
 
   void _initializeSocket() {
     try {
-      debugPrint('Debug socket: Bắt đầu khởi tạo socket');
       socket = IO.io(
         socketIOUrl,
         IO.OptionBuilder()
@@ -59,31 +58,36 @@ class SocketController {
       );
 
       socket?.onConnect((_) {
-        debugPrint('Debug socket: Đã kết nối thành công');
+        debugPrint('Debug socket: connect');
         socketConnected.value = true;
         _authenticate();
         socket?.emit("joinRoom", "driver_${AppPrefs.instance.user?.id}");
       });
 
+      socket?.on('current_order_info', (data) {
+        debugPrint('Debug socket: current_order_info ${data}');
+        _handleNewOrder(data, isOldOrder: true);
+      });
+
       socket?.onDisconnect((_) {
-        debugPrint('Debug socket: Đã ngắt kết nối');
+        debugPrint('Debug socket: disconnect ');
         socketConnected.value = false;
       });
 
       socket?.on('driver_new_order_request', (data) {
-        debugPrint('Debug socket: Nhận đơn hàng mới');
+        debugPrint('Debug socket: driver_new_order_request ${data}');
         _handleNewOrder(data);
       });
 
       socket?.on('order_cancelled', (data) {
-        debugPrint('Debug socket: Đơn hàng bị hủy');
+        debugPrint('Debug socket: order_cancelled ${data}');
         //TODO: Xử lý đơn hàng bị hủy
         // _handleOrderCanceled(data);
-      }); 
+      });
 
       // Thêm xử lý event nhận phản hồi xác thực thành công
       socket?.on('authentication_success', (data) {
-        debugPrint('Debug socket: Xác thực thành công');
+        debugPrint('Debug socket: authentication_success ${data}');
         final socketResponse = _parseSocketResponse(data);
 
         if (socketResponse.isSuccess) {
@@ -100,16 +104,14 @@ class SocketController {
 
       // Thêm xử lý event lỗi xác thực
       socket?.on('authentication_error', (data) {
+        debugPrint('Debug socket: authentication_error ${data}');
         final socketResponse = _parseSocketResponse(data);
-        debugPrint(
-            'Debug socket: Lỗi xác thực: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}');
         // Có thể thêm xử lý khi xác thực thất bại
       });
 
       socket?.on('error', (data) {
+        debugPrint('Debug socket: error ${data}');
         final socketResponse = _parseSocketResponse(data);
-        debugPrint(
-            'Debug socket: Lỗi: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}');
       });
 
       socket?.connect();
@@ -191,11 +193,8 @@ class SocketController {
       //TODO: remove later
       currentLocation.value = LatLng(47.495987, 19.0653861);
 
-      debugPrint(
-          'Debug socket: Đã lấy vị trí: ${position.latitude}, ${position.longitude}');
-
       if (socket?.connected == true && _isOnline) {
-        debugPrint('Debug socket: Gửi vị trí lên server');
+        debugPrint('Debug socket: Gửi vị trí lên server ${position.latitude}, ${position.longitude}');
         socket?.emit('driver_update_location', {
           'latitude': position.latitude,
           'longitude': position.longitude,
@@ -209,7 +208,7 @@ class SocketController {
     }
   }
 
-  void _handleNewOrder(dynamic data) {
+  void _handleNewOrder(dynamic data, {bool isOldOrder = false}) {
     final socketResponse = _parseSocketResponse(data);
 
     if (socketResponse.isSuccess && socketResponse.data != null) {
@@ -223,7 +222,11 @@ class SocketController {
       currentOrder = driverNewOrder.order;
       responseTimeout = driverNewOrder.responseTimeout;
       timestampOrderReceived = DateTime.parse(driverNewOrder.timestamp!);
-      orderStatus.value = AppOrderProcessStatus.findDriver;
+      if (isOldOrder) {
+        orderStatus.value = currentOrder!.processStatusEnum;
+      } else {
+        orderStatus.value = AppOrderProcessStatus.findDriver;
+      }
       debugPrint(
           'Debug socket: Thông tin đơn hàng mới: ${jsonEncode(currentOrder)}');
 

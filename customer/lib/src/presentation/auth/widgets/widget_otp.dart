@@ -237,7 +237,7 @@ class _PhoneVerificationScreenState
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               vertical: 12.sw,
-                              horizontal: 80.sw,
+                              horizontal: 40.sw,
                             ),
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
@@ -252,30 +252,33 @@ class _PhoneVerificationScreenState
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (_dateTimeSendOTP != null)
-                                WidgetTimer(builder: () {
-                                  if (seconds <= 0) {
-                                    return SizedBox();
-                                  }
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 12.0),
-                                    child: CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: appColorPrimaryOrange,
-                                      child: Text(
-                                        seconds.toString(),
-                                        style: w600TextStyle(
-                                          fontSize: 14,
-                                          height: 1,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                })
-                              else
+                              RichText(
+                                text: TextSpan(
+                                  style: w400TextStyle(
+                                    fontSize: 18,
+                                    color: seconds < 0
+                                        ? appColorText
+                                        : Colors.grey,
+                                  ),
+                                  text: _dateTimeSendOTP == null
+                                      ? "We sending a code".tr()
+                                      : seconds > 0
+                                          ? "You can resend a code in ".tr()
+                                          : "Resend a code".tr(),
+                                  children: seconds > 0
+                                      ? [
+                                          TextSpan(
+                                            text: "${seconds}s",
+                                            style:
+                                                w600TextStyle(fontSize: 18.sw),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                              ),
+                              if (_dateTimeSendOTP == null)
                                 Padding(
-                                  padding: const EdgeInsets.only(right: 12.0),
+                                  padding: const EdgeInsets.only(left: 12.0),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
@@ -285,14 +288,6 @@ class _PhoneVerificationScreenState
                                     ),
                                   ),
                                 ),
-                              Text(
-                                "I didn't get a code",
-                                style: w400TextStyle(
-                                  fontSize: 18,
-                                  color:
-                                      seconds < 0 ? appColorText : Colors.grey,
-                                ),
-                              ),
                             ],
                           ),
                         );

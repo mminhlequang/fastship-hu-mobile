@@ -21,6 +21,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:network_resources/enums.dart';
+import 'package:network_resources/here_polyline_converter.dart';
+import 'package:network_resources/order/models/models.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -162,33 +165,117 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Stack(
               children: [
                 ValueListenableBuilder(
-                  valueListenable: socketController.currentLocation,
-                  builder: (context, location, child) {
-                    print('location: $location');
-                    return WidgetAppFlutterMapAnimation(
-                      mapController: mapController,
-                      initialCenter: location ?? LatLng(37.7749, -122.4194),
-                      markers: [
-                        if (location != null)
-                          Marker(
-                            point: location,
-                            width: 32.sw,
-                            height: 32.sw,
-                            child: Center(
-                              child: AvatarGlow(
-                                glowColor: appColorPrimary,
-                                child: WidgetAppSVG(
-                                  'motor',
-                                  width: 28.sw,
-                                  height: 28.sw,
+                    valueListenable: socketController.orderStatus,
+                    builder: (context, status, child) {
+                      return ValueListenableBuilder(
+                        valueListenable: socketController.currentLocation,
+                        builder: (context, location, child) {
+                          List<Marker> markers = [];
+                          List<Polyline> polylines = [];
+                          OrderModel? order = socketController.currentOrder;
+                          if (location != null) {
+                            markers.add(Marker(
+                              point: location,
+                              width: 32.sw,
+                              height: 32.sw,
+                              child: Center(
+                                child: AvatarGlow(
+                                  glowColor: appColorPrimary,
+                                  child: WidgetAppSVG(
+                                    'motor',
+                                    width: 28.sw,
+                                    height: 28.sw,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
+                            ));
+                          }
+                          if (status != AppOrderProcessStatus.pending) {
+                            if (order != null) {
+                              markers.addAll([
+                                Marker(
+                                  point: LatLng(
+                                    order.store!.lat!,
+                                    order.store!.lng!,
+                                  ),
+                                  width: 36.sw,
+                                  height: 36.sw,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.store!.avatarImage,
+                                    radius1: 18.sw,
+                                    radius2: 18.sw - 2,
+                                    radius3: 18.sw - 2,
+                                    borderColor: Colors.white,
+                                  ),
+                                ),
+                                Marker(
+                                  point: LatLng(
+                                    order.lat!,
+                                    order.lng!,
+                                  ),
+                                  width: 36,
+                                  height: 36,
+                                  child: AvatarGlow(
+                                    glowColor: appColorPrimary,
+                                    duration:
+                                        const Duration(milliseconds: 2000),
+                                    repeat: true,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.customer!.avatar,
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ]);
+                            }
+
+                            if (socketController
+                                    .currentOrder?.shipPolyline?.isNotEmpty ??
+                                false) {
+                              try {
+                                List<LatLng> polylinePoints =
+                                    FlexiblePolyline.decode(socketController
+                                            .currentOrder!.shipPolyline!)
+                                        .map((e) => LatLng(e.lat, e.lng))
+                                        .toList();
+                                polylines.add(Polyline(
+                                  points: polylinePoints,
+                                  pattern: const StrokePattern.dotted(
+                                    spacingFactor: 1.5,
+                                    patternFit: PatternFit.scaleUp,
+                                  ),
+                                  color: appColorPrimary,
+                                  strokeWidth: 6.0,
+                                  borderColor: Colors.white,
+                                  borderStrokeWidth: 1.0,
+                                ));
+                              } catch (e) {
+                                debugPrint('Error decoding polyline: $e');
+                              }
+                            }
+                          }
+
+                          if (location != null) {
+                            mapController.future.then((e) {
+                              e.animateTo(
+                                dest: location,
+                                duration: const Duration(milliseconds: 300),
+                              );
+                            });
+                          }
+                          return WidgetAppFlutterMapAnimation(
+                            mapController: mapController,
+                            initialCenter:
+                                location ?? LatLng(37.7749, -122.4194),
+                            polylines: polylines,
+                            markers: markers,
+                          );
+                        },
+                      );
+                    }),
                 Positioned(
                   left: 16,
                   right: 16,
