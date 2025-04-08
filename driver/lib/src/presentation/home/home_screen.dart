@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/utils/app_map_helper.dart';
 import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
@@ -260,10 +261,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           if (location != null) {
                             mapController.future.then((e) {
-                              e.animateTo(
-                                dest: location,
-                                duration: const Duration(milliseconds: 300),
-                              );
+                              updateMapToBoundsLatLng(
+                                  markers.map((e) => e.point).toList(), e);
                             });
                           }
                           return WidgetAppFlutterMapAnimation(

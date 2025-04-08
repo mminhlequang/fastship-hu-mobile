@@ -24,7 +24,7 @@ CustomerSocketController get socketController =>
 class CustomerSocketController {
   IO.Socket? socket;
 
-  OrderModel? order;
+  OrderModel? currentOrder;
 
   final ValueNotifier<AppOrderProcessStatus?> orderStatus =
       ValueNotifier<AppOrderProcessStatus?>(null);
@@ -60,55 +60,31 @@ class CustomerSocketController {
 
       socket?.on('authentication_success', (data) {
         debugPrint('Debug socket: authentication_success: $data');
-        appShowSnackBar(
-          context: appContext,
-          msg: "Authentication success",
-          type: AppSnackBarType.notitfication,
-        );
       });
 
       // Xử lý khi đơn hàng được tạo
       socket?.on('create_order_result', (data) {
         debugPrint('Debug socket: create_order_result: $data');
         _onCreateOrderResult(data);
-        appShowSnackBar(
-          context: appContext,
-          msg: "create_order_result: $data",
-          type: AppSnackBarType.notitfication,
-        );
       });
 
       // Xử lý khi trạng thái đơn hàng thay đổi
-      socket?.on('order_status_updated', (data) {
+      socket?.on('order_status_updated', (data) async {
         debugPrint('[Debug socket] order_status_updated: $data');
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
           orderStatus.value = AppOrderProcessStatus.values
               .byName(socketResponse.data!['processStatus']);
-
-          appShowSnackBar(
-            context: appContext,
-            msg: orderStatus.value?.textNotification ?? "Unknown",
-            type: AppSnackBarType.notitfication,
-          );
+          _refreshOrder();
         }
       });
 
       socket?.on('order_completed', (data) async {
         debugPrint('Debug socket: order_completed: $data');
-        appShowSnackBar(
-          context: appContext,
-          msg: "order_completed: $data",
-          type: AppSnackBarType.notitfication,
-        );
 
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
-          orderStatus.value = AppOrderProcessStatus.values
-              .byName(socketResponse.data!['processStatus']);
-
-          debugPrint(
-              '[Debug socket] order_status_updated: ${socketResponse.data}');
+          orderStatus.value = AppOrderProcessStatus.cancelled;
 
           appContext.pop();
           await appOpenDialog(WidgetDialogNotification(
@@ -121,23 +97,12 @@ class CustomerSocketController {
                 appContext.pop();
               }));
           appOpenBottomSheet(WidgetRatingDriver());
-
-          appShowSnackBar(
-            context: appContext,
-            msg: orderStatus.value?.textNotification ?? "Unknown",
-            type: AppSnackBarType.notitfication,
-          );
         }
       });
 
       // Xử lý khi đơn hàng bị hủy
       socket?.on('order_cancelled', (data) async {
         debugPrint('Debug socket: order_cancelled: $data');
-        appShowSnackBar(
-          context: appContext,
-          msg: "order_cancelled: $data",
-          type: AppSnackBarType.notitfication,
-        );
 
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
@@ -161,12 +126,6 @@ class CustomerSocketController {
       socket?.on('error', (data) {
         debugPrint('Debug socket: error: $data');
         final socketResponse = _parseSocketResponse(data);
-        appShowSnackBar(
-          context: appContext,
-          msg:
-              "error: ${socketResponse.messageCode} - ${socketResponse.data != null ? socketResponse.data['message'] : ''}",
-          type: AppSnackBarType.notitfication,
-        );
       });
 
       socket?.connect();
@@ -193,7 +152,7 @@ class CustomerSocketController {
 
     if (socket?.connected == true) {
       socket?.emit('create_order', order.toJson());
-      this.order = order;
+      this.currentOrder = order;
 
       return await _createOrderCompleter.future;
     } else {
@@ -215,9 +174,13 @@ class CustomerSocketController {
           break;
         case AppFindDriverStatus.found:
           orderStatus.value = AppOrderProcessStatus.driverAccepted;
-          socket?.on('driver_${socketResponse.data!['driverInfo']?['profile']?['id']}', (data) {
-            debugPrint('Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
+          socket?.on(
+              'driver_${socketResponse.data!['driverInfo']?['profile']?['id']}',
+              (data) {
+            debugPrint(
+                'Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
           });
+          await Future.delayed(Duration(seconds: 1));
           await _refreshOrder();
           if (!_createOrderCompleter.isCompleted) {
             _createOrderCompleter.complete(true);
@@ -230,6 +193,35 @@ class CustomerSocketController {
           }
           break;
       }
+    }
+  }
+
+// Cập nhật phương thức để hủy đơn hàng
+  void cancelOrder(String reason) {
+    debugPrint('Debug socket: Hủy đơn hàng với lý do: $reason');
+
+    if (currentOrder != null && socket?.connected == true) {
+      debugPrint(
+          'Debug socket: Gửi yêu cầu hủy đơn hàng ID: ${currentOrder!.id}');
+
+      socket?.emit(
+          'cancel_order', {'orderId': currentOrder!.id, 'reason': reason});
+
+      // Lắng nghe phản hồi
+      socket?.once('order_cancelled_confirmation', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          orderStatus.value = AppOrderProcessStatus.cancelled;
+          // onOrderStatusChanged?.call(orderStatus);
+          debugPrint('Debug socket: Đơn hàng đã được hủy thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi hủy đơn hàng: ${socketResponse.messageCode}');
+        }
+      });
+    } else {
+      debugPrint(
+          'Debug socket: Không thể hủy đơn hàng - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
     }
   }
 
@@ -262,10 +254,10 @@ class CustomerSocketController {
 
   _refreshOrder() async {
     NetworkResponse response =
-        await OrderRepo().getOrderDetail({'id': order?.id});
+        await OrderRepo().getOrderDetail({'id': currentOrder?.id});
 
     if (response.isSuccess && response.data != null) {
-      order = response.data!;
+      currentOrder = response.data!;
     }
   }
 

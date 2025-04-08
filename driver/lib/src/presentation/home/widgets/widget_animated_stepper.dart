@@ -24,6 +24,37 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
     AppOrderProcessStatus.completed,
   ];
 
+  _buildStep(AppOrderProcessStatus status, isCompleted) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.bottomCenter,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          child: CircleAvatar(
+            radius: 12.sw,
+            backgroundColor: isCompleted ? appColorPrimary : grey1,
+            child: WidgetAppSVG(
+              _getStepIcon(status),
+              width: 18.sw,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -17.sw,
+          child: Text(
+            _getStepText(status),
+            style: w400TextStyle(
+              fontSize: 11.sw,
+              color: isCompleted ? appColorPrimary : grey1,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -31,57 +62,17 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
       children: List.generate(totalStep.length, (index) {
         bool isCompleted = widget.status.index >= totalStep[index].index;
         return index == totalStep.length - 1
-            ? Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
-                children: [
-                  WidgetAppSVG(
-                    _getStepIcon(totalStep[index]),
-                    width: 24.sw,
-                    color: isCompleted ? darkGreen : grey1,
-                  ),
-                  Positioned(
-                    bottom: -19.sw,
-                    child: Text(
-                      'Delivered'.tr(),
-                      style: w400TextStyle(
-                        fontSize: 12.sw,
-                        color: isCompleted ? darkGreen : grey1,
-                      ),
-                    ),
-                  ),
-                ],
-              )
+            ? _buildStep(totalStep[index], isCompleted)
             : Expanded(
                 child: Row(
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        WidgetAppSVG(
-                          _getStepIcon(totalStep[index]),
-                          width: 24.sw,
-                          color: isCompleted ? darkGreen : grey1,
-                        ),
-                        Positioned(
-                          bottom: -19.sw,
-                          child: Text(
-                            _getStepText(totalStep[index]),
-                            style: w400TextStyle(
-                              fontSize: 12.sw,
-                              color: isCompleted ? darkGreen : grey1,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    _buildStep(totalStep[index], isCompleted),
                     Expanded(
                       child: Container(
                         height: 3.sw,
                         color:
                             (widget.status.index >= totalStep[index + 1].index)
-                                ? darkGreen
+                                ? appColorPrimary
                                 : hexColor('#E0E0E0'),
                       ),
                     ),
@@ -107,18 +98,16 @@ class _WidgetAnimatedStepperState extends State<WidgetAnimatedStepper> {
     }
   }
 
-  String _getStepIcon(
-    AppOrderProcessStatus status,
-  ) {
+  String _getStepIcon(AppOrderProcessStatus status) {
     switch (status) {
       case AppOrderProcessStatus.driverArrivedStore:
-        return assetsvg('ic_picked_on'); //TODO: change icon
+        return assetsvg('icon4');
       case AppOrderProcessStatus.driverPicked:
-        return assetsvg('ic_picked_on');
+        return assetsvg('icon3');
       case AppOrderProcessStatus.driverArrivedDestination:
-        return assetsvg('ic_delivering_on');
+        return assetsvg('icon2');
       default:
-        return assetsvg('ic_delivered_on');
+        return assetsvg('icon1');
     }
   }
 }

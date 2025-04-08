@@ -81,8 +81,7 @@ class SocketController {
 
       socket?.on('order_cancelled', (data) {
         debugPrint('Debug socket: order_cancelled ${data}');
-        //TODO: Xử lý đơn hàng bị hủy
-        // _handleOrderCanceled(data);
+        _handleOrderCanceled(data);
       });
 
       // Thêm xử lý event nhận phản hồi xác thực thành công
@@ -191,10 +190,11 @@ class SocketController {
       currentLocation.value = LatLng(position.latitude, position.longitude);
 
       //TODO: remove later
-      currentLocation.value = LatLng(47.495987, 19.0653861);
+      currentLocation.value = LatLng(47.495927, 19.0653831);
 
       if (socket?.connected == true && _isOnline) {
-        debugPrint('Debug socket: Gửi vị trí lên server ${position.latitude}, ${position.longitude}');
+        debugPrint(
+            'Debug socket: Gửi vị trí lên server ${position.latitude}, ${position.longitude}');
         socket?.emit('driver_update_location', {
           'latitude': position.latitude,
           'longitude': position.longitude,
@@ -248,45 +248,14 @@ class SocketController {
     }
   }
 
-  // void _handleOrderCanceled(dynamic data) {
-  //   debugPrint('Debug socket: Xử lý đơn hàng bị hủy');
-  //   if (_orderStatus == AppOrderProcessStatus.inProgress ||
-  //       _orderStatus == AppOrderProcessStatus.accepted ||
-  //       _orderStatus == AppOrderProcessStatus.picked) {
-  //     final socketResponse = _parseSocketResponse(data);
+  void _handleOrderCanceled(dynamic data) {
+    currentOrder = null;
+    orderStatus.value = AppOrderProcessStatus.cancelled;
 
-  //     if (socketResponse.isSuccess && socketResponse.data != null) {
-  //       // Chuẩn hóa dữ liệu đơn hàng
-  //       final orderData = socketResponse.data is Map ? socketResponse.data : {};
-
-  //       // Đảm bảo trường orderId tồn tại
-  //       if (orderData['id'] != null && orderData['orderId'] == null) {
-  //         orderData['orderId'] = orderData['id'];
-  //       }
-
-  //       currentOrder = Map<String, dynamic>.from(orderData);
-  //       _orderStatus = AppOrderProcessStatus.canceled;
-  //       debugPrint(
-  //           'Debug socket: Thông tin đơn hàng bị hủy: ${jsonEncode(currentOrder)}');
-
-  //       // Thông báo cho UI
-  //       debugPrint('Debug socket: Gọi callback cho đơn hàng bị hủy');
-  //       onOrderStatusChanged?.call(_orderStatus);
-  //       onOrderCanceled?.call(currentOrder!);
-  //       onPlayNotification?.call();
-
-  //       // Rung điện thoại
-  //       debugPrint('Debug socket: Kích hoạt rung cho đơn hủy');
-  //       Vibration.vibrate(pattern: [300, 300, 300, 300]);
-  //     } else {
-  //       debugPrint(
-  //           'Debug socket: Lỗi khi xử lý đơn hàng bị hủy: ${socketResponse.messageCode}');
-  //     }
-  //   } else {
-  //     debugPrint(
-  //         'Debug socket: Bỏ qua sự kiện hủy đơn vì trạng thái hiện tại không phải đang tiến hành: $_orderStatus');
-  //   }
-  // }
+    Timer(const Duration(seconds: 10), () {
+      orderStatus.value = AppOrderProcessStatus.pending;
+    });
+  }
 
   // void _handleOrderStatusUpdate(dynamic data) {
   //   debugPrint('Debug socket: Xử lý cập nhật trạng thái đơn hàng');
@@ -435,7 +404,7 @@ class SocketController {
 
             currentOrder = null;
 
-            Timer(const Duration(seconds: 5), () {
+            Timer(const Duration(seconds: 10), () {
               orderStatus.value = AppOrderProcessStatus.pending;
             });
           } else {

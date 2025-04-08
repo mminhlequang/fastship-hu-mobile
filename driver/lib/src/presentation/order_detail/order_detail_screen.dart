@@ -50,16 +50,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
       };
 
   Future<void> _onPhoneCall() async {
-    var url = Uri.parse('tel:${widget.order.phone ?? '+36 9830268966'}');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      print('Could not launch $url');
-    }
+    launchUrl(Uri.parse('tel:${widget.order.phone!}'));
   }
 
   _onChat() {
-    appContext.push('/order-detail/chat');
+    launchUrl(Uri.parse('sms:${widget.order.phone!}'));
+    // appContext.push('/order-detail/chat');
   }
 
   List<String> reasons = [
@@ -209,7 +205,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                             WidgetAppSVG('ic_calling'),
                             Gap(6.sw),
                             Text(
-                              'Điện thoại'.tr(),
+                              'Phone call'.tr(),
                               style:
                                   w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
@@ -255,7 +251,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                             ),
                             Gap(6.sw),
                             Text(
-                              'Chat'.tr(),
+                              'Send message'.tr(),
                               style:
                                   w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
@@ -274,7 +270,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                             WidgetAppSVG('ic_close'),
                             Gap(6.sw),
                             Text(
-                              'Từ chối'.tr(),
+                              'Cancel order'.tr(),
                               style:
                                   w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),

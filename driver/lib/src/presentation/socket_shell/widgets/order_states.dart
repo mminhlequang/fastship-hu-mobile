@@ -5,6 +5,7 @@ import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
+import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -14,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/enums.dart';
 import 'package:network_resources/order/models/models.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WidgetOrderStates extends StatefulWidget {
   final AppOrderProcessStatus processStatus;
@@ -44,12 +46,11 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
   ];
 
   /// Lấy trạng thái tiếp theo dựa trên trạng thái hiện tại
-  AppOrderProcessStatus get _nextStatus {
+  AppOrderProcessStatus? get _nextStatus {
     final index = totalStep.indexOf(widget.processStatus);
     if (index + 1 < totalStep.length) {
       return totalStep[index + 1];
     }
-    return AppOrderProcessStatus.pending;
   }
 
   /// Xử lý khi trạng thái thay đổi
@@ -60,7 +61,6 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
 
   @override
   Widget build(BuildContext context) {
-    print('Debug socket: Trạng thái đơn hàng: ${widget.processStatus}');
     bool isWaitingToConfirm =
         widget.processStatus == AppOrderProcessStatus.findDriver;
 
@@ -76,87 +76,93 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
           widget.processStatus == AppOrderProcessStatus.findDriver) {
         return const SizedBox();
       }
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.sw)),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                16.sw, 16.sw, 16.sw, 16.sw + context.mediaQueryPadding.bottom),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (isWaitingToConfirm) ...[
-                  _buildOrderHeader(),
-                ] else ...[
-                  _buildStatusHeader(context),
-                  Gap(24.sw),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.sw),
-                    child: WidgetAnimatedStepper(
-                      status: widget.processStatus,
-                    ),
-                  ),
-                  Gap(33.sw),
-                ],
-                const AppDivider(),
-                Gap(16.sw),
-                _buildOrderRouteInfo(context),
-                Gap(20.sw),
-                isWaitingToConfirm
-                    ? WidgetRippleButton(
-                        onTap: () {
-                          appHaptic();
-                          socketController.acceptOrder();
-                        },
-                        color: appColorPrimary,
-                        child: SizedBox(
-                          height: 48.sw,
-                          child: Center(
-                            child: Text(
-                              '${'Accept order'.tr()} ($seconds s)',
-                              style: w500TextStyle(
-                                  fontSize: 16.sw, color: Colors.white),
+      return Material(
+        color: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.sw)),
+          ),
+          padding: EdgeInsets.fromLTRB(
+              16.sw, 16.sw, 16.sw, 16.sw + context.mediaQueryPadding.bottom),
+          child: _nextStatus == null ||
+                  widget.processStatus == AppOrderProcessStatus.cancelled
+              ? _buildCancelled()
+              : _nextStatus == null ||
+                      widget.processStatus == AppOrderProcessStatus.completed
+                  ? _buildCompleted()
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isWaitingToConfirm) ...[
+                          _buildOrderHeader(),
+                        ] else ...[
+                          _buildStatusHeader(context),
+                          Gap(24.sw),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.sw),
+                            child: WidgetAnimatedStepper(
+                              status: widget.processStatus,
                             ),
                           ),
-                        ),
-                      )
-                    : SliderButton(
-                        key: Key(_nextStatus.name),
-                        action: () async {
-                          _handleStatusChange(_nextStatus);
-                          return false;
-                        },
-                        label: Text(
-                          _nextStatus.titleDisplay,
-                          style: w500TextStyle(
-                              fontSize: 18.sw, color: Colors.white),
-                        ),
-                        icon: Center(
-                          child: Icon(
-                            Icons.arrow_forward_rounded,
-                            color: appColorPrimary,
-                            size: 24.sw,
-                          ),
-                        ),
-                        height: 48.sw,
-                        buttonSize: 40.sw,
-                        width: MediaQuery.of(context).size.width,
-                        radius: 99,
-                        alignLabel: Alignment.center,
-                        buttonColor: Colors.white,
-                        backgroundColor: appColorPrimary,
-                        highlightedColor: appColorPrimary,
-                        baseColor: Colors.white,
-                        shimmer: false,
-                      ),
-              ],
-            ),
-          ),
+                          Gap(33.sw),
+                        ],
+                        const AppDivider(),
+                        Gap(16.sw),
+                        _buildOrderRouteInfo(context),
+                        Gap(20.sw),
+                        isWaitingToConfirm
+                            ? WidgetRippleButton(
+                                onTap: () {
+                                  appHaptic();
+                                  socketController.acceptOrder();
+                                },
+                                color: appColorPrimary,
+                                child: SizedBox(
+                                  height: 48.sw,
+                                  child: Center(
+                                    child: Text(
+                                      '${'Accept order'.tr()} ($seconds s)',
+                                      style: w500TextStyle(
+                                          fontSize: 16.sw, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SliderButton(
+                                key: Key(_nextStatus!.name),
+                                action: () async {
+                                  appHaptic();
+                                  _handleStatusChange(_nextStatus!);
+                                  setState(() {});
+                                  return true;
+                                },
+                                label: Text(
+                                  _nextStatus!.titleDisplay,
+                                  style: w500TextStyle(
+                                      fontSize: 18.sw, color: Colors.white),
+                                ),
+                                icon: Center(
+                                  child: Icon(
+                                    Icons.arrow_forward_rounded,
+                                    color: appColorPrimary,
+                                    size: 24.sw,
+                                  ),
+                                ),
+                                height: 48.sw,
+                                buttonSize: 40.sw,
+                                width: MediaQuery.of(context).size.width,
+                                radius: 99,
+                                alignLabel: Alignment.center,
+                                buttonColor: Colors.white,
+                                backgroundColor: appColorPrimary,
+                                highlightedColor: appColorPrimary,
+                                baseColor: Colors.white,
+                                shimmer: false,
+                              ),
+                      ],
+                    ),
         ),
       );
     });
@@ -211,11 +217,9 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
   Widget _buildOrderRouteInfo(BuildContext context) {
     final restaurantName = widget.order?.store?.name ?? 'Unknown';
     final restaurantAddress = widget.order?.store?.address ?? 'Unknown';
-    final restaurantDistance = '1,2km';
 
     final customerName = widget.order?.customer?.name ?? 'Unknown';
     final customerAddress = widget.order?.address ?? 'Unknown';
-    final customerDistance = widget.order?.shipDistance ?? 0;
 
     return Stack(
       children: [
@@ -225,16 +229,47 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                restaurantName,
-                style: w500TextStyle(fontSize: 16.sw),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          restaurantName,
+                          style: w500TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(2.sw),
+                        Text(
+                          restaurantAddress,
+                          style: w400TextStyle(color: grey1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  WidgetRippleButton(
+                    onTap: () {
+                      appHaptic();
+                      launchUrl(Uri.parse('tel:${widget.order!.store!.phone}'));
+                    },
+                    radius: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 6.sw, vertical: 6.sw),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: grey9),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: WidgetAppSVG(
+                        'ic_calling',
+                        color: appColorPrimary,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              Gap(2.sw),
-              Text(
-                restaurantAddress,
-                style: w400TextStyle(color: grey1),
-              ),
-              Gap(4.sw),
+              Gap(32.sw),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
                 decoration: BoxDecoration(
@@ -242,31 +277,50 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                   border: Border.all(color: grey9),
                 ),
                 child: Text(
-                  restaurantDistance,
+                  distanceFormatted(widget.order!.shipDistance!),
                   style: w400TextStyle(fontSize: 12.sw),
                 ),
               ),
-              Gap(16.sw),
-              Text(
-                customerName,
-                style: w500TextStyle(fontSize: 16.sw),
-              ),
-              Gap(2.sw),
-              Text(
-                customerAddress,
-                style: w400TextStyle(color: grey1),
-              ),
-              Gap(4.sw),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(99),
-                  border: Border.all(color: grey9),
-                ),
-                child: Text(
-                  distanceFormatted(customerDistance),
-                  style: w400TextStyle(fontSize: 12.sw),
-                ),
+              Gap(32.sw),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          customerName,
+                          style: w500TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(2.sw),
+                        Text(
+                          customerAddress,
+                          style: w400TextStyle(color: grey1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  WidgetRippleButton(
+                    onTap: () {
+                      appHaptic();
+                      launchUrl(Uri.parse('tel:${widget.order!.phone!}'));
+                    },
+                    radius: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 6.sw, vertical: 6.sw),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: grey9),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: WidgetAppSVG(
+                        'ic_calling',
+                        color: appColorPrimary,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ],
           ),
@@ -292,6 +346,90 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCancelled() {
+    return Column(
+      children: [
+        WidgetAppSVG(
+          'icon5',
+          height: 140.sw,
+        ),
+        Text(
+          'Order cancelled'.tr(),
+          style: w500TextStyle(fontSize: 18.sw),
+        ),
+        Gap(12.sw),
+        RichText(
+          text: TextSpan(
+            style: w400TextStyle(),
+            children: [
+              TextSpan(text: 'Your order has been cancelled. '.tr()),
+              TextSpan(
+                  text:
+                      'Order cancelled by user does not affect your rating and reputation. '
+                          .tr()),
+              TextSpan(
+                  text:
+                      'No payment will be transferred to your wallet for this order.'
+                          .tr()),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        Gap(12.sw),
+        WidgetAppButtonOK(
+          label: 'Check order details'.tr(),
+          onTap: () {
+            context.push('/order-detail', extra: widget.order);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompleted() {
+    return Column(
+      children: [
+        WidgetAppSVG(
+          'icon5',
+          height: 140.sw,
+        ),
+        Text(
+          'You have completed the delivery'.tr(),
+          style: w500TextStyle(fontSize: 18.sw),
+        ),
+        Gap(12.sw),
+        RichText(
+          text: TextSpan(
+            style: w400TextStyle(),
+            children: [
+              TextSpan(text: 'Thank you for your delivery. '.tr()),
+              TextSpan(
+                text: currencyFormatted(widget.order?.shipFee ?? 0).tr(),
+                style: w500TextStyle(color: darkGreen),
+              ),
+              if ((widget.order?.tip ?? 0) > 0) ...[
+                TextSpan(text: ' + '.tr()),
+                TextSpan(
+                  text: currencyFormatted(widget.order?.tip ?? 0).tr(),
+                  style: w500TextStyle(color: darkGreen),
+                ),
+              ],
+              TextSpan(text: ' will be transferred to your wallet'.tr()),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        Gap(12.sw),
+        WidgetAppButtonOK(
+          label: 'Check order details'.tr(),
+          onTap: () {
+            context.push('/order-detail', extra: widget.order);
+          },
         ),
       ],
     );

@@ -2,13 +2,16 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:easy_localization/easy_localization.dart'; 
-import 'package:internal_core/internal_core.dart'; 
+import 'package:easy_localization/easy_localization.dart';
+import 'package:internal_core/internal_core.dart';
 
 enum SheetProcessStatus {
   loading,
+  findingDriver,
   success,
-  error,
+  error_payment,
+  error_create_order,
+  error_no_driver
 }
 
 class WidgetBottomSheetProcess extends StatefulWidget {
@@ -42,19 +45,31 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
             mainAxisSize: MainAxisSize.min,
             children: switch (value) {
               SheetProcessStatus.loading => [
-                  // WidgetAppSVG(
-                  //   'ic_loading', //TODO: replace
-                  //   width: 72.sw,
-                  // ),
                   Gap(32.sw),
                   Text(
-                    "Processing...",
+                    "Processing...".tr(),
                     style: w500TextStyle(fontSize: 24.sw),
                   ),
                   Gap(16.sw),
                   Text(
-                    "Your profile is being processed.\nPlease wait while we upload your information"
-                        .tr(),
+                    "Calling related APIs to process your order".tr(),
+                    style: w300TextStyle(fontSize: 14.sw, height: 1.4),
+                    textAlign: TextAlign.center,
+                  ),
+                  Gap(40.sw),
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(appColorPrimary),
+                  ),
+                ],
+              SheetProcessStatus.findingDriver => [
+                  Gap(32.sw),
+                  Text(
+                    "Finding Driver".tr(),
+                    style: w500TextStyle(fontSize: 24.sw),
+                  ),
+                  Gap(16.sw),
+                  Text(
+                    "System is finding a suitable driver for your order".tr(),
                     style: w300TextStyle(fontSize: 14.sw, height: 1.4),
                     textAlign: TextAlign.center,
                   ),
@@ -64,43 +79,106 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
                   ),
                 ],
               SheetProcessStatus.success => [
-                  WidgetAppSVG(
-                    'ic_done',
-                    width: 72.sw,
-                  ),
-                  Gap(32.sw),
-                  Text(
-                    "Congrats!",
-                    style: w500TextStyle(fontSize: 24.sw),
-                  ),
-                  Gap(16.sw),
-                  Text(
-                    "Profile added successfully.\nThe FastShip team has received your application and will contact you soon"
-                        .tr(),
-                    style: w300TextStyle(fontSize: 14.sw, height: 1.4),
-                    textAlign: TextAlign.center,
-                  ),
-                  Gap(40.sw),
-                  WidgetButtonConfirm(
-                    text: "Done",
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
-                  ),
-                ],
-              SheetProcessStatus.error => [
                   // WidgetAppSVG(
-                  //   'ic_error', //TODO: replace
+                  //   'ic_done',
                   //   width: 72.sw,
                   // ),
                   Gap(32.sw),
                   Text(
-                    "Error!",
+                    "Success!".tr(),
                     style: w500TextStyle(fontSize: 24.sw),
                   ),
                   Gap(16.sw),
                   Text(
-                    "Your profile is not complete yet.\nPlease make sure to fill in all required information to proceed"
+                    "Driver has accepted and is picking up your order for delivery"
+                        .tr(),
+                    style: w300TextStyle(fontSize: 14.sw, height: 1.4),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              SheetProcessStatus.error_create_order => [
+                  Gap(32.sw),
+                  Text(
+                    "Error!".tr(),
+                    style: w500TextStyle(fontSize: 24.sw),
+                  ),
+                  Gap(16.sw),
+                  Text(
+                    "Unable to create order. Please try again later".tr(),
+                    style: w300TextStyle(fontSize: 14.sw, height: 1.4),
+                    textAlign: TextAlign.center,
+                  ),
+                  Gap(40.sw),
+                  Row(
+                    spacing: 16.sw,
+                    children: [
+                      Expanded(
+                        child: WidgetButtonCancel(
+                          text: "Back".tr(),
+                          onPressed: () {
+                            appHaptic();
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: WidgetButtonConfirm(
+                          text: "Try Again".tr(),
+                          onPressed: () {
+                            appHaptic();
+                            widget.onTryAgain();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              SheetProcessStatus.error_no_driver => [
+                  Gap(32.sw),
+                  Text(
+                    "Error!".tr(),
+                    style: w500TextStyle(fontSize: 24.sw),
+                  ),
+                  Gap(16.sw),
+                  Text(
+                    "No active drivers available. Please try again later".tr(),
+                    style: w300TextStyle(fontSize: 14.sw, height: 1.4),
+                    textAlign: TextAlign.center,
+                  ),
+                  Gap(40.sw),
+                  Row(
+                    spacing: 16.sw,
+                    children: [
+                      Expanded(
+                        child: WidgetButtonCancel(
+                          text: "Back".tr(),
+                          onPressed: () {
+                            appHaptic();
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: WidgetButtonConfirm(
+                          text: "Try Again".tr(),
+                          onPressed: () {
+                            appHaptic();
+                            widget.onTryAgain();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              SheetProcessStatus.error_payment => [
+                  Gap(32.sw),
+                  Text(
+                    "Payment Error!".tr(),
+                    style: w500TextStyle(fontSize: 24.sw),
+                  ),
+                  Gap(16.sw),
+                  Text(
+                    "Payment processing failed. Please check your payment method and try again"
                         .tr(),
                     style: w300TextStyle(fontSize: 14.sw, height: 1.4),
                     textAlign: TextAlign.center,
@@ -111,7 +189,7 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
                     children: [
                       Expanded(
                         child: WidgetButtonCancel(
-                          text: "Back",
+                          text: "Back".tr(),
                           onPressed: () {
                             appHaptic();
                             Navigator.pop(context, false);
@@ -120,7 +198,7 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
                       ),
                       Expanded(
                         child: WidgetButtonConfirm(
-                          text: "Try again",
+                          text: "Try Again".tr(),
                           onPressed: () {
                             appHaptic();
                             widget.onTryAgain();

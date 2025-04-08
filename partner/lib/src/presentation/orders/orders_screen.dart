@@ -1,3 +1,4 @@
+import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:network_resources/order/models/order.dart';
@@ -46,8 +47,7 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-  final OrderRepo _orderRepo = OrderRepo();
+  late final TabController _tabController; 
   OrderStatus _currentStatus = OrderStatus.preOrder;
   bool _isLoading = true;
   List<OrderModel> _orders = [];
@@ -71,7 +71,8 @@ class _OrdersScreenState extends State<OrdersScreen>
     });
 
     try {
-      final response = await _orderRepo.getOrders({
+      final response = await OrderRepo().getOrdersByStore({
+        'store_id': authCubit.storeId,
         'status': _currentStatus.apiStatus,
       });
 
@@ -157,7 +158,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                             ),
                             Gap(2.sw),
                             Text(
-                              '${'Delivery at'.tr()} ${order.deliveryTime}',
+                              '${'Delivery at'.tr()} ${order.shipEstimateTime} fake',
                               style:
                                   w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
@@ -175,7 +176,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                   style: w400TextStyle(),
                                 ),
                                 Text(
-                                  order.status ?? '',
+                                  order.processStatus ?? '',
                                   style: w400TextStyle(),
                                 ),
                               ],
@@ -185,11 +186,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${order.itemCount} ${'items'.tr()}',
+                                  '${order.items?.length} ${'items'.tr()}',
                                   style: w400TextStyle(),
                                 ),
                                 Text(
-                                  '\$${order.finalAmount}',
+                                  '\$${order.total}',
                                   style: w400TextStyle(),
                                 ),
                               ],

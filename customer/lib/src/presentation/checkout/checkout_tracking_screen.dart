@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_dialog_notification.dart';
+import 'package:app/src/utils/app_map_helper.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -14,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:network_resources/cart/models/models.dart';
 import 'package:network_resources/enums.dart';
 import 'package:network_resources/here_polyline_converter.dart';
 import 'package:network_resources/order/models/models.dart';
@@ -34,13 +37,28 @@ class CheckoutTrackingScreen extends StatefulWidget {
 class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   Completer<AnimatedMapController> mapController =
       Completer<AnimatedMapController>();
+
+  final ScrollController _scrollController = ScrollController();
   final PanelController _panelController = PanelController();
 
   // ValueNotifier cho polylines
   final ValueNotifier<List<Polyline>> _polylinesNotifier =
       ValueNotifier<List<Polyline>>([]);
 
-  OrderModel get order => socketController.order!;
+  OrderModel get order => socketController.currentOrder!;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels < 0) {
+        _panelController.close();
+      } else if (_scrollController.position.pixels >
+          _scrollController.position.maxScrollExtent) {
+        _panelController.open();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -53,8 +71,8 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     return ValueListenableBuilder(
         valueListenable: socketController.orderStatus,
         builder: (context, value, child) {
-          if (socketController.order == null) return SizedBox();
-          OrderModel order = socketController.order!;
+          if (socketController.currentOrder == null) return SizedBox();
+          OrderModel order = socketController.currentOrder!;
           return Scaffold(
             body: Stack(
               children: [
@@ -80,67 +98,75 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                               }
                             }
 
-                            return WidgetAppFlutterMapAnimation(
-                              mapController: mapController,
-                              initialCenter: LatLng(
-                                order.lat!,
-                                order.lng!,
+                            List<Marker> markers = [
+                              Marker(
+                                point: LatLng(
+                                  order.store!.lat!,
+                                  order.store!.lng!,
+                                ),
+                                width: 36.sw,
+                                height: 36.sw,
+                                child: WidgetAvatar(
+                                  imageUrl: order.store!.avatarImage,
+                                  radius1: 18.sw,
+                                  radius2: 18.sw - 2,
+                                  radius3: 18.sw - 2,
+                                  borderColor: Colors.white,
+                                ),
                               ),
-                              markers: [
+                              if (order.driver != null &&
+                                  driverLocation != null)
                                 Marker(
                                   point: LatLng(
-                                    order.store!.lat!,
-                                    order.store!.lng!,
+                                    driverLocation.latitude,
+                                    driverLocation.longitude,
                                   ),
                                   width: 36.sw,
                                   height: 36.sw,
                                   child: WidgetAvatar(
-                                    imageUrl: order.store!.avatarImage,
+                                    imageUrl: order.driver!.avatar ?? '',
                                     radius1: 18.sw,
                                     radius2: 18.sw - 2,
                                     radius3: 18.sw - 2,
                                     borderColor: Colors.white,
                                   ),
                                 ),
-                                if (order.driver != null &&
-                                    driverLocation != null)
-                                  Marker(
-                                    point: LatLng(
-                                      driverLocation.latitude,
-                                      driverLocation.longitude,
-                                    ),
-                                    width: 36.sw,
-                                    height: 36.sw,
-                                    child: WidgetAvatar(
-                                      imageUrl: order.driver!.avatar ?? '',
-                                      radius1: 18.sw,
-                                      radius2: 18.sw - 2,
-                                      radius3: 18.sw - 2,
-                                      borderColor: Colors.white,
-                                    ),
-                                  ),
-                                Marker(
-                                  point: LatLng(
-                                    order.lat!,
-                                    order.lng!,
-                                  ),
-                                  width: 36,
-                                  height: 36,
-                                  child: AvatarGlow(
-                                    glowColor: appColorPrimary,
-                                    duration:
-                                        const Duration(milliseconds: 2000),
-                                    repeat: true,
-                                    child: WidgetAvatar(
-                                      imageUrl: order.customer!.avatar,
-                                      radius1: 18.sw,
-                                      radius2: 18.sw - 2,
-                                      radius3: 18.sw - 2,
-                                      borderColor: Colors.white,
-                                    ),
+                              Marker(
+                                point: LatLng(
+                                  order.lat!,
+                                  order.lng!,
+                                ),
+                                width: 36,
+                                height: 36,
+                                child: AvatarGlow(
+                                  glowColor: appColorPrimary,
+                                  duration: const Duration(milliseconds: 2000),
+                                  repeat: true,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.customer!.avatar,
+                                    radius1: 18.sw,
+                                    radius2: 18.sw - 2,
+                                    radius3: 18.sw - 2,
+                                    borderColor: Colors.white,
                                   ),
                                 ),
-                              ],
+                              ),
+                            ];
+
+                            mapController.future.then((controller) {
+                              updateMapToBoundsLatLng(
+                                markers.map((e) => e.point).toList(),
+                                controller,
+                              );
+                            });
+
+                            return WidgetAppFlutterMapAnimation(
+                              mapController: mapController,
+                              initialCenter: LatLng(
+                                order.lat!,
+                                order.lng!,
+                              ),
+                              markers: markers,
                               polylines: [
                                 Polyline(
                                   pattern: const StrokePattern.dotted(
@@ -173,15 +199,21 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                   maxHeight: 580.sw + MediaQuery.of(context).padding.bottom,
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(16)),
-                  panel: Column(
-                    children: [
-                      _buildProgressIndicator(
-                          value ?? AppOrderProcessStatus.pending),
-                      SizedBox(height: 12.sw),
-                      _buildDriverInfo(order),
-                      _buildAddressCard(order),
-                      _buildOrderSummary(order),
-                    ],
+                  panel: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      children: [
+                        _buildProgressIndicator(
+                            value ?? AppOrderProcessStatus.pending),
+                        SizedBox(height: 12.sw),
+                        _buildDriverInfo(order),
+                        _buildAddressCard(order),
+                        _buildOrderSummary(order),
+                        SizedBox(
+                            height:
+                                40 + MediaQuery.of(context).viewInsets.bottom),
+                      ],
+                    ),
                   ),
                   body: Container(),
                 ),
@@ -317,9 +349,24 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           appHaptic();
-                          //Cancel order
+                          final r = await appContext.push('/cancel-order');
+                          if (r is String) {
+                            socketController.cancelOrder(r);
+                            context.pop();
+
+                            appOpenDialog(
+                              WidgetDialogNotification(
+                                icon: 'icon60',
+                                title:
+                                    "We're so sad about your cancellation".tr(),
+                                message:
+                                    "We will continue to improve our service & satisfy you on the next order.",
+                                buttonText: "Done".tr(),
+                              ),
+                            );
+                          }
                         },
                         child: Container(
                           height: 48.sw,
@@ -450,6 +497,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
         dashPattern: [8, 4],
         color: Color(0xFFCEC6C5),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -464,53 +512,278 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                 ),
               ],
             ),
-            const Divider(color: Color(0xFFF1EFE9)),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: const Divider(color: Color(0xFFF1EFE9)),
+            ),
+            Text(
+              'Order items'.tr(),
+              style: w500TextStyle(fontSize: 16.sw),
+            ),
+            Gap(8.sw),
+            ...order.items
+                    ?.map((cartItem) => _buildOrderItem(cartItem))
+                    .toList() ??
+                [],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: const Divider(color: Color(0xFFF1EFE9)),
+            ),
+            _buildSummaryRow('Subtotal', currencyFormatted(order.subtotal)),
+            _buildSummaryRow(
+                'Application fee', currencyFormatted(order.applicationFee)),
+            _buildSummaryRow('Courier tip', currencyFormatted(order.tip),
+                color: appColorPrimary),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Subtotal'.tr(),
-                    style: w400TextStyle(
-                      fontSize: 16.sw,
-                      color: const Color(0xFF3C3836),
-                    ),
+                  Row(
+                    children: [
+                      WidgetAppSVG('icon34',
+                          height: 18.sw, color: hexColor('#F17228')),
+                      const SizedBox(width: 8),
+                      Text(
+                        '\$0.50 off, more deals below',
+                        style: w400TextStyle(
+                          fontSize: 16.sw,
+                          color: hexColor('#3C3836'),
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
-                    '\$ 12,00', //TODO: change to order.totalPrice
-                    style: w500TextStyle(fontSize: 16.sw),
+                    '- ${currencyFormatted(order.discount)}',
+                    style: w500TextStyle(
+                      fontSize: 16.sw,
+                      color: hexColor('#F17228'),
+                    ),
                   ),
                 ],
               ),
             ),
-            OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF74CA45)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(120),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: const Divider(color: Color(0xFFF1EFE9)),
+            ),
+            _buildSummaryRow('Total', currencyFormatted(order.total)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String title, String amount, {Color? color}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: w400TextStyle(
+              fontSize: 16.sw,
+              color: hexColor('#3C3836'),
+            ),
+          ),
+          Text(
+            amount,
+            style: w500TextStyle(
+              fontSize: 16.sw,
+              color: color ?? hexColor('#091230'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderItem(CartItemModel cartItem) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.sw),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 4.sw),
+            height: 34.sw,
+            width: 34.sw,
+            decoration: BoxDecoration(
+              color: hexColor('#F2F1F1'),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              cartItem.quantity.toString(),
+              style: w500TextStyle(
+                fontSize: 16.sw,
+                height: 1,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Order summary',
-                    style: GoogleFonts.fredoka(
-                      fontSize: 16,
-                      color: const Color(0xFF74CA45),
+            ),
+          ),
+          SizedBox(width: 12.sw),
+          Expanded(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 44.sw,
+                      height: 44.sw,
+                      padding: EdgeInsets.all(1.sw),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Color(0xFFF8F1F0)),
+                      ),
+                      child: WidgetAppImage(
+                        imageUrl: cartItem.product?.image ?? '',
+                        width: 44.sw,
+                        height: 44.sw,
+                        radius: 8,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  SvgPicture.string(
-                    '''<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9.5 6L15.1464 11.6464C15.3417 11.8417 15.3417 12.1583 15.1464 12.3536L9.5 18" stroke="#74CA45" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>''',
-                  ),
-                ],
+                    SizedBox(width: 8.sw),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            cartItem.product?.name ?? "",
+                            style: w500TextStyle(
+                              fontSize: 14.sw,
+                              color: Color(0xFF3C3836),
+                            ),
+                          ),
+                          Gap(4.sw),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: currencyFormatted(cartItem
+                                              .product!.price! *
+                                          cartItem.quantity! +
+                                      cartItem.variations!.fold(
+                                              0,
+                                              (sum, variation) =>
+                                                  sum +
+                                                  variation.price!.toInt()) *
+                                          cartItem.quantity!),
+                                  style: w500TextStyle(
+                                    fontSize: 14.sw,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text:
+                                      " (${currencyFormatted(cartItem.product!.price!)} x ${cartItem.quantity} + ${currencyFormatted(cartItem.variations!.fold(0, (sum, variation) => sum + variation.price!.toInt()) * cartItem.quantity!)})",
+                                  style: w400TextStyle(
+                                      fontSize: 14.sw, color: appColorText2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                ...cartItem.product!.variations!.map((e) => _buildMenuSection(
+                      e.name ?? '',
+                      e.values?.map(
+                            (e) {
+                              bool isSelected = cartItem.variations!
+                                  .any((element) => element.id == e.id);
+                              return GestureDetector(
+                                onTap: () {
+                                  if (isSelected) {
+                                    cartItem.variations!.removeWhere(
+                                        (element) => element.id == e.id);
+                                  } else {
+                                    cartItem.variations!.removeWhere(
+                                        (element) =>
+                                            element.parentId == e.parentId);
+                                    cartItem.variations!.add(e);
+                                  }
+                                  setState(() {});
+                                },
+                                child: _MenuItem(
+                                  title: e.value ?? '',
+                                  price:
+                                      "+${currencyFormatted(e.price?.toDouble())}",
+                                  isSelected: isSelected,
+                                ),
+                              );
+                            },
+                          ).toList() ??
+                          [],
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 12.sw),
+        Text(title, style: w600TextStyle(fontSize: 16.sw)),
+        SizedBox(height: 8.sw),
+        ...items,
+      ],
+    );
+  }
+}
+
+class _MenuItem extends StatelessWidget {
+  final String title;
+  final String price;
+  final bool isSelected;
+
+  const _MenuItem({
+    Key? key,
+    required this.title,
+    required this.price,
+    this.isSelected = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: isSelected
+          ? BoxDecoration(
+              border: Border.all(color: appColorPrimary),
+              color: hexColor('#E6FBDA'),
+              borderRadius: BorderRadius.circular(12),
+            )
+          : BoxDecoration(
+              color: hexColor('#F9F8F6'),
+              borderRadius: BorderRadius.circular(12),
+            ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: w400TextStyle(
+                  color: isSelected ? Colors.black : hexColor('#7D7575'),
+                  fontSize: 14.sw,
+                ),
+              ),
+            ),
+            Text(
+              price,
+              style: w500TextStyle(
+                color: isSelected ? hexColor('#538D33') : hexColor('#B6B6B6'),
+                fontSize: 14.sw,
               ),
             ),
           ],

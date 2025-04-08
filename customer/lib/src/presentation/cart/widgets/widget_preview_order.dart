@@ -301,7 +301,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
               msg: e.error.message,
               type: AppSnackBarType.error,
             );
-            processer.value = SheetProcessStatus.error;
+            processer.value = SheetProcessStatus.error_payment;
             return;
           }
         }
@@ -311,21 +311,20 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         if (socketResult) {
           processer.value = SheetProcessStatus.success;
           Timer(
-            const Duration(seconds: 3),
+            const Duration(seconds: 2),
             () async {
               context.pop();
               if (socketResult) {
                 context.pop();
-                await Future.delayed(const Duration(milliseconds: 300));
-                context.push('/checkout-tracking'); 
+                context.push('/checkout-tracking');
               }
             },
           );
         } else {
-          processer.value = SheetProcessStatus.error;
+          processer.value = SheetProcessStatus.error_no_driver;
         }
       } else {
-        processer.value = SheetProcessStatus.error;
+        processer.value = SheetProcessStatus.error_create_order;
       }
     }
 
@@ -337,7 +336,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         onTryAgain: callback,
       ),
       isDismissible: kDebugMode,
-    ); 
+    );
   }
 
   @override
@@ -669,29 +668,29 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
               'Order items'.tr(),
               style: w500TextStyle(fontSize: 16.sw),
             ),
-            GestureDetector(
-              onTap: () {
-                appHaptic();
-                Navigator.pop(context);
-              },
-              child: Row(
-                children: [
-                  WidgetAppSVG(
-                    'icon53',
-                    height: 18.sw,
-                    color: appColorPrimary,
-                  ),
-                  SizedBox(width: 4.sw),
-                  Text(
-                    'Add more'.tr(),
-                    style: w400TextStyle(
-                      fontSize: 16.sw,
-                      color: appColorPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () {
+            //     appHaptic();
+            //     Navigator.pop(context);
+            //   },
+            //   child: Row(
+            //     children: [
+            //       WidgetAppSVG(
+            //         'icon53',
+            //         height: 18.sw,
+            //         color: appColorPrimary,
+            //       ),
+            //       SizedBox(width: 4.sw),
+            //       Text(
+            //         'Add more'.tr(),
+            //         style: w400TextStyle(
+            //           fontSize: 16.sw,
+            //           color: appColorPrimary,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 12),

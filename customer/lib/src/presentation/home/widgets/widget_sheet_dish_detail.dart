@@ -243,15 +243,19 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                       WidgetInkWellTransparent(
                         onTap: () {
                           appHaptic();
-                          setState(() {
-                            quantity--;
-                          });
+                          if (quantity > 1) {
+                            setState(() {
+                              quantity--;
+                            });
+                          }
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: WidgetAppSVG(
                             'icon52',
                             width: 24.sw,
+                            color: appColorText
+                                .withOpacity(quantity > 1 ? 1 : 0.5),
                           ),
                         ),
                       ),
@@ -276,6 +280,7 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                           child: WidgetAppSVG(
                             'icon53',
                             width: 24.sw,
+                            color: appColorText,
                           ),
                         ),
                       ),
