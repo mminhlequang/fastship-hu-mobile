@@ -2,59 +2,106 @@ import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
 
-// Contact Option Tile Widget
-class ContactOptionTile extends StatelessWidget {
-  final String icon;
-  final String title;
-  final VoidCallback onTap;
+class FaqItem {
+  String category;
+  List<Map<String, String>> items;
 
-  const ContactOptionTile({
-    Key? key,
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: appColorBackground,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: SvgPicture.asset(
-                icon,
-                width: 24,
-                height: 24,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: w400TextStyle(
-                fontSize: 16,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  FaqItem({required this.category, required this.items});
 }
+
+List<FaqItem> _faqs = [
+  FaqItem(category: 'General', items: [
+    {
+      'question': 'What is FastShip?',
+      'answer':
+          'FastShip is a delivery service platform that connects customers with reliable delivery partners to transport goods quickly and efficiently.'
+    },
+    {
+      'question': 'How do I track my delivery?',
+      'answer':
+          'You can track your delivery by going to the "My Orders" section and selecting the specific order. The real-time tracking information will be displayed there.'
+    },
+    {
+      'question': 'What are your delivery hours?',
+      'answer':
+          'Our delivery service operates 24/7. However, delivery times may vary depending on the location and type of service selected.'
+    },
+    {
+      'question': 'How do I contact customer support?',
+      'answer':
+          'You can contact our customer support through the app by going to the Help Center and selecting "Contact Us". We are available 24/7 to assist you.'
+    }
+  ]),
+  FaqItem(category: 'Account', items: [
+    {
+      'question': 'How do I create an account?',
+      'answer':
+          'To create an account, click on the "Sign Up" button and follow the registration process. You will need to provide your email address and create a password.'
+    },
+    {
+      'question': 'How do I reset my password?',
+      'answer':
+          'Click on "Forgot Password" on the login screen. You will receive an email with instructions to reset your password.'
+    },
+    {
+      'question': 'How do I update my profile information?',
+      'answer':
+          'Go to "My Profile" in the app menu, then click on "Edit Profile" to update your personal information.'
+    },
+    {
+      'question': 'How do I delete my account?',
+      'answer':
+          'To delete your account, go to "Account Settings" and select "Delete Account". Please note that this action cannot be undone.'
+    }
+  ]),
+  FaqItem(category: 'Service', items: [
+    {
+      'question': 'What types of items can I send?',
+      'answer':
+          'We accept most common items for delivery. However, there are restrictions on hazardous materials, illegal items, and certain fragile items. Please check our terms of service for details.'
+    },
+    {
+      'question': 'How do I schedule a delivery?',
+      'answer':
+          'Open the app, click on "New Delivery", fill in the pickup and delivery details, select your preferred delivery option, and confirm the booking.'
+    },
+    {
+      'question': 'Can I cancel a delivery?',
+      'answer':
+          'Yes, you can cancel a delivery before it is picked up. Go to "My Orders", select the order, and click "Cancel Delivery". Note that cancellation fees may apply.'
+    },
+    {
+      'question': 'What happens if my delivery is delayed?',
+      'answer':
+          'If your delivery is delayed, you will be notified through the app. You can track the status in real-time and contact customer support for assistance.'
+    }
+  ]),
+  FaqItem(category: 'Payment', items: [
+    {
+      'question': 'What payment methods are accepted?',
+      'answer':
+          'We accept credit/debit cards, digital wallets, and bank transfers. You can add and manage your payment methods in the "Payment" section.'
+    },
+    {
+      'question': 'How do I get a receipt?',
+      'answer':
+          'After completing a delivery, you will receive an electronic receipt in the app. You can also request a copy by email through the "Order History" section.'
+    },
+    {
+      'question': 'Can I get a refund?',
+      'answer':
+          'Refunds are processed according to our refund policy. If you believe you are eligible for a refund, please contact customer support with your order details.'
+    },
+    {
+      'question': 'How do I add a new payment method?',
+      'answer':
+          'Go to "Payment Methods" in the app menu, click "Add New Payment Method", and follow the instructions to add your preferred payment option.'
+    }
+  ]),
+];
 
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
@@ -65,34 +112,11 @@ class HelpCenterScreen extends StatefulWidget {
 
 class _HelpCenterScreenState extends State<HelpCenterScreen> {
   bool isFAQ = true;
-
   int _selectedCategoryIndex = 0;
   int _expandedFaqIndex = 0;
 
-  final List<String> _categories = ['General', 'Account', 'Service', 'Payment'];
-  final List<Map<String, String?>> _faqs = [
-    {
-      'question': 'What is Foodu?',
-      'answer':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    },
-    {
-      'question': 'How I can make a payment?',
-      'answer': null,
-    },
-    {
-      'question': 'How do I can cancel orders?',
-      'answer': null,
-    },
-    {
-      'question': 'How do I can delete my account?',
-      'answer': null,
-    },
-    {
-      'question': 'How do I exit the app?',
-      'answer': null,
-    },
-  ];
+  // Get categories from _faqs list
+  List<String> get _categories => _faqs.map((e) => e.category).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +265,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 
   Widget _buildCategories() {
     return SingleChildScrollView(
+      clipBehavior: Clip.none,
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(
@@ -261,14 +286,21 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildFaqList() {
+    // Get current category
+    final currentCategory = _categories[_selectedCategoryIndex];
+    // Get FAQs for current category
+    final categoryFaqs =
+        _faqs.firstWhere((e) => e.category == currentCategory).items;
+
     return Column(
       children: List.generate(
-        _faqs.length,
+        categoryFaqs.length,
         (index) => Padding(
-          padding: EdgeInsets.only(bottom: index != _faqs.length - 1 ? 12 : 0),
-          child: FaqItem(
-            question: _faqs[index]['question']!,
-            answer: _faqs[index]['answer'],
+          padding: EdgeInsets.only(
+              bottom: index != categoryFaqs.length - 1 ? 12 : 0),
+          child: FaqItemWidget(
+            question: categoryFaqs[index]['question']!,
+            answer: categoryFaqs[index]['answer'],
             isExpanded: _expandedFaqIndex == index,
             onTap: () => setState(() => _expandedFaqIndex = index),
           ),
@@ -314,20 +346,20 @@ class CategoryChip extends StatelessWidget {
   }
 }
 
-// FAQ Item Widget
-class FaqItem extends StatelessWidget {
+// Rename FaqItem widget to avoid naming conflict
+class FaqItemWidget extends StatelessWidget {
   final String question;
   final String? answer;
   final bool isExpanded;
   final VoidCallback onTap;
 
-  const FaqItem({
-    Key? key,
+  const FaqItemWidget({
+    super.key,
     required this.question,
     this.answer,
     required this.isExpanded,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +396,7 @@ class FaqItem extends StatelessWidget {
                   angle: isExpanded ? 3.14159 : 0,
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: appColorText,
+                    color: appColorText2,
                   ),
                 ),
               ],
@@ -380,7 +412,8 @@ class FaqItem extends StatelessWidget {
             ),
             Text(
               answer!,
-              style: w300TextStyle(fontSize: 14, height: 1.4),
+              style: w300TextStyle(
+                  fontSize: 14, height: 1.4, color: appColorText2),
             ),
           ],
         ],
