@@ -25,7 +25,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    cartCubit.getCarts();
+    cartCubit.fetchCarts();
   }
 
   @override

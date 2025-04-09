@@ -25,6 +25,8 @@ import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_search_field.dart';
 import 'package:app/src/utils/utils.dart';
 
+import '../cart/cubit/cart_cubit.dart';
+import '../notifications/cubit/notification_cubit.dart';
 import 'widgets/widget_category_card.dart';
 import 'widgets/widget_dialog_filters.dart';
 import 'widgets/widget_dish_card.dart';
@@ -955,12 +957,36 @@ class _LocationHeader extends StatelessWidget {
             width: 44.sw,
             height: 44.sw,
             child: Center(
-              child: WidgetAppSVG(
-                'icon2',
-                width: 24,
-                height: 24,
-                fit: BoxFit.contain,
-              ),
+              child: BlocBuilder<CartCubit, CartState>(
+                  bloc: cartCubit,
+                  buildWhen: (previous, current) =>
+                      previous.totalItems != current.totalItems,
+                  builder: (context, state) {
+                    return Stack(
+                      children: [
+                        WidgetAppSVG(
+                          'icon2',
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                        if (state.totalItems > 0)
+                          Positioned(
+                            right: 0,
+                            child: Container(
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(width: 1.2, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
             ),
           ),
         ),
@@ -969,18 +995,42 @@ class _LocationHeader extends StatelessWidget {
             appHaptic();
             context.push('/notifications');
           },
-          child: Container(
-            width: 44.sw,
-            height: 44.sw,
-            child: Center(
-              child: WidgetAppSVG(
-                'icon11',
-                width: 24,
-                height: 24,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          child: BlocBuilder<NotificationCubit, NotificationState>(
+              bloc: notificationCubit,
+              buildWhen: (previous, current) =>
+                  previous.unreadCount != current.unreadCount,
+              builder: (context, state) {
+                return Container(
+                  width: 44.sw,
+                  height: 44.sw,
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        WidgetAppSVG(
+                          'icon11',
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                        if (state.unreadCount > 0)
+                          Positioned(
+                            right: 0,
+                            child: Container(
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(width: 1.2, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
         ),
       ],
     );

@@ -1,45 +1,51 @@
+abstract class NotificationModelType {
+  static const String system = 'system';
+  static const String news = 'news';
+  static const String promotion = 'promotion';
+  static const String order = 'order';
+  static const String transaction = 'transaction';
+}
+
 class NotificationModel {
   int? id;
   String? title;
-  String? content;
+  String? description;
+  dynamic content;
   String? image;
   String? type;
-  bool? isRead;
+  int? referenceId;
+  int? isRead;
   String? createdAt;
-  String? updatedAt;
 
-  NotificationModel({
-    this.id,
-    this.title,
-    this.content,
-    this.image,
-    this.type,
-    this.isRead,
-    this.createdAt,
-    this.updatedAt,
-  });
+  NotificationModel({this.id, this.title, this.description, this.content, this.image, this.type, this.referenceId, this.isRead, this.createdAt});
 
   NotificationModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    title = json['title'];
-    content = json['content'];
-    image = json['image'];
-    type = json['type'];
-    isRead = json['is_read'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    id = json["id"];
+    title = json["title"];
+    description = json["description"];
+    content = json["content"];
+    image = json["image"];
+    type = json["type"];
+    referenceId = json["reference_id"];
+    isRead = json["is_read"];
+    createdAt = json["created_at"];
+  }
+
+  static List<NotificationModel> fromList(List<Map<String, dynamic>> list) {
+    return list.map(NotificationModel.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (id != null) data['id'] = id;
-    if (title != null) data['title'] = title;
-    if (content != null) data['content'] = content;
-    if (image != null) data['image'] = image;
-    if (type != null) data['type'] = type;
-    if (isRead != null) data['is_read'] = isRead;
-    if (createdAt != null) data['created_at'] = createdAt;
-    if (updatedAt != null) data['updated_at'] = updatedAt;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["title"] = title;
+    _data["description"] = description;
+    _data["content"] = content;
+    _data["image"] = image;
+    _data["type"] = type;
+    _data["reference_id"] = referenceId;
+    _data["is_read"] = isRead;
+    _data["created_at"] = createdAt;
+    return _data;
   }
 }

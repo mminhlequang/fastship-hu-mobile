@@ -16,7 +16,7 @@ class CartCubit extends Cubit<CartState> {
   final CartRepo cartRepo = CartRepo();
   CartCubit() : super(CartState(isLoading: false, items: []));
 
-  Future<void> getCarts() async {
+  Future<void> fetchCarts() async {
     emit(state.copyWith(isLoading: true));
     final response = await cartRepo.getCarts({});
     emit(state.copyWith(isLoading: false, items: response.data));
@@ -49,7 +49,7 @@ class CartCubit extends Cubit<CartState> {
             msg: "Add to cart successfully", type: AppSnackBarType.success);
       }
 
-      await getCarts();
+      await fetchCarts();
     });
   }
 
@@ -71,7 +71,7 @@ class CartCubit extends Cubit<CartState> {
       ]
     });
 
-    await getCarts();
+    await fetchCarts();
   }
 
   Future<void> removeCartItem(int id) async {
@@ -80,6 +80,6 @@ class CartCubit extends Cubit<CartState> {
       appShowSnackBar(
           msg: "Remove cart item successfully", type: AppSnackBarType.success);
     }
-    await getCarts();
+    await fetchCarts();
   }
 }

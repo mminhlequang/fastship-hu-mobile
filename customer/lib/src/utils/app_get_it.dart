@@ -5,6 +5,7 @@ import '../base/bloc.dart';
 import '../base/cubit/location_cubit.dart';
 import '../presentation/navigation/cubit/navigation_cubit.dart';
 import '../presentation/cart/cubit/cart_cubit.dart';
+import '../presentation/notifications/cubit/notification_cubit.dart';
 import '../presentation/socket_shell/controllers/socket_controller.dart';
 
 final getIt = GetIt.instance;
@@ -20,5 +21,5 @@ void getItSetup() {
   getIt.registerSingleton<CustomerSocketController>(CustomerSocketController());
   getIt.registerSingleton<NavigationCubit>(NavigationCubit());
   getIt.registerSingleton<CartCubit>(CartCubit());
-  
+  getIt.registerSingleton<NotificationCubit>(NotificationCubit());
 }

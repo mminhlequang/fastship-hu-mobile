@@ -7,6 +7,7 @@ import 'package:internal_core/widgets/widgets.dart';
 import '../cart/cubit/cart_cubit.dart';
 import '../home/home_screen.dart';
 import '../cart/cart_screen.dart';
+import '../notifications/cubit/notification_cubit.dart';
 import '../orders/orders_screen.dart';
 import '../account/account_screen.dart';
 import '../restaurants/restaurants_screen.dart';
@@ -22,7 +23,8 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
   @override
   void initState() {
-    cartCubit.getCarts();
+    cartCubit.fetchCarts();
+    notificationCubit.fetchNotifications();
     super.initState();
   }
 
