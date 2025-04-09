@@ -1,107 +1,69 @@
+abstract class VoucherModelType {
+  static const String percentage = 'percentage';
+  static const String fixed = 'fixed';
+}
+
 class VoucherModel {
   int? id;
   String? code;
   String? name;
   String? image;
-  double? cartValue;
-  double? saleMaximum;
+  num? cartValue;
+  num? saleMaximum;
   String? description;
-  String? productIds;
-  int? value;
+  String? content;
+  num? value;
+  dynamic productIds;
   String? startDate;
   String? expiryDate;
   String? type;
-  int? storeId;
-  bool? isSaved;
-  StoreModel? store;
+  int? active;
+  int? isValid;
   String? createdAt;
-  String? updatedAt;
 
-  VoucherModel({
-    this.id,
-    this.code,
-    this.name,
-    this.image,
-    this.cartValue,
-    this.saleMaximum,
-    this.description,
-    this.productIds,
-    this.value,
-    this.startDate,
-    this.expiryDate,
-    this.type,
-    this.storeId,
-    this.isSaved,
-    this.store,
-    this.createdAt,
-    this.updatedAt,
-  });
+  VoucherModel({this.id, this.code, this.name, this.image, this.cartValue, this.saleMaximum, this.description, this.content, this.value, this.productIds, this.startDate, this.expiryDate, this.type, this.active, this.isValid, this.createdAt});
 
   VoucherModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    code = json['code'];
-    name = json['name'];
-    image = json['image'];
-    cartValue = json['cart_value']?.toDouble();
-    saleMaximum = json['sale_maximum']?.toDouble();
-    description = json['description'];
-    productIds = json['product_ids'];
-    value = json['value'];
-    startDate = json['start_date'];
-    expiryDate = json['expiry_date'];
-    type = json['type'];
-    storeId = json['store_id'];
-    isSaved = json['is_saved'];
-    store = json['store'] != null ? StoreModel.fromJson(json['store']) : null;
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    id = json["id"];
+    code = json["code"];
+    name = json["name"];
+    image = json["image"];
+    cartValue = json["cart_value"];
+    saleMaximum = json["sale_maximum"];
+    description = json["description"];
+    content = json["content"];
+    value = json["value"];
+    productIds = json["product_ids"];
+    startDate = json["start_date"];
+    expiryDate = json["expiry_date"];
+    type = json["type"];
+    active = json["active"];
+    isValid = json["is_valid"];
+    createdAt = json["created_at"];
+  }
+
+  static List<VoucherModel> fromList(List<Map<String, dynamic>> list) {
+    return list.map(VoucherModel.fromJson).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (id != null) data['id'] = id;
-    data['code'] = code;
-    data['name'] = name;
-    data['image'] = image;
-    data['cart_value'] = cartValue;
-    data['sale_maximum'] = saleMaximum;
-    data['description'] = description;
-    data['product_ids'] = productIds;
-    data['value'] = value;
-    data['start_date'] = startDate;
-    data['expiry_date'] = expiryDate;
-    data['type'] = type;
-    data['store_id'] = storeId;
-    return data;
-  }
-}
-
-class StoreModel {
-  int? id;
-  String? name;
-  String? image;
-  String? address;
-
-  StoreModel({
-    this.id,
-    this.name,
-    this.image,
-    this.address,
-  });
-
-  StoreModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    image = json['image'];
-    address = json['address'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['image'] = image;
-    data['address'] = address;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["code"] = code;
+    _data["name"] = name;
+    _data["image"] = image;
+    _data["cart_value"] = cartValue;
+    _data["sale_maximum"] = saleMaximum;
+    _data["description"] = description;
+    _data["content"] = content;
+    _data["value"] = value;
+    _data["product_ids"] = productIds;
+    _data["start_date"] = startDate;
+    _data["expiry_date"] = expiryDate;
+    _data["type"] = type;
+    _data["active"] = active;
+    _data["is_valid"] = isValid;
+    _data["created_at"] = createdAt;
+    return _data;
   }
 }

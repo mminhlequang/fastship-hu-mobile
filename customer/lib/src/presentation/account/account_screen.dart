@@ -134,7 +134,17 @@ class _AccountScreenState extends State<AccountScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildInfoItem('Point', '10000 Point', 'icon74'),
-                    _buildInfoItem('Voucher', '400+ voucher', 'icon73'),
+                    WidgetInkWellTransparent(
+                      onTap: () {
+                        appHaptic();
+                        context.push('/vouchers');
+                      },
+                      child: _buildInfoItem(
+                        'Voucher'.tr(),
+                        '400+ voucher',
+                        'icon73',
+                      ),
+                    ),
                   ],
                 ),
               )

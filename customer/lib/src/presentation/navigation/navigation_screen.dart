@@ -132,7 +132,8 @@ class _CustomBottomBar extends StatelessWidget {
           appHaptic();
           onTap(index);
         },
-        child: SizedBox(
+        child: Container(
+          color: Colors.transparent,
           height: 48.sw,
           child: Stack(
             alignment: Alignment.center,

@@ -26,7 +26,7 @@ import 'package:network_resources/transaction/models/models.dart';
 
 import 'package:network_resources/order/repo.dart';
 import 'widget_sheet_locations.dart';
-import 'widget_sheet_vouchers.dart';
+import '../../vouchers/vouchers_screen.dart';
 
 class WidgetPreviewOrder extends StatefulWidget {
   final CartModel cart;
@@ -1093,7 +1093,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     return GestureDetector(
       onTap: () {
         appHaptic();
-        appOpenBottomSheet(const WidgetSheetVouchers());
+        context.push('/vouchers', extra: widget.cart.store?.id);
       },
       child: Container(
         padding: const EdgeInsets.all(12),

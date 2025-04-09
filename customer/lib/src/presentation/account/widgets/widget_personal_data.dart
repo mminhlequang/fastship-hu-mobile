@@ -5,32 +5,119 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:network_resources/auth/repo.dart';
 
-class PersonalDataScreen extends StatelessWidget {
-  const PersonalDataScreen({Key? key}) : super(key: key);
+class PersonalDataScreen extends StatefulWidget {
+  const PersonalDataScreen({super.key});
+
+  @override
+  State<PersonalDataScreen> createState() => _PersonalDataScreenState();
+}
+
+class _PersonalDataScreenState extends State<PersonalDataScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _birthdayController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
+  int? _selectedGender;
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  void _initData() {
+    final user = AppPrefs.instance.user;
+    if (user != null) {
+      _nameController.text = user.name ?? '';
+      _birthdayController.text = user.birthday ?? '';
+      _emailController.text = user.email ?? '';
+      _selectedGender = user.sex;
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _birthdayController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateProfile() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await AuthRepo().updateProfile({
+        'name': _nameController.text,
+        'birthday': _birthdayController.text,
+        'sex': _selectedGender,
+        'email': _emailController.text,
+      });
+
+      if (response.isSuccess) {
+        AppPrefs.instance.user = response.data;
+        appShowSnackBar(
+          msg: 'Profile updated successfully',
+          type: AppSnackBarType.success,
+        );
+        Navigator.pop(context);
+      } else {
+        appShowSnackBar(
+          msg: response.msg ?? 'Failed to update profile',
+          type: AppSnackBarType.error,
+        );
+      }
+    } catch (e) {
+      appShowSnackBar(
+        msg: 'An error occurred',
+        type: AppSnackBarType.error,
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: Stack(
         children: [
-          WidgetAppBar(
-            title: 'Personal Data'.tr(),
-            showBackButton: true,
+          Column(
+            children: [
+              WidgetAppBar(
+                title: 'Personal Data'.tr(),
+                showBackButton: true,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildProfileSection(),
+                      _buildFormFields(),
+                      const SizedBox(height: 80), // Space for bottom button
+                    ],
+                  ),
+                ),
+              ),
+              _buildSaveButton(),
+            ],
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildProfileSection(),
-                  _buildFormFields(),
-                  const SizedBox(height: 80), // Space for bottom button
-                ],
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(),
               ),
             ),
-          ),
-          _buildSaveButton(),
         ],
       ),
     );
@@ -94,28 +181,47 @@ class PersonalDataScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildFormField('Full Name', 'Frances Swann'),
-          const SizedBox(height: 12),
-          _buildFormField('Date of birth', '19/06/1999'),
-          const SizedBox(height: 12),
           _buildFormField(
-            'Gender',
-            'Male',
-            suffix: Icon(
-              Icons.keyboard_arrow_down,
-              color: appColorText,
-            ),
+            'Full Name',
+            _nameController,
+            hintText: 'Enter your name',
           ),
           const SizedBox(height: 12),
-          _buildFormField('Phone', '+1 325-433-7656'),
+          _buildFormField(
+            'Date of birth',
+            _birthdayController,
+            hintText: 'DD/MM/YYYY',
+            readOnly: true,
+            onTap: () {
+              // TODO: Show date picker
+            },
+          ),
           const SizedBox(height: 12),
-          _buildFormField('Email', 'albertstevano@gmail.com'),
+          _buildGenderField(),
+          const SizedBox(height: 12),
+          _buildFormField(
+            'Phone',
+            TextEditingController(text: AppPrefs.instance.user?.phone ?? ''),
+            readOnly: true,
+          ),
+          const SizedBox(height: 12),
+          _buildFormField(
+            'Email',
+            _emailController,
+            hintText: 'Enter your email',
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildFormField(String label, String value, {Widget? suffix}) {
+  Widget _buildFormField(
+    String label,
+    TextEditingController controller, {
+    String? hintText,
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,15 +244,73 @@ class PersonalDataScreen extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  value,
+                child: TextField(
+                  controller: controller,
+                  readOnly: readOnly,
+                  onTap: onTap,
+                  decoration: InputDecoration(
+                    hintText: hintText,
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
                   style: w400TextStyle(
                     color: appColorText,
                     fontSize: 16,
                   ),
                 ),
               ),
-              if (suffix != null) suffix,
+              if (onTap != null)
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: appColorText,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender',
+          style: w400TextStyle(
+            color: appColorText2,
+            fontSize: 14,
+            height: 1.43,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: appColorBorder),
+            color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _selectedGender == 1
+                      ? 'Male'
+                      : _selectedGender == 2
+                          ? 'Female'
+                          : 'Select gender',
+                  style: w400TextStyle(
+                    color: appColorText,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.keyboard_arrow_down,
+                color: appColorText,
+              ),
             ],
           ),
         ),
@@ -170,10 +334,9 @@ class PersonalDataScreen extends StatelessWidget {
       ),
       alignment: Alignment.bottomCenter,
       child: WidgetButtonConfirm(
-          onPressed: () {
-            // Save action
-          },
-          text: 'Save'.tr()),
+        onPressed: _updateProfile,
+        text: 'Save'.tr(),
+      ),
     );
   }
 }

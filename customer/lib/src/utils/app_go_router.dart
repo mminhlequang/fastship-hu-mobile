@@ -17,6 +17,7 @@ import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
+import '../presentation/vouchers/vouchers_screen.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -123,6 +124,10 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/cancel-order',
           builder: (context, state) => const CancelOrderScreen(),
+        ),
+        GoRoute(
+          path: '/vouchers',
+          builder: (context, state) =>   VouchersScreen(storeId: state.extra as int?),
         ),
       ],
     ),
