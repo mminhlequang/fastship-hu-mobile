@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/presentation/store_registration/cubit/store_registration_cubit.dart';
@@ -6,14 +9,37 @@ import 'package:app/src/utils/app_go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/extensions/extensions.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
-class StoreRegistrationScreen extends StatelessWidget {
+class StoreRegistrationScreen extends StatefulWidget {
   const StoreRegistrationScreen({super.key});
+
+  @override
+  State<StoreRegistrationScreen> createState() =>
+      _StoreRegistrationScreenState();
+}
+
+class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> {
+  String? pathPDF;
+
+  @override
+  void initState() {
+    super.initState();
+    fromAsset(
+            'assets/pdfs/file-example_PDF_1MB.pdf', 'file-example_PDF_1MB.pdf')
+        .then((f) {
+      setState(() {
+        pathPDF = f.path;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +257,37 @@ class StoreRegistrationScreen extends StatelessWidget {
                   style: w600TextStyle(fontSize: 16.sw),
                 ),
                 Gap(16.sw),
-                Container(height: 192.sw, color: Colors.grey),
+                SizedBox(
+                  height: 300.sw,
+                  child: pathPDF == null
+                      ? const SizedBox.shrink()
+                      : PDFView(
+                          filePath: pathPDF!,
+                          enableSwipe: true,
+                          swipeHorizontal: false,
+                          autoSpacing: false,
+                          pageFling: false,
+                          backgroundColor: Colors.grey[100],
+                          onRender: (_pages) {
+                            setState(() {
+                              // pages = _pages;
+                              // isReady = true;
+                            });
+                          },
+                          // onError: (error) {
+                          //   print(error.toString());
+                          // },
+                          // onPageError: (page, error) {
+                          //   print('$page: ${error.toString()}');
+                          // },
+                          // onViewCreated: (PDFViewController pdfViewController) {
+                          //   _controller.complete(pdfViewController);
+                          // },
+                          // onPageChanged: (int page, int total) {
+                          //   print('page change: $page/$total');
+                          // },
+                        ),
+                ),
                 Gap(16.sw),
                 WidgetInkWellTransparent(
                   onTap: () {
@@ -316,4 +372,22 @@ class StoreRegistrationScreen extends StatelessWidget {
       },
     );
   }
+}
+
+Future<File> fromAsset(String asset, String filename) async {
+  // To open from assets, you can copy them to the app storage folder, and the access them "locally"
+  Completer<File> completer = Completer();
+
+  try {
+    var dir = await getApplicationDocumentsDirectory();
+    File file = File("${dir.path}/$filename");
+    var data = await rootBundle.load(asset);
+    var bytes = data.buffer.asUint8List();
+    await file.writeAsBytes(bytes, flush: true);
+    completer.complete(file);
+  } catch (e) {
+    throw Exception('Error parsing asset file!: $e');
+  }
+
+  return completer.future;
 }
