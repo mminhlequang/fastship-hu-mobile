@@ -7,6 +7,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/product/repo.dart';
 import 'package:network_resources/store/models/models.dart';
 
 class WidgetDishCardInMenu extends StatelessWidget {
@@ -454,7 +455,7 @@ class WidgetDishCardV2Shimmer extends StatelessWidget {
   }
 }
 
-class WidgetDishCard extends StatelessWidget {
+class WidgetDishCard extends StatefulWidget {
   final ProductModel product;
   final StoreModel? store;
   final VoidCallback? onTap;
@@ -469,16 +470,34 @@ class WidgetDishCard extends StatelessWidget {
   });
 
   @override
+  State<WidgetDishCard> createState() => _WidgetDishCardState();
+}
+
+class _WidgetDishCardState extends State<WidgetDishCard> {
+  Future<void> toggleFavorite() async {
+    widget.product.isFavorite = widget.product.isFavorite == 1 ? 0 : 1;
+    setState(() {});
+    appHaptic();
+
+    final result = await ProductRepo().favoriteProduct(widget.product.id ?? 0);
+    if (result.isSuccess) {
+      setState(() {});
+    } else {
+      widget.product.isFavorite = widget.product.isFavorite == 1 ? 0 : 1;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ??
+      onTap: widget.onTap ??
           () {
             appHaptic();
-            appOpenBottomSheet(
-                WidgetSheetDishDetail(product: product, store: store));
+            appOpenBottomSheet(WidgetSheetDishDetail(
+                product: widget.product, store: widget.store));
           },
       child: Container(
-        width: width ?? 175.sw,
+        width: widget.width ?? 175.sw,
         height: 220.sw,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.sw),
@@ -493,7 +512,7 @@ class WidgetDishCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: WidgetAppImage(
-                        imageUrl: product.image ?? '',
+                        imageUrl: widget.product.image ?? '',
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
@@ -502,21 +521,9 @@ class WidgetDishCard extends StatelessWidget {
                   Positioned(
                     top: 5,
                     right: 5,
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(123),
-                      ),
-                      child: Center(
-                        child: WidgetAppSVG(
-                          'icon12',
-                          width: 20,
-                          height: 20,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+                    child: WidgetFavoriteState(
+                      isFavorite: widget.product.isFavorite == 1,
+                      onTap: toggleFavorite,
                     ),
                   ),
                   Positioned(
@@ -562,13 +569,13 @@ class WidgetDishCard extends StatelessWidget {
                   child: Row(
                     children: [
                       WidgetAvatar.withoutBorder(
-                        imageUrl: product.store?.avatarImage ?? '',
+                        imageUrl: widget.store?.avatarImage ?? '',
                         radius: 18.sw / 2,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          product.store?.name ?? '',
+                          widget.store?.name ?? '',
                           maxLines: 1,
                           style: w400TextStyle(
                             fontSize: 12.sw,
@@ -589,7 +596,7 @@ class WidgetDishCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      product.rating.toString(),
+                      widget.product.rating.toString(),
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#FC8A06'),
@@ -601,7 +608,7 @@ class WidgetDishCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              product.name ?? '',
+              widget.product.name ?? '',
               style: w400TextStyle(fontSize: 16.sw),
             ),
             const SizedBox(height: 6),
@@ -629,7 +636,8 @@ class WidgetDishCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      currencyFormatted(product.priceCompare?.toDouble()),
+                      currencyFormatted(
+                          widget.product.priceCompare?.toDouble()),
                       style: w400TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#A6A0A0'),
@@ -638,7 +646,7 @@ class WidgetDishCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      currencyFormatted(product.price?.toDouble()),
+                      currencyFormatted(widget.product.price?.toDouble()),
                       style: w500TextStyle(
                         fontSize: 12.sw,
                         color: hexColor('#F17228'),
@@ -755,6 +763,39 @@ class WidgetDishCardInMenuShimmer extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class WidgetFavoriteState extends StatelessWidget {
+  final bool isFavorite;
+  final VoidCallback? onTap;
+  const WidgetFavoriteState({
+    super.key,
+    required this.isFavorite,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(123),
+        ),
+        child: Center(
+          child: WidgetAppSVG(
+            isFavorite ? 'icon81' : 'icon12',
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+          ),
+        ),
       ),
     );
   }

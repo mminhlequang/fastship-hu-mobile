@@ -21,6 +21,23 @@ class NotificationState {
 }
 
 extension XNotificationModel on NotificationModel {
+  IconData get icon {
+    switch (type) {
+      case NotificationModelType.order:
+        return Icons.delivery_dining_rounded;
+      case NotificationModelType.promotion:
+        return Icons.local_offer_rounded;
+      case NotificationModelType.system:
+        return Icons.info_rounded;
+      case NotificationModelType.transaction:
+        return Icons.credit_card_rounded;
+      case NotificationModelType.news:
+        return Icons.notifications_rounded;
+      default:
+        return Icons.notifications_rounded;
+    }
+  }
+
   void openDetail() {
     appHaptic();
     switch (type) {

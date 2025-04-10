@@ -1,5 +1,6 @@
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:network_resources/category/model/category.dart';
 import 'package:network_resources/category/repo.dart';
 import 'package:network_resources/product/model/product.dart';
@@ -247,73 +248,21 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: WidgetInkWellTransparent(
-                      onTap: () {
-                        appHaptic();
-                        setState(() {
-                          isRestaurant = true;
-                        });
-                        _fetchRestaurants();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.sw),
-                        child: Center(
-                          child: Text(
-                            'All restaurants',
-                            style: w400TextStyle(
-                                fontSize: 18.sw,
-                                color: isRestaurant
-                                    ? appColorText
-                                    : Color(0xFF847D79)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: WidgetInkWellTransparent(
-                      onTap: () {
-                        appHaptic();
-                        setState(() {
-                          isRestaurant = false;
-                        });
-                        _fetchFoods();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.sw),
-                        child: Center(
-                          child: Text(
-                            'All foods',
-                            style: w400TextStyle(
-                                fontSize: 18.sw,
-                                color: !isRestaurant
-                                    ? appColorText
-                                    : Color(0xFF847D79)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              AnimatedPositioned(
-                duration: Duration(milliseconds: 300),
-                left: isRestaurant ? 0 : context.width / 2 - 16 + 12,
-                child: Container(
-                  width: context.width / 2 - 16 - 12,
-                  height: 2,
-                  color: appColorText2,
-                ),
-              )
-            ],
+          WidgetFoodRestaurantTabbar(
+            isRestaurant: isRestaurant,
+            onTapRestaurant: () {
+              setState(() {
+                isRestaurant = true;
+              });
+              _fetchRestaurants();
+            },
+            onTapFood: () {
+              setState(() {
+                isRestaurant = false;
+              });
+              _fetchFoods();
+            },
+            padding: 16,
           ),
           SizedBox(height: 16),
           if (isRestaurant)
@@ -370,5 +319,81 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
         ],
       ),
     );
+  }
+}
+
+
+class WidgetFoodRestaurantTabbar extends StatelessWidget {
+ final bool isRestaurant;
+ final VoidCallback onTapRestaurant;
+ final VoidCallback onTapFood;
+ final double padding;
+ 
+  const WidgetFoodRestaurantTabbar({super.key, required this.isRestaurant, required this.onTapRestaurant, required this.onTapFood,   this.padding = 16});
+ 
+ @override
+  Widget build(BuildContext context) {
+    return Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: WidgetInkWellTransparent(
+                      onTap: () {
+                        appHaptic();
+                        onTapRestaurant();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.sw),
+                        child: Center(
+                          child: Text(
+                            'All restaurants'.tr(),
+                            style: w400TextStyle(
+                                fontSize: 18.sw,
+                                color: isRestaurant
+                                    ? appColorText
+                                    : Color(0xFF847D79)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: WidgetInkWellTransparent(
+                      onTap: () {
+                        appHaptic();
+                        onTapFood();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.sw),
+                        child: Center(
+                          child: Text(
+                            'All foods'.tr(),
+                            style: w400TextStyle(
+                                fontSize: 18.sw,
+                                color: !isRestaurant
+                                    ? appColorText
+                                    : Color(0xFF847D79)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              AnimatedPositioned(
+                duration: Duration(milliseconds: 300),
+                left: isRestaurant ? 0 : context.width / 2 - 16 + 12,
+                child: Container(
+                  width: context.width / 2 - padding - 12,
+                  height: 2,
+                  color: appColorText2,
+                ),
+              )
+            ],
+          );
   }
 }

@@ -1,11 +1,13 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/home/widgets/widget_dish_card.dart';
 import 'package:network_resources/store/models/store.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/store/repo.dart';
 
-class WidgetRestaurantCard extends StatelessWidget {
+class WidgetRestaurantCard extends StatefulWidget {
   final StoreModel store;
   final VoidCallback? onTap;
 
@@ -16,12 +18,30 @@ class WidgetRestaurantCard extends StatelessWidget {
   });
 
   @override
+  State<WidgetRestaurantCard> createState() => _WidgetRestaurantCardState();
+}
+
+class _WidgetRestaurantCardState extends State<WidgetRestaurantCard> {
+  Future<void> toggleFavorite() async {
+    widget.store.isFavorite = widget.store.isFavorite == 1 ? 0 : 1;
+    setState(() {});
+    appHaptic();
+
+    final result = await StoreRepo().favoriteStore(widget.store.id ?? 0);
+    if (result.isSuccess) {
+      setState(() {});
+    } else {
+      widget.store.isFavorite = widget.store.isFavorite == 1 ? 0 : 1;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ??
+      onTap: widget.onTap ??
           () {
             appHaptic();
-            context.push('/restaurant-detail/${store.id}');
+            context.push('/restaurant-detail/${widget.store.id}');
           },
       child: Container(
         padding: EdgeInsets.all(10),
@@ -32,15 +52,24 @@ class WidgetRestaurantCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: WidgetAppImage(
-                imageUrl: store.avatarImage ?? '',
-                width: 105.sw,
-                height: 105.sw,
-                fit: BoxFit.cover,
-                radius: 8.sw,
-              ),
+            Stack(
+              children: [
+                WidgetAppImage(
+                  imageUrl: widget.store.avatarImage ?? '',
+                  width: 105.sw,
+                  height: 105.sw,
+                  fit: BoxFit.cover,
+                  radius: 8.sw,
+                ),
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: WidgetFavoriteState(
+                    isFavorite: widget.store.isFavorite == 1,
+                    onTap: toggleFavorite,
+                  ),
+                ),
+              ],
             ),
             SizedBox(width: 8),
             Expanded(
@@ -51,7 +80,7 @@ class WidgetRestaurantCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          store.name ?? '',
+                          widget.store.name ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: w500TextStyle(
@@ -63,7 +92,8 @@ class WidgetRestaurantCard extends StatelessWidget {
                   ),
                   SizedBox(height: 9),
                   Text(
-                    store.categories?.map((e) => e.name).join(', ') ?? '',
+                    widget.store.categories?.map((e) => e.name).join(', ') ??
+                        '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: w400TextStyle(
@@ -88,29 +118,29 @@ class WidgetRestaurantCard extends StatelessWidget {
                   Row(
                     children: [
                       // if (discount != null)
-                      Container(
-                        height: 28.sw,
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF17228),
-                          border: Border.all(color: Color(0xFFF17228)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            WidgetAppSVG('icon34', width: 14, height: 14),
-                            SizedBox(width: 2),
-                            Text(
-                              "20%",
-                              style: w400TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.sw,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12),
+                      // Container(
+                      //   height: 28.sw,
+                      //   padding: EdgeInsets.symmetric(horizontal: 10),
+                      //   decoration: BoxDecoration(
+                      //     color: Color(0xFFF17228),
+                      //     border: Border.all(color: Color(0xFFF17228)),
+                      //     borderRadius: BorderRadius.circular(12),
+                      //   ),
+                      //   child: Row(
+                      //     children: [
+                      //       WidgetAppSVG('icon34', width: 14, height: 14),
+                      //       SizedBox(width: 2),
+                      //       Text(
+                      //         "20%",
+                      //         style: w400TextStyle(
+                      //           color: Colors.white,
+                      //           fontSize: 14.sw,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // SizedBox(width: 12),
                       Container(
                         height: 28.sw,
                         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -145,7 +175,7 @@ class WidgetRestaurantCard extends StatelessWidget {
                           ),
                           SizedBox(width: 3),
                           Text(
-                            store.rating.toString(),
+                            widget.store.rating.toString(),
                             style: w500TextStyle(
                               fontSize: 12.sw,
                               color: Color(0xFFFC8A06),
@@ -320,11 +350,6 @@ class WidgetRestaurantCardShimmer extends StatelessWidget {
                     Spacer(),
                     WidgetAppShimmer(
                       width: 40.sw,
-                      height: 16.sw,
-                    ),
-                    SizedBox(width: 8.sw),
-                    WidgetAppShimmer(
-                      width: 50.sw,
                       height: 16.sw,
                     ),
                   ],

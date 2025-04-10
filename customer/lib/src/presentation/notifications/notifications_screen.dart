@@ -20,7 +20,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     notificationCubit.fetchNotifications().then((value) {
-      notificationCubit.readAllNotifications();
+      if (notificationCubit.state.unreadCount > 0) {
+        notificationCubit.readAllNotifications();
+      }
     });
   }
 
@@ -86,11 +88,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionShimmer('Today'),
+        _buildSectionShimmer('Today'.tr()),
         const SizedBox(height: 12),
-        _buildSectionShimmer('Yesterday'),
+        _buildSectionShimmer('Yesterday'.tr()),
         const SizedBox(height: 12),
-        _buildSectionShimmer('Last Week'),
+        _buildSectionShimmer('Last Week'.tr()),
       ],
     );
   }
@@ -252,11 +254,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             itemBuilder: (context, index) => GestureDetector(
               onTap: () => items[index].openDetail(),
               child: _buildNotificationItem(
-                icon: _getIconByType(items[index].type),
-                iconColor: _getIconColorByType(items[index].type),
-                title: items[index].title ?? '',
-                subtitle: items[index].description ?? '',
-                isUnread: items[index].isRead == 0,
+                item: items[index],
               ),
             ),
           ),
@@ -264,23 +262,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         const SizedBox(height: 12),
       ],
     );
-  }
-
-  IconData _getIconByType(String? type) {
-    switch (type?.toLowerCase()) {
-      case 'order':
-        return Icons.delivery_dining;
-      case 'promotion':
-        return Icons.local_offer;
-      case 'system':
-        return Icons.info;
-      case 'payment':
-        return Icons.credit_card;
-      case 'account':
-        return Icons.person;
-      default:
-        return Icons.notifications;
-    }
   }
 
   Color _getIconColorByType(String? type) {
@@ -300,13 +281,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Widget _buildNotificationItem({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    bool isUnread = false,
-  }) {
+  Widget _buildNotificationItem({required NotificationModel item}) {
     return Column(
       children: [
         Padding(
@@ -320,11 +295,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 height: 48,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  icon,
-                  color: iconColor,
+                  item.icon,
+                  color: _getIconColorByType(item.type),
                   size: 24,
                 ),
               ),
@@ -334,7 +309,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      item.title ?? '',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: w500TextStyle(
@@ -343,7 +318,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      subtitle,
+                      item.description ?? '',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: w400TextStyle(
@@ -354,7 +329,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ],
                 ),
               ),
-              if (isUnread)
+              if (item.isRead == 0)
                 Container(
                   width: 10,
                   height: 10,
