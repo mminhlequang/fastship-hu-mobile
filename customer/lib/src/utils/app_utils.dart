@@ -5,7 +5,51 @@ import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
+import '../presentation/widgets/widget_bottom_pickdatetime.dart';
 import 'utils.dart';
+
+Future<void> appOpenDateTimePicker(
+  DateTime? date,
+  Function(DateTime date) onConfirm, {
+  title,
+  type = DateTimePickerType.date,
+  DateTime? minimumDate,
+  DateTime? maximumDate,
+}) async {
+  date ??= DateTime.now();
+  final rs = await appOpenBottomSheet(
+    WidgetDateTimePicker(
+      type: type,
+      initialDateTime: date,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+    ),
+    enableDrag: false,
+    backgroundColor: Colors.transparent,
+  );
+  if (rs is DateTime) {
+    onConfirm(rs);
+  }
+}
+
+Future<void> appOpenTimePicker(
+  DateTime? date,
+  Function(DateTime date) onConfirm, {
+  title,
+}) async {
+  date ??= DateTime.now();
+  final rs = await appOpenBottomSheet(
+    WidgetBottomPickTime(
+      title: title ?? 'SELECT TIME'.tr(),
+      time: date,
+    ),
+    enableDrag: false,
+    backgroundColor: Colors.transparent,
+  );
+  if (rs is DateTime) {
+    onConfirm(rs);
+  }
+}
 
 requestLoginWrapper(Function function) {
   if (authCubit.state.stateType != AuthStateType.logged) {
@@ -21,6 +65,7 @@ appOpenBottomSheet(
   Widget child, {
   bool isDismissible = true,
   bool enableDrag = true,
+  Color? backgroundColor,
 }) async {
   appIsBottomSheetOpen = true;
   var r = await showMaterialModalBottomSheet(
@@ -34,7 +79,7 @@ appOpenBottomSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     isDismissible: isDismissible,
-    backgroundColor: Colors.white,
+    backgroundColor: backgroundColor ?? Colors.white,
     useRootNavigator: true,
   );
   appIsBottomSheetOpen = false;

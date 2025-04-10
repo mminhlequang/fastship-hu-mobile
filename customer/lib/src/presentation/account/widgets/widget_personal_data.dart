@@ -1,3 +1,4 @@
+import 'package:app/src/presentation/widgets/widget_app_dropdown.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:app/src/utils/utils.dart';
@@ -16,9 +17,11 @@ class PersonalDataScreen extends StatefulWidget {
 
 class _PersonalDataScreenState extends State<PersonalDataScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+
+  DateTime? _birthdayController;
   bool _isLoading = false;
+  bool _isChanged = false;
   int? _selectedGender;
 
   @override
@@ -31,7 +34,10 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     final user = AppPrefs.instance.user;
     if (user != null) {
       _nameController.text = user.name ?? '';
-      _birthdayController.text = user.birthday ?? '';
+      if (user.birthday != null) {
+        _birthdayController =
+            string2DateTime(user.birthday!, format: 'yyyy-MM-dd');
+      }
       _emailController.text = user.email ?? '';
       _selectedGender = user.sex;
     }
@@ -40,7 +46,6 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _birthdayController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -55,7 +60,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     try {
       final response = await AuthRepo().updateProfile({
         'name': _nameController.text,
-        'birthday': _birthdayController.text,
+        'birthday': _birthdayController?.formatDate(formatType: 'yyyy-MM-dd'),
         'sex': _selectedGender,
         'email': _emailController.text,
       });
@@ -63,13 +68,13 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       if (response.isSuccess) {
         AppPrefs.instance.user = response.data;
         appShowSnackBar(
-          msg: 'Profile updated successfully',
+          msg: 'Profile updated successfully'.tr(),
           type: AppSnackBarType.success,
         );
         Navigator.pop(context);
       } else {
         appShowSnackBar(
-          msg: response.msg ?? 'Failed to update profile',
+          msg: response.msg ?? 'Failed to update profile'.tr(),
           type: AppSnackBarType.error,
         );
       }
@@ -88,36 +93,25 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
+      backgroundColor: appColorBackground,
+      body: Column(
         children: [
-          Column(
-            children: [
-              WidgetAppBar(
-                title: 'Personal Data'.tr(),
-                showBackButton: true,
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildProfileSection(),
-                      _buildFormFields(),
-                      const SizedBox(height: 80), // Space for bottom button
-                    ],
-                  ),
-                ),
-              ),
-              _buildSaveButton(),
-            ],
+          WidgetAppBar(
+            title: 'Personal Data'.tr(),
+            showBackButton: true,
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(
-                child: CircularProgressIndicator(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildProfileSection(),
+                  _buildFormFields(),
+                  const SizedBox(height: 80), // Space for bottom button
+                ],
               ),
             ),
+          ),
+          if (_isChanged) _buildSaveButton(),
         ],
       ),
     );
@@ -182,33 +176,57 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       child: Column(
         children: [
           _buildFormField(
-            'Full Name',
+            'Full Name'.tr(),
             _nameController,
-            hintText: 'Enter your name',
+            keyboardType: TextInputType.name,
+            hintText: 'Enter your name'.tr(),
+            onChanged: (value) {
+              setState(() {
+                _isChanged = true;
+              });
+            },
           ),
           const SizedBox(height: 12),
-          _buildFormField(
-            'Date of birth',
-            _birthdayController,
-            hintText: 'DD/MM/YYYY',
-            readOnly: true,
-            onTap: () {
-              // TODO: Show date picker
-            },
+          SizedBox(
+            key: Key(_birthdayController?.formatDate() ?? '_birthday'),
+            child: _buildFormField(
+              'Date of birth'.tr(),
+              TextEditingController(
+                  text: _birthdayController?.formatDate() ?? ''),
+              hintText: 'DD/MM/YYYY',
+              readOnly: true,
+              onTap: () {
+                appOpenDateTimePicker(
+                  _birthdayController ??
+                      DateTime(DateTime.now().year - 18, 1, 1),
+                  (date) {
+                    _birthdayController = date;
+                    _isChanged = true;
+                    setState(() {});
+                  },
+                );
+              },
+            ),
           ),
           const SizedBox(height: 12),
           _buildGenderField(),
           const SizedBox(height: 12),
           _buildFormField(
-            'Phone',
+            'Phone'.tr(),
             TextEditingController(text: AppPrefs.instance.user?.phone ?? ''),
             readOnly: true,
           ),
           const SizedBox(height: 12),
           _buildFormField(
-            'Email',
+            'Email'.tr(),
             _emailController,
-            hintText: 'Enter your email',
+            keyboardType: TextInputType.emailAddress,
+            hintText: 'Enter your email'.tr(),
+            onChanged: (value) {
+              setState(() {
+                _isChanged = true;
+              });
+            },
           ),
         ],
       ),
@@ -218,9 +236,11 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   Widget _buildFormField(
     String label,
     TextEditingController controller, {
+    TextInputType? keyboardType,
     String? hintText,
     bool readOnly = false,
     VoidCallback? onTap,
+    Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,18 +265,25 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             children: [
               Expanded(
                 child: TextField(
+                  keyboardType: keyboardType,
                   controller: controller,
                   readOnly: readOnly,
                   onTap: onTap,
-                  decoration: InputDecoration(
-                    hintText: hintText,
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
                   style: w400TextStyle(
                     color: appColorText,
                     fontSize: 16,
+                  ),
+                  onChanged: onChanged,
+                  decoration: InputDecoration(
+                    hintText: hintText,
+                    hintStyle: w300TextStyle(
+                      color: appColorText2,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 16,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ),
@@ -277,7 +304,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Gender',
+          'Gender'.tr(),
           style: w400TextStyle(
             color: appColorText2,
             fontSize: 14,
@@ -285,33 +312,48 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: appColorBorder),
-            color: Colors.white,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _selectedGender == 1
-                      ? 'Male'
-                      : _selectedGender == 2
-                          ? 'Female'
-                          : 'Select gender',
-                  style: w400TextStyle(
-                    color: appColorText,
-                    fontSize: 16,
+        AppDropdown(
+          items: ['Male', 'Female'],
+          indexSelected: _selectedGender == null ? null : _selectedGender! - 1,
+          hintText: 'Select gender'.tr(),
+          onChanged: (value) {
+            _isChanged = true;
+            _selectedGender = value + 1;
+            setState(() {});
+          },
+          itemAsString: (item) => item,
+          isAutoHeight: true,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: appColorBorder),
+              color: Colors.white,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedGender == 1
+                        ? 'Male'.tr()
+                        : _selectedGender == 2
+                            ? 'Female'.tr()
+                            : 'Select gender'.tr(),
+                    style: w400TextStyle(
+                      color: appColorText,
+                      fontStyle: _selectedGender == null
+                          ? FontStyle.italic
+                          : FontStyle.normal,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-              ),
-              Icon(
-                Icons.keyboard_arrow_down,
-                color: appColorText,
-              ),
-            ],
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: appColorText,
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -335,6 +377,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       alignment: Alignment.bottomCenter,
       child: WidgetButtonConfirm(
         onPressed: _updateProfile,
+        isLoading: _isLoading,
         text: 'Save'.tr(),
       ),
     );

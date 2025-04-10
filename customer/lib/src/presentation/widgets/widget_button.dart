@@ -1,4 +1,5 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_loading_wrapper.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,11 @@ Widget _buildButton({
       ),
       child: Center(
         child: isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
+            ? SizedBox(
+                width: 28.sw,
+                height: 28.sw,
+                child: WidgetAppLoader(),
+              )
             : Text(
                 text,
                 style: w600TextStyle(
