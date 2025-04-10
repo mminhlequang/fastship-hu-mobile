@@ -2,6 +2,7 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:go_router/go_router.dart';
+import 'package:network_resources/enums.dart';
 import 'package:network_resources/voucher/repo.dart';
 import 'package:network_resources/voucher/models/models.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -130,10 +131,18 @@ class _VouchersScreenState extends State<VouchersScreen> {
                               itemCount: vouchers!.length,
                               itemBuilder: (context, index) => _WidgetItem(
                                 voucher: vouchers![index],
+                                applyNow: widget.storeId != null,
                                 onTap: () {
                                   appHaptic();
-                                  if (vouchers![index].isValid == 1) {
-                                    context.pop(vouchers![index]);
+                                  if (widget.storeId != null) {
+                                    if (vouchers![index].isValid == 1) {
+                                      context.pop(vouchers![index]);
+                                    }
+                                  } else {
+                                    context.push(
+                                      '/vouchers-detail',
+                                      extra: vouchers![index],
+                                    );
                                   }
                                 },
                               ),
@@ -203,69 +212,91 @@ class _VouchersScreenState extends State<VouchersScreen> {
 
 class _WidgetItem extends StatelessWidget {
   final VoucherModel voucher;
+  final bool applyNow;
   final VoidCallback onTap;
 
   const _WidgetItem({
     Key? key,
     required this.voucher,
     required this.onTap,
+    this.applyNow = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 70.sw,
-          height: 70.sw,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: hexColor('#F8F1F0'),
-              width: 1,
+    String textValue;
+    if (voucher.type == VoucherModelType.fixed) {
+      textValue = " (-${currencyFormatted(voucher.value)})";
+    } else {
+      textValue = " (-${voucher.value}%)";
+    }
+    return WidgetInkWellTransparent(
+      onTap: onTap,
+      enableInkWell: false,
+      child: Row(
+        children: [
+          Container(
+            width: 70.sw,
+            height: 70.sw,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: hexColor('#F8F1F0'),
+                width: 1,
+              ),
+            ),
+            child: WidgetAppImage(imageUrl: voucher.image ?? ''),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: w500TextStyle(
+                      fontSize: 18.sw,
+                      color: appColorText,
+                    ),
+                    children: [
+                      TextSpan(text: voucher.name ?? ''),
+                      TextSpan(
+                        text: textValue,
+                        style: w400TextStyle(
+                          fontSize: 18.sw,
+                          color: appColorPrimaryOrange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  voucher.description ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: w400TextStyle(
+                    fontSize: 14.sw,
+                    height: 1.4,
+                    color: hexColor('#847D79'),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  applyNow ? "Apply now".tr() : "See details".tr(),
+                  style: w300TextStyle(
+                    fontSize: 12.sw,
+                    height: 1.4,
+                    color: appColorPrimary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
             ),
           ),
-          child: WidgetAppImage(imageUrl: voucher.image ?? ''),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: w500TextStyle(
-                    fontSize: 20.sw,
-                    color: voucher.isValid == 1
-                        ? hexColor('#091230')
-                        : hexColor('#847D79'),
-                  ),
-                  children: [
-                    TextSpan(text: voucher.name ?? ''),
-                    TextSpan(
-                      text: voucher.value.toString(),
-                      style: w400TextStyle(
-                        color: voucher.isValid == 1
-                            ? appColorPrimary
-                            : hexColor('#847D79'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                voucher.description ?? '',
-                style: w400TextStyle(
-                  fontSize: 14.sw,
-                  color: hexColor('#847D79'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

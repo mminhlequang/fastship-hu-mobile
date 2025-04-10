@@ -22,7 +22,7 @@ class AppDivider extends StatelessWidget {
       child: Divider(
         height: height,
         thickness: thickness,
-        color: color ?? appColorBackground,
+        color: color ?? appColorBorder,
       ),
     );
   }

@@ -60,6 +60,21 @@ class AuthCubit extends Cubit<AuthState> {
     _redirect();
   }
 
+  refreshUserInfo() async {
+    try {
+      NetworkResponse response = await AuthRepo().getProfile();
+      if (response.isSuccess) {
+        state.user = response.data;
+        AppPrefs.instance.user = response.data;
+        emit(state.update());
+      } else {
+        logout();
+      }
+    } catch (e) {
+      logout();
+    }
+  }
+
   logout() async {
     try {
       AppPrefs.instance.clear();

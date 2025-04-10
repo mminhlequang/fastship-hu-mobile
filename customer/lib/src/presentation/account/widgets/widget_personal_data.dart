@@ -67,6 +67,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
 
       if (response.isSuccess) {
         AppPrefs.instance.user = response.data;
+        WidgetsFlutterBinding.ensureInitialized().performReassemble();
         appShowSnackBar(
           msg: 'Profile updated successfully'.tr(),
           type: AppSnackBarType.success,

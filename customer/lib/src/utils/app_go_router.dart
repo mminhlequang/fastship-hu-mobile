@@ -6,6 +6,7 @@ import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:network_resources/voucher/models/models.dart';
 
 import '../presentation/account/widgets/widget_help_center.dart';
 import '../presentation/account/widgets/widget_my_favorite.dart';
@@ -18,6 +19,7 @@ import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/socket_shell/widgets/location_permission_wraper.dart';
 import '../presentation/vouchers/vouchers_screen.dart';
+import '../presentation/vouchers/widgets/voucher_detail_screen.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -128,6 +130,11 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/vouchers',
           builder: (context, state) =>   VouchersScreen(storeId: state.extra as int?),
+        ),
+        GoRoute(
+          path: '/vouchers-detail',
+          builder: (context, state) =>
+              VoucherDetailScreen(voucher: state.extra as VoucherModel),
         ),
       ],
     ),
