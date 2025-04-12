@@ -9,14 +9,14 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 
-class CustomerReviewsScreen extends StatefulWidget {
-  const CustomerReviewsScreen({super.key});
+class RatingsScreen extends StatefulWidget {
+  const RatingsScreen({super.key});
 
   @override
-  State<CustomerReviewsScreen> createState() => _CustomerReviewsScreenState();
+  State<RatingsScreen> createState() => _RatingsScreenState();
 }
 
-class _CustomerReviewsScreenState extends State<CustomerReviewsScreen> {
+class _RatingsScreenState extends State<RatingsScreen> {
   bool _isLoading = true;
   List<RatingModel> _reviews = [];
   double _averageRating = 0;

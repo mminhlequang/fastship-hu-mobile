@@ -10,10 +10,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/cart/models/models.dart';
@@ -28,7 +26,8 @@ import '../widgets/widget_app_map.dart';
 import '../widgets/widget_appbar.dart';
 
 class CheckoutTrackingScreen extends StatefulWidget {
-  const CheckoutTrackingScreen({super.key});
+  final OrderModel? order;
+  const CheckoutTrackingScreen({super.key, this.order});
 
   @override
   State<CheckoutTrackingScreen> createState() => _CheckoutTrackingScreenState();
@@ -45,7 +44,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   final ValueNotifier<List<Polyline>> _polylinesNotifier =
       ValueNotifier<List<Polyline>>([]);
 
-  OrderModel get order => socketController.currentOrder!;
+  OrderModel? get currentOrder => widget.order ?? socketController.currentOrder;
 
   @override
   void initState() {
@@ -71,8 +70,8 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     return ValueListenableBuilder(
         valueListenable: socketController.orderStatus,
         builder: (context, value, child) {
-          if (socketController.currentOrder == null) return SizedBox();
-          OrderModel order = socketController.currentOrder!;
+          if (currentOrder == null) return SizedBox();
+          OrderModel order = currentOrder!;
           return Scaffold(
             body: Stack(
               children: [

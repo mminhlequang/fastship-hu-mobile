@@ -17,6 +17,8 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../notification/cubit/notification_cubit.dart';
+
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
 
@@ -35,6 +37,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   void initState() {
     super.initState();
+    notificationCubit.fetchNotifications();
     _checkNotificationPermission().then((_) async {
       AuthRepo().updateDeviceToken(
           {'device_token': await FirebaseMessaging.instance.getToken()});

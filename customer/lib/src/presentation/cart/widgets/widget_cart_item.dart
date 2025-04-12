@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:network_resources/enums.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class WidgetCartItem extends StatelessWidget {
               child: WidgetButtonConfirm(
                 onPressed: () {
                   appHaptic();
-                  appOpenBottomSheet(WidgetPreviewOrder(cart: cart));
+                  context.push('/preview-order', extra: cart);
                 },
                 text:
                     'Check out now (${currencyFormatted(cart.cartItems?.fold(0, (sum, item) => sum! + (item.product?.price ?? 0) * (item.quantity ?? 0)) ?? 0)})'

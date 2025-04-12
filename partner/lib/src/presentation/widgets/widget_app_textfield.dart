@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:network_resources/enums.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({

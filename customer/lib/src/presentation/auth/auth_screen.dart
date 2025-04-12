@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/options.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:network_resources/enums.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/widget_infinity_slider.dart';

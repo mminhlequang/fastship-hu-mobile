@@ -1,14 +1,14 @@
+import 'package:map_launcher/map_launcher.dart';
 import 'package:network_resources/enums.dart';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/presentation/checkout/checkout_tracking_screen.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
-import 'package:app/src/presentation/widgets/widget_sheet_process.dart';
+import 'package:app/src/presentation/cart/widgets/widget_sheet_process.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -26,7 +26,10 @@ import 'package:network_resources/transaction/models/models.dart';
 
 import 'package:network_resources/order/repo.dart';
 import 'widget_sheet_locations.dart';
-import '../../vouchers/vouchers_screen.dart';
+
+// logic tính phí ship để tính khi giao hàng
+// Dưới 2 km	2.50 eur	 (Phí cơ bản)
+// Mỗi km tiếp theo	+1.00
 
 class WidgetPreviewOrder extends StatefulWidget {
   final CartModel cart;
@@ -38,8 +41,8 @@ class WidgetPreviewOrder extends StatefulWidget {
 
 class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
   double tip = 0;
-  bool isPickupYourself = false;
-  double distance = 0.0;
+  AppOrderDeliveryType deliveryType = AppOrderDeliveryType.ship;
+  double distanceInMet = 0.0;
   String duration = '';
   bool isCalculatingRoute = false;
   final dio = Dio();
@@ -63,6 +66,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                     2),
       ) ??
       0;
+  double get shippingFee {
+    if (distanceInMet < 2000) {
+      return 2.5;
+    } else {
+      return 2.5 + (distanceInMet - 2000) * 1;
+    }
+  }
 
   double get applicationFee => subtotal * 0.1; //TODO: Get from backend
   double get discount => 0.5; //TODO: Get from backend;
@@ -91,7 +101,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
   void initState() {
     super.initState();
     // Tính toán quãng đường và lộ trình khi khởi tạo widget
-    if (!isPickupYourself) {
+    if (deliveryType == AppOrderDeliveryType.ship) {
       _calculateRoute();
     }
   }
@@ -153,7 +163,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             final summary = section['summary'];
 
             // Quãng đường (mét)
-            distance = summary['length'] / 1000; // Chuyển đổi sang km
+            distanceInMet = summary['length']?.toDouble() ?? 0;
             ship_distance =
                 summary['length']; // Lưu lại khoảng cách dưới dạng mét (int)
 
@@ -216,7 +226,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         ValueNotifier<SheetProcessStatus>(SheetProcessStatus.loading);
 
     // Nếu cần ship, tính toán lộ trình trước khi tạo đơn hàng
-    if (!isPickupYourself && distance == 0) {
+    if (deliveryType == AppOrderDeliveryType.ship && distanceInMet == 0) {
       await _calculateRoute();
     }
 
@@ -224,12 +234,12 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
       processer.value = SheetProcessStatus.loading;
       final r = await OrderRepo().createOrder({
         "store_id": widget.cart.store!.id!,
-        "payment_type": "ship",
+        "delivery_type": deliveryType.name,
         "payment_id": selectedPaymentWalletProvider,
         // "voucher_id": 0,
         // "voucher_value": 0,
         "tip": tip,
-        "ship_fee": tip,
+        "ship_fee": shippingFee,
         "ship_distance": ship_distance,
         "ship_estimate_time": ship_estimate_time,
         "ship_polyline": ship_polyline,
@@ -245,7 +255,6 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "state": locationCubit.state.addressDetail!.address?.state,
         "country": locationCubit.state.addressDetail!.address?.countryName,
         "country_code": locationCubit.state.addressDetail!.address?.countryCode,
-        "is_pickup": isPickupYourself, // Xác định phương thức nhận hàng
       });
       if (r.isSuccess) {
         CreateOrderResponse orderResponse = r.data!;
@@ -306,6 +315,18 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           }
         }
 
+        if (deliveryType == AppOrderDeliveryType.pickup) {
+          processer.value = SheetProcessStatus.success;
+          Timer(
+            const Duration(seconds: 2),
+            () async {
+              context.pop();
+              context.pushReplacement('/checkout-tracking', extra: orderResponse.order);
+            },
+          );
+          return;
+        }
+
         final socketResult =
             await socketController.createOrder(orderResponse.order!);
         if (socketResult) {
@@ -315,8 +336,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             () async {
               context.pop();
               if (socketResult) {
-                context.pop();
-                context.push('/checkout-tracking');
+                context.pushReplacement('/checkout-tracking');
               }
             },
           );
@@ -354,17 +374,31 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                   WidgetAppBar(
                     title: widget.cart.store?.name ?? "",
                     actions: [
-                      WidgetAppSVG('icon20', width: 18.sw, height: 18.sw),
-                      const SizedBox(width: 4),
-                      Text(
-                        "0.6 Km",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: w400TextStyle(
-                          fontSize: 14.sw,
-                          color: Color(0xFFF17228),
+                      WidgetInkWellTransparent(
+                        onTap: () {
+                          MapLauncher.installedMaps.then((maps) {
+                            maps.first.showMarker(
+                              coords: Coords(widget.cart.store!.lat!,
+                                  widget.cart.store!.lng!),
+                              title: widget.cart.store?.name ?? "",
+                            );
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: WidgetAppSVG('icon20',
+                              width: 18.sw, height: 18.sw),
                         ),
                       ),
+                      // Text(
+                      //   "0.6 Km",
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      //   style: w400TextStyle(
+                      //     fontSize: 14.sw,
+                      //     color: Color(0xFFF17228),
+                      //   ),
+                      // ),
                     ],
                   ),
                   Padding(
@@ -407,14 +441,14 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           onTap: () {
             appHaptic();
             setState(() {
-              isPickupYourself = false;
+              deliveryType = AppOrderDeliveryType.ship;
             });
             // Tính toán lộ trình khi chuyển sang chế độ giao hàng
             _calculateRoute();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: !isPickupYourself
+            decoration: deliveryType == AppOrderDeliveryType.ship
                 ? appBoxDecorationSelected
                 : appBoxDecorationUnSelected,
             child: Column(
@@ -434,7 +468,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'Current location'.tr(),
+                                  'Delivery address'.tr(),
                                   style: w500TextStyle(
                                     fontSize: 16.sw,
                                   ),
@@ -447,7 +481,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                                           const WidgetSheetLocations())
                                       .then((_) {
                                     // Tính toán lại lộ trình khi thay đổi địa chỉ
-                                    if (!isPickupYourself) {
+                                    if (deliveryType ==
+                                        AppOrderDeliveryType.ship) {
                                       _calculateRoute();
                                     }
                                   });
@@ -479,7 +514,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                   ],
                 ),
                 // Hiển thị thông tin quãng đường và thời gian giao hàng
-                if (!isPickupYourself && (distance > 0 || isCalculatingRoute))
+                if (deliveryType == AppOrderDeliveryType.ship &&
+                    (distanceInMet > 0 || isCalculatingRoute))
                   Container(
                     margin: EdgeInsets.only(top: 8.sw),
                     decoration: BoxDecoration(
@@ -512,7 +548,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                               isCalculatingRoute
                                   ? 'Calculating route...'.tr()
                                   : ('Estimated time'.tr() +
-                                      ': $duration (${distance.toStringAsFixed(1)} km)'),
+                                      ': $duration (${distanceFormatted(distanceInMet)})'),
                               style: w500TextStyle(
                                 fontSize: 14.sw,
                                 color: hexColor('#F17228'),
@@ -531,12 +567,12 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           onTap: () {
             appHaptic();
             setState(() {
-              isPickupYourself = true;
+              deliveryType = AppOrderDeliveryType.pickup;
             });
           },
           child: Container(
             padding: const EdgeInsets.all(12),
-            decoration: isPickupYourself
+            decoration: deliveryType == AppOrderDeliveryType.pickup
                 ? appBoxDecorationSelected
                 : appBoxDecorationUnSelected,
             child: Row(
@@ -544,7 +580,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                 WidgetAppSVG('icon38'),
                 const SizedBox(width: 8),
                 Text(
-                  'Pick up yourself',
+                  'Pick up yourself'.tr(),
                   style: w400TextStyle(
                     fontSize: 16,
                     color: hexColor('#847D79'),
@@ -808,25 +844,11 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                             (e) {
                               bool isSelected = cartItem.variations!
                                   .any((element) => element.id == e.id);
-                              return GestureDetector(
-                                onTap: () {
-                                  if (isSelected) {
-                                    cartItem.variations!.removeWhere(
-                                        (element) => element.id == e.id);
-                                  } else {
-                                    cartItem.variations!.removeWhere(
-                                        (element) =>
-                                            element.parentId == e.parentId);
-                                    cartItem.variations!.add(e);
-                                  }
-                                  setState(() {});
-                                },
-                                child: _MenuItem(
-                                  title: e.value ?? '',
-                                  price:
-                                      "+${currencyFormatted(e.price?.toDouble())}",
-                                  isSelected: isSelected,
-                                ),
+                              return _MenuItem(
+                                title: e.value ?? '',
+                                price:
+                                    "+${currencyFormatted(e.price?.toDouble())}",
+                                isSelected: isSelected,
                               );
                             },
                           ).toList() ??
@@ -1034,6 +1056,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           _buildSummaryRow('Subtotal', currencyFormatted(subtotal)),
           _buildSummaryRow(
               'Application fee', currencyFormatted(applicationFee)),
+          if (shippingFee > 0)
+            _buildSummaryRow('Shipping fee', currencyFormatted(shippingFee)),
           _buildSummaryRow('Courier tip', currencyFormatted(tip),
               color: appColorPrimary),
           Row(

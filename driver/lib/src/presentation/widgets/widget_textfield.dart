@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/src/utils/selector_config.dart';
 import 'package:intl_phone_number_input/src/widgets/input_widget.dart';
 import 'package:intl_phone_number_input/src/utils/phone_number.dart';
+import 'package:network_resources/enums.dart';
 
 enum TextFieldErrorType { hint, normal }
 

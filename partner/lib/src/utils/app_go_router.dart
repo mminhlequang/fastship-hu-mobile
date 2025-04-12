@@ -26,10 +26,15 @@ import '../presentation/auth/auth_screen.dart';
 import '../presentation/menu/widgets/widget_add_dish_variation.dart';
 import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/ratings/ratings_screen.dart';
 import '../presentation/report/report_page.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
 import '../presentation/store_registration/widgets/widget_store_category.dart';
+import '../presentation/wallet/wallet_screen.dart';
+import '../presentation/wallet_banks_card_add/banks_card_add_screen.dart';
+import '../presentation/wallet_banks_cards/banks_cards_screen.dart';
+import '../presentation/wallet_transactions/wallet_transactions.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -72,35 +77,38 @@ final goRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/store-registration',
-          builder: (context, state) => const StoreRegistrationScreen(),
+          pageBuilder:
+              _defaultPageBuilder((state) => const StoreRegistrationScreen()),
         ),
         GoRoute(
           path: '/provide-info',
-          builder: (context, state) => const ProvideInfoScreen(),
+          pageBuilder:
+              _defaultPageBuilder((state) => const ProvideInfoScreen()),
         ),
         GoRoute(
           path: '/opening-time',
-          builder: (context, state) => OpeningTimeScreen(
-            initialData: state.extra as List<OpeningTimeModel>?,
-          ),
+          pageBuilder: _defaultPageBuilder((state) => OpeningTimeScreen(
+                initialData: state.extra as List<OpeningTimeModel>?,
+              )),
         ),
         GoRoute(
           path: '/business-type',
-          builder: (context, state) => WidgetBusinessType(
-            initialData: state.extra as List<int>?,
-          ),
+          pageBuilder: _defaultPageBuilder((state) => WidgetBusinessType(
+                initialData: state.extra as List<int>?,
+              )),
         ),
         GoRoute(
           path: '/store-category',
-          builder: (context, state) => WidgetStoreCategory(
-            initialData: state.extra as List<int>?,
-          ),
+          pageBuilder: _defaultPageBuilder((state) => WidgetStoreCategory(
+                initialData: state.extra as List<int>?,
+              )),
         ),
       ],
     ),
     GoRoute(
       path: '/merchant-onboarding',
-      builder: (context, state) => const MerchantOnboardingScreen(),
+      pageBuilder:
+          _defaultPageBuilder((state) => const MerchantOnboardingScreen()),
     ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,
@@ -114,139 +122,134 @@ final goRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/navigation',
-          builder: (context, state) => const NavigationScreen(),
+          pageBuilder: _defaultPageBuilder((state) => const NavigationScreen()),
         ),
         GoRoute(
           path: '/menu',
-          builder: (context, state) => const MenuScreen(),
+          pageBuilder: _defaultPageBuilder((state) => const MenuScreen()),
         ),
         GoRoute(
           path: '/add-topping-group',
-          builder: (context, state) => WidgetAddToppingGroup(
-            model: state.extra as MenuModel?,
-          ),
+          pageBuilder: _defaultPageBuilder((state) => WidgetAddToppingGroup(
+                model: state.extra as MenuModel?,
+              )),
         ),
         GoRoute(
           path: '/add-dish',
-          builder: (context, state) =>
-              WidgetAddDish(params: state.extra as AddDishParams),
+          pageBuilder: _defaultPageBuilder(
+              (state) => WidgetAddDish(params: state.extra as AddDishParams)),
         ),
         GoRoute(
           path: '/add-topping',
-          builder: (context, state) =>
-              WidgetAddTopping(topping: state.extra as ToppingModel?),
+          pageBuilder: _defaultPageBuilder((state) =>
+              WidgetAddTopping(topping: state.extra as ToppingModel?)),
         ),
         GoRoute(
           path: '/add-variation',
-          builder: (context, state) =>
-              WidgetAddVariation(variation: state.extra as VariationModel?),
+          pageBuilder: _defaultPageBuilder((state) =>
+              WidgetAddVariation(variation: state.extra as VariationModel?)),
         ),
         GoRoute(
           path: '/link-topping-group',
-          builder: (context, state) => WidgetLinkToppingGroup(
-            initList: state.extra as List<int>?,
-          ),
+          pageBuilder: _defaultPageBuilder((state) => WidgetLinkToppingGroup(
+                initList: state.extra as List<int>?,
+              )),
         ),
         GoRoute(
           path: '/add-option',
-          builder: (context, state) => const WidgetAddOption(),
+          pageBuilder: _defaultPageBuilder((state) => const WidgetAddOption()),
         ),
         GoRoute(
           path: '/detail-order',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const DetailOrderScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const DetailOrderScreen()),
+        ),
+        GoRoute(
+          path: '/ratings',
+          pageBuilder: _defaultPageBuilder((state) => const RatingsScreen()),
         ),
         GoRoute(
           path: '/my-profile',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const MyProfileScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const MyProfileScreen()),
         ),
         GoRoute(
           path: '/store-settings',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const StoreSettingsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const StoreSettingsScreen()),
           routes: [
             GoRoute(
               name: 'information',
               path: 'information',
-              pageBuilder: (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: const InformationScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: animation.drive(
-                      Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).chain(CurveTween(curve: Curves.easeInOut)),
-                    ),
-                    child: child,
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 300),
-              ),
+              pageBuilder:
+                  _defaultPageBuilder((state) => const InformationScreen()),
             ),
           ],
         ),
         GoRoute(
           path: '/order-settings',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const OrderSettingsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const OrderSettingsScreen()),
         ),
         GoRoute(
           path: '/help-center',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const HelpCenterScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const HelpCenterScreen()),
         ),
         GoRoute(
           path: '/report',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const ReportPage(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const ReportPage()),
+        ),
+        GoRoute(
+          path: '/my-wallet',
+          pageBuilder: _defaultPageBuilder((state) => const WalletScreen()),
+          routes: [
+            GoRoute(
+              path: '/transactions',
+              pageBuilder:
+                  _defaultPageBuilder((state) => const TransactionsScreen()),
+            ),
+            GoRoute(
+              path: '/banks-cards',
+              pageBuilder: _defaultPageBuilder(
+                (state) => BanksCardsScreen(isSelector: state.extra == true),
+              ),
+            ),
+            GoRoute(
+              path: '/banks-cards/add-card',
+              pageBuilder: _defaultPageBuilder(
+                (state) => BanksCardAddScreen(
+                  params: state.extra as Map<String, dynamic>,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     ),
   ],
 );
+
+Page<dynamic> Function(BuildContext, GoRouterState) _defaultPageBuilder<T>(
+        Widget Function(GoRouterState) builder) =>
+    (BuildContext context, GoRouterState state) {
+      return _buildPageWithDefaultTransition<T>(
+        context: context,
+        state: state,
+        name: state.name,
+        child: builder(state),
+      );
+    };
+
+CustomTransitionPage _buildPageWithDefaultTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+  required String? name,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    name: name,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
+}

@@ -22,6 +22,7 @@ dependencies:
       path: network/
       ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
   tuple: ^2.0.2
+  easy_localization: ^3.0.7+1
 
 
 dev_dependencies:

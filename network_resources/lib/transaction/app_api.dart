@@ -25,12 +25,12 @@ class _MyAppEndpoint {
 }
 
 abstract class MyAppApi {
-  Future<NetworkResponse> getTransactions();
+  Future<NetworkResponse> getTransactions(Map<String, dynamic> data);
   Future<NetworkResponse> getTransactionDetail(String id);
   Future<NetworkResponse> requestTopUp(Map<String, dynamic> data);
   Future<NetworkResponse> requestWithdraw(Map<String, dynamic> data);
   Future<NetworkResponse> getMyWallet(Map<String, dynamic> data);
-  Future<NetworkResponse> getPaymentWalletProvider();
+  Future<NetworkResponse> getPaymentWalletProvider(Map<String, dynamic> data);
   Future<NetworkResponse> getPaymentAccounts();
   Future<NetworkResponse> createPaymentAccounts(Map<String, dynamic> data);
   Future<NetworkResponse> updatePaymentAccounts(Map<String, dynamic> data);
@@ -39,12 +39,12 @@ abstract class MyAppApi {
 
 class MyAppApiImp extends MyAppApi {
   @override
-  Future<NetworkResponse> getTransactions() async {
+  Future<NetworkResponse> getTransactions(Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).get(_MyAppEndpoint.transaction());
+        ).get(_MyAppEndpoint.transaction(), queryParameters: data);
         return NetworkResponse.fromResponse(
           response,
           converter:
@@ -115,12 +115,14 @@ class MyAppApiImp extends MyAppApi {
   }
 
   @override
-  Future<NetworkResponse> getPaymentWalletProvider() async {
+  Future<NetworkResponse> getPaymentWalletProvider(
+      Map<String, dynamic> data) async {
     return await handleNetworkError(
       proccess: () async {
         Response response = await AppClient(
           token: await appPrefs.getNormalToken(),
-        ).get(_MyAppEndpoint.getPaymentWalletProvider());
+        ).get(_MyAppEndpoint.getPaymentWalletProvider(),
+            queryParameters: data);
         return NetworkResponse.fromResponse(
           response,
           converter:

@@ -1,7 +1,7 @@
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:network_resources/transaction/models/models.dart';
-import 'package:app/src/presentation/banks_cards/banks_cards_screen.dart';
+import 'package:app/src/presentation/wallet_banks_cards/banks_cards_screen.dart';
 import 'package:app/src/presentation/widgets/widget_bottom_sheet_base.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';

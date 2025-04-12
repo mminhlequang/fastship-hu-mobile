@@ -46,7 +46,8 @@ class _BanksCardsScreenState extends State<BanksCardsScreen> {
       });
     }
 
-    var providerResponse = await TransactionRepo().getPaymentWalletProvider();
+    var providerResponse = await TransactionRepo()
+        .getPaymentWalletProvider({"is_order_payment": 0});
     if (providerResponse.isSuccess) {
       setState(() {
         paymentWalletProvider = providerResponse.data;

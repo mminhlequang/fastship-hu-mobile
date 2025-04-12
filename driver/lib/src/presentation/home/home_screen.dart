@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/utils/app_map_helper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
@@ -27,6 +28,8 @@ import 'package:network_resources/here_polyline_converter.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../notifications/cubit/notification_cubit.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -41,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    notificationCubit.fetchNotifications();
     _checkNotificationPermission().then((_) async {
       AuthRepo().updateDeviceToken(
           {'device_token': await FirebaseMessaging.instance.getToken()});
@@ -295,42 +299,63 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       WidgetRippleButton(
-                        onTap: () => context.push('/notifications'),
+                        onTap: () {
+                          appHaptic();
+                          context.push('/notifications');
+                        },
                         elevation: 12,
                         shadowColor: Colors.black54,
                         child: SizedBox(
                           height: 40.sw,
                           width: 40.sw,
-                          child: Center(
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                WidgetAppSVG('ic_bell'),
-                                Positioned(
-                                  top: -6,
-                                  right: -4,
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(
-                                        4.sw, 2.53.sw, 4.sw, 0.47.sw),
-                                    decoration: BoxDecoration(
-                                      color: hexColor('#F58737'),
-                                      borderRadius: BorderRadius.circular(7.sw),
-                                      border: Border.all(color: Colors.white),
-                                    ),
-                                    child: Text(
-                                      '3',
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 10.sw,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1,
-                                      ),
-                                    ),
+                          child: BlocBuilder<NotificationCubit,
+                                  NotificationState>(
+                              bloc: notificationCubit,
+                              builder: (context, state) {
+                                return Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      WidgetAppSVG('ic_bell'),
+                                      if (state.items.any((e) => e.isRead == 0))
+                                        Positioned(
+                                          top: -6,
+                                          right: -4,
+                                          child: Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                4.sw, 2.53.sw, 4.sw, 0.47.sw),
+                                            decoration: BoxDecoration(
+                                              color: hexColor('#F58737'),
+                                              borderRadius:
+                                                  BorderRadius.circular(7.sw),
+                                              border: Border.all(
+                                                  color: Colors.white),
+                                            ),
+                                            child: Text(
+                                              state.items
+                                                          .where((e) =>
+                                                              e.isRead == 0)
+                                                          .length >
+                                                      5
+                                                  ? '5+'
+                                                  : state.items
+                                                      .where(
+                                                          (e) => e.isRead == 0)
+                                                      .length
+                                                      .toString(),
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 10.sw,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w500,
+                                                height: 1,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                );
+                              }),
                         ),
                       ),
                     ],

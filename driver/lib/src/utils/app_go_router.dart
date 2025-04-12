@@ -1,9 +1,9 @@
-import 'package:app/src/presentation/banks_card_add/banks_card_add_screen.dart';
+import 'package:app/src/presentation/wallet_banks_card_add/banks_card_add_screen.dart';
 import 'package:app/src/presentation/auth/auth_screen.dart';
-import 'package:app/src/presentation/banks_cards/banks_cards_screen.dart';
+import 'package:app/src/presentation/wallet_banks_cards/banks_cards_screen.dart';
 import 'package:app/src/presentation/change_password/change_password_screen.dart';
 import 'package:app/src/presentation/chat/chat_screen.dart';
-import 'package:app/src/presentation/customer_reviews/customer_reviews_screen.dart';
+import 'package:app/src/presentation/ratings/ratings_screen.dart';
 import 'package:app/src/presentation/my_profile/my_profile_screen.dart';
 import 'package:app/src/presentation/my_profile/widgets/personal_info_screen.dart';
 import 'package:app/src/presentation/order_detail/order_detail_screen.dart';
@@ -24,6 +24,7 @@ import '../presentation/splash/splash_screen.dart';
 import '../presentation/statistics/statistics_screen.dart';
 import '../presentation/vehicles/vehicles_screen.dart';
 import '../presentation/wallet/wallet_screen.dart';
+import '../presentation/wallet_transactions/wallet_transactions.dart';
 import 'app_get.dart';
 
 GlobalKey<NavigatorState> get appNavigatorKey =>
@@ -38,59 +39,19 @@ final goRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SplashScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      pageBuilder: _defaultPageBuilder((state) => const SplashScreen()),
     ),
     GoRoute(
       path: '/auth',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const LoginScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      pageBuilder: _defaultPageBuilder((state) => const LoginScreen()),
     ),
     GoRoute(
       path: '/driver-register',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const DriverRegisterScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      pageBuilder: _defaultPageBuilder((state) => const DriverRegisterScreen()),
     ),
     GoRoute(
       path: '/driver-register/profile',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const WidgetFormProfile(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      pageBuilder: _defaultPageBuilder((state) => const WidgetFormProfile()),
     ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,
@@ -106,275 +67,117 @@ final goRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/home',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const HomeScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const HomeScreen()),
         ),
         GoRoute(
           path: '/settings',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const SettingsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(-1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
-        ),
-        GoRoute(
-          path: '/wallet',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const WalletScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const SettingsScreen()),
         ),
         GoRoute(
           path: '/statistics',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const StatisticsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const StatisticsScreen()),
         ),
         GoRoute(
           path: '/help-center',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const HelpCenterScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const HelpCenterScreen()),
         ),
         GoRoute(
           path: '/notifications',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const NotificationsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const NotificationsScreen()),
         ),
         GoRoute(
           path: '/order-detail',
-          builder: (context, state) =>
-              OrderDetailScreen(order: state.extra as OrderModel),
+          pageBuilder: _defaultPageBuilder((state) => OrderDetailScreen(
+                order: state.extra as OrderModel,
+              )),
         ),
         GoRoute(
           path: '/order-detail/chat',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const ChatScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const ChatScreen()),
         ),
         GoRoute(
           path: '/order-detail/report-order',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const ReportOrderScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const ReportOrderScreen()),
         ),
         GoRoute(
           path: '/vehicles',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const VehiclesScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const VehiclesScreen()),
         ),
         GoRoute(
-          path: '/customer-reviews',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const CustomerReviewsScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          path: '/ratings',
+          pageBuilder: _defaultPageBuilder((state) => const RatingsScreen()),
         ),
         GoRoute(
           path: '/my-profile',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const MyProfileScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder: _defaultPageBuilder((state) => const MyProfileScreen()),
           routes: [
             GoRoute(
               name: 'personal-info',
               path: 'personal-info',
-              pageBuilder: (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: const PersonalInfoScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: animation.drive(
-                      Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).chain(CurveTween(curve: Curves.easeInOut)),
-                    ),
-                    child: child,
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 300),
-              ),
+              pageBuilder:
+                  _defaultPageBuilder((state) => const PersonalInfoScreen()),
             ),
           ],
         ),
         GoRoute(
           path: '/change-password',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const ChangePasswordScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+          pageBuilder:
+              _defaultPageBuilder((state) => const ChangePasswordScreen()),
         ),
         GoRoute(
-          path: '/my-wallet/banks-cards',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: BanksCardsScreen(isSelector: state.extra == true),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
-                ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
-        ),
-        GoRoute(
-          path: '/my-wallet/banks-cards/add-card',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: BanksCardAddScreen(
-              params: state.extra as Map<String, dynamic>,
+          path: '/my-wallet',
+          pageBuilder: _defaultPageBuilder((state) => const WalletScreen()),
+          routes: [
+            GoRoute(
+              path: '/transactions',
+              pageBuilder:
+                  _defaultPageBuilder((state) => const TransactionsScreen()),
             ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeInOut)),
+            GoRoute(
+              path: '/banks-cards',
+              pageBuilder: _defaultPageBuilder(
+                (state) => BanksCardsScreen(isSelector: state.extra == true),
+              ),
+            ),
+            GoRoute(
+              path: '/banks-cards/add-card',
+              pageBuilder: _defaultPageBuilder(
+                (state) => BanksCardAddScreen(
+                  params: state.extra as Map<String, dynamic>,
                 ),
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 300),
-          ),
+              ),
+            ),
+          ],
         ),
       ],
     ),
   ],
 );
+
+Page<dynamic> Function(BuildContext, GoRouterState) _defaultPageBuilder<T>(
+        Widget Function(GoRouterState) builder) =>
+    (BuildContext context, GoRouterState state) {
+      return _buildPageWithDefaultTransition<T>(
+        context: context,
+        state: state,
+        name: state.name,
+        child: builder(state),
+      );
+    };
+
+CustomTransitionPage _buildPageWithDefaultTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+  required String? name,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    name: name,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
+}

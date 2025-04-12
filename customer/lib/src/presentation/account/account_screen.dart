@@ -208,6 +208,7 @@ class _AccountScreenState extends State<AccountScreen> {
         border: Border.all(color: const Color(0xFFF1EFE9)),
       ),
       child: Column(
+        spacing: 8.sw,
         children: [
           _buildMenuItem('Personal Data', 'icon70', () {
             appContext.push("/personal-data");
@@ -218,9 +219,9 @@ class _AccountScreenState extends State<AccountScreen> {
           _buildMenuItem('Settings', 'icon71', () {
             appContext.push("/settings");
           }),
-          _buildMenuItem('Security', 'icon72', () {
-            appContext.push("/security");
-          }),
+          // _buildMenuItem('Security', 'icon72', () {
+          //   appContext.push("/security");
+          // }),
         ],
       ),
     );
@@ -249,6 +250,7 @@ class _AccountScreenState extends State<AccountScreen> {
             border: Border.all(color: const Color(0xFFF1EFE9)),
           ),
           child: Column(
+            spacing: 8.sw,
             children: [
               _buildMenuItem('Help Center', 'icon67', () {
                 appContext.push("/help-center");
@@ -272,54 +274,51 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildMenuItem(String title, String imageUrl, [VoidCallback? onTap]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: WidgetInkWellTransparent(
-        enableInkWell: false,
-        onTap: () {
-          appHaptic();
-          if (onTap != null) {
-            onTap();
-          }
-        },
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF4F4F4),
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Center(
-                child: WidgetAppSVG(
-                  imageUrl,
-                  width: 24,
-                  height: 24,
-                ),
+    return WidgetInkWellTransparent(
+      enableInkWell: false,
+      onTap: () {
+        appHaptic();
+        if (onTap != null) {
+          onTap();
+        }
+      },
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F4F4),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Center(
+              child: WidgetAppSVG(
+                imageUrl,
+                width: 24,
+                height: 24,
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: w400TextStyle(
-                  fontSize: 16.sw,
-                  color: const Color(0xFF3C3836),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: w400TextStyle(
+                fontSize: 16.sw,
                 color: const Color(0xFF3C3836),
               ),
             ),
-          ],
-        ),
+          ),
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: const Color(0xFF3C3836),
+            ),
+          ),
+        ],
       ),
     );
   }

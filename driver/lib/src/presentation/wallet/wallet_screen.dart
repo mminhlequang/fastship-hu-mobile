@@ -143,7 +143,7 @@ class _WalletScreenState extends State<WalletScreen> {
     setState(() {
       _isLoadingTransactions = true;
     });
-    final response = await TransactionRepo().getTransactions();
+    final response = await TransactionRepo().getTransactions({});
     setState(() {
       transactions = response.data ?? [];
       _isLoadingTransactions = false;
@@ -429,13 +429,34 @@ class _WalletScreenState extends State<WalletScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.sw),
-                        child: Text(
-                          'Transactions'.tr(),
-                          style: w600TextStyle(
-                            fontSize: 16.sw,
-                            color: hexColor('#4F4F4F'),
+                      WidgetInkWellTransparent(
+                        onTap: () {
+                          appContext.push('/my-wallet/transactions');
+                        },
+                        enableInkWell: false,
+                        child: Padding(
+                          padding: EdgeInsets.all(16.sw),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Transactions'.tr(),
+                                  style: w600TextStyle(
+                                    fontSize: 16.sw,
+                                    color: hexColor('#4F4F4F'),
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                'View all'.tr(),
+                                style: w400TextStyle(
+                                  fontSize: 12.sw,
+                                  height: 2,
+                                  decoration: TextDecoration.underline,
+                                  color: appColorPrimary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

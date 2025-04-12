@@ -1,3 +1,4 @@
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -26,7 +27,7 @@ class PersonalInfoScreen extends StatelessWidget {
             ),
             Gap(4.sw),
             Text(
-              'John Doe',
+              '${AppPrefs.instance.user?.name}'.toUpperCase(),
               style: w400TextStyle(fontSize: 16.sw),
             ),
             Gap(12.sw),
@@ -38,7 +39,7 @@ class PersonalInfoScreen extends StatelessWidget {
             ),
             Gap(4.sw),
             Text(
-              '(332) 454-9224',
+              '${AppPrefs.instance.user?.phone}',
               style: w400TextStyle(fontSize: 16.sw),
             ),
             Gap(12.sw),
@@ -50,7 +51,7 @@ class PersonalInfoScreen extends StatelessWidget {
             ),
             Gap(4.sw),
             Text(
-              '98765432234',
+              'DRIVER-${AppPrefs.instance.user?.id}'.toUpperCase(),
               style: w400TextStyle(fontSize: 16.sw),
             ),
           ],

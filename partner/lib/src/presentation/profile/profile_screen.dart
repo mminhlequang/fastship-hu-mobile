@@ -16,33 +16,33 @@ import 'package:internal_core/widgets/widgets.dart';
 enum ProfileItem {
   myProfile,
   storeSettings,
-  orderSettings,
+  // orderSettings,
   helpCenter,
-  deleteAccount,
+  // deleteAccount,
   logout;
 
   String get title => switch (this) {
         myProfile => 'My profile'.tr(),
         storeSettings => 'Store settings'.tr(),
-        orderSettings => 'Order settings'.tr(),
+        // orderSettings => 'Order settings'.tr(),
         helpCenter => 'Help center'.tr(),
-        deleteAccount => 'Delete account'.tr(),
+        // deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
 
   String get icon => switch (this) {
         myProfile => assetsvg('ic_my_profile'),
         storeSettings => assetsvg('ic_store_2'),
-        orderSettings => assetsvg('ic_order_settings'),
+        // orderSettings => assetsvg('ic_order_settings'),
         helpCenter => assetsvg('ic_support'),
-        deleteAccount => assetsvg('ic_delete_acc'),
+        // deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
 
   String? get route => switch (this) {
         myProfile => '/my-profile',
         storeSettings => '/store-settings',
-        orderSettings => '/order-settings',
+        // orderSettings => '/order-settings',
         helpCenter => '/help-center',
         _ => null,
       };
@@ -145,9 +145,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return WidgetRippleButton(
             onTap: () {
               switch (item) {
-                case ProfileItem.deleteAccount:
-                  _deleteAccount();
-                  break;
+                // case ProfileItem.deleteAccount:
+                //   _deleteAccount();
+                //   break;
                 case ProfileItem.logout:
                   _logout();
                   break;

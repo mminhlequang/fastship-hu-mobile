@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../base/bloc.dart';
+import '../presentation/notification/cubit/notification_cubit.dart';
 
 
 final getIt = GetIt.instance;
@@ -15,4 +16,5 @@ void getItSetup() {
       GlobalKey<NavigatorState>());
   getIt.registerSingleton<AuthCubit>(AuthCubit());
   getIt.registerSingleton<NavigationCubit>(NavigationCubit());
+  getIt.registerSingleton<NotificationCubit>(NotificationCubit());
 }

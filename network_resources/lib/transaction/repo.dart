@@ -15,8 +15,8 @@ class TransactionRepo {
 
   late MyAppApi _api;
 
-  Future<NetworkResponse> getTransactions() async {
-    return await _api.getTransactions();
+  Future<NetworkResponse> getTransactions(Map<String, dynamic> data) async {
+    return await _api.getTransactions(data);
   }
 
   Future<NetworkResponse> getTransactionDetail(String id) async {
@@ -35,8 +35,10 @@ class TransactionRepo {
     return await _api.getMyWallet(data);
   }
 
-  Future<NetworkResponse> getPaymentWalletProvider() async {
-    return await _api.getPaymentWalletProvider();
+  Future<NetworkResponse> getPaymentWalletProvider(
+    Map<String, dynamic> data,
+  ) async {
+    return await _api.getPaymentWalletProvider(data);
   }
 
   Future<NetworkResponse> getPaymentAccounts() async {

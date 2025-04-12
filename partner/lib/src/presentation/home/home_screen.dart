@@ -46,7 +46,7 @@ enum HomeItem {
         menu => '/menu',
         // banner => '',
         statistics => '/report',
-        wallet => '',
+        wallet => '/my-wallet',
         rating => '',
         support => '/help-center',
         settings => '/store-settings',
@@ -83,10 +83,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> banners = [
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS95xqc0vn-3EDxzvHeazJ7e21bC9w_LIp6g&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS95xqc0vn-3EDxzvHeazJ7e21bC9w_LIp6g&s',
-  ];
+  // List<String> banners = [
+  //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS95xqc0vn-3EDxzvHeazJ7e21bC9w_LIp6g&s',
+  //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS95xqc0vn-3EDxzvHeazJ7e21bC9w_LIp6g&s',
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -94,53 +94,53 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: EdgeInsets.all(16.sw),
       child: Column(
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return CarouselSlider.builder(
-                options: CarouselOptions(
-                  autoPlay: true,
-                  aspectRatio: 343 / 129,
-                  viewportFraction: 1,
-                  autoPlayAnimationDuration: const Duration(seconds: 1),
-                  autoPlayCurve: Curves.easeInOut,
-                  enlargeCenterPage: true,
-                ),
-                itemCount: banners.length,
-                itemBuilder: (context, index, realIndex) {
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      WidgetAppImage(
-                        imageUrl: banners[index],
-                        radius: 8.sw,
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned(
-                        left: 16.sw,
-                        bottom: 16.sw,
-                        child: WidgetRippleButton(
-                          onTap: () {
-                            // Todo:
-                          },
-                          radius: 4.sw,
-                          color: hexColor('#F5DA27'),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10.sw, vertical: 4.sw),
-                            child: Text(
-                              'Try now'.tr(),
-                              style: w600TextStyle(fontSize: 12.sw),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-          Gap(16.sw),
+          // LayoutBuilder(
+          //   builder: (context, constraints) {
+          //     return CarouselSlider.builder(
+          //       options: CarouselOptions(
+          //         autoPlay: true,
+          //         aspectRatio: 343 / 129,
+          //         viewportFraction: 1,
+          //         autoPlayAnimationDuration: const Duration(seconds: 1),
+          //         autoPlayCurve: Curves.easeInOut,
+          //         enlargeCenterPage: true,
+          //       ),
+          //       itemCount: banners.length,
+          //       itemBuilder: (context, index, realIndex) {
+          //         return Stack(
+          //           fit: StackFit.expand,
+          //           children: [
+          //             WidgetAppImage(
+          //               imageUrl: banners[index],
+          //               radius: 8.sw,
+          //               fit: BoxFit.cover,
+          //             ),
+          //             Positioned(
+          //               left: 16.sw,
+          //               bottom: 16.sw,
+          //               child: WidgetRippleButton(
+          //                 onTap: () {
+          //                   // Todo:
+          //                 },
+          //                 radius: 4.sw,
+          //                 color: hexColor('#F5DA27'),
+          //                 child: Padding(
+          //                   padding: EdgeInsets.symmetric(
+          //                       horizontal: 10.sw, vertical: 4.sw),
+          //                   child: Text(
+          //                     'Try now'.tr(),
+          //                     style: w600TextStyle(fontSize: 12.sw),
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //           ],
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
+          // Gap(16.sw),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 13.sw, vertical: 16.sw),
             decoration: BoxDecoration(

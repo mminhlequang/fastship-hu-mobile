@@ -1,5 +1,6 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/utils/app_go_router.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -177,7 +178,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     style: w400TextStyle(fontSize: 16.sw),
                   ),
                   Text(
-                    '98765432234',
+                    'driver-${AppPrefs.instance.user?.id}'.toUpperCase(),
                     style: w400TextStyle(color: grey9),
                   ),
                 ],
@@ -186,6 +187,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             _divider,
             WidgetRippleButton(
               onTap: () {
+                appHaptic();
                 appContext.pushNamed('personal-info');
               },
               radius: 0,
@@ -204,85 +206,86 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
               ),
             ),
-            _divider,
-            WidgetRippleButton(
-              onTap: () {
-                // Todo:
-              },
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Services and contracts'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    WidgetAppSVG('chevron_right'),
-                  ],
-                ),
-              ),
-            ),
-            _divider,
-            WidgetRippleButton(
-              onTap: () {
-                // Todo:
-              },
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tax'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    WidgetAppSVG('chevron_right'),
-                  ],
-                ),
-              ),
-            ),
-            _divider,
-            WidgetRippleButton(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return WidgetConfirmDialog(
-                      title: 'Stop cooperation'.tr(),
-                      subTitle:
-                          'Are you sure you want to stop cooperation with FastShip?'
-                              .tr(),
-                      onConfirm: _onStopCooperation,
-                    );
-                  },
-                );
-              },
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  children: [
-                    Text(
-                      'Stop cooperation'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    const Spacer(),
-                    Text(
-                      'Pending'.tr(),
-                      style: w400TextStyle(color: hexColor('#FFC148')),
-                    ),
-                    Gap(2.sw),
-                    WidgetAppSVG('chevron_right'),
-                  ],
-                ),
-              ),
-            ),
+            // _divider,
+            // WidgetRippleButton(
+            //   onTap: () {
+            //     // Todo:
+            //     appHaptic();
+            //   },
+            //   radius: 0,
+            //   child: Padding(
+            //     padding:
+            //         EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         Text(
+            //           'Services and contracts'.tr(),
+            //           style: w400TextStyle(fontSize: 16.sw),
+            //         ),
+            //         WidgetAppSVG('chevron_right'),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            // _divider,
+            // WidgetRippleButton(
+            //   onTap: () {
+            //     // Todo:
+            //   },
+            //   radius: 0,
+            //   child: Padding(
+            //     padding:
+            //         EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         Text(
+            //           'Tax'.tr(),
+            //           style: w400TextStyle(fontSize: 16.sw),
+            //         ),
+            //         WidgetAppSVG('chevron_right'),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            // _divider,
+            // WidgetRippleButton(
+            //   onTap: () {
+            //     showDialog(
+            //       context: context,
+            //       builder: (context) {
+            //         return WidgetConfirmDialog(
+            //           title: 'Stop cooperation'.tr(),
+            //           subTitle:
+            //               'Are you sure you want to stop cooperation with FastShip?'
+            //                   .tr(),
+            //           onConfirm: _onStopCooperation,
+            //         );
+            //       },
+            //     );
+            //   },
+            //   radius: 0,
+            //   child: Padding(
+            //     padding:
+            //         EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+            //     child: Row(
+            //       children: [
+            //         Text(
+            //           'Stop cooperation'.tr(),
+            //           style: w400TextStyle(fontSize: 16.sw),
+            //         ),
+            //         const Spacer(),
+            //         Text(
+            //           'Pending'.tr(),
+            //           style: w400TextStyle(color: hexColor('#FFC148')),
+            //         ),
+            //         Gap(2.sw),
+            //         WidgetAppSVG('chevron_right'),
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

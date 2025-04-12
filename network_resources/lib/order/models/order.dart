@@ -53,7 +53,8 @@ class OrderModel {
   int? id;
   String? code;
   String? currency;
-  String? paymentType;
+  String? deliveryType;
+  String? storeStatus;
   String? paymentStatus;
   String? processStatus;
   dynamic note;
@@ -89,6 +90,11 @@ class OrderModel {
   dynamic timePickup;
   dynamic timeDelivery;
 
+  AppOrderDeliveryType get deliveryTypeEnum => AppOrderDeliveryType.values
+      .byName(deliveryType ?? AppOrderDeliveryType.ship.name);
+
+  AppOrderStoreStatus get storeStatusEnum => AppOrderStoreStatus.values
+      .byName(storeStatus ?? AppOrderStoreStatus.pending.name);
 
   AppPaymentOrderStatus get paymentStatusEnum => AppPaymentOrderStatus.values
       .byName(paymentStatus ?? AppPaymentOrderStatus.pending.name);
@@ -100,7 +106,8 @@ class OrderModel {
     this.id,
     this.code,
     this.currency,
-    this.paymentType,
+    this.deliveryType,
+    this.storeStatus,
     this.paymentStatus,
     this.processStatus,
     this.note,
@@ -141,7 +148,8 @@ class OrderModel {
     id = json["id"];
     code = json["code"];
     currency = json["currency"];
-    paymentType = json["payment_type"];
+    deliveryType = json["delivery_type"];
+    storeStatus = json["store_status"];
     paymentStatus = json["payment_status"];
     processStatus = json["process_status"];
     note = json["note"];
@@ -163,8 +171,8 @@ class OrderModel {
     state = json["state"];
     country = json["country"];
     countryCode = json["country_code"];
-    lat = json["lat"];
-    lng = json["lng"];
+    lat = json["lat"]?.toDouble();
+    lng = json["lng"]?.toDouble();
     address = json["address"];
     shipFee = json["ship_fee"];
     tip = json["tip"];
@@ -192,7 +200,8 @@ class OrderModel {
     _data["id"] = id;
     _data["code"] = code;
     _data["currency"] = currency;
-    _data["payment_type"] = paymentType;
+    _data["delivery_type"] = deliveryType;
+    _data["store_status"] = storeStatus;
     _data["payment_status"] = paymentStatus;
     _data["process_status"] = processStatus;
     _data["note"] = note;

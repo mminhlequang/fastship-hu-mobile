@@ -1,7 +1,9 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:app/src/presentation/notification/cubit/notification_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
@@ -50,6 +52,11 @@ class CustomBottomBar extends StatelessWidget {
   Widget _buildTabItem(int index, String icon, String label) {
     bool isNotification = index == 1;
     bool isSelected = currentIndex == index;
+    Widget iconWidget = WidgetAppSVG(
+      icon,
+      width: 24.sw,
+      color: isSelected ? appColorPrimary : hexColor('#E1E1E1'),
+    );
 
     return Expanded(
       child: InkWell(
@@ -59,41 +66,51 @@ class CustomBottomBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Gap(10.sw),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                WidgetAppSVG(
-                  icon,
-                  width: 24.sw,
-                  color: isSelected ? appColorPrimary : hexColor('#E1E1E1'),
-                ),
-                if (isNotification)
-                  Positioned(
-                    top: -5.sw,
-                    right: -7.sw,
-                    child: Container(
-                      height: 15.sw,
-                      padding: EdgeInsets.symmetric(horizontal: 4.sw),
-                      decoration: BoxDecoration(
-                        color: hexColor('#FF8832'),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '10',
-                          style: GoogleFonts.roboto(
-                            fontSize: 10.sw,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                            height: 1.4,
+            !isNotification
+                ? iconWidget
+                : BlocBuilder<NotificationCubit, NotificationState>(
+                    bloc: notificationCubit,
+                    builder: (context, state) {
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          WidgetAppSVG(
+                            icon,
+                            width: 24.sw,
+                            color: isSelected
+                                ? appColorPrimary
+                                : hexColor('#E1E1E1'),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+                          if (state.unreadCount > 0)
+                            Positioned(
+                              top: -5.sw,
+                              right: -7.sw,
+                              child: Container(
+                                height: 15.sw,
+                                padding: EdgeInsets.symmetric(horizontal: 4.sw),
+                                decoration: BoxDecoration(
+                                  color: hexColor('#FF8832'),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.white),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    state.unreadCount > 5
+                                        ? '5+'
+                                        : state.unreadCount.toString(),
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 10.sw,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
             Gap(2.sw),
             Text(
               label,

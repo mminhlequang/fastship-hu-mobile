@@ -151,17 +151,17 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
             },
           ),
         ),
-        ValueListenableBuilder<bool>(
-          valueListenable: _socketController.socketConnected,
-          builder: (context, value, child) {
-            return !value
-                ? Container(
-                    color: Colors.black.withOpacity(0.1),
-                    child: const WidgetAppLoader(),
-                  )
-                : const SizedBox.shrink();
-          },
-        ),
+        // ValueListenableBuilder<bool>(
+        //   valueListenable: _socketController.socketConnected,
+        //   builder: (context, value, child) {
+        //     return !value
+        //         ? Container(
+        //             color: Colors.black.withOpacity(0.1),
+        //             child: const WidgetAppLoader(),
+        //           )
+        //         : const SizedBox.shrink();
+        //   },
+        // ),
       ],
     );
   }

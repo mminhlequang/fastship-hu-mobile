@@ -51,7 +51,7 @@ enum SettingsItem {
   String? get route => switch (this) {
         myProfile => '/my-profile',
         incomeStatistics => '/statistics',
-        customerReviews => '/customer-reviews',
+        customerReviews => '/ratings',
         changePassword => '/change-password',
         // vehicles => '/vehicles',
         helpCenter => '/help-center',
@@ -262,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: WidgetWallet(
                   onTap: () {
                     appHaptic();
-                    context.push('/wallet');
+                    context.push('/my-wallet');
                   },
                 ),
               ),
