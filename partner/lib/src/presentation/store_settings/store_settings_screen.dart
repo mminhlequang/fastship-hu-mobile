@@ -22,130 +22,128 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Store settings'.tr())),
-      body: ColoredBox(
-        color: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            WidgetRippleButton(
-              onTap: () => appContext.pushNamed('information'),
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Information'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    const WidgetAppSVG('chevron-right'),
-                  ],
-                ),
+      backgroundColor: Colors.white,
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          WidgetRippleButton(
+            onTap: () => appContext.pushNamed('information'),
+            radius: 0,
+            child: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Information'.tr(),
+                    style: w400TextStyle(fontSize: 16.sw),
+                  ),
+                  const WidgetAppSVG('chevron-right'),
+                ],
               ),
             ),
-            AppDivider(
-              color: grey8,
-              padding: EdgeInsets.symmetric(horizontal: 16.sw),
-            ),
-            WidgetRippleButton(
-              onTap: () async {
-                final r = await appContext.push('/opening-time',
-                        extra: OpeningTimeModel.fromListOperatingHours(
-                            authCubit.state.store!.operatingHours ?? [])) ??
-                    [];
-                if (r is List<OpeningTimeModel>) {
-                  StoreRepo().updateStore({
-                    "id": authCubit.state.store!.id!,
-                    "operating_hours": r
-                        .map((e) => {
-                              "is_off": e.isOpen ? 0 : 1,
-                              "day": e.dayNumber,
-                              "hours": [e.openTime, e.closeTime]
-                            })
-                        .toList()
-                  }).then((v) {
-                    if (v.isSuccess) {
-                      authCubit.refreshStore();
-                      appShowSnackBar(
+          ),
+          AppDivider(
+            color: grey8,
+            padding: EdgeInsets.symmetric(horizontal: 16.sw),
+          ),
+          WidgetRippleButton(
+            onTap: () async {
+              final r = await appContext.push('/opening-time',
+                      extra: OpeningTimeModel.fromListOperatingHours(
+                          authCubit.state.store!.operatingHours ?? [])) ??
+                  [];
+              if (r is List<OpeningTimeModel>) {
+                StoreRepo().updateStore({
+                  "id": authCubit.state.store!.id!,
+                  "operating_hours": r
+                      .map((e) => {
+                            "is_off": e.isOpen ? 0 : 1,
+                            "day": e.dayNumber,
+                            "hours": [e.openTime, e.closeTime]
+                          })
+                      .toList()
+                }).then((v) {
+                  if (v.isSuccess) {
+                    authCubit.refreshStore();
+                    appShowSnackBar(
+                      context: context,
+                      msg: "Opening hours updated successfully!".tr(),
+                      type: AppSnackBarType.success,
+                    );
+                  } else {
+                    appShowSnackBar(
                         context: context,
-                        msg: "Opening hours updated successfully!".tr(),
-                        type: AppSnackBarType.success,
-                      );
-                    } else {
-                      appShowSnackBar(
-                          context: context,
-                          msg:
-                              "Failed to update opening hours, please try again later!"
-                                  .tr());
-                    }
-                  });
-                }
-              },
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Opening hours'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    const WidgetAppSVG('chevron-right'),
-                  ],
-                ),
+                        msg:
+                            "Failed to update opening hours, please try again later!"
+                                .tr());
+                  }
+                });
+              }
+            },
+            radius: 0,
+            child: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Opening hours'.tr(),
+                    style: w400TextStyle(fontSize: 16.sw),
+                  ),
+                  const WidgetAppSVG('chevron-right'),
+                ],
               ),
             ),
-            WidgetRippleButton(
-              onTap: () async {
-                final r = await appContext.push('/store-category',
-                    extra: authCubit.state.store?.categories
-                            ?.map((e) => e.id!)
-                            .toList() ??
-                        []);
-                if (r is List<int>) {
-                  StoreRepo().updateStore({
-                    "id": authCubit.state.store!.id!,
-                    "category_ids": r
-                  }).then((v) {
-                    if (v.isSuccess) {
-                      appShowSnackBar(
+          ),
+          WidgetRippleButton(
+            onTap: () async {
+              final r = await appContext.push('/store-category',
+                  extra: authCubit.state.store?.categories
+                          ?.map((e) => e.id!)
+                          .toList() ??
+                      []);
+              if (r is List<int>) {
+                StoreRepo().updateStore({
+                  "id": authCubit.state.store!.id!,
+                  "category_ids": r
+                }).then((v) {
+                  if (v.isSuccess) {
+                    appShowSnackBar(
+                      context: context,
+                      msg: "Store categories updated successfully!".tr(),
+                      type: AppSnackBarType.success,
+                    );
+                    authCubit.refreshStore();
+                  } else {
+                    appShowSnackBar(
                         context: context,
-                        msg: "Store categories updated successfully!".tr(),
-                        type: AppSnackBarType.success,
-                      );
-                      authCubit.refreshStore();
-                    } else {
-                      appShowSnackBar(
-                          context: context,
-                          msg:
-                              "Failed to update store info, please try again later!"
-                                  .tr());
-                    }
-                  });
-                }
-              },
-              radius: 0,
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Store categories'.tr(),
-                      style: w400TextStyle(fontSize: 16.sw),
-                    ),
-                    const WidgetAppSVG('chevron-right'),
-                  ],
-                ),
+                        msg:
+                            "Failed to update store info, please try again later!"
+                                .tr());
+                  }
+                });
+              }
+            },
+            radius: 0,
+            child: Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Store categories'.tr(),
+                    style: w400TextStyle(fontSize: 16.sw),
+                  ),
+                  const WidgetAppSVG('chevron-right'),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

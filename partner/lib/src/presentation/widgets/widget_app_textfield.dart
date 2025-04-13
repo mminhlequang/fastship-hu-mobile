@@ -12,6 +12,7 @@ class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
     this.title,
+    this.subTitle,
     this.isRequired = true,
     this.controller,
     this.maxLines,
@@ -28,6 +29,7 @@ class AppTextField extends StatelessWidget {
   });
 
   final String? title;
+  final String? subTitle;
   final bool isRequired;
   final TextEditingController? controller;
   final int? maxLines;
@@ -41,7 +43,7 @@ class AppTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsets? padding;
   final List<TextInputFormatter>? inputFormatters;
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -64,7 +66,14 @@ class AppTextField extends StatelessWidget {
                     : null,
               ),
             ),
-            Gap(8.sw)
+            if (subTitle != null)
+              Padding(
+                padding: EdgeInsets.only(top: 4.sw, bottom: 8.sw),
+                child: Text(subTitle!, style: w400TextStyle(color: appColorTextLabel),
+                ),
+              )
+            else
+              Gap(8.sw)
           ],
           TextFormField(
             controller: controller,
@@ -105,6 +114,7 @@ class AppTextField extends StatelessWidget {
 
 class WidgetAppTextFieldPhone extends StatelessWidget {
   final String title;
+  final String? subTitle;
   final bool isRequired;
   final String? hintText;
   final bool readOnly;
@@ -115,8 +125,9 @@ class WidgetAppTextFieldPhone extends StatelessWidget {
   final String? Function(String?)? validator;
 
   const WidgetAppTextFieldPhone({
-    Key? key,
+    super.key,
     required this.title,
+    this.subTitle,
     this.isRequired = false,
     this.hintText,
     this.readOnly = false,
@@ -125,7 +136,7 @@ class WidgetAppTextFieldPhone extends StatelessWidget {
     this.initialValue,
     this.validator,
     this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +157,16 @@ class WidgetAppTextFieldPhone extends StatelessWidget {
                 : null,
           ),
         ),
-        Gap(8.sw),
+        if (subTitle != null)
+          Padding(
+            padding: EdgeInsets.only(top: 4.sw, bottom: 8.sw),
+            child: Text(
+              subTitle!,
+              style: w400TextStyle(color: appColorTextLabel),
+            ),
+          )
+        else
+          Gap(8.sw),
         Container(
           decoration: BoxDecoration(
             color: appColorBackground,

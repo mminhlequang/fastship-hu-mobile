@@ -26,6 +26,7 @@ import '../presentation/auth/auth_screen.dart';
 import '../presentation/menu/widgets/widget_add_dish_variation.dart';
 import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
+import '../presentation/preference_settings/perference_settings_screen.dart';
 import '../presentation/ratings/ratings_screen.dart';
 import '../presentation/report/report_page.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
@@ -42,6 +43,7 @@ GlobalKey<NavigatorState> get appNavigatorKey =>
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
 
+
 clearAllRouters([String? router]) {
   try {
     while (appContext.canPop() == true) {
@@ -50,6 +52,30 @@ clearAllRouters([String? router]) {
   } catch (_) {}
   if (router != null) {
     appContext.pushReplacement(router);
+  }
+}
+
+pushWidget(
+    {required child,
+    String? routeName,
+    bool opaque = true,
+    bool replacement = false}) {
+  if (replacement) {
+    return Navigator.of(appContext).pushReplacement(PageRouteBuilder(
+      opaque: opaque,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(opacity: animation, child: child),
+      settings: RouteSettings(name: routeName),
+    ));
+  } else {
+    return Navigator.of(appContext).push(PageRouteBuilder(
+      opaque: opaque,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(opacity: animation, child: child),
+      settings: RouteSettings(name: routeName),
+    ));
   }
 }
 
@@ -189,6 +215,11 @@ final goRouter = GoRouter(
           path: '/order-settings',
           pageBuilder:
               _defaultPageBuilder((state) => const OrderSettingsScreen()),
+        ),
+        GoRoute(
+          path: '/preference-settings',
+          pageBuilder:
+              _defaultPageBuilder((state) => const PreferenceSettingsScreen()),
         ),
         GoRoute(
           path: '/help-center',

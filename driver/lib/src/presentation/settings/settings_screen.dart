@@ -21,6 +21,7 @@ enum SettingsItem {
   changePassword,
   // vehicles,
   helpCenter,
+  settings,
   // deleteAccount,
   logout;
 
@@ -32,6 +33,7 @@ enum SettingsItem {
         changePassword => 'Change password'.tr(),
         // vehicles => 'Vehicles'.tr(),
         helpCenter => 'Help center'.tr(),
+        settings => 'Preference settings'.tr(),
         // deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
@@ -44,6 +46,7 @@ enum SettingsItem {
         changePassword => assetsvg('ic_lock'),
         // vehicles => assetsvg('ic_vehicle'),
         helpCenter => assetsvg('ic_support'),
+        settings => assetsvg('ic_settings'),
         // deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
@@ -53,6 +56,7 @@ enum SettingsItem {
         incomeStatistics => '/statistics',
         customerReviews => '/ratings',
         changePassword => '/change-password',
+        settings => '/preference-settings',
         // vehicles => '/vehicles',
         helpCenter => '/help-center',
         _ => null,

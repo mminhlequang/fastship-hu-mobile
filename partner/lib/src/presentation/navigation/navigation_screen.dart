@@ -7,7 +7,7 @@ import 'package:network_resources/auth/repo.dart';
 import 'package:app/src/presentation/home/home_screen.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/navigation/widgets/custom_bottom_bar.dart';
-import 'package:app/src/presentation/notification/notification_screen.dart';
+import 'package:app/src/presentation/notifications/notifications_screen.dart';
 import 'package:app/src/presentation/orders/orders_screen.dart';
 import 'package:app/src/presentation/profile/profile_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,7 +17,7 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../notification/cubit/notification_cubit.dart';
+import '../notifications/cubit/notification_cubit.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});

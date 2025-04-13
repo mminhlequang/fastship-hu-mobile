@@ -18,6 +18,7 @@ enum ProfileItem {
   storeSettings,
   // orderSettings,
   helpCenter,
+  settings,
   // deleteAccount,
   logout;
 
@@ -26,6 +27,7 @@ enum ProfileItem {
         storeSettings => 'Store settings'.tr(),
         // orderSettings => 'Order settings'.tr(),
         helpCenter => 'Help center'.tr(),
+        settings => 'Preference Settings'.tr(),
         // deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
@@ -35,6 +37,7 @@ enum ProfileItem {
         storeSettings => assetsvg('ic_store_2'),
         // orderSettings => assetsvg('ic_order_settings'),
         helpCenter => assetsvg('ic_support'),
+        settings => assetsvg('ic_settings'),
         // deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
@@ -43,6 +46,7 @@ enum ProfileItem {
         myProfile => '/my-profile',
         storeSettings => '/store-settings',
         // orderSettings => '/order-settings',
+        settings => '/preference-settings',
         helpCenter => '/help-center',
         _ => null,
       };

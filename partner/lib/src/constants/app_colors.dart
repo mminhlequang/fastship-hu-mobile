@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../utils/utils.dart';
 
 Color get appColorPrimary => AppColors.instance.primary;
+Color get appColorPrimaryOrange => hexColor('#F17228');
 Color get appColorPrimaryRed => Colors.red;
 
 Color get appColorPrimaryDark => hexColor('12AD2A');

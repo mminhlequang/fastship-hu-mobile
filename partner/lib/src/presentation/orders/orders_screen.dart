@@ -15,24 +15,24 @@ import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
 enum OrderStatus {
-  preOrder,
+  // preOrder,
   newOrder,
-  confirmed,
+  // confirmed,
   completed,
   canceled;
 
   String get title => switch (this) {
-        preOrder => 'Pre-order'.tr(),
+        // preOrder => 'Pre-order'.tr(),
         newOrder => 'New'.tr(),
-        confirmed => 'Confirmed'.tr(),
+        // confirmed => 'Confirmed'.tr(),
         completed => 'Completed'.tr(),
         canceled => 'Canceled'.tr(),
       };
 
   String get apiStatus => switch (this) {
-        preOrder => 'pre_order',
+        // preOrder => 'pre_order',
         newOrder => 'new',
-        confirmed => 'confirmed',
+        // confirmed => 'confirmed',
         completed => 'completed',
         canceled => 'canceled',
       };
@@ -47,8 +47,8 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabController; 
-  OrderStatus _currentStatus = OrderStatus.preOrder;
+  late final TabController _tabController;
+  OrderStatus _currentStatus = OrderStatus.values.first;
   bool _isLoading = true;
   List<OrderModel> _orders = [];
 
@@ -95,8 +95,8 @@ class _OrdersScreenState extends State<OrdersScreen>
     return WidgetAppTabBar(
       tabController: _tabController,
       physics: const NeverScrollableScrollPhysics(),
-      isScrollable: true,
-      tabAlignment: TabAlignment.start,
+      // isScrollable: true,
+      // tabAlignment: TabAlignment.start,
       onTap: (index) {
         setState(() {
           _currentStatus = OrderStatus.values[index];

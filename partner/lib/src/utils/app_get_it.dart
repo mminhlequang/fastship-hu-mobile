@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../base/bloc.dart';
-import '../presentation/notification/cubit/notification_cubit.dart';
+import '../presentation/notifications/cubit/notification_cubit.dart';
 
 
 final getIt = GetIt.instance;

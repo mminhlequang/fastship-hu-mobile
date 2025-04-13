@@ -30,10 +30,11 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     super.initState();
     if (widget.initialData != null) {
       _nameController.text = widget.initialData!['name'] ?? '';
-      _phoneNumber = PhoneNumber(
-          isoCode: widget.initialData!['phoneIsoCode'],
-          phoneNumber: widget.initialData!['phone'],
-          dialCode: widget.initialData!['phoneDialCode']);
+      PhoneNumber.fromRawString(widget.initialData!['phone']).then((value) {
+        setState(() {
+          _phoneNumber = value;
+        });
+      });
       _addressController.text =
           (widget.initialData!['address'] as HereSearchResult?)?.title ??
               "";

@@ -156,11 +156,12 @@ class _NotificationScreenState extends State<NotificationScreen>
                   itemCount: orderNotifications.length,
                   separatorBuilder: (context, index) => Gap(8.sw),
                   itemBuilder: (context, index) {
-                    final notification = orderNotifications[index];
+                    final item = orderNotifications[index];
                     return WidgetRippleButton(
                       onTap: () {
+                        appHaptic();
                         // Todo: go detail
-                        notification.openDetail();
+                        item.openDetail();
                       },
                       radius: 12.sw,
                       child: Padding(
@@ -168,30 +169,52 @@ class _NotificationScreenState extends State<NotificationScreen>
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            WidgetAppImage(
-                              imageUrl: notification.image ?? '',
-                              height: 32.sw,
-                              width: 32.sw,
-                              radius: 4.sw,
-                            ),
-                            Gap(8.sw),
+                            // WidgetAppImage(
+                            //   imageUrl: notification.image ?? '',
+                            //   height: 32.sw,
+                            //   width: 32.sw,
+                            //   radius: 4.sw,
+                            // ),
+                            // Gap(8.sw),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    notification.title ?? '',
-                                    style: w500TextStyle(),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          item.title ?? '',
+                                          style: w500TextStyle(),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (item.isRead == 0)
+                                        Container(
+                                          width: 10,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: appColorPrimaryOrange,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: appColorPrimaryOrange
+                                                  .withOpacity(0.2),
+                                              width: 3,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                   Gap(4.sw),
                                   Text(
-                                    notification.content ?? '',
+                                    item.description ?? '',
                                     style: w400TextStyle(
                                         fontSize: 12.sw, color: grey10),
                                   ),
                                   Gap(4.sw),
                                   Text(
-                                    notification.createdAt ?? '',
+                                    item.createdAt ?? '',
                                     style: w400TextStyle(
                                         fontSize: 10.sw, color: grey1),
                                   ),

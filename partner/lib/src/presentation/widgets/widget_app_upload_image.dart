@@ -167,39 +167,46 @@ class AppUploadImage extends StatelessWidget {
             },
             radius: 4.sw,
             color: grey8,
-            child: Container(
+            child: SizedBox(
               height: height ?? 80.sw,
               width: width ?? 80.sw,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: imageUrl != null
-                    ? DecorationImage(
-                        image: CachedNetworkImageProvider(
-                          appImageCorrectUrl(imageUrl!),
-                        ),
-                        fit: BoxFit.cover,
-                      )
-                    : xFileImage != null
-                        ? DecorationImage(
-                            image: FileImage(File(xFileImage!.path)),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  const WidgetAppSVG('upload_image'),
-                  Gap(2.sw),
-                  WidgetGlassBackground(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 4.sw, vertical: 2.sw),
-                    child: Text(
-                      'Upload'.tr(),
-                      style: w400TextStyle(
-                          fontSize: 12.sw,
-                          color: !haveImage ? grey1 : Colors.white),
+                  if (imageUrl != null)
+                    Positioned.fill(
+                      child: WidgetAppImage(
+                        imageUrl: imageUrl,
+                        radius: 8,
+                      ),
+                    )
+                  else if (xFileImage != null)
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(xFileImage!.path),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const WidgetAppSVG('upload_image'),
+                      Gap(2.sw),
+                      WidgetGlassBackground(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 4.sw, vertical: 2.sw),
+                        child: Text(
+                          'Upload'.tr(),
+                          style: w400TextStyle(
+                              fontSize: 12.sw,
+                              color: !haveImage ? grey1 : Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
