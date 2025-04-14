@@ -22,9 +22,9 @@ class StoreRegistrationState extends Equatable {
 
   const StoreRegistrationState({
     this.totalStep1 = 3,
-    this.currentStep1 =  kDebugMode ? 3 : 1,
+    this.currentStep1 = 1,
     this.totalStep2 = 3,
-    this.currentStep2 = kDebugMode ? 3 : 1,
+    this.currentStep2 = 1,
     this.selectedService = 0,
     this.hasAlcohol = false,
     this.acceptTerms = kDebugMode,

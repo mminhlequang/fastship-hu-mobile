@@ -295,7 +295,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         horizontal: 16.sw, vertical: 14.sw),
                     child: Row(
                       children: [
-                        WidgetAppSVG(item.icon),
+                        WidgetAppSVG(
+                          item.icon,
+                          color: grey9,
+                        ),
                         Gap(8.sw),
                         Expanded(
                           child: Text(

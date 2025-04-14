@@ -197,7 +197,6 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
               WidgetTextFieldPhone(
                 controller: _phoneController,
                 initialValue: _phoneNumber?.phoneNumber,
-                initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
                 onPhoneNumberChanged: (phoneNumber) {
                   setState(() {
                     _phoneNumber = phoneNumber;

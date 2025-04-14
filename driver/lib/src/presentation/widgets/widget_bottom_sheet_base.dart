@@ -62,7 +62,10 @@ class WidgetAppBaseSheet extends StatelessWidget {
                           title,
                           style: w600TextStyle(fontSize: 16.sw, color: grey1),
                         ),
-                        const CloseButton(),
+                        if (actions != null)
+                          ...actions!
+                        else
+                          const CloseButton(),
                       ],
                     ),
                   ),

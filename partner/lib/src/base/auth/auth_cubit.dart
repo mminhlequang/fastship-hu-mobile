@@ -76,10 +76,16 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  fetchStores({bool isRedirect = false}) async {
+  fetchStores({bool isRedirect = false, bool refresh = false}) async {
     NetworkResponse response = await StoreRepo().getMyStores({});
     if (response.isSuccess) {
       state.stores = response.data;
+      if (refresh) {
+        state.store = state.stores?.firstWhere(
+          (element) => element.id == state.store?.id,
+          orElse: () => state.stores!.first,
+        );
+      }
       emit(state.update());
     }
     if (isRedirect) {

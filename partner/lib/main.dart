@@ -103,18 +103,20 @@ class _AppState extends State<_App> {
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
         builder: (context, child) {
-          return GestureDetector(
-            onDoubleTap: kDebugMode
-                ? () {
+          return kDebugMode
+              ? GestureDetector(
+                  onDoubleTap: () {
                     AppPrefs.instance.getNormalToken().then((value) {
                       print(value);
                     });
-                  }
-                : null,
-            child: KeyboardDismissOnTap(
-              child: child!,
-            ),
-          );
+                  },
+                  child: KeyboardDismissOnTap(
+                    child: child!,
+                  ),
+                )
+              : KeyboardDismissOnTap(
+                  child: child!,
+                );
         },
       ),
     );

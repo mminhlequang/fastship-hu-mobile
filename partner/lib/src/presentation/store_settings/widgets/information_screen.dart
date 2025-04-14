@@ -28,8 +28,8 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
   PhoneNumber? _phoneNumber;
   XFile? _avatarImage;
   XFile? _coverImage;
-  String? _currentAvatarUrl = authCubit.state.store!.avatarImage;
-  String? _currentCoverUrl = authCubit.state.store!.bannerImages?.first.image;
+  final String? _currentAvatarUrl = authCubit.state.store!.avatarImage;
+  final String? _currentCoverUrl = authCubit.state.store!.bannerImages?.first.image;
 
   Future<void> _saveChanges() async {
     setLoading(true);
@@ -68,13 +68,14 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
       // Gọi API update thông tin
       final response = await StoreRepo().updateStore({
         'id': authCubit.state.store!.id,
-        if (newAvatarUrl != null) 'avatar': newAvatarUrl,
-        if (newCoverUrl != null) 'cover_image': newCoverUrl,
+        if (newAvatarUrl != null) 'avatar_image': newAvatarUrl,
+        if (newCoverUrl != null) 'banner_images': [newCoverUrl],
         'name': _nameController.text,
       });
 
       if (response.isSuccess) {
         context.pop();
+        authCubit.fetchStores(refresh: true);
         appShowSnackBar(
           msg: 'Store information updated successfully'.tr(),
           context: context,

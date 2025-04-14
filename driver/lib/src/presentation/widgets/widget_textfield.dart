@@ -212,7 +212,6 @@ class WidgetTextFieldPhone extends StatefulWidget {
   final TextStyle? labelTextStyle;
   final Function(String value)? onSubmitted;
   final String? initialValue;
-  final String initialCountryCode;
   final Function(PhoneNumber phoneNumber)? onPhoneNumberChanged;
   final Function(bool isValid)? onInputValidated;
   final FocusNode? focusNode;
@@ -228,7 +227,6 @@ class WidgetTextFieldPhone extends StatefulWidget {
     this.labelTextStyle,
     this.onSubmitted,
     this.initialValue,
-    this.initialCountryCode = 'HU',
     this.onPhoneNumberChanged,
     this.onInputValidated,
     this.focusNode,
@@ -244,6 +242,7 @@ class WidgetTextFieldPhone extends StatefulWidget {
 class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
   TextEditingController? _controller = TextEditingController();
   FocusNode? _focusNode;
+  PhoneNumber? _phoneNumber;
 
   double get _fontSize => 16;
 
@@ -253,6 +252,13 @@ class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
         widget.controller ?? TextEditingController(text: widget.initialValue);
     _focusNode = widget.focusNode ?? FocusNode();
     _controller?.addListener(() {});
+    if (widget.initialValue != null) {
+      PhoneNumber.fromRawString(widget.initialValue!).then((value) {
+        setState(() {
+          _phoneNumber = value;
+        });
+      });
+    }
     super.initState();
   }
 
@@ -294,7 +300,7 @@ class _WidgetTextFieldPhoneState extends State<WidgetTextFieldPhone> {
             spaceBetweenSelectorAndTextField: 12.sw,
             countries: ['VN'] +
                 euroCounries.map((e) => e['code']!.toString()).toList(),
-            initialValue: PhoneNumber(isoCode: widget.initialCountryCode),
+            initialValue: _phoneNumber,
             selectorConfig: SelectorConfig(
               trailingSpace: false,
               bgColor: Colors.white,

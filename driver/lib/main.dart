@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -29,12 +30,12 @@ void main() async {
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
-      if (Platform.isAndroid)
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-            overlays: [SystemUiOverlay.top]),
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]),
+    if (Platform.isAndroid)
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+          overlays: [SystemUiOverlay.top]),
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]),
     AppPrefs.instance.initialize(),
     initEasyLocalization(),
   ]);
@@ -106,6 +107,22 @@ class _AppState extends State<_App> {
         ),
         themeMode:
             AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+        builder: (context, child) {
+          return kDebugMode
+              ? GestureDetector(
+                  onDoubleTap: () {
+                    AppPrefs.instance.getNormalToken().then((value) {
+                      print(value);
+                    });
+                  },
+                  child: KeyboardDismissOnTap(
+                    child: child!,
+                  ),
+                )
+              : KeyboardDismissOnTap(
+                  child: child!,
+                );
+        },
       ),
     );
   }

@@ -30,14 +30,15 @@ class _WidgetFormProfile1State extends State<WidgetFormProfile1> {
     super.initState();
     if (widget.initialData != null) {
       _nameController.text = widget.initialData!['name'] ?? '';
-      PhoneNumber.fromRawString(widget.initialData!['phone']).then((value) {
-        setState(() {
-          _phoneNumber = value;
+      if (widget.initialData!['phone'] != null) {
+        PhoneNumber.fromRawString(widget.initialData!['phone']).then((value) {
+          setState(() {
+            _phoneNumber = value;
+          });
         });
-      });
+      }
       _addressController.text =
-          (widget.initialData!['address'] as HereSearchResult?)?.title ??
-              "";
+          (widget.initialData!['address'] as HereSearchResult?)?.title ?? "";
     }
   }
 

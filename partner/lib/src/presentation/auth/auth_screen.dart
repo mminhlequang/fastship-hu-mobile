@@ -278,7 +278,6 @@ class _LoginScreenState extends State<LoginScreen> {
           type: AnimationStaggeredType.bottomToTop,
           child: WidgetTextFieldPhone(
             initialValue: _phoneNumber?.phoneNumber,
-            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
             focusNode: _phoneFocusNode,
             onPhoneNumberChanged: (phoneNumber) {
               setState(() {
@@ -378,7 +377,6 @@ class _LoginScreenState extends State<LoginScreen> {
           type: AnimationStaggeredType.bottomToTop,
           child: WidgetTextFieldPhone(
             initialValue: _phoneNumber?.phoneNumber,
-            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
             focusNode: _phoneFocusNode,
             onPhoneNumberChanged: (phoneNumber) {
               setState(() {
@@ -549,7 +547,6 @@ class _LoginScreenState extends State<LoginScreen> {
           type: AnimationStaggeredType.bottomToTop,
           child: WidgetTextFieldPhone(
             initialValue: _phoneNumber?.phoneNumber,
-            initialCountryCode: _phoneNumber?.isoCode ?? 'HU',
             focusNode: _phoneFocusNode,
             onPhoneNumberChanged: (phoneNumber) {
               setState(() {

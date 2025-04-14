@@ -91,11 +91,15 @@ class _WidgetFormProfile2State extends State<WidgetFormProfile2> {
               RepresentativeType.individual.name);
       _nameController.text = widget.initialData!['contact_full_name'] ?? '';
       _emailController.text = widget.initialData!['contact_email'] ?? '';
-      PhoneNumber.fromRawString(widget.initialData!['contact_phone']).then((value) {
-        setState(() {
-          _phoneNumber = value;
-        });
-      });
+      if (widget.initialData!['contact_phone'] != null) {
+        PhoneNumber.fromRawString(widget.initialData!['contact_phone']).then(
+          (value) {
+            setState(() {
+              _phoneNumber = value;
+            });
+          },
+        );
+      }
       _imageIDCardFront = widget.initialData!['contact_card_id_image_front'];
       _imageIDCardBack = widget.initialData!['contact_card_id_image_back'];
       _imageBusinessLicense = widget.initialData!['contact_image_license'];

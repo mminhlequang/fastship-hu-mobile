@@ -30,13 +30,13 @@ class WidgetDateTimePicker extends StatefulWidget {
   final String? title;
 
   const WidgetDateTimePicker({
-    Key? key,
+    super.key,
     required this.type,
     this.initialDateTime,
     this.onConfirm,
     this.onCancel,
     this.title,
-  }) : super(key: key);
+  });
 
   @override
   _WidgetDateTimePickerState createState() => _WidgetDateTimePickerState();
@@ -65,7 +65,7 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
           },
           enableInkWell: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Text(
               'Cancel'.tr(),
               style: w400TextStyle(color: appColorText),
@@ -80,7 +80,7 @@ class _WidgetDateTimePickerState extends State<WidgetDateTimePicker> {
           },
           enableInkWell: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Text(
               'Save'.tr(),
               style: w400TextStyle(color: appColorPrimary),
