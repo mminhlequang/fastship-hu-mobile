@@ -9,11 +9,11 @@ class WidgetNewsCard extends StatelessWidget {
   final String title;
 
   const WidgetNewsCard({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.date,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +28,15 @@ class WidgetNewsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: WidgetAppImage(
-              imageUrl: imageUrl,
-              width: double.infinity,
-              height: 145,
-              fit: BoxFit.cover,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: WidgetAppImage(
+                imageUrl: imageUrl,
+                width: double.infinity,
+                height: 145,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(height: 8),

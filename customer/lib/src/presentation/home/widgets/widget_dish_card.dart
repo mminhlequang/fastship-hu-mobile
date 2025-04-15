@@ -1,14 +1,16 @@
-import 'package:app/src/constants/constants.dart';
-import 'package:network_resources/enums.dart';
-import 'package:network_resources/product/model/product.dart';
-import 'package:app/src/presentation/home/widgets/widget_sheet_dish_detail.dart';
-import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/enums.dart';
+import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/product/repo.dart';
 import 'package:network_resources/store/models/models.dart';
+
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/home/widgets/widget_sheet_dish_detail.dart';
+import 'package:app/src/utils/app_utils.dart';
+import 'package:app/src/utils/utils.dart';
 
 class WidgetDishCardInMenu extends StatelessWidget {
   final ProductModel product;
@@ -122,6 +124,8 @@ class WidgetDishCardV2 extends StatelessWidget {
     this.onTap,
   });
 
+  StoreModel? get getStore => this.store ?? product.store;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -129,7 +133,7 @@ class WidgetDishCardV2 extends StatelessWidget {
           () {
             appHaptic();
             appOpenBottomSheet(
-                WidgetSheetDishDetail(product: product, store: store));
+                WidgetSheetDishDetail(product: product, store: getStore));
           },
       child: Container(
         height: 185.sw,
@@ -241,7 +245,7 @@ class WidgetDishCardV2 extends StatelessWidget {
             Row(
               children: [
                 WidgetAvatar.withoutBorder(
-                  imageUrl: product.store?.avatarImage ?? '',
+                  imageUrl: getStore?.avatarImage ?? '',
                   radius: 18.sw / 2,
                 ),
                 SizedBox(width: 8.sw),
@@ -250,7 +254,7 @@ class WidgetDishCardV2 extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product.store?.name ?? '',
+                        getStore?.name ?? '',
                         style: w400TextStyle(fontSize: 12.sw),
                       ),
                       Row(
@@ -487,14 +491,16 @@ class _WidgetDishCardState extends State<WidgetDishCard> {
     }
   }
 
+  StoreModel? get store => widget.store ?? widget.product.store;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onTap ??
           () {
             appHaptic();
-            appOpenBottomSheet(WidgetSheetDishDetail(
-                product: widget.product, store: widget.store));
+            appOpenBottomSheet(
+                WidgetSheetDishDetail(product: widget.product, store: store));
           },
       child: Container(
         width: widget.width ?? 175.sw,
@@ -569,13 +575,13 @@ class _WidgetDishCardState extends State<WidgetDishCard> {
                   child: Row(
                     children: [
                       WidgetAvatar.withoutBorder(
-                        imageUrl: widget.store?.avatarImage ?? '',
+                        imageUrl: store?.avatarImage ?? '',
                         radius: 18.sw / 2,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          widget.store?.name ?? '',
+                          store?.name ?? '',
                           maxLines: 1,
                           style: w400TextStyle(
                             fontSize: 12.sw,
@@ -777,10 +783,16 @@ class WidgetFavoriteState extends StatelessWidget {
     this.onTap,
   });
 
+  Future<void> callback() async {
+    wrapRequiredLogin(() {
+      onTap?.call();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: callback,
       child: Container(
         width: 28,
         height: 28,

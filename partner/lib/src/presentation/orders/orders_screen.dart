@@ -1,6 +1,8 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:internal_core/setup/app_utils.dart';
+import 'package:network_resources/enums.dart';
 import 'package:network_resources/order/models/order.dart';
 import 'package:network_resources/order/repo.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
@@ -14,30 +16,6 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
-enum OrderStatus {
-  // preOrder,
-  newOrder,
-  // confirmed,
-  completed,
-  canceled;
-
-  String get title => switch (this) {
-        // preOrder => 'Pre-order'.tr(),
-        newOrder => 'New'.tr(),
-        // confirmed => 'Confirmed'.tr(),
-        completed => 'Completed'.tr(),
-        canceled => 'Canceled'.tr(),
-      };
-
-  String get apiStatus => switch (this) {
-        // preOrder => 'pre_order',
-        newOrder => 'new',
-        // confirmed => 'confirmed',
-        completed => 'completed',
-        canceled => 'canceled',
-      };
-}
-
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
 
@@ -48,14 +26,14 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  OrderStatus _currentStatus = OrderStatus.values.first;
   bool _isLoading = true;
+  Map<String, String> _mapParamByStatus = {};
   List<OrderModel> _orders = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadData();
   }
 
@@ -71,10 +49,11 @@ class _OrdersScreenState extends State<OrdersScreen>
     });
 
     try {
-      final response = await OrderRepo().getOrdersByStore({
+      Map<String, dynamic> params = {
         'store_id': authCubit.storeId,
-        'status': _currentStatus.apiStatus,
-      });
+      };
+      params.addAll(_mapParamByStatus);
+      final response = await OrderRepo().getOrdersByStore(params);
 
       if (response.data != null) {
         setState(() {
@@ -94,16 +73,21 @@ class _OrdersScreenState extends State<OrdersScreen>
   Widget build(BuildContext context) {
     return WidgetAppTabBar(
       tabController: _tabController,
-      physics: const NeverScrollableScrollPhysics(),
-      // isScrollable: true,
-      // tabAlignment: TabAlignment.start,
+      // physics: const NeverScrollableScrollPhysics(),
+      isScrollable: true,
+      tabAlignment: TabAlignment.center,
       onTap: (index) {
-        setState(() {
-          _currentStatus = OrderStatus.values[index];
-        });
+        setState(() {});
+        _mapParamByStatus = switch (index) {
+          0 => {"store_status": AppOrderStoreStatus.pending.name},
+          1 => {"store_status": AppOrderStoreStatus.accepted.name},
+          2 => {"store_status": AppOrderStoreStatus.completed.name},
+          3 => {"store_status": AppOrderStoreStatus.rejected.name},
+          _ => {},
+        };
         _loadData();
       },
-      tabs: OrderStatus.values.map((e) => e.title).toList(),
+      tabs: ["New", "Processing", "Completed", "Canceled"],
       body: _ordersByStatus,
     );
   }
@@ -142,66 +126,97 @@ class _OrdersScreenState extends State<OrdersScreen>
                   separatorBuilder: (context, index) => Gap(8.sw),
                   itemBuilder: (context, index) {
                     final order = _orders[index];
-                    return WidgetRippleButton(
-                      onTap: () =>
-                          appContext.push('/detail-order', extra: order),
-                      radius: 8.sw,
-                      child: Padding(
-                        padding: EdgeInsets.all(12.sw),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '#${order.code}',
-                              style: w600TextStyle(
-                                  fontSize: 16.sw, color: appColorPrimary),
-                            ),
-                            Gap(2.sw),
-                            Text(
-                              '${'Delivery at'.tr()} ${order.shipEstimateTime} fake',
-                              style:
-                                  w400TextStyle(fontSize: 12.sw, color: grey1),
-                            ),
-                            Gap(16.sw),
-                            Text(
-                              order.store?.name ?? '',
-                              style: w400TextStyle(),
-                            ),
-                            _divider,
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Status'.tr(),
-                                  style: w400TextStyle(),
-                                ),
-                                Text(
-                                  order.processStatus ?? '',
-                                  style: w400TextStyle(),
-                                ),
-                              ],
-                            ),
-                            _divider,
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${order.items?.length} ${'items'.tr()}',
-                                  style: w400TextStyle(),
-                                ),
-                                Text(
-                                  '\$${order.total}',
-                                  style: w400TextStyle(),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    return _buildItem(order);
                   },
                 ),
               );
+  }
+
+  Widget _buildItem(OrderModel order) {
+    Color? color;
+    String? statusText;
+    String? description;
+
+    switch (order.storeStatusEnum) {
+      case AppOrderStoreStatus.pending:
+        color = Colors.yellow;
+        statusText = 'Pending';
+        description = 'New order at ${order.timeOrder}';
+      case AppOrderStoreStatus.accepted:
+        color = Colors.green;
+        statusText = 'Accepted';
+        description = 'Order is being processed';
+      case AppOrderStoreStatus.rejected:
+        color = Colors.red;
+        statusText = 'Rejected';
+        description = 'Order is rejected';
+      case AppOrderStoreStatus.completed:
+        color = Colors.blue;
+        statusText = 'Completed';
+        description = 'Order is completed';
+    }
+    return GestureDetector(
+      onTap: () {
+        appHaptic();
+        appContext.push('/detail-order', extra: order.id);
+      },
+      child: Container(
+        padding: EdgeInsets.all(12.sw),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.sw),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '#${order.code}',
+              style: w600TextStyle(fontSize: 16.sw, color: color),
+            ),
+            Gap(2.sw),
+            Text(
+              description,
+              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+            ),
+            Gap(16.sw),
+            Text(
+              order.store?.name ?? '',
+              style: w400TextStyle(),
+            ),
+            _divider,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Status'.tr(),
+                  style: w400TextStyle(),
+                ),
+                Text(
+                  statusText ?? '',
+                  style: w400TextStyle(
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+            _divider,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${order.items?.length} ${'items'.tr()}',
+                  style: w400TextStyle(),
+                ),
+                Text(
+                  '\$${order.total}',
+                  style: w400TextStyle(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget get _divider => Padding(

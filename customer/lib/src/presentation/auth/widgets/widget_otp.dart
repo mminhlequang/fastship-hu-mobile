@@ -188,6 +188,7 @@ class _PhoneVerificationScreenState
                       controller: _pinController,
                       keyboardType: TextInputType.number,
                       animationType: AnimationType.fade,
+                      autoDisposeControllers: false,
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
                         activeColor: appColorPrimary.withOpacity(0.65),

@@ -13,16 +13,12 @@ class NavigationCubit extends Cubit<NavigationState> {
   NavigationCubit() : super(NavigationState(currentIndex: 0));
 
   void changeIndex(int index) async {
-    if (!authCubit.isLoggedIn && index > 2) {
-      final result = await appOpenDialog(WidgetDialogConfirm(
-        title: "Login is required".tr(),
-        message: "Please login to continue".tr(),
-      ));
-      if (result == true) {
-        appContext.push('/auth');
-      }
-      return;
+    if (index > 2) {
+      wrapRequiredLogin(() {
+        emit(state.copyWith(currentIndex: index));
+      });
+    } else {
+      emit(state.copyWith(currentIndex: index));
     }
-    emit(state.copyWith(currentIndex: index));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:network_resources/enums.dart';
 import 'dart:async';
@@ -97,11 +98,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         ),
       ];
 
+  bool get isPickup => deliveryType == AppOrderDeliveryType.pickup;
+
   @override
   void initState() {
     super.initState();
     // Tính toán quãng đường và lộ trình khi khởi tạo widget
-    if (deliveryType == AppOrderDeliveryType.ship) {
+    if (!isPickup) {
       _calculateRoute();
     }
   }
@@ -226,7 +229,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         ValueNotifier<SheetProcessStatus>(SheetProcessStatus.loading);
 
     // Nếu cần ship, tính toán lộ trình trước khi tạo đơn hàng
-    if (deliveryType == AppOrderDeliveryType.ship && distanceInMet == 0) {
+    if (!isPickup) {
       await _calculateRoute();
     }
 
@@ -239,11 +242,11 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         // "voucher_id": 0,
         // "voucher_value": 0,
         "tip": tip,
-        "ship_fee": shippingFee,
-        "ship_distance": ship_distance,
-        "ship_estimate_time": ship_estimate_time,
-        "ship_polyline": ship_polyline,
-        "ship_here_raw": jsonEncode(routeData),
+        "ship_fee": isPickup ? 0 : shippingFee,
+        "ship_distance": isPickup ? 0 : ship_distance,
+        "ship_estimate_time": isPickup ? '' : ship_estimate_time,
+        "ship_polyline": isPickup ? '' : ship_polyline,
+        "ship_here_raw": isPickup ? '' : jsonEncode(routeData),
         // "note": "string",
         // "phone": "123456",
         "address": locationCubit.addressDetail ?? '',
@@ -257,6 +260,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "country_code": locationCubit.state.addressDetail!.address?.countryCode,
       });
       if (r.isSuccess) {
+        cartCubit.fetchCarts();
         CreateOrderResponse orderResponse = r.data!;
 
         if (selectedPaymentWalletProvider == 4 &&
@@ -316,12 +320,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         }
 
         if (deliveryType == AppOrderDeliveryType.pickup) {
-          processer.value = SheetProcessStatus.success;
+          processer.value = SheetProcessStatus.createPickupSuccess;
           Timer(
             const Duration(seconds: 2),
             () async {
               context.pop();
-              context.pushReplacement('/checkout-tracking', extra: orderResponse.order);
+              context.pushReplacement('/checkout-tracking',
+                  extra: orderResponse.order);
             },
           );
           return;
@@ -330,7 +335,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         final socketResult =
             await socketController.createOrder(orderResponse.order!);
         if (socketResult) {
-          processer.value = SheetProcessStatus.success;
+          processer.value = SheetProcessStatus.findingDriverSuccess;
           Timer(
             const Duration(seconds: 2),
             () async {
@@ -448,7 +453,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: deliveryType == AppOrderDeliveryType.ship
+            decoration: !isPickup
                 ? appBoxDecorationSelected
                 : appBoxDecorationUnSelected,
             child: Column(
@@ -514,8 +519,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                   ],
                 ),
                 // Hiển thị thông tin quãng đường và thời gian giao hàng
-                if (deliveryType == AppOrderDeliveryType.ship &&
-                    (distanceInMet > 0 || isCalculatingRoute))
+                if (!isPickup && (distanceInMet > 0 || isCalculatingRoute))
                   Container(
                     margin: EdgeInsets.only(top: 8.sw),
                     decoration: BoxDecoration(

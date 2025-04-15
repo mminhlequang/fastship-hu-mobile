@@ -226,7 +226,7 @@ class __PromoBannerState extends State<_PromoBanner> {
   }
 }
 
-List<CategoryModel>? _categories;
+List<CategoryModel>? appProductCategories;
 int? _categoryIdSelected;
 
 class _CategorySection extends StatefulWidget {
@@ -247,11 +247,11 @@ class __CategorySectionState extends State<_CategorySection> {
   void _fetchCategories() async {
     final response = await CategoryRepo().getCategories({});
     if (response.isSuccess) {
-      _categories = response.data;
-      if (_categories != null && _categories!.isNotEmpty) {
-        widget.categoryNotifier.value = _categories!.firstWhere(
+      appProductCategories = response.data;
+      if (appProductCategories != null && appProductCategories!.isNotEmpty) {
+        widget.categoryNotifier.value = appProductCategories!.firstWhere(
           (category) => category.id == _categoryIdSelected,
-          orElse: () => _categories!.first,
+          orElse: () => appProductCategories!.first,
         );
         _categoryIdSelected = widget.categoryNotifier.value?.id;
       }
@@ -307,12 +307,12 @@ class __CategorySectionState extends State<_CategorySection> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _categories == null
+                  children: appProductCategories == null
                       ? List.generate(
                           5,
                           (index) => const WidgetCategoryCardShimmer(),
                         )
-                      : _categories!.map((category) {
+                      : appProductCategories!.map((category) {
                           return WidgetCategoryCard(
                             title: category.name ?? '',
                             imageUrl: category.image ?? '',
@@ -477,7 +477,7 @@ class __RestaurantDiscountSectionState
         "category_ids": [
           widget.category?.id,
           if (_subCategorySelected != null) _subCategorySelected?.id
-        ],
+        ].join(','),
     });
     if (response.isSuccess) {
       _restaurantDiscounts = response.data;
@@ -520,6 +520,7 @@ class __RestaurantDiscountSectionState
             autoPlayInterval: const Duration(seconds: 5),
             autoPlayAnimationDuration: const Duration(milliseconds: 800),
             enlargeCenterPage: true,
+            clipBehavior: Clip.none,
             scrollDirection: Axis.horizontal,
           ),
           items: _restaurantDiscounts == null
@@ -606,6 +607,7 @@ class __RecommendedSectionState extends State<_RecommendedSection> {
           onTap: () {},
         ),
         SingleChildScrollView(
+          clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: Row(
             spacing: 12.sw,
@@ -664,6 +666,7 @@ class __BestSellerSectionState extends State<_BestSellerSection> {
           onTap: () {},
         ),
         SingleChildScrollView(
+          clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: Row(
             spacing: 12.sw,
@@ -733,6 +736,7 @@ class __NewsSectionState extends State<_NewsSection> {
         ),
         const SizedBox(height: 16),
         SingleChildScrollView(
+          clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           child: _news == null
               ? Row(
@@ -790,22 +794,22 @@ class _PartnerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Let's be partners now!",
+          "Let's be partners now!".tr(),
           style: w400TextStyle(fontSize: 20.sw),
         ),
         const SizedBox(height: 16),
         Row(
           children: [
             _buildPartnerCard(
-              'Signup as a business',
-              'Partner with us',
+              'Signup as a\nbusiness'.tr(),
+              'Partner\nwith us'.tr(),
               'icon7',
               'https://www.google.com', //TODO: change to external link
             ),
             const SizedBox(width: 12),
             _buildPartnerCard(
-              'Ride with us',
-              'Ride with us',
+              'Signup as a\nrider'.tr(),
+              'Ride\nwith us'.tr(),
               'icon4',
               'https://www.google.com', //TODO: change to external link
             ),

@@ -1,13 +1,28 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 import '../presentation/widgets/widget_bottom_pickdatetime.dart';
+import '../presentation/widgets/widget_dialog_confirm.dart';
 import 'utils.dart';
 
+Future<void> wrapRequiredLogin(VoidCallback? function) async {
+  if (!authCubit.isLoggedIn) {
+    final result = await appOpenDialog(WidgetDialogConfirm(
+      title: "Login is required".tr(),
+      message: "Please login to continue".tr(),
+    ));
+    if (result == true) {
+      appContext.push('/auth');
+    }
+  } else {
+    function?.call();
+  }
+}
 Future<void> appOpenDateTimePicker(
   DateTime? date,
   Function(DateTime date) onConfirm, {

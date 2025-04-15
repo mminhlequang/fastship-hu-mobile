@@ -1,74 +1,147 @@
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/filter_results/filter_results_screen.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/category/model/category.dart';
+import 'package:network_resources/category/repo.dart';
+import 'package:network_resources/enums.dart';
+
+import '../home_screen.dart';
+import 'widget_category_card.dart';
+
+class _SortOption {
+  int id;
+  String label;
+  String fieldName;
+  dynamic value;
+
+  _SortOption({
+    required this.id,
+    required this.label,
+    required this.fieldName,
+    this.value,
+  });
+}
 
 class WidgetDialogFilters extends StatefulWidget {
-  const WidgetDialogFilters({Key? key}) : super(key: key);
+  final bool isRestaurant;
+  final Map<String, dynamic>? initialParams;
+  const WidgetDialogFilters(
+      {super.key, this.isRestaurant = false, this.initialParams});
 
   @override
   State<WidgetDialogFilters> createState() => _WidgetDialogFiltersState();
 }
 
 class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
-  String selectedSort = 'Recommended';
-  RangeValues priceRange = const RangeValues(5.0, 100.0);
-  final List<String> sortOptions = [
-    'Recommended',
-    'Delivery price',
-    'Rating',
-    'Distance',
-    'Delivery time',
-    'Distance',
+  List<int> selectedSort = [2, 3];
+  final List<_SortOption> sortOptions = [
+    _SortOption(
+      id: 1,
+      label: 'Recommend',
+      fieldName: 'is_popular',
+      value: 1,
+    ),
+    _SortOption(
+      id: 2,
+      label: 'Best seller',
+      fieldName: 'is_topseller',
+      value: 1,
+    ),
+    _SortOption(
+      id: 3,
+      label: 'High rating',
+      fieldName: 'is_topseller', //TODO: need correct
+      value: 1,
+    ),
+    _SortOption(
+      id: 4,
+      label: 'Preparation time',
+      fieldName: 'is_topseller', //TODO: need correct
+      value: 1,
+    ),
+    _SortOption(
+      id: 5,
+      label: 'Delivery time',
+      fieldName: 'is_topseller', //TODO: need correct
+      value: 1,
+    ),
   ];
 
-  final List<String> foodTypes = [
-    'American',
-    'Asian',
-    'Chinese',
-    'Indian',
-    'French',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Mexican',
-    'Nepalese',
-    'Vietnamese',
-    'Bakery',
-    'BBQ',
-    'Bagel',
-    'Bento',
-    'Bowl',
-    'Breakfast',
-    'Burger',
-    'Cafe',
-    'Chicken',
-    'Crepe',
-    'Curry',
-    'Dessert',
-    'Fish',
-    'Healthy',
-    'Ice cream',
-    'Pasta',
-    'Noodles',
-    'Pizza',
-    'Ramen',
-    'Salad',
-    'Sandwich',
-    'Smoothie',
-    'Soup',
-    'Steak',
-    'Street Food',
-    'Sushi',
-    'Takoyaki',
-    'Thai',
-    'Tsukemen',
-    'Udon',
-    'Waffles',
-    'Western',
-  ];
+  int? _categoryIdSelected;
+  List<int> subTypeIds = [];
+  RangeValues priceRange = const RangeValues(5.0, 200.0);
+
+  Map<String, dynamic> get paramFilters {
+    var result = <String, dynamic>{};
+    if (selectedSort.isNotEmpty) {
+      for (var sort
+          in sortOptions.where((option) => selectedSort.contains(option.id))) {
+        result.addAll({
+          sort.fieldName: sort.value,
+        });
+      }
+    }
+    if (_categoryIdSelected != null) {
+      result['category_ids'] = [_categoryIdSelected, ...subTypeIds].join(',');
+    }
+    result['price_from'] = priceRange.start;
+    result['price_to'] = priceRange.end;
+    print(result);
+    return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialParams != null) {
+      if (widget.initialParams?['is_popular'] != null) {
+        selectedSort.add(1);
+      }
+      if (widget.initialParams?['is_topseller'] != null) {
+        selectedSort.add(2);
+      }
+      if (widget.initialParams?['category_ids']?.isNotEmpty == true) {
+        List<String> listCategoryIds =
+            widget.initialParams?['category_ids'].split(',');
+        _categoryIdSelected = int.parse(listCategoryIds.first);
+        subTypeIds = listCategoryIds.skip(1).map(int.parse).toList();
+      }
+      if (widget.initialParams?['price_from'] != null) {
+        priceRange = RangeValues(
+          widget.initialParams?['price_from'],
+          widget.initialParams?['price_to'],
+        );
+      }
+    }
+    _fetchCategories();
+  }
+
+  void _fetchCategories() async {
+    final response = await CategoryRepo().getCategories({});
+    if (response.isSuccess) {
+      appProductCategories = response.data;
+      if (appProductCategories != null && appProductCategories!.isNotEmpty) {
+        if (_categoryIdSelected == null) {
+          _categoryIdSelected = appProductCategories!
+              .firstWhere(
+                (category) => category.id == _categoryIdSelected,
+                orElse: () => appProductCategories!.first,
+              )
+              .id;
+          subTypeIds = [];
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +150,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       child: Container(
         margin: MediaQuery.of(context)
             .padding
-            .add(const EdgeInsets.symmetric(horizontal: 16)),
+            .add(const EdgeInsets.symmetric(horizontal: 8)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24.sw),
@@ -98,7 +171,6 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
                       _buildSortBySection(),
                       _buildDivider(),
                       _buildTypeFoodSection(),
-                      _buildSeeAllFilter(),
                       _buildDivider(),
                       _buildPriceRangeSection(),
                     ],
@@ -176,7 +248,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Sort by',
+          'Sort by'.tr(),
           style: w500TextStyle(fontSize: 18.sw),
         ),
         const SizedBox(height: 12),
@@ -190,36 +262,53 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
     );
   }
 
-  Widget _buildSortOption(String option) {
-    return SizedBox(
-      width: context.width * 0.4,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: selectedSort == option
-                      ? const Color(0xFF74CA45)
-                      : const Color(0xFFBDBDBD),
-                  width: 1.5,
+  Widget _buildSortOption(_SortOption option) {
+    return GestureDetector(
+      onTap: () {
+        if (selectedSort.contains(option.id)) {
+          selectedSort.remove(option.id);
+        } else {
+          selectedSort.add(option.id);
+        }
+        setState(() {});
+      },
+      child: SizedBox(
+        width: context.width * 0.4,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selectedSort.contains(option.id)
+                        ? appColorPrimary
+                        : const Color(0xFFBDBDBD),
+                    width: 1.5,
+                  ),
+                ),
+                child: selectedSort.contains(option.id)
+                    ? Icon(
+                        Icons.check,
+                        size: 16,
+                        color: appColorPrimary,
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                option.label,
+                style: const TextStyle(
+                  color: Color(0xFF120F0F),
+                  fontFamily: 'Fredoka',
+                  fontSize: 16,
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              option,
-              style: const TextStyle(
-                color: Color(0xFF120F0F),
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -230,54 +319,85 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Type food',
+          'Type food'.tr(),
           style: w500TextStyle(fontSize: 18.sw),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: foodTypes.map((type) => _buildFoodTypeChip(type)).toList(),
+        SingleChildScrollView(
+          clipBehavior: Clip.none,
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: appProductCategories == null
+                ? List.generate(
+                    5,
+                    (index) => const WidgetCategoryCardShimmer(),
+                  )
+                : appProductCategories!.map((category) {
+                    return WidgetCategoryCard(
+                      title: category.name ?? '',
+                      imageUrl: category.image ?? '',
+                      isSelected: _categoryIdSelected == category.id,
+                      onTap: () {
+                        appHaptic();
+                        _categoryIdSelected = category.id;
+                        subTypeIds = [];
+                        setState(() {});
+                      },
+                    );
+                  }).toList(),
+          ),
         ),
+        if (_categoryIdSelected != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: appProductCategories!
+                      .firstWhere(
+                          (category) => category.id == _categoryIdSelected)
+                      .children
+                      ?.map((category) => _buildFoodTypeChip(category))
+                      .toList() ??
+                  [],
+            ),
+          ),
+        Gap(16.sw),
       ],
     );
   }
 
-  Widget _buildFoodTypeChip(String type) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE7E7E7)),
-        borderRadius: BorderRadius.circular(46),
-        color: Colors.white,
-      ),
-      child: Text(
-        type,
-        style: const TextStyle(
-          color: Color(0xFF120F0F),
-          fontFamily: 'Fredoka',
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSeeAllFilter() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Icon(Icons.add, color: const Color(0xFFF17228)),
-          const SizedBox(width: 6),
-          Text(
-            'See all filter',
-            style: TextStyle(
-              color: const Color(0xFFF17228),
-              fontFamily: 'Fredoka',
-              fontSize: 16,
-            ),
+  Widget _buildFoodTypeChip(CategoryModel category) {
+    return WidgetInkWellTransparent(
+      onTap: () {
+        appHaptic();
+        if (subTypeIds.contains(category.id)) {
+          subTypeIds.remove(category.id);
+        } else {
+          subTypeIds.add(category.id!);
+        }
+        setState(() {});
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: subTypeIds.contains(category.id)
+                ? appColorPrimary
+                : const Color(0xFFE7E7E7),
           ),
-        ],
+          borderRadius: BorderRadius.circular(46),
+          color:
+              subTypeIds.contains(category.id) ? appColorPrimary : Colors.white,
+        ),
+        child: Text(
+          category.name ?? '',
+          style: w400TextStyle(
+            color:
+                subTypeIds.contains(category.id) ? Colors.white : appColorText,
+          ),
+        ),
       ),
     );
   }
@@ -289,14 +409,14 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Price',
+              'Price'.tr(),
               style: w500TextStyle(fontSize: 18.sw),
             ),
             Text(
               '\$${priceRange.start.toStringAsFixed(2)} - \$${priceRange.end.toStringAsFixed(2)}',
               style: w400TextStyle(
                 fontSize: 16.sw,
-                color: Color(0xFF453D3D),
+                color: appColorText2,
               ),
             ),
           ],
@@ -305,9 +425,9 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
         Row(
           children: [
             Text(
-              '\$1.00',
+              currencyFormatted(1),
               style: w400TextStyle(
-                color: Color(0xFF847D79),
+                color: appColorText2,
                 fontSize: 14.sw,
               ),
             ),
@@ -325,7 +445,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
                 child: RangeSlider(
                   values: priceRange,
                   min: 1.0,
-                  max: 100.0,
+                  max: 1000.0,
                   onChanged: (RangeValues values) {
                     setState(() {
                       priceRange = values;
@@ -335,9 +455,9 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
               ),
             ),
             Text(
-              '\$100.0',
+              currencyFormatted(1000),
               style: w400TextStyle(
-                color: Color(0xFF847D79),
+                color: appColorText2,
                 fontSize: 14.sw,
               ),
             ),
@@ -384,19 +504,53 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       ),
       child: Row(
         children: [
-          WidgetButtonCancel(
-            text: 'Cancel',
-            onPressed: () {
-              context.pop();
-            },
-            width: 120.sw,
+          Expanded(
+            flex: 2,
+            child: WidgetButtonCancel(
+              text: 'Cancel'.tr(),
+              onPressed: () {
+                context.pop();
+              },
+              width: 120.sw,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
+            flex: 3,
             child: WidgetButtonConfirm(
-              text: 'Apply ( 10 results found )',
+              text: 'Apply filters'.tr(),
               onPressed: () {
                 context.pop();
+                appHaptic();
+                List<String> listChip = [];
+
+                if (selectedSort.isNotEmpty) {
+                  for (var sort in sortOptions
+                      .where((option) => selectedSort.contains(option.id))) {
+                    listChip.add(sort.label);
+                  }
+                }
+                if (subTypeIds.isNotEmpty) {
+                  listChip.addAll(appProductCategories!
+                          .firstWhere(
+                              (category) => category.id == _categoryIdSelected)
+                          .children
+                          ?.where(
+                              (category) => subTypeIds.contains(category.id))
+                          .map((category) => category.name ?? '')
+                          .toList() ??
+                      []);
+                }
+                listChip.add(
+                    '${"from".tr()} ${priceRange.start.toStringAsFixed(2)} ${"to".tr()} ${priceRange.end.toStringAsFixed(2)}');
+
+                FilterResultsParams params = FilterResultsParams(
+                  name:
+                      '${appProductCategories!.firstWhere((category) => category.id == _categoryIdSelected).name} ${"near you".tr()}',
+                  listChip: listChip,
+                  params: paramFilters,
+                );
+                context.push('/filter-results', extra: params);
               },
             ),
           ),

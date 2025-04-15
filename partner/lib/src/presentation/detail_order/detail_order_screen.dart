@@ -11,9 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/order/models/models.dart';
+import 'package:network_resources/order/repo.dart';
 
 class DetailOrderScreen extends StatefulWidget {
-  const DetailOrderScreen({super.key});
+  final int id;
+  const DetailOrderScreen({super.key, required this.id});
 
   @override
   State<DetailOrderScreen> createState() => _DetailOrderScreenState();
@@ -27,18 +30,20 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
   @override
   void initState() {
     super.initState();
-    Timer.periodic(
-      const Duration(seconds: 5),
-      (_) {
-        if (mounted) {
-          setState(() {
-            currentStep += 0.5;
-          });
-        }
-      },
-    );
+    _fetchOrder();
   }
 
+  OrderModel? order;
+  Future<void> _fetchOrder() async {
+    final response = await OrderRepo().getOrderDetail({"id": widget.id});
+    if (response.data != null) {
+      if (mounted) {
+        setState(() {
+          order = response.data;
+        });
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

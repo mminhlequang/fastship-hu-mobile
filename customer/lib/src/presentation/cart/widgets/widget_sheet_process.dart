@@ -9,7 +9,8 @@ import 'package:internal_core/internal_core.dart';
 enum SheetProcessStatus {
   loading,
   findingDriver,
-  success,
+  findingDriverSuccess,
+  createPickupSuccess,
   error_payment,
   error_create_order,
   error_no_driver;
@@ -18,7 +19,9 @@ enum SheetProcessStatus {
     switch (this) {
       case SheetProcessStatus.loading:
         return WidgetAppLoader();
-      case SheetProcessStatus.success:
+      case SheetProcessStatus.createPickupSuccess:
+        return WidgetAssetImage.png('image3', width: 100.sw, height: 100.sw);
+      case SheetProcessStatus.findingDriverSuccess:
         return 'icon56';
       case SheetProcessStatus.findingDriver:
         return 'icon87';
@@ -38,7 +41,9 @@ enum SheetProcessStatus {
         return 'Processing...';
       case SheetProcessStatus.findingDriver:
         return 'Finding Driver';
-      case SheetProcessStatus.success:
+      case SheetProcessStatus.createPickupSuccess:
+        return 'Success!';
+      case SheetProcessStatus.findingDriverSuccess:
         return 'Success!';
       case SheetProcessStatus.error_payment:
         return 'Payment Error!';
@@ -57,7 +62,9 @@ enum SheetProcessStatus {
         return 'We are processing your order'.tr();
       case SheetProcessStatus.findingDriver:
         return 'We are finding a suitable driver for your order'.tr();
-      case SheetProcessStatus.success:
+      case SheetProcessStatus.createPickupSuccess:
+        return 'Your order has been created successfully'.tr();
+      case SheetProcessStatus.findingDriverSuccess:
         return 'Driver has accepted and is picking up your order for delivery'
             .tr();
       case SheetProcessStatus.error_payment:
@@ -120,7 +127,7 @@ class _WidgetBottomSheetProcessState extends State<WidgetBottomSheetProcess> {
                 style: w300TextStyle(fontSize: 14.sw, height: 1.4),
                 textAlign: TextAlign.center,
               ),
-              if (value.index > 2) ...[
+              if (value.index > 3) ...[
                 Gap(40.sw),
                 Row(
                   spacing: 16.sw,

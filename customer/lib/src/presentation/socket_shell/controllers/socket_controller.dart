@@ -88,7 +88,7 @@ class CustomerSocketController {
 
           appContext.pop();
           await appOpenDialog(WidgetDialogNotification(
-              icon: 'icon58',
+              iconPng: 'image3',
               title: "Driver Has Arrived!".tr(),
               message: "Enjoy your meal!\nSee you in the next order :)",
               buttonText: "Done".tr(),
@@ -230,9 +230,6 @@ class CustomerSocketController {
     debugPrint('Debug socket: Hủy CustomerSocketController');
     socket?.disconnect();
     socket?.dispose();
-    socketConnected.dispose();
-    driverLocation.dispose();
-    orderStatus.dispose();
   }
 
   // Phương thức trợ giúp phân tích phản hồi từ socket
@@ -286,7 +283,7 @@ extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
       case AppOrderProcessStatus.cancelled:
         return "Order cancelled";
       default:
-        return "Unknown";
+        return "Being processed";
     }
   }
 
@@ -305,7 +302,7 @@ extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
       case AppOrderProcessStatus.cancelled:
         return "Order cancelled";
       default:
-        return "Unknown";
+        return "Being processed";
     }
   }
 }

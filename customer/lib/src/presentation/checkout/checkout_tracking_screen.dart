@@ -45,6 +45,8 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
       ValueNotifier<List<Polyline>>([]);
 
   OrderModel? get currentOrder => widget.order ?? socketController.currentOrder;
+  bool get isPickup =>
+      currentOrder?.deliveryTypeEnum == AppOrderDeliveryType.pickup;
 
   @override
   void initState() {
@@ -78,7 +80,19 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                 Column(
                   children: [
                     WidgetAppBar(
-                      title: value?.textNotification ?? '',
+                      title: 'Order Tracking'.tr(),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            appHaptic();
+                            context.push('/help-center');
+                          },
+                          child: Text('Need help?'.tr(),
+                              style: w400TextStyle(
+                                  fontSize: 16.sw,
+                                  color: appColorPrimaryOrange)),
+                        ),
+                      ],
                     ),
                     Expanded(
                       child: ValueListenableBuilder(
@@ -105,12 +119,17 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                                 ),
                                 width: 36.sw,
                                 height: 36.sw,
-                                child: WidgetAvatar(
-                                  imageUrl: order.store!.avatarImage,
-                                  radius1: 18.sw,
-                                  radius2: 18.sw - 2,
-                                  radius3: 18.sw - 2,
-                                  borderColor: Colors.white,
+                                child: AvatarGlow(
+                                  glowColor: appColorPrimary,
+                                  duration: const Duration(milliseconds: 2000),
+                                  repeat: true,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.store!.avatarImage,
+                                    radius1: 18.sw,
+                                    radius2: 18.sw - 2,
+                                    radius3: 18.sw - 2,
+                                    borderColor: Colors.white,
+                                  ),
                                 ),
                               ),
                               if (order.driver != null &&
@@ -167,17 +186,18 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                               ),
                               markers: markers,
                               polylines: [
-                                Polyline(
-                                  pattern: const StrokePattern.dotted(
-                                    spacingFactor: 1.5,
-                                    patternFit: PatternFit.scaleUp,
-                                  ),
-                                  color: appColorPrimary,
-                                  strokeWidth: 6.0,
-                                  borderColor: Colors.white,
-                                  borderStrokeWidth: 1.0,
-                                  points: polylinePoints,
-                                )
+                                if (!isPickup)
+                                  Polyline(
+                                    pattern: const StrokePattern.dotted(
+                                      spacingFactor: 1.5,
+                                      patternFit: PatternFit.scaleUp,
+                                    ),
+                                    color: appColorPrimary,
+                                    strokeWidth: 6.0,
+                                    borderColor: Colors.white,
+                                    borderStrokeWidth: 1.0,
+                                    points: polylinePoints,
+                                  )
                               ],
                               initialZoom: 14,
                             );
@@ -202,10 +222,16 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                     controller: _scrollController,
                     child: Column(
                       children: [
-                        _buildProgressIndicator(
-                            value ?? AppOrderProcessStatus.pending),
+                        if (isPickup) ...[
+                          _buildStoreStatus(order.storeStatusEnum),
+                        ] else ...[
+                          _buildProcessStatus(
+                              value ?? AppOrderProcessStatus.pending),
+                        ],
                         SizedBox(height: 12.sw),
-                        _buildDriverInfo(order),
+                        if (!isPickup) ...[
+                          _buildDriverInfo(order),
+                        ],
                         _buildAddressCard(order),
                         _buildOrderSummary(order),
                         SizedBox(
@@ -222,7 +248,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
         });
   }
 
-  Widget _buildProgressIndicator(AppOrderProcessStatus status) {
+  Widget _buildProcessStatus(AppOrderProcessStatus status) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       margin: const EdgeInsets.only(top: 4),
@@ -288,6 +314,62 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
           ),
           Text(
             status.description.tr(),
+            style: w400TextStyle(fontSize: 16.sw, color: hexColor('#847D79')),
+          ),
+          Gap(10.sw),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoreStatus(AppOrderStoreStatus status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.only(top: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: hexColor('#F1EFE9')),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10.sw),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildProgressIcon(
+                  'icon51',
+                  isActive: true,
+                ),
+                Container(
+                  width: 60,
+                  height: 2,
+                  color: true ? appColorPrimary : const Color(0xFFCEC6C5),
+                ),
+                _buildProgressIcon(
+                  'icon54',
+                  isActive: true,
+                ),
+                Container(
+                  width: 60,
+                  height: 2,
+                  color: status.index >= AppOrderProcessStatus.completed.index
+                      ? appColorPrimary
+                      : const Color(0xFFCEC6C5),
+                ),
+                _buildProgressIcon(
+                  'icon61',
+                  isActive:
+                      status.index >= AppOrderProcessStatus.completed.index,
+                ),
+              ],
+            ),
+          ),
+          Text(
+            'Store is being processed'.tr(),
             style: w400TextStyle(fontSize: 16.sw, color: hexColor('#847D79')),
           ),
           Gap(10.sw),
@@ -440,12 +522,14 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
             title: order.store?.name ?? '',
             address: order.store?.address ?? '',
           ),
-          const SizedBox(height: 10),
-          _buildAddressRow(
-            icon: 'icon20',
-            title: "Customer address".tr(),
-            address: order.address ?? '',
-          ),
+          if (!isPickup) ...[
+            const SizedBox(height: 10),
+            _buildAddressRow(
+              icon: 'icon20',
+              title: "Customer address".tr(),
+              address: order.address ?? '',
+            ),
+          ],
         ],
       ),
     );

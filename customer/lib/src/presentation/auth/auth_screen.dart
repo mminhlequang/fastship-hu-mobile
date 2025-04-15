@@ -237,6 +237,7 @@ class _AuthScreenState extends State<AuthScreen> {
               appHaptic();
               clearAllRouters('/');
             },
+            enableInkWell: false,
             child: Text(
               'Continue as a guest'.tr(),
               style: w500TextStyle(
@@ -247,6 +248,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );

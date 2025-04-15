@@ -188,7 +188,7 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/detail-order',
           pageBuilder:
-              _defaultPageBuilder((state) => const DetailOrderScreen()),
+              _defaultPageBuilder((state) => DetailOrderScreen(id: state.extra as int)),
         ),
         GoRoute(
           path: '/ratings',

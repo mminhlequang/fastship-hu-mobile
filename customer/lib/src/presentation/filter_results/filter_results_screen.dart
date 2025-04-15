@@ -1,303 +1,263 @@
+import 'package:app/src/base/cubit/location_cubit.dart';
+import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_appbar.dart';
+import 'package:app/src/utils/app_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/product/model/product.dart';
+import 'package:network_resources/product/repo.dart';
+import 'package:network_resources/store/models/models.dart';
+import 'package:network_resources/store/repo.dart';
 
+import '../home/widgets/widget_dialog_filters.dart';
+import '../home/widgets/widget_dish_card.dart';
+import '../home/widgets/widget_restaurant_card.dart';
+import '../restaurants/restaurants_screen.dart';
 import '../widgets/widget_search_field.dart';
 
-class ListFood extends StatelessWidget {
-  const ListFood({Key? key}) : super(key: key);
+class FilterResultsParams {
+  String name;
+  List<String> listChip;
+  Map<String, dynamic> params;
+
+  FilterResultsParams({
+    required this.name,
+    required this.listChip,
+    required this.params,
+  });
+}
+
+class FilterResultsScreen extends StatefulWidget {
+  final FilterResultsParams params;
+  const FilterResultsScreen({super.key, required this.params});
+
+  @override
+  State<FilterResultsScreen> createState() => _FilterResultsScreenState();
+}
+
+class _FilterResultsScreenState extends State<FilterResultsScreen> {
+  bool isRestaurant = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isRestaurant) {
+      _fetchRestaurants();
+    } else {
+      _fetchFoods();
+    }
+  }
+
+  List<StoreModel>? _restaurants;
+  List<ProductModel>? _foods;
+  void _fetchRestaurants() async {
+    _restaurants = null;
+    setState(() {});
+
+    Map<String, dynamic> params = {
+      "lat": locationCubit.latitude,
+      "lng": locationCubit.longitude,
+    };
+    if (widget.params.params.isNotEmpty) {
+      params.addAll(widget.params.params);
+    }
+    final response = await StoreRepo().getStores(params);
+    if (response.isSuccess) {
+      _restaurants = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _fetchFoods() async {
+    _foods = null;
+    setState(() {});
+    Map<String, dynamic> params = {
+      "lat": locationCubit.latitude,
+      "lng": locationCubit.longitude,
+    };
+    if (widget.params.params.isNotEmpty) {
+      params.addAll(widget.params.params);
+    }
+    final response = await ProductRepo().getProducts(params);
+    if (response.isSuccess) {
+      _foods = response.data;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.only(bottom: 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                color: const Color(0xFFF9F8F6),
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  top: 12,
-                  bottom: 12,
+      backgroundColor: appColorBackground,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          WidgetAppBar(
+            title: Row(
+              children: [
+                Expanded(child: WidgetSearchField(onTap: () {})),
+                WidgetInkWellTransparent(
+                  onTap: () {
+                    appHaptic();
+                    // appOpenDialog(WidgetDialogFilters());
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+                    child: WidgetAppSVG('icon26', width: 24.sw, height: 24.sw),
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '9:41',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Urbanist',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                        letterSpacing: 0.2,
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.params.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: w600TextStyle(fontSize: 20.sw),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 24,
-                          height: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: WidgetSearchField(
-                            onTap: () {
-                              // Handle search
-                            },
+                      SizedBox(width: 24),
+                      GestureDetector(
+                        onTap: () {
+                          appHaptic();
+                          context.pop();
+                          appOpenDialog(WidgetDialogFilters(
+                            isRestaurant: isRestaurant,
+                            initialParams: widget.params.params,
+                          ));
+                        },
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: hexColor('#EEEEEE')),
+                            color: Colors.white,
                           ),
-                        ),
-                        Container(
-                          width: 44,
-                          padding: const EdgeInsets.all(10),
-                          child: Image.network(
-                            'https://cdn.builder.io/api/v1/image/assets/TEMP/f9d9522407f52f22ccdbd742ccfa27453c4ed725?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                            width: 24,
-                            height: 24,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 17),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Cafe near me',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 32,
-                              fontFamily: 'Fredoka',
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
-                            ),
-                          ),
-                          Container(
-                            width: 40,
-                            height: 40,
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Image.network(
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/46077d169b8fe4f3bcf5223e5ba54a905d425ec9?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                              width: 24,
+                          child: Center(
+                            child: WidgetAppSVG(
+                              'icon30',
+                              width: 24.sw,
+                              height: 24.sw,
                               fit: BoxFit.contain,
                             ),
                           ),
-                        ],
+                        ),
                       ),
+                    ],
+                  ),
+                  if (widget.params.listChip.isNotEmpty)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: widget.params.listChip
+                          .map((e) => _WidgetFilterChip(label: e))
+                          .toList(),
                     ),
-                    const SizedBox(height: 24),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          FoodFilterChip(
-                            label: 'Espresso Coffee',
-                            isSelected: true,
-                          ),
-                          const SizedBox(width: 8),
-                          FoodFilterChip(
-                            label: 'Traditional Coffee',
-                            isSelected: false,
-                          ),
-                          const SizedBox(width: 8),
-                          FoodFilterChip(
-                            label: 'Cappuccino Coffee',
-                            isSelected: false,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 23),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'All restaurants',
-                            style: TextStyle(
-                              color: const Color(0xFF847D79),
-                              fontFamily: 'Fredoka',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'All food',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: 'Fredoka',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  const SizedBox(height: 8),
+                  WidgetFoodRestaurantTabbar(
+                    isRestaurant: isRestaurant,
+                    onTapRestaurant: () {
+                      setState(() {
+                        isRestaurant = true;
+                      });
+                      _fetchRestaurants();
+                    },
+                    onTapFood: () {
+                      setState(() {
+                        isRestaurant = false;
+                      });
+                      _fetchFoods();
+                    },
+                    padding: 16,
+                  ),
+                  SizedBox(height: 16),
+                  Expanded(
+                    child: (isRestaurant)
+                        ? _restaurants == null
+                            ? ListView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: WidgetRestaurantCardShimmer(),
+                                  );
+                                },
+                              )
+                            : ListView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: _restaurants?.length ?? 0,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: WidgetRestaurantCard(
+                                      store: _restaurants![index],
+                                    ),
+                                  );
+                                },
+                              )
+                        : _foods == null
+                            ? SingleChildScrollView(
+                                child: Wrap(
+                                  spacing: 16.sw,
+                                  runSpacing: 20.sw,
+                                  children: List.generate(
+                                    8,
+                                    (index) => SizedBox(
+                                      width: context.width / 2 - 16 - 8.sw,
+                                      child: WidgetDishCardShimmer(),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                child: Wrap(
+                                  spacing: 16.sw,
+                                  runSpacing: 20.sw,
+                                  children: List.generate(
+                                    _foods?.length ?? 0,
+                                    (index) => WidgetDishCard(
+                                      width: context.width / 2 - 16 - 8.sw,
+                                      product: _foods![index],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                  ),
+                ],
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Image.network(
-                  'https://cdn.builder.io/api/v1/image/assets/TEMP/1f398861c064554f2c2170428b181c3d5cd313d3?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                  width: 175,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.75,
-                      children: const [
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/37de13feba83b89e5d0184ed9a35387931d323c8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Macchiato',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '200m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/304767ab2aba27c75ce3c785ba548137a9f53f32?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 1.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/ae83f352e884c905df4f793abfca173cce2c8d2c?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Traditional Coffee',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '20m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/760da60a84bac2411a9cdba824de49cbceef1398?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 2.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/95b492ee43d7cdcfa72270691552506e9bd48b7e?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Latte',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '200m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/11be37dd42008bbda5e50ac00ebf0910c8998fbb?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 1.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/68a58645830b225b909e36382c4afe4f7cfcf2ff?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Latte',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '15m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/304767ab2aba27c75ce3c785ba548137a9f53f32?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 2.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/168b62483e1259bc74928edd1f64599fe05acfaa?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Espresso',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '200m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/50271b7067760b27fdb534ccc4f233094dc01f01?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 1.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/1812aeaa6b8d994a0d3f3e75142c20c38ae7abfd?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Instant coffee',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '15m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/0259121d8f2d3fb26cee5cc308191e970a347365?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 2.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/dacb73ca75b696b59039c5a373680e04012402e8?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Black coffee',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '200m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/bdffe3c9f489d966154e4a4c5fa5f7b1532a6e03?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 1.20,
-                        ),
-                        FoodItemCard(
-                          imageUrl:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/268bf66a0d968310d361d7a25a8071431abd4189?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          name: 'Instant coffee',
-                          price: 2.20,
-                          originalPrice: 3.30,
-                          rating: 4.5,
-                          distance: '15m',
-                          restaurantName: 'Playa Outdoor',
-                          restaurantLogo:
-                              'https://cdn.builder.io/api/v1/image/assets/TEMP/0259121d8f2d3fb26cee5cc308191e970a347365?placeholderIfAbsent=true&apiKey=4f64436fe9d5484a9dcabcc2b9ed4215',
-                          discount: 2.20,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
 }
 
-class FoodFilterChip extends StatelessWidget {
+class _WidgetFilterChip extends StatelessWidget {
   final String label;
-  final bool isSelected;
 
-  const FoodFilterChip({
-    Key? key,
+  const _WidgetFilterChip({
+    super.key,
     required this.label,
-    required this.isSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -307,20 +267,17 @@ class FoodFilterChip extends StatelessWidget {
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFF9F8F6) : Colors.transparent,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isSelected ? const Color(0xFFF17228) : const Color(0xFFF1EFE9),
+          color: appColorPrimaryOrange,
         ),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          color: isSelected ? const Color(0xFFF17228) : const Color(0xFF847D79),
-          fontFamily: 'Fredoka',
+        style: w400TextStyle(
+          color: appColorPrimaryOrange,
           fontSize: 14,
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.28,
           height: 1.2,
         ),
       ),

@@ -74,7 +74,7 @@ Widget _buildButton({
         : null,
     child: Container(
       width: width,
-      height: height ?? 50.sw,
+      height: height ?? 48.sw,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         border: !isEnabled

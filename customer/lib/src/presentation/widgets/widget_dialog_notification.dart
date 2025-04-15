@@ -5,6 +5,8 @@ import 'package:app/src/constants/constants.dart';
 
 class WidgetDialogNotification extends StatelessWidget {
   final String? icon;
+  final String? iconPng;
+
   final String title;
   final String message;
   final String buttonText;
@@ -12,6 +14,7 @@ class WidgetDialogNotification extends StatelessWidget {
   const WidgetDialogNotification({
     super.key,
     this.icon,
+    this.iconPng,
     required this.title,
     required this.message,
     required this.buttonText,
@@ -47,6 +50,12 @@ class WidgetDialogNotification extends StatelessWidget {
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
+                  ),
+                if (iconPng != null)
+                  WidgetAssetImage.png(
+                    iconPng!,
+                    width: 120,
+                    height: 120,
                   ),
                 const SizedBox(height: 24),
                 Text(

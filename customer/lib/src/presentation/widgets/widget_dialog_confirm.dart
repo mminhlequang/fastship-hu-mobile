@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
@@ -43,16 +43,16 @@ class WidgetDialogConfirm extends StatelessWidget {
                   Text(
                     title,
                     style: w500TextStyle(
-                      fontSize: 32,
+                      fontSize: 24.sw,
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Text(
                     message,
                     textAlign: TextAlign.center,
                     style: w400TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       height: 1.4,
                       color: appColorText2,
                     ),
@@ -63,8 +63,8 @@ class WidgetDialogConfirm extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
+                    child: WidgetButtonCancel(
+                      onPressed: () {
                         appHaptic();
                         if (onCancel != null) {
                           onCancel?.call();
@@ -72,30 +72,12 @@ class WidgetDialogConfirm extends StatelessWidget {
                           Navigator.pop(context, false);
                         }
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 19,
-                        ),
-                        decoration: BoxDecoration(
-                          color: appColorPrimary,
-                          borderRadius: BorderRadius.circular(120),
-                        ),
-                        child: Text(
-                          'Cancel'.tr(),
-                          textAlign: TextAlign.center,
-                          style: w400TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
+                    child: WidgetButtonConfirm(
+                      onPressed: () {
                         appHaptic();
                         if (onConfirm != null) {
                           onConfirm?.call();
@@ -103,28 +85,7 @@ class WidgetDialogConfirm extends StatelessWidget {
                           Navigator.pop(context, true);
                         }
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 19,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(120),
-                          border: Border.all(
-                            color: appColorBorder,
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          'Confirm'.tr(),
-                          textAlign: TextAlign.center,
-                          style: w400TextStyle(
-                            fontSize: 18,
-                            color: appColorText,
-                          ),
-                        ),
-                      ),
+                       
                     ),
                   ),
                 ],

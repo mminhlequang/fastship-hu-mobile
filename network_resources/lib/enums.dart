@@ -10,6 +10,7 @@ enum AppOrderStoreStatus {
   pending, // Đang chờ
   accepted, // Đã chấp nhận đơn
   rejected, // Đã từ chối đơn
+  completed, // Đã hoàn thành đơn
 }
 
 enum AppOrderProcessStatus {

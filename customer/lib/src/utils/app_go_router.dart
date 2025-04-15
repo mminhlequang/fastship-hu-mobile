@@ -17,6 +17,7 @@ import '../presentation/account/widgets/widget_settings.dart';
 import '../presentation/auth/auth_screen.dart';
 import '../presentation/cart/widgets/widget_preview_order.dart';
 import '../presentation/checkout/widgets/widget_cancel_order.dart';
+import '../presentation/filter_results/filter_results_screen.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
@@ -110,6 +111,11 @@ final goRouter = GoRouter(
           pageBuilder: _defaultPageBuilder((state) => const HelpCenterScreen()),
         ),
         GoRoute(
+          path: '/filter-results',
+          pageBuilder: _defaultPageBuilder((state) =>
+              FilterResultsScreen(params: state.extra as FilterResultsParams)),
+        ),
+        GoRoute(
           path: '/my-favorite',
           pageBuilder: _defaultPageBuilder((state) => const MyFavoriteScreen()),
         ),
@@ -124,9 +130,10 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/checkout-tracking',
-          pageBuilder:
-              _defaultPageBuilder((state) =>   CheckoutTrackingScreen(
-                order: state.extra is OrderModel ? state.extra as OrderModel : null,
+          pageBuilder: _defaultPageBuilder((state) => CheckoutTrackingScreen(
+                order: state.extra is OrderModel
+                    ? state.extra as OrderModel
+                    : null,
               )),
         ),
         GoRoute(
