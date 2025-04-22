@@ -1,5 +1,22 @@
+import 'package:flutter/foundation.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
+
+const String appCurrency = "EUR";
+const String appCurrencySymbol = "€";
+
+String get appMapUrlTemplate =>
+    kDebugMode ? appMapUrlTemplateGg : appMapUrlTemplateHERE;
+
+const String hereMapApiKey = "HxCn0uXDho1pV2wM59D_QWzCgPtWB_E5aIiqIdnBnV0";
+String get appMapUrlTemplateHERE =>
+    "https://maps.hereapi.com/v3/base/mc/{z}/{x}/{y}/png8?lang=${appPrefs.languageCode}&size=256&style=lite.day&apiKey=$hereMapApiKey";
+const String appMapUrlTemplateGg =
+    "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
+
+const String socketIOUrl =
+    kDebugMode ? "http://192.168.1.7:3000" : "http://157.230.101.76.45:3000";
 
 enum AppOrderDeliveryType {
   ship, // Giao hàng
@@ -14,7 +31,7 @@ enum AppOrderStoreStatus {
 }
 
 enum AppOrderProcessStatus {
-  pending, // Đơn hàng mới 
+  pending, // Đơn hàng mới
   findDriver, // Đang tìm tài xế
   driverAccepted, // Tài xế đã chấp nhận đơn
   storeAccepted, // Cửa hàng đã chấp nhận đơn
@@ -22,7 +39,7 @@ enum AppOrderProcessStatus {
   driverPicked, // Tài xế đã lấy hàng
   driverArrivedDestination, // Tài xế đã đến địa điểm giao hàng
   completed, // Đơn hàng hoàn thành
-  cancelled 
+  cancelled,
 }
 
 enum AppFindDriverStatus {
@@ -30,7 +47,7 @@ enum AppFindDriverStatus {
   availableDrivers, // Tài xế khả dụng
   found, // Đã tìm thấy tài xế
   noDriver, // Không tìm thấy tài xế
-  error // Lỗi
+  error, // Lỗi
 }
 
 enum AppPaymentOrderStatus {
@@ -43,7 +60,6 @@ enum AppOrderType {
   delivery, // Giao hàng
   pickup, // Món đặt lấy
 }
-
 
 String currencyFormatted(num? amount, {int? decimalDigits}) {
   return NumberFormat.currency(
@@ -116,7 +132,6 @@ enum Gender {
   }
 }
 
-
 const List<Map> euroCounries = [
   {"name": "Andorra", "code": "AD"},
   {"name": "Albania", "code": "AL"},
@@ -166,5 +181,5 @@ const List<Map> euroCounries = [
   {"name": "Slovakia", "code": "SK"},
   {"name": "San Marino", "code": "SM"},
   {"name": "Ukraine", "code": "UA"},
-  {"name": "Holy See (Vatican City State)", "code": "VA"}
+  {"name": "Holy See (Vatican City State)", "code": "VA"},
 ];

@@ -1,3 +1,4 @@
+import 'package:network_resources/enums.dart';
 import 'dart:ui';
 
 import 'package:app/src/base/auth/auth_cubit.dart';

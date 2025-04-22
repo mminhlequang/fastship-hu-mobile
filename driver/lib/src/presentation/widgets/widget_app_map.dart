@@ -1,3 +1,4 @@
+import 'package:network_resources/enums.dart';
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';

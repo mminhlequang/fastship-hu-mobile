@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:network_resources/enums.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppPrefs {

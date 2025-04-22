@@ -1,3 +1,4 @@
+import 'package:network_resources/enums.dart';
 import 'dart:io';
 import 'dart:convert';
 

@@ -1,3 +1,4 @@
+import 'package:network_resources/enums.dart';
 import 'dart:async';
 import 'dart:math';
 import 'dart:convert';

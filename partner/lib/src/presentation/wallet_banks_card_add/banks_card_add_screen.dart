@@ -1,3 +1,5 @@
+import 'package:network_resources/enums.dart';
+import 'package:network_resources/enums.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:app/src/constants/constants.dart';
