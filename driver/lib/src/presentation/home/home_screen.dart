@@ -23,8 +23,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:network_resources/enums.dart';
-import 'package:network_resources/here_polyline_converter.dart';
+import 'package:network_resources/network_resources.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:permission_handler/permission_handler.dart';
 

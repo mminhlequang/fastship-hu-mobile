@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/category/model/category.dart';
 import 'package:network_resources/category/repo.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 
 import '../home_screen.dart';
 import 'widget_category_card.dart';
@@ -413,7 +413,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
               style: w500TextStyle(fontSize: 18.sw),
             ),
             Text(
-              '\$${priceRange.start.toStringAsFixed(2)} - \$${priceRange.end.toStringAsFixed(2)}',
+              '${currencyFormatted(priceRange.start)} - ${currencyFormatted(priceRange.end)}',
               style: w400TextStyle(
                 fontSize: 16.sw,
                 color: appColorText2,

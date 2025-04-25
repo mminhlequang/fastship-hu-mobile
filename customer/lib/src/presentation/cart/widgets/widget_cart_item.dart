@@ -1,16 +1,14 @@
-import 'package:go_router/go_router.dart';
-import 'package:network_resources/enums.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/cart/models/models.dart';
+import 'package:network_resources/network_resources.dart'; 
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
-import 'package:app/src/utils/utils.dart';
 
-import 'widget_preview_order.dart';
 
 class WidgetCartItem extends StatelessWidget {
   final CartModel cart;
@@ -99,31 +97,31 @@ class WidgetCartItem extends StatelessWidget {
                         ),
                       ),
                       _buildVerticalDivider(),
-                      Text(
-                        '1,8 km',
-                        style: w400TextStyle(
-                          fontSize: 12.sw,
-                          color: const Color(0xFF7D7575),
-                        ),
-                      ),
-                      _buildVerticalDivider(),
-                      Row(
-                        children: [
-                          WidgetAppSVG(
-                            'icon39',
-                            width: 16.sw,
-                            height: 16.sw,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '\$1.30',
-                            style: w400TextStyle(
-                              fontSize: 12.sw,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Text(
+                      //   '1,8 km',
+                      //   style: w400TextStyle(
+                      //     fontSize: 12.sw,
+                      //     color: const Color(0xFF7D7575),
+                      //   ),
+                      // ),
+                      // _buildVerticalDivider(),
+                      // Row(
+                      //   children: [
+                      //     WidgetAppSVG(
+                      //       'icon39',
+                      //       width: 16.sw,
+                      //       height: 16.sw,
+                      //     ),
+                      //     const SizedBox(width: 4),
+                      //     Text(
+                      //         '\$1.30',
+                      //       style: w400TextStyle(
+                      //         fontSize: 12.sw,
+                      //         color: Colors.black,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(

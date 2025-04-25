@@ -3,7 +3,7 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:gap/gap.dart';

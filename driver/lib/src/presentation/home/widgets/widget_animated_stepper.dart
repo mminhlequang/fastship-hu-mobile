@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'dart:async';
 
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 
 class WidgetAnimatedStepper extends StatefulWidget {
   const WidgetAnimatedStepper({super.key, required this.status});

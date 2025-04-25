@@ -5,6 +5,7 @@ import 'package:app/src/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/product/repo.dart';
 import 'package:network_resources/store/models/models.dart';
@@ -364,7 +365,7 @@ class FoodItemCard extends StatelessWidget {
                       height: 14,
                     ),
                     Text(
-                      '\$$discount off',
+                      currencyFormatted(discount) + ' off',
                       style: const TextStyle(
                         color: Colors.white,
                         fontFamily: 'Fredoka',
@@ -467,26 +468,21 @@ class FoodItemCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '\$${originalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
+                  currencyFormatted(originalPrice),
+                  style: w400TextStyle(
                     color: const Color(0xFFA6A0A0),
-                    fontFamily: 'Fredoka',
                     fontSize: 12,
-                    fontWeight: FontWeight.w400,
                     decoration: TextDecoration.lineThrough,
-                    letterSpacing: -0.12,
+                    
                   ),
                 ),
                 const SizedBox(width: 3),
                 Text(
-                  '\$${price.toStringAsFixed(2)}',
-                  style: TextStyle(
+                  currencyFormatted(price),
+                  style: w500TextStyle(
                     color: const Color(0xFFED653B),
-                    fontFamily: 'Fredoka',
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -0.12,
-                  ),
+                     ),
                 ),
               ],
             ),

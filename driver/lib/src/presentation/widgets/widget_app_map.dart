@@ -1,4 +1,4 @@
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -70,11 +70,12 @@ class WidgetAppFlutterMapAnimation extends StatefulWidget {
   });
 
   @override
-  State<WidgetAppFlutterMapAnimation> createState() => _WidgetAppFlutterMapAnimationState();
+  State<WidgetAppFlutterMapAnimation> createState() =>
+      _WidgetAppFlutterMapAnimationState();
 }
 
-class _WidgetAppFlutterMapAnimationState extends State<WidgetAppFlutterMapAnimation>
-    with TickerProviderStateMixin {
+class _WidgetAppFlutterMapAnimationState
+    extends State<WidgetAppFlutterMapAnimation> with TickerProviderStateMixin {
   late final _animatedMapController = AnimatedMapController(vsync: this);
 
   // @override
@@ -132,8 +133,10 @@ class _WidgetAppFlutterMapAnimationState extends State<WidgetAppFlutterMapAnimat
           flutter_map.PolylineLayer(
             polylines: widget.polylines!,
           ),
-        if (widget.circles != null) flutter_map.CircleLayer(circles: widget.circles!),
-        if (widget.markers != null) flutter_map.MarkerLayer(markers: widget.markers!),
+        if (widget.circles != null)
+          flutter_map.CircleLayer(circles: widget.circles!),
+        if (widget.markers != null)
+          flutter_map.MarkerLayer(markers: widget.markers!),
       ],
     );
   }
@@ -202,7 +205,8 @@ class WidgetAppFlutterMap extends StatefulWidget {
 }
 
 class _WidgetAppFlutterMapState extends State<WidgetAppFlutterMap> {
-  late final flutter_map.MapController mapController = flutter_map.MapController();
+  late final flutter_map.MapController mapController =
+      flutter_map.MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -253,8 +257,10 @@ class _WidgetAppFlutterMapState extends State<WidgetAppFlutterMap> {
           flutter_map.PolylineLayer(
             polylines: widget.polylines!,
           ),
-        if (widget.circles != null) flutter_map.CircleLayer(circles: widget.circles!),
-        if (widget.markers != null) flutter_map.MarkerLayer(markers: widget.markers!),
+        if (widget.circles != null)
+          flutter_map.CircleLayer(circles: widget.circles!),
+        if (widget.markers != null)
+          flutter_map.MarkerLayer(markers: widget.markers!),
       ],
     );
   }
@@ -262,7 +268,8 @@ class _WidgetAppFlutterMapState extends State<WidgetAppFlutterMap> {
 
 class _CachedNetworkTileProvider extends flutter_map.TileProvider {
   @override
-  ImageProvider getImage(flutter_map.TileCoordinates coordinates, flutter_map.TileLayer options) {
+  ImageProvider getImage(
+      flutter_map.TileCoordinates coordinates, flutter_map.TileLayer options) {
     // appDebugPrint('getTileUrl: ${getTileUrl(coordinates, options)}');
     return CachedNetworkImageProvider(getTileUrl(coordinates, options));
   }

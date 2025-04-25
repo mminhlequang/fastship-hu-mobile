@@ -1,6 +1,6 @@
 import 'package:network_resources/auth/models/models.dart';
 import 'package:network_resources/cart/models/models.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:network_resources/transaction/models/payment_provider.dart';
 

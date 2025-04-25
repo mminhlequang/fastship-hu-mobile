@@ -23,6 +23,7 @@ Future<void> wrapRequiredLogin(VoidCallback? function) async {
     function?.call();
   }
 }
+
 Future<void> appOpenDateTimePicker(
   DateTime? date,
   Function(DateTime date) onConfirm, {
@@ -74,7 +75,6 @@ requestLoginWrapper(Function function) {
   }
 }
 
- 
 bool appIsBottomSheetOpen = false;
 appOpenBottomSheet(
   Widget child, {
@@ -145,10 +145,12 @@ appShowSnackBar({
   context,
   required msg,
   Duration? duration,
-  AppSnackBarType type = AppSnackBarType.notitfication,
+  required AppSnackBarType type,
 }) {
   Color color;
   Duration duration;
+
+  print('appShowSnackBar type: $type msg: $msg');
 
   switch (type) {
     case AppSnackBarType.error:

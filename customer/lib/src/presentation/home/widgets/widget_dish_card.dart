@@ -2,7 +2,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/product/repo.dart';
 import 'package:network_resources/store/models/models.dart';

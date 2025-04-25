@@ -11,7 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/options.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/widget_infinity_slider.dart';
@@ -281,13 +281,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _buildTermsSection() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+          16, 12, 16, 12 + MediaQuery.of(context).padding.bottom),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: GoogleFonts.fredoka().fontFamily,
-          ),
+          style: w400TextStyle(),
           children: [
             TextSpan(
               text: 'When continue, you agree to our '.tr(),

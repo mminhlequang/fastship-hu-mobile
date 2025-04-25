@@ -1,4 +1,4 @@
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
@@ -17,7 +17,8 @@ enum CustomerOrderStatus {
   cancelled, // Đơn hàng bị hủy
 }
 
-CustomerSocketController get socketController => findInstance<CustomerSocketController>();
+CustomerSocketController get socketController =>
+    findInstance<CustomerSocketController>();
 
 class CustomerSocketController {
   IO.Socket? socket;
@@ -151,14 +152,16 @@ class CustomerSocketController {
 
       socket?.emit('cancel_order', data);
     } else {
-      debugPrint('Debug socket: Không thể hủy đơn hàng - không có đơn hoặc socket chưa kết nối');
+      debugPrint(
+          'Debug socket: Không thể hủy đơn hàng - không có đơn hoặc socket chưa kết nối');
     }
   }
 
   // Đánh giá đơn hàng
   void rateOrder(int rating, {String? comment}) {
     if (_currentOrder != null && socket?.connected == true) {
-      debugPrint('Debug socket: Đánh giá đơn hàng ${_currentOrder!['orderId']} - $rating sao');
+      debugPrint(
+          'Debug socket: Đánh giá đơn hàng ${_currentOrder!['orderId']} - $rating sao');
 
       final Map<String, dynamic> data = {
         'order_id': _currentOrder!['orderId'],
@@ -199,13 +202,15 @@ class CustomerSocketController {
       _currentOrder = Map<String, dynamic>.from(socketResponse.data);
       _orderStatus = CustomerOrderStatus.pending;
 
-      debugPrint('Debug socket: Đơn hàng mới đã được tạo: ${jsonEncode(_currentOrder)}');
+      debugPrint(
+          'Debug socket: Đơn hàng mới đã được tạo: ${jsonEncode(_currentOrder)}');
 
       onOrderStatusChanged?.call(_orderStatus);
       onOrderCreated?.call(_currentOrder!);
       onPlayNotification?.call();
     } else {
-      debugPrint('Debug socket: Lỗi khi tạo đơn hàng: ${socketResponse.messageCode}');
+      debugPrint(
+          'Debug socket: Lỗi khi tạo đơn hàng: ${socketResponse.messageCode}');
     }
   }
 
@@ -219,13 +224,15 @@ class CustomerSocketController {
       _driverInfo = socketResponse.data['driver'];
       _orderStatus = CustomerOrderStatus.assigned;
 
-      debugPrint('Debug socket: Tài xế đã được gán cho đơn hàng: ${jsonEncode(_driverInfo)}');
+      debugPrint(
+          'Debug socket: Tài xế đã được gán cho đơn hàng: ${jsonEncode(_driverInfo)}');
 
       onOrderStatusChanged?.call(_orderStatus);
       onDriverAssigned?.call(_driverInfo!);
       onPlayNotification?.call();
     } else {
-      debugPrint('Debug socket: Lỗi khi gán tài xế: ${socketResponse.messageCode}');
+      debugPrint(
+          'Debug socket: Lỗi khi gán tài xế: ${socketResponse.messageCode}');
     }
   }
 
@@ -236,7 +243,8 @@ class CustomerSocketController {
     if (socketResponse.isSuccess && socketResponse.data != null) {
       _driverLocation = Map<String, dynamic>.from(socketResponse.data);
 
-      debugPrint('Debug socket: Vị trí tài xế đã cập nhật: ${jsonEncode(_driverLocation)}');
+      debugPrint(
+          'Debug socket: Vị trí tài xế đã cập nhật: ${jsonEncode(_driverLocation)}');
 
       onDriverLocationUpdated?.call(_driverLocation!);
     }
@@ -289,13 +297,15 @@ class CustomerSocketController {
       _currentOrder = Map<String, dynamic>.from(socketResponse.data);
       _orderStatus = CustomerOrderStatus.cancelled;
 
-      debugPrint('Debug socket: Đơn hàng đã bị hủy: ${jsonEncode(_currentOrder)}');
+      debugPrint(
+          'Debug socket: Đơn hàng đã bị hủy: ${jsonEncode(_currentOrder)}');
 
       onOrderStatusChanged?.call(_orderStatus);
       onOrderUpdated?.call(_currentOrder!);
       onPlayNotification?.call();
     } else {
-      debugPrint('Debug socket: Lỗi khi hủy đơn hàng: ${socketResponse.messageCode}');
+      debugPrint(
+          'Debug socket: Lỗi khi hủy đơn hàng: ${socketResponse.messageCode}');
     }
   }
 

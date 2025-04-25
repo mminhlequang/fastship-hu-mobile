@@ -64,7 +64,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   return Text(
                     NumberFormat.currency(
                       symbol: AppPrefs.instance.currencySymbol,
-                      decimalDigits: 2,
+                      decimalDigits: 1,
                     ).format(state.wallet?.availableBalance ?? 0),
                     style: TextStyle(
                       fontSize: 32,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:network_resources/network_resources.dart';
  
 
 class WidgetRatingDriver extends StatefulWidget {
@@ -295,7 +296,7 @@ class TipAmountGrid extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            '\$$amount',
+            currencyFormatted(amount),
             style: w500TextStyle(
               fontSize: 16,
               color: isSelected ? Colors.white : appColorPrimary,

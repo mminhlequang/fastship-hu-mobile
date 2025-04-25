@@ -1,4 +1,4 @@
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'dart:ui';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
@@ -316,7 +316,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       Text(
                         NumberFormat.currency(
                           symbol: AppPrefs.instance.currencySymbol,
-                          decimalDigits: 2,
+                          decimalDigits: 1,
                         ).format(state.wallet?.availableBalance ?? 0),
                         style: w500TextStyle(
                           fontSize: 40.sw,
@@ -336,7 +336,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         child: Text(
                           '${'Pending'.tr()} ${NumberFormat.currency(
                             symbol: AppPrefs.instance.currencySymbol,
-                            decimalDigits: 2,
+                            decimalDigits: 1,
                           ).format(state.wallet?.frozenBalance ?? 0)}',
                           style: w400TextStyle(color: Colors.white),
                         ),
@@ -624,7 +624,9 @@ class _WalletScreenState extends State<WalletScreen> {
                                                               w400TextStyle(),
                                                         ),
                                                         Text(
-                                                          '\$${(transaction.price ?? 0).toStringAsFixed(2)}',
+                                                          currencyFormatted(
+                                                              transaction
+                                                                  .price),
                                                           style:
                                                               w400TextStyle(),
                                                         ),

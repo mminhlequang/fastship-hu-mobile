@@ -2,7 +2,7 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:go_router/go_router.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/voucher/repo.dart';
 import 'package:network_resources/voucher/models/models.dart';
 import 'package:easy_localization/easy_localization.dart';

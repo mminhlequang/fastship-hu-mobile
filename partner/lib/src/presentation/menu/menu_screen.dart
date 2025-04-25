@@ -1,6 +1,7 @@
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/store/models/menu.dart';
 import 'package:network_resources/store/repo.dart';
@@ -232,7 +233,7 @@ class _MenuScreenState extends State<MenuScreen>
                                   Gap(2.sw),
                                 ],
                                 Text(
-                                  '\$${product.price ?? 0}',
+                                 currencyFormatted(product.price) ,
                                   style: w400TextStyle(color: darkGreen),
                                 ),
                               ],

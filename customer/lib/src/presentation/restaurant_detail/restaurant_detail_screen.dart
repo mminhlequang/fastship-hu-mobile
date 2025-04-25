@@ -1,5 +1,6 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:network_resources/store/repo.dart';
 import 'package:flutter/material.dart';
@@ -349,7 +350,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           children: [
                             TextSpan(text: 'Min order: '),
                             TextSpan(
-                              text: '\$1,00',
+                              text: currencyFormatted(1000),
                               style: w400TextStyle(
                                   fontSize: 14.sw, color: Color(0xFF3C3836)),
                             ),
@@ -378,7 +379,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '\$2,00',
+                            currencyFormatted(2000),
                             style: w400TextStyle(
                                 fontSize: 14.sw, color: Color(0xFF3C3836)),
                           ),

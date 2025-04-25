@@ -11,7 +11,7 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:internal_core/widgets/widgets.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import 'package:app/src/base/auth/auth_cubit.dart';

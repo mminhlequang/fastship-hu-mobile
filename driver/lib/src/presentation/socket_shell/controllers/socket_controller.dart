@@ -6,7 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:vibration/vibration.dart';
@@ -190,7 +190,7 @@ class SocketController {
       currentLocation.value = LatLng(position.latitude, position.longitude);
 
       //TODO: remove later
-      currentLocation.value = LatLng(47.495927, 19.0653831);
+      // currentLocation.value = LatLng(47.495927, 19.0653831);
 
       if (socket?.connected == true && _isOnline) {
         debugPrint(

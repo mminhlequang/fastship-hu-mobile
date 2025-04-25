@@ -10,7 +10,7 @@ import 'package:app/src/presentation/widgets/widget_textfield.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 
 class WidgetFormProfile1 extends StatefulWidget {
   final ValueChanged<Map<String, dynamic>> onChanged;

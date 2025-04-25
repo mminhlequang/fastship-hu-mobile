@@ -48,7 +48,7 @@ class _WidgetWalletState extends State<WidgetWallet> {
                     Text(
                       NumberFormat.currency(
                         symbol: AppPrefs.instance.currencySymbol,
-                        decimalDigits: 2,
+                        decimalDigits: 1,
                       ).format(state.wallet?.availableBalance ?? 0),
                       style: w600TextStyle(fontSize: 24.sw, color: Colors.white),
                     ),
@@ -56,7 +56,7 @@ class _WidgetWalletState extends State<WidgetWallet> {
                     Text(
                       '${'PENDING'.tr()}: - ${NumberFormat.currency(
                         symbol: AppPrefs.instance.currencySymbol,
-                        decimalDigits: 2,
+                        decimalDigits: 1,
                       ).format(state.wallet?.frozenBalance ?? 0)}',
                       style: w400TextStyle(color: Colors.white),
                     ),

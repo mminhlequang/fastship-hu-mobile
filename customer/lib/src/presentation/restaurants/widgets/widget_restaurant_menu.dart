@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:provider/provider.dart';
 import 'widget_restaurant_menu2.dart';
 
@@ -168,9 +170,9 @@ class RestaurantMenu extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    _buildInfoChip('Min. order: \$1,00'),
+                    _buildInfoChip('Min. order: ' + currencyFormatted(1000)),
                     const SizedBox(width: 4),
-                    _buildInfoChip('\$2,00', icon: true),
+                    _buildInfoChip(currencyFormatted(2000), icon: true),
                     const SizedBox(width: 4),
                     _buildInfoChip('More', isLink: true),
                   ],
@@ -389,11 +391,9 @@ class RestaurantMenu extends StatelessWidget {
               ],
             ),
             Text(
-              '\$ ${state.totalPrice.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontFamily: 'Fredoka',
+              currencyFormatted(state.totalPrice),
+              style: w500TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w500,
                 color: Colors.white,
               ),
             ),
@@ -491,20 +491,19 @@ class RestaurantMenu extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Row(
-            children: const [
+            children: [
               Text(
-                '\$3.30',
-                style: TextStyle(
+                currencyFormatted(3300),
+                style: w400TextStyle(
                   color: Color(0xFFA6A0A0),
                   decoration: TextDecoration.lineThrough,
                 ),
               ),
               SizedBox(width: 4),
               Text(
-                '\$2.20',
-                style: TextStyle(
+                currencyFormatted(2200),
+                style: w500TextStyle(
                   color: Color(0xFFF17228),
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -553,13 +552,11 @@ class RestaurantMenu extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '\$2.20',
-                  style: TextStyle(
+                Text(
+                  currencyFormatted(2200),
+                  style: w500TextStyle(
                     color: Color(0xFFF17228),
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.16,
                   ),
                 ),
                 const SizedBox(height: 4),

@@ -11,6 +11,7 @@ import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 class WidgetAddVariation extends StatefulWidget {
   const WidgetAddVariation({super.key, this.variation});
@@ -240,7 +241,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
                                     locale: 'en_EU',
                                     symbol: AppPrefs.instance.currencySymbol,
                                     enableNegative: false,
-                                    decimalDigits: 2,
+                                    decimalDigits: 1,
                                   ),
                                 ],
                               ),

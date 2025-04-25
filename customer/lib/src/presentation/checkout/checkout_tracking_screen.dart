@@ -15,8 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/cart/models/models.dart';
-import 'package:network_resources/enums.dart';
-import 'package:network_resources/here_polyline_converter.dart';
+import 'package:network_resources/network_resources.dart'; 
 import 'package:network_resources/order/models/models.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -628,7 +627,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                           height: 18.sw, color: hexColor('#F17228')),
                       const SizedBox(width: 8),
                       Text(
-                        '\$0.50 off, more deals below',
+                        currencyFormatted(1000) + ' off, more deals below',
                         style: w400TextStyle(
                           fontSize: 16.sw,
                           color: hexColor('#3C3836'),

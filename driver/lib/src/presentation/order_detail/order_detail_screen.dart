@@ -1,4 +1,4 @@
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';

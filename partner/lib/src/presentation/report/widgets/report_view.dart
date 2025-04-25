@@ -4,6 +4,7 @@ import 'package:app/src/presentation/report/cubit/report_cubit.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 class ReportView extends StatelessWidget {
   const ReportView({super.key});
@@ -115,7 +116,7 @@ class ReportView extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '\$${state.totalRevenue.toStringAsFixed(2)}',
+                currencyFormatted(state.totalRevenue),
                 style: w600TextStyle(fontSize: 32),
               ),
               const SizedBox(height: 8),
@@ -174,7 +175,7 @@ class ReportView extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '\$${order['amount']}',
+                          currencyFormatted(order['amount']),
                           style: w500TextStyle(
                             fontSize: 16,
                             color: hexColor('#4CAF50'),

@@ -1,6 +1,4 @@
- 
-import 'package:tuple/tuple.dart';
-import 'dart:math';
+part of 'network_resources.dart';
  
 
 ///

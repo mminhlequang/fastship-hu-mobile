@@ -21,6 +21,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 class AddDishParams {
   final ProductModel? model;
@@ -323,7 +324,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                               locale: 'en_EU',
                               symbol: AppPrefs.instance.currencySymbol,
                               enableNegative: false,
-                              decimalDigits: 2,
+                              decimalDigits: 1,
                             ),
                           ],
                         ),

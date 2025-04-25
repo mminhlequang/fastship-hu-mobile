@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:app/src/base/cubit/location_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/cart/widgets/widget_sheet_locations.dart';
@@ -62,7 +62,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
     _currentLocation = LatLng(position.latitude, position.longitude);
 
     //TODO: remove later
-    _currentLocation = LatLng(47.495986, 19.0653862);
+    // _currentLocation = LatLng(47.495986, 19.0653862);
 
     locationCubit.updateLocation(_currentLocation);
 
@@ -255,7 +255,8 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
                     appShowSnackBar(
                         msg:
                             "We couldn't get your location, please try again later!"
-                                .tr());
+                                .tr(),
+                        type: AppSnackBarType.error);
                   }
                   setState(() {
                     _permissionStatus = result;

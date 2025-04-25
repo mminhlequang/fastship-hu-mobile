@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/order/repo.dart';
 
@@ -44,6 +45,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +77,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.sw, vertical: 24.sw),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 8.sw, vertical: 24.sw),
                       child: WidgetAnimatedStepper(currentStep: currentStep),
                     ),
                   ],
@@ -158,7 +161,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                   ] else ...[
                     if (!isCompleted) AppDivider(height: 5.sw, thickness: 5.sw),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.sw, vertical: 12.sw),
                       child: Row(
                         children: [
                           WidgetAppSVG('ic_user_circle', width: 24.sw),
@@ -174,7 +178,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                 Gap(4.sw),
                                 Text(
                                   '+084912345678',
-                                  style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                                  style: w400TextStyle(
+                                      fontSize: 12.sw, color: grey1),
                                 ),
                               ],
                             ),
@@ -191,11 +196,13 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                       onTap: () {
                         appOpenBottomSheet(
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 32.sw),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.sw, vertical: 32.sw),
                             child: Row(
                               children: [
                                 WidgetAppImage(
-                                  imageUrl: 'https://mdbcdn.b-cdn.net/img/new/avatars/2.webp',
+                                  imageUrl:
+                                      'https://mdbcdn.b-cdn.net/img/new/avatars/2.webp',
                                   height: 40.sw,
                                   width: 40.sw,
                                   radius: 20.sw,
@@ -204,16 +211,19 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                 Expanded(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Text(
                                             'Nguyễn Văn A',
-                                            style: w600TextStyle(fontSize: 16.sw),
+                                            style:
+                                                w600TextStyle(fontSize: 16.sw),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 8.sw),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.sw),
                                             child: CircleAvatar(
                                               radius: 2.sw,
                                               backgroundColor: appColorText,
@@ -240,12 +250,14 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                     // Todo:
                                   },
                                   color: grey8,
-                                  borderSide: BorderSide(color: hexColor('#E0E0E0')),
+                                  borderSide:
+                                      BorderSide(color: hexColor('#E0E0E0')),
                                   child: SizedBox(
                                     height: 32.sw,
                                     width: 32.sw,
                                     child: Center(
-                                      child: WidgetAppSVG('ic_chat', width: 20.sw),
+                                      child:
+                                          WidgetAppSVG('ic_chat', width: 20.sw),
                                     ),
                                   ),
                                 ),
@@ -259,7 +271,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                     height: 32.sw,
                                     width: 32.sw,
                                     child: Center(
-                                      child: WidgetAppSVG('ic_call_2', width: 20.sw),
+                                      child: WidgetAppSVG('ic_call_2',
+                                          width: 20.sw),
                                     ),
                                   ),
                                 ),
@@ -270,7 +283,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                       },
                       enableInkWell: false,
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.sw, vertical: 12.sw),
                         child: Row(
                           children: [
                             WidgetAppSVG('ic_user_circle', width: 24.sw),
@@ -286,7 +300,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                   Gap(4.sw),
                                   Text(
                                     '+084912345678',
-                                    style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                                    style: w400TextStyle(
+                                        fontSize: 12.sw, color: grey1),
                                   ),
                                 ],
                               ),
@@ -305,7 +320,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                   /// rating
                   if (isCompleted) ...[
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.sw, vertical: 12.sw),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -314,7 +330,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             children: [
                               RatingBarIndicator(
                                 rating: 4,
-                                itemBuilder: (context, index) => WidgetAppSVG('ic_star'),
+                                itemBuilder: (context, index) =>
+                                    WidgetAppSVG('ic_star'),
                                 itemCount: 5,
                                 itemSize: 16.sw,
                                 direction: Axis.horizontal,
@@ -323,7 +340,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               ),
                               Text(
                                 '24/02/2025 11:11',
-                                style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                                style: w400TextStyle(
+                                    fontSize: 12.sw, color: grey1),
                               ),
                             ],
                           ),
@@ -342,7 +360,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                           Gap(2.sw),
                           Text(
                             'Khach comment Lorem ipsum dolor sit amet consec tetur. Duis vel libero sed rutrum.',
-                            style: w400TextStyle(fontSize: 12.sw, color: grey10),
+                            style:
+                                w400TextStyle(fontSize: 12.sw, color: grey10),
                           ),
                         ],
                       ),
@@ -362,7 +381,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             Gap(2.sw),
                             Text(
                               'Feedback'.tr(),
-                              style: w400TextStyle(fontSize: 12.sw, color: grey10),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey10),
                             ),
                           ],
                         ),
@@ -383,7 +403,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 3,
-                    separatorBuilder: (context, index) => AppDivider(color: grey8),
+                    separatorBuilder: (context, index) =>
+                        AppDivider(color: grey8),
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.sw),
@@ -414,7 +435,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                   flex: 1,
                                   child: Center(
                                     child: Text(
-                                      '\$15',
+                                      currencyFormatted(15),
                                       style: w400TextStyle(),
                                     ),
                                   ),
@@ -424,7 +445,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             Gap(2.sw),
                             Text(
                               'Size M. Less ice',
-                              style: w400TextStyle(fontSize: 12.sw, color: grey1),
+                              style:
+                                  w400TextStyle(fontSize: 12.sw, color: grey1),
                             ),
                           ],
                         ),
@@ -433,7 +455,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                   ),
                   AppDivider(height: 5.sw, thickness: 5.sw),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -445,7 +468,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               style: w600TextStyle(),
                             ),
                             Text(
-                              '\$35'.tr(),
+                              currencyFormatted(35),
                               style: w600TextStyle(),
                             ),
                           ],
@@ -459,7 +482,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               style: w400TextStyle(color: grey1),
                             ),
                             Text(
-                              '\$3'.tr(),
+                              currencyFormatted(3),
                               style: w400TextStyle(color: grey1),
                             ),
                           ],
@@ -473,7 +496,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               style: w400TextStyle(color: grey1),
                             ),
                             Text(
-                              '\$2'.tr(),
+                              currencyFormatted(2),
                               style: w400TextStyle(color: grey1),
                             ),
                           ],
@@ -487,7 +510,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               style: w600TextStyle(),
                             ),
                             Text(
-                              '\$30'.tr(),
+                              currencyFormatted(30),
                               style: w600TextStyle(color: darkGreen),
                             ),
                           ],
@@ -497,7 +520,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                   ),
                   AppDivider(height: 5.sw, thickness: 5.sw),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -518,7 +542,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                     style: w400TextStyle(color: blue1),
                                   ),
                                   Gap(4.sw),
-                                  WidgetAppSVG('ic_copy', width: 16.sw, color: blue1),
+                                  WidgetAppSVG('ic_copy',
+                                      width: 16.sw, color: blue1),
                                 ],
                               ),
                             ),
@@ -623,7 +648,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                         child: Center(
                           child: Text(
                             'Edit/Cancel order'.tr(),
-                            style: w500TextStyle(fontSize: 16.sw, color: appColorPrimary),
+                            style: w500TextStyle(
+                                fontSize: 16.sw, color: appColorPrimary),
                           ),
                         ),
                       ),
@@ -642,7 +668,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                       child: Center(
                         child: Text(
                           'Notify to driver'.tr(),
-                          style: w500TextStyle(fontSize: 16.sw, color: Colors.white),
+                          style: w500TextStyle(
+                              fontSize: 16.sw, color: Colors.white),
                         ),
                       ),
                     ),

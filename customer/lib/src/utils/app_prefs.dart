@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
-
-import 'package:app/src/constants/app_constants.dart';
+ 
 import 'package:app/src/presentation/widgets/widget_search_place_builder.dart';
 import 'package:network_resources/auth/models/models.dart';
 import 'package:network_resources/auth/repo.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:internal_network/network_resources/resources.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppPrefs {

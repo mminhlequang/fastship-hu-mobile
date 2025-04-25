@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 
 enum TextFieldErrorType { hint, normal }
 
@@ -210,7 +210,7 @@ class WidgetTextFieldPhone extends StatefulWidget {
   final String? label;
   final TextStyle? labelTextStyle;
   final Function(String value)? onSubmitted;
-  final String? initialValue; 
+  final String? initialValue;
   final Function(PhoneNumber phoneNumber)? onPhoneNumberChanged;
   final Function(bool isValid)? onInputValidated;
   final FocusNode? focusNode;
@@ -225,7 +225,7 @@ class WidgetTextFieldPhone extends StatefulWidget {
     this.label,
     this.labelTextStyle,
     this.onSubmitted,
-    this.initialValue, 
+    this.initialValue,
     this.onPhoneNumberChanged,
     this.onInputValidated,
     this.focusNode,

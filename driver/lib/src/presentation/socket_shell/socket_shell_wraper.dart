@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:app/src/presentation/widgets/widget_loader.dart';
 import 'package:app/src/utils/app_get.dart';
 import 'package:flutter/material.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 

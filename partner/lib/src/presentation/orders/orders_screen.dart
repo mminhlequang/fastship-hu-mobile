@@ -2,7 +2,7 @@ import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:internal_core/setup/app_utils.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/order.dart';
 import 'package:network_resources/order/repo.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
@@ -208,7 +208,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   style: w400TextStyle(),
                 ),
                 Text(
-                  '\$${order.total}',
+                  currencyFormatted(order.total),
                   style: w400TextStyle(),
                 ),
               ],

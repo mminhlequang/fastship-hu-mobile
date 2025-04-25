@@ -1,6 +1,6 @@
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:map_launcher/map_launcher.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -1073,7 +1073,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                       height: 18.sw, color: hexColor('#F17228')),
                   const SizedBox(width: 8),
                   Text(
-                    '\$0.50 off, more deals below',
+                    currencyFormatted(1000) + ' off, more deals below',
                     style: w400TextStyle(
                       fontSize: 16.sw,
                       color: hexColor('#3C3836'),

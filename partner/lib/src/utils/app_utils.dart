@@ -8,23 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
-
-String currencyFormatted(double? amount) {
-  return NumberFormat.currency(
-    locale: 'vi_VN',
-    symbol: AppPrefs.instance.currencySymbol,
-    decimalDigits: 2,
-  ).format(amount ?? 0);
-}
-
-double currencyFromEditController(TextEditingController controller) {
-  final cleanedText = controller.text.replaceAll(RegExp(r'[^\d.]'), '');
-  if (cleanedText.isNotEmpty) {
-    final amount = double.tryParse(cleanedText) ?? 0;
-    return amount;
-  }
-  return 0;
-}
+ 
 
 bool appIsBottomSheetOpen = false;
 Future<T> appOpenBottomSheet<T>(

@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:internal_core/internal_core.dart';
-import 'package:intl/intl.dart';
-import 'package:easy_localization/easy_localization.dart';
 
-const String appCurrency = "EUR";
-const String appCurrencySymbol = "€";
+part of 'network_resources.dart';
+
+const String appCurrency = "HUF";
+const String appCurrencySymbol = "Ft";
 
 String get appMapUrlTemplate =>
     kDebugMode ? appMapUrlTemplateGg : appMapUrlTemplateHERE;
@@ -61,13 +59,6 @@ enum AppOrderType {
   pickup, // Món đặt lấy
 }
 
-String currencyFormatted(num? amount, {int? decimalDigits}) {
-  return NumberFormat.currency(
-    locale: 'vi_VN',
-    symbol: "€",
-    decimalDigits: decimalDigits ?? 2,
-  ).format(amount ?? 0);
-}
 
 String distanceFormatted(num metter) {
   if (metter < 1000) {

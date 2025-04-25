@@ -57,7 +57,7 @@ class _WidgetTopUpSheetState extends State<WidgetTopUpSheet> {
                       locale: 'en_EU',
                       symbol: AppPrefs.instance.currencySymbol,
                       enableNegative: false,
-                      decimalDigits: 2,
+                      decimalDigits: 1,
                     ),
                   ],
                   decoration: InputDecoration(
@@ -73,7 +73,7 @@ class _WidgetTopUpSheetState extends State<WidgetTopUpSheet> {
                 Text(
                   '${'Balance available'.tr()}: ${NumberFormat.currency(
                     symbol: AppPrefs.instance.currencySymbol,
-                    decimalDigits: 2,
+                    decimalDigits: 1,
                   ).format(state.wallet?.availableBalance ?? 0)}',
                   style: w400TextStyle(color: grey1),
                 ),
@@ -158,7 +158,7 @@ class _WidgetWithdrawSheetState extends State<WidgetWithdrawSheet> {
                     locale: 'en_EU',
                     symbol: AppPrefs.instance.currencySymbol,
                     enableNegative: false,
-                    decimalDigits: 2,
+                    decimalDigits: 1,
                   ),
                 ],
                 decoration: InputDecoration(
@@ -174,7 +174,7 @@ class _WidgetWithdrawSheetState extends State<WidgetWithdrawSheet> {
               Text(
                 '${'Balance available'.tr()}: ${NumberFormat.currency(
                   symbol: AppPrefs.instance.currencySymbol,
-                  decimalDigits: 2,
+                  decimalDigits: 1,
                 ).format(state.wallet?.availableBalance ?? 0)}',
                 style: w400TextStyle(color: grey1),
               ),

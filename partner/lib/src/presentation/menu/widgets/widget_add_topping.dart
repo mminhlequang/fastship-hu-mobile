@@ -10,6 +10,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 class WidgetAddTopping extends StatefulWidget {
   const WidgetAddTopping({super.key, this.topping});
@@ -107,7 +108,7 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                       locale: 'en_EU',
                       symbol: AppPrefs.instance.currencySymbol,
                       enableNegative: false,
-                      decimalDigits: 2,
+                      decimalDigits: 1,
                     ),
                   ],
                 ),

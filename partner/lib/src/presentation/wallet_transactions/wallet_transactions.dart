@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/transaction/models/models.dart';
 import 'package:network_resources/transaction/repo.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -319,7 +320,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                               style: w400TextStyle(),
                                             ),
                                             Text(
-                                              '\$${(transaction.price ?? 0).toStringAsFixed(2)}',
+                                              currencyFormatted(
+                                                  transaction.price ?? 0),
                                               style: w400TextStyle(),
                                             ),
                                           ],

@@ -7,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/product/model/product.dart';
 
 import 'cubit/cart_cubit.dart';
@@ -246,7 +247,7 @@ class CartItem extends StatelessWidget {
                           ),
                           _buildDivider(),
                           Text(
-                            '\$ ${product.price?.toStringAsFixed(2)}',
+                            currencyFormatted(product.price),
                             style: w500TextStyle(
                               fontSize: 14,
                               color: Color(0xFFF17228),

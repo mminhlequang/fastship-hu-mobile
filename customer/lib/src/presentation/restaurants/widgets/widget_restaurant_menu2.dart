@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 class RestaurantMenuScroll extends StatelessWidget {
   const RestaurantMenuScroll({Key? key}) : super(key: key);
@@ -201,10 +203,10 @@ class RestaurantMenuScroll extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Row(
-                        children: const [
+                        children:   [
                           Text(
-                            '\$3.30',
-                            style: TextStyle(
+                            currencyFormatted(3300),
+                            style: w400TextStyle(
                               color: Color(0xFFA6A0A0),
                               decoration: TextDecoration.lineThrough,
                             ),

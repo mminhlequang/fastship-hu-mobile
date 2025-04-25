@@ -6,7 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 import 'package:internal_core/setup/app_utils.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -69,7 +69,9 @@ class AppTextField extends StatelessWidget {
             if (subTitle != null)
               Padding(
                 padding: EdgeInsets.only(top: 4.sw, bottom: 8.sw),
-                child: Text(subTitle!, style: w400TextStyle(color: appColorTextLabel),
+                child: Text(
+                  subTitle!,
+                  style: w400TextStyle(color: appColorTextLabel),
                 ),
               )
             else

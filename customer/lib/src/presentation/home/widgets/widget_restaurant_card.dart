@@ -1,5 +1,6 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/home/widgets/widget_dish_card.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/store/models/store.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
@@ -193,7 +194,7 @@ class _WidgetRestaurantCardState extends State<WidgetRestaurantCard> {
                           ),
                           SizedBox(width: 4),
                           Text(
-                            '\$8.0',
+                            currencyFormatted(8000),
                             style: w400TextStyle(
                               fontSize: 14.sw,
                             ),

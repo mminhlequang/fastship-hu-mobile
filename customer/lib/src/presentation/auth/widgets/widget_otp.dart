@@ -48,7 +48,8 @@ class _PhoneVerificationScreenState
         verificationCompleted: (PhoneAuthCredential credential) {},
         verificationFailed: (FirebaseAuthException e) {
           setLoading(false);
-          appShowSnackBar(msg: e.toString());
+          appShowSnackBar(msg: e.message, type: AppSnackBarType.error);
+          Navigator.pop(context);
         },
         codeSent: (String verificationId, int? resendToken) {
           this.verificationId = verificationId;
@@ -65,6 +66,7 @@ class _PhoneVerificationScreenState
     } catch (e) {
       setLoading(false);
       appShowSnackBar(msg: e.toString(), type: AppSnackBarType.error);
+      Navigator.pop(context);
     }
   }
 

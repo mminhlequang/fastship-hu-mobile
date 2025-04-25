@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/network_resources/model/model.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:network_resources/enums.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/order/repo.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
