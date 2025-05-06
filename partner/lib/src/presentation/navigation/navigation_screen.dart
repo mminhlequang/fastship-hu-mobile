@@ -160,11 +160,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
       bloc: navigationCubit,
       builder: (context, state) {
         int currentIndex = state.currentIndex;
+        String storeName = authCubit.state.store?.name ?? 'Unnamed Store';
         String title = switch (currentIndex) {
-          0 => authCubit.state.store?.name ?? 'Unnamed Store',
-          1 => 'Notification'.tr(),
-          2 => 'Orders'.tr(),
-          _ => 'Profile'.tr(),
+          0 => storeName,
+          1 => '$storeName\'s ${'Notification'.tr()}',
+          2 => '$storeName\'s ${'Orders'.tr()}',
+          _ => '$storeName\'s ${'Profile'.tr()}',
         };
 
         return Scaffold(

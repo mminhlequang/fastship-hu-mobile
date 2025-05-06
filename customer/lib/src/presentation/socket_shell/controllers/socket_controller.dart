@@ -28,6 +28,8 @@ class CustomerSocketController {
 
   final ValueNotifier<AppOrderProcessStatus?> orderStatus =
       ValueNotifier<AppOrderProcessStatus?>(null);
+  final ValueNotifier<AppOrderStoreStatus?> statusStore =
+      ValueNotifier<AppOrderStoreStatus?>(null);
   final ValueNotifier<bool> socketConnected = ValueNotifier<bool>(false);
   final ValueNotifier<LatLng?> driverLocation = ValueNotifier<LatLng?>(null);
 
@@ -68,13 +70,15 @@ class CustomerSocketController {
         _onCreateOrderResult(data);
       });
 
-      // Xử lý khi trạng thái đơn hàng thay đổi
+      // Xử lý khi trạng thái đơn hàng thay đổi từ driver
       socket?.on('order_status_updated', (data) async {
         debugPrint('[Debug socket] order_status_updated: $data');
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
           orderStatus.value = AppOrderProcessStatus.values
               .byName(socketResponse.data!['processStatus']);
+          statusStore.value = AppOrderStoreStatus.values
+              .byName(socketResponse.data!['storeStatus']);
           _refreshOrder();
         }
       });
@@ -165,33 +169,44 @@ class CustomerSocketController {
   void _onCreateOrderResult(dynamic data) async {
     final socketResponse = _parseSocketResponse(data);
     if (socketResponse.isSuccess && socketResponse.data != null) {
-      AppFindDriverStatus findDriverStatus = AppFindDriverStatus.values
-          .byName(socketResponse.data!['find_driver_status']);
-      switch (findDriverStatus) {
-        case AppFindDriverStatus.finding:
-          break;
-        case AppFindDriverStatus.availableDrivers:
-          break;
-        case AppFindDriverStatus.found:
-          orderStatus.value = AppOrderProcessStatus.driverAccepted;
-          socket?.on(
-              'driver_${socketResponse.data!['driverInfo']?['profile']?['id']}',
-              (data) {
-            debugPrint(
-                'Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
-          });
-          await Future.delayed(Duration(seconds: 1));
-          await _refreshOrder();
-          if (!_createOrderCompleter.isCompleted) {
-            _createOrderCompleter.complete(true);
-          }
-          break;
-        case AppFindDriverStatus.noDriver:
-        case AppFindDriverStatus.error:
-          if (!_createOrderCompleter.isCompleted) {
-            _createOrderCompleter.complete(false);
-          }
-          break;
+      AppOrderProcessStatus processStatus = AppOrderProcessStatus.values
+          .byName(socketResponse.data!['process_status']);
+
+      if (processStatus == AppOrderProcessStatus.storeAccepted) {
+        await Future.delayed(Duration(seconds: 1));
+        await _refreshOrder();
+        if (!_createOrderCompleter.isCompleted) {
+          _createOrderCompleter.complete(true);
+        }
+      } else {
+        AppFindDriverStatus findDriverStatus = AppFindDriverStatus.values
+            .byName(socketResponse.data!['find_driver_status']);
+        switch (findDriverStatus) {
+          case AppFindDriverStatus.finding:
+            break;
+          case AppFindDriverStatus.availableDrivers:
+            break;
+          case AppFindDriverStatus.found:
+            orderStatus.value = AppOrderProcessStatus.driverAccepted;
+            socket?.on(
+                'driver_${socketResponse.data!['driverInfo']?['profile']?['id']}',
+                (data) {
+              debugPrint(
+                  'Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
+            });
+            await Future.delayed(Duration(seconds: 1));
+            await _refreshOrder();
+            if (!_createOrderCompleter.isCompleted) {
+              _createOrderCompleter.complete(true);
+            }
+            break;
+          case AppFindDriverStatus.noDriver:
+          case AppFindDriverStatus.error:
+            if (!_createOrderCompleter.isCompleted) {
+              _createOrderCompleter.complete(false);
+            }
+            break;
+        }
       }
     }
   }

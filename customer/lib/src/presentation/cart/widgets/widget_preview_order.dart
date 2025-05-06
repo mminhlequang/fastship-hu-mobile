@@ -319,30 +319,19 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           }
         }
 
-        if (deliveryType == AppOrderDeliveryType.pickup) {
-          processer.value = SheetProcessStatus.createPickupSuccess;
-          Timer(
-            const Duration(seconds: 2),
-            () async {
-              context.pop();
-              context.pushReplacement('/checkout-tracking',
-                  extra: orderResponse.order);
-            },
-          );
-          return;
-        }
-
         final socketResult =
             await socketController.createOrder(orderResponse.order!);
         if (socketResult) {
-          processer.value = SheetProcessStatus.findingDriverSuccess;
+          if (deliveryType == AppOrderDeliveryType.pickup) {
+            processer.value = SheetProcessStatus.createPickupSuccess;
+          } else {
+            processer.value = SheetProcessStatus.findingDriverSuccess;
+          }
           Timer(
             const Duration(seconds: 2),
             () async {
               context.pop();
-              if (socketResult) {
-                context.pushReplacement('/checkout-tracking');
-              }
+              context.pushReplacement('/checkout-tracking');
             },
           );
         } else {

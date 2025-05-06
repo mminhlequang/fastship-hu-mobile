@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 
 import '../base/bloc.dart';
 import '../presentation/notifications/cubit/notification_cubit.dart';
+import '../presentation/socket_shell/controllers/socket_controller.dart';
 
 
 final getIt = GetIt.instance;
@@ -17,4 +18,5 @@ void getItSetup() {
   getIt.registerSingleton<AuthCubit>(AuthCubit());
   getIt.registerSingleton<NavigationCubit>(NavigationCubit());
   getIt.registerSingleton<NotificationCubit>(NotificationCubit());
+  getIt.registerSingleton<CustomerSocketController>(CustomerSocketController());
 }

@@ -1,4 +1,3 @@
-
 part of 'network_resources.dart';
 
 const String appCurrency = "HUF";
@@ -14,7 +13,8 @@ const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
 const String socketIOUrl =
-    kDebugMode ? "http://192.168.1.7:3000" : "http://157.230.101.76.45:3000";
+    kDebugMode ? "http://192.168.1.6:3000" :
+    "http://164.90.171.63:3000";
 
 enum AppOrderDeliveryType {
   ship, // Giao hàng
@@ -23,7 +23,7 @@ enum AppOrderDeliveryType {
 
 enum AppOrderStoreStatus {
   pending, // Đang chờ
-  accepted, // Đã chấp nhận đơn
+  // accepted, // Đã chấp nhận đơn
   rejected, // Đã từ chối đơn
   completed, // Đã hoàn thành đơn
 }
@@ -58,7 +58,6 @@ enum AppOrderType {
   delivery, // Giao hàng
   pickup, // Món đặt lấy
 }
-
 
 String distanceFormatted(num metter) {
   if (metter < 1000) {

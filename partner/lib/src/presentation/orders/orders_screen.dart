@@ -80,14 +80,21 @@ class _OrdersScreenState extends State<OrdersScreen>
         setState(() {});
         _mapParamByStatus = switch (index) {
           0 => {"store_status": AppOrderStoreStatus.pending.name},
-          1 => {"store_status": AppOrderStoreStatus.accepted.name},
+          // 1 => {"store_status": AppOrderStoreStatus.accepted.name},
           2 => {"store_status": AppOrderStoreStatus.completed.name},
           3 => {"store_status": AppOrderStoreStatus.rejected.name},
           _ => {},
         };
         _loadData();
       },
-      tabs: ["New", "Processing", "Completed", "Canceled"],
+
+      tabs: ["New/Processing", "Completed", "Canceled"],
+      tabColors: [
+        orderStatusNew,
+        // orderStatusProcessing,
+        orderStatusCompleted,
+        orderStatusCanceled,
+      ],
       body: _ordersByStatus,
     );
   }
@@ -139,19 +146,19 @@ class _OrdersScreenState extends State<OrdersScreen>
 
     switch (order.storeStatusEnum) {
       case AppOrderStoreStatus.pending:
-        color = Colors.yellow;
+        color = orderStatusNew;
         statusText = 'Pending';
-        description = 'New order at ${order.timeOrder}';
-      case AppOrderStoreStatus.accepted:
-        color = Colors.green;
-        statusText = 'Accepted';
-        description = 'Order is being processed';
+        description = 'Order at ${order.timeOrder}';
+      // case AppOrderStoreStatus.accepted:
+      //   color = orderStatusProcessing;
+      //   statusText = 'Accepted';
+      //   description = 'Order is being processed';
       case AppOrderStoreStatus.rejected:
-        color = Colors.red;
+        color = orderStatusCanceled;
         statusText = 'Rejected';
         description = 'Order is rejected';
       case AppOrderStoreStatus.completed:
-        color = Colors.blue;
+        color = orderStatusCompleted;
         statusText = 'Completed';
         description = 'Order is completed';
     }
@@ -179,20 +186,36 @@ class _OrdersScreenState extends State<OrdersScreen>
               style: w400TextStyle(fontSize: 12.sw, color: grey1),
             ),
             Gap(16.sw),
-            Text(
-              order.store?.name ?? '',
-              style: w400TextStyle(),
+            // Text(
+            //   order.store?.name ?? '',
+            //   style: w400TextStyle(),
+            // ),
+            // _divider,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Delivery type'.tr(),
+                  style: w400TextStyle(),
+                ),
+                Text(
+                  order.deliveryTypeEnum.name,
+                  style: w400TextStyle(
+                    color: color,
+                  ),
+                ),
+              ],
             ),
             _divider,
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Status'.tr(),
+                  'Processing status'.tr(),
                   style: w400TextStyle(),
                 ),
                 Text(
-                  statusText ?? '',
+                  order.processStatusEnum.name,
                   style: w400TextStyle(
                     color: color,
                   ),

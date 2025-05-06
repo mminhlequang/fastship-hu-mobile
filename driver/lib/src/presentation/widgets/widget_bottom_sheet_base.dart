@@ -56,11 +56,12 @@ class WidgetAppBaseSheet extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.fromLTRB(16.sw, 4.sw, 6.sw, 4.sw),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          title,
-                          style: w600TextStyle(fontSize: 16.sw, color: grey1),
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: w600TextStyle(fontSize: 16.sw, color: grey1),
+                          ),
                         ),
                         if (actions != null)
                           ...actions!

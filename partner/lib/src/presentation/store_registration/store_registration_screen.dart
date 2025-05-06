@@ -320,15 +320,17 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text('Store registration'.tr()),
-            leading: BackButton(
-              onPressed: () {
-                if (state.currentStep1 > 1) {
-                  cubit.previousStep1();
-                } else {
-                  appContext.pop();
-                }
-              },
-            ),
+            leading: context.canPop() || state.currentStep1 > 1
+                ? BackButton(
+                    onPressed: () {
+                      if (state.currentStep1 > 1) {
+                        cubit.previousStep1();
+                      } else {
+                        appContext.pop();
+                      }
+                    },
+                  )
+                : null,
           ),
           body: Column(
             children: [

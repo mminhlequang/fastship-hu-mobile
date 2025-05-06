@@ -2,7 +2,7 @@ import 'package:network_resources/models/opening_time_model.dart';
 import 'package:network_resources/product/model/product.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:network_resources/topping/models/models.dart';
-import 'package:app/src/presentation/detail_order/detail_order_screen.dart';
+import 'package:app/src/presentation/order_detail/detail_order_screen.dart';
 import 'package:app/src/presentation/help_center/help_center_screen.dart';
 import 'package:app/src/presentation/menu/menu_screen.dart';
 import 'package:app/src/presentation/menu/widgets/widget_add_topping_group.dart';
@@ -42,7 +42,6 @@ GlobalKey<NavigatorState> get appNavigatorKey =>
     findInstance<GlobalKey<NavigatorState>>();
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
-
 
 clearAllRouters([String? router]) {
   try {
@@ -131,11 +130,6 @@ final goRouter = GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: '/merchant-onboarding',
-      pageBuilder:
-          _defaultPageBuilder((state) => const MerchantOnboardingScreen()),
-    ),
     ShellRoute(
       parentNavigatorKey: appNavigatorKey,
       pageBuilder: (context, state, child) {
@@ -146,6 +140,11 @@ final goRouter = GoRouter(
         );
       },
       routes: [
+        GoRoute(
+          path: '/merchant-onboarding',
+          pageBuilder:
+              _defaultPageBuilder((state) => const MerchantOnboardingScreen()),
+        ),
         GoRoute(
           path: '/navigation',
           pageBuilder: _defaultPageBuilder((state) => const NavigationScreen()),
@@ -187,8 +186,8 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/detail-order',
-          pageBuilder:
-              _defaultPageBuilder((state) => DetailOrderScreen(id: state.extra as int)),
+          pageBuilder: _defaultPageBuilder(
+              (state) => DetailOrderScreen(id: state.extra as int)),
         ),
         GoRoute(
           path: '/ratings',

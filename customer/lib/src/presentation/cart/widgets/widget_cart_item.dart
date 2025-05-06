@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/cart/models/models.dart';
-import 'package:network_resources/network_resources.dart'; 
+import 'package:network_resources/network_resources.dart';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/cart/cubit/cart_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
-
 
 class WidgetCartItem extends StatelessWidget {
   final CartModel cart;
@@ -229,7 +228,7 @@ class __WidgetItemState extends State<_WidgetItem> {
           fit: BoxFit.cover,
           radius: 8,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +239,7 @@ class __WidgetItemState extends State<_WidgetItem> {
                   fontSize: 14.sw,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.sw),
               Text(
                 descText,
                 maxLines: 1,
@@ -250,29 +249,33 @@ class __WidgetItemState extends State<_WidgetItem> {
                   color: const Color(0xFF847D79),
                 ),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 8.sw),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        currencyFormatted(cartItem.product?.priceCompare ?? 0),
-                        style: w400TextStyle(
-                          fontSize: 16.sw,
-                          color: const Color(0xFFA6A0A0),
-                          decoration: TextDecoration.lineThrough,
-                        ),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "${currencyFormatted(
+                                    cartItem.product?.priceCompare ?? 0)}\n",
+                            style: w400TextStyle(
+                              fontSize: 14.sw,
+                              color: const Color(0xFFA6A0A0),
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                                currencyFormatted(cartItem.product?.price ?? 0),
+                            style: w600TextStyle(
+                              fontSize: 16.sw,
+                              color: appColorPrimaryOrange,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        currencyFormatted(cartItem.product?.price ?? 0),
-                        style: w600TextStyle(
-                          fontSize: 16.sw,
-                          color: const Color(0xFFF17228),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(

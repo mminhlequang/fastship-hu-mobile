@@ -15,7 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/cart/models/models.dart';
-import 'package:network_resources/network_resources.dart'; 
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -69,181 +69,191 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: socketController.orderStatus,
-        builder: (context, value, child) {
-          if (currentOrder == null) return SizedBox();
-          OrderModel order = currentOrder!;
-          return Scaffold(
-            body: Stack(
-              children: [
-                Column(
-                  children: [
-                    WidgetAppBar(
-                      title: 'Order Tracking'.tr(),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            appHaptic();
-                            context.push('/help-center');
-                          },
-                          child: Text('Need help?'.tr(),
-                              style: w400TextStyle(
-                                  fontSize: 16.sw,
-                                  color: appColorPrimaryOrange)),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: ValueListenableBuilder(
-                          valueListenable: socketController.driverLocation,
-                          builder: (context, driverLocation, child) {
-                            // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
-                            List<LatLng> polylinePoints = [];
-                            if (order.shipPolyline?.isNotEmpty ?? false) {
-                              try {
-                                polylinePoints =
-                                    FlexiblePolyline.decode(order.shipPolyline!)
-                                        .map((e) => LatLng(e.lat, e.lng))
-                                        .toList();
-                              } catch (e) {
-                                debugPrint('Error decoding polyline: $e');
-                              }
-                            }
-
-                            List<Marker> markers = [
-                              Marker(
-                                point: LatLng(
-                                  order.store!.lat!,
-                                  order.store!.lng!,
-                                ),
-                                width: 36.sw,
-                                height: 36.sw,
-                                child: AvatarGlow(
-                                  glowColor: appColorPrimary,
-                                  duration: const Duration(milliseconds: 2000),
-                                  repeat: true,
-                                  child: WidgetAvatar(
-                                    imageUrl: order.store!.avatarImage,
-                                    radius1: 18.sw,
-                                    radius2: 18.sw - 2,
-                                    radius3: 18.sw - 2,
-                                    borderColor: Colors.white,
-                                  ),
-                                ),
+        valueListenable: socketController.statusStore,
+        builder: (context, statusStore, child) {
+          return ValueListenableBuilder(
+              valueListenable: socketController.orderStatus,
+              builder: (context, processStatus, child) {
+                if (currentOrder == null) return SizedBox();
+                OrderModel order = currentOrder!;
+                return Scaffold(
+                  body: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          WidgetAppBar(
+                            title: 'Order Tracking'.tr(),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  appHaptic();
+                                  context.push('/help-center');
+                                },
+                                child: Text('Need help?'.tr(),
+                                    style: w400TextStyle(
+                                        fontSize: 16.sw,
+                                        color: appColorPrimaryOrange)),
                               ),
-                              if (order.driver != null &&
-                                  driverLocation != null)
-                                Marker(
-                                  point: LatLng(
-                                    driverLocation.latitude,
-                                    driverLocation.longitude,
-                                  ),
-                                  width: 36.sw,
-                                  height: 36.sw,
-                                  child: WidgetAvatar(
-                                    imageUrl: order.driver!.avatar ?? '',
-                                    radius1: 18.sw,
-                                    radius2: 18.sw - 2,
-                                    radius3: 18.sw - 2,
-                                    borderColor: Colors.white,
-                                  ),
-                                ),
-                              Marker(
-                                point: LatLng(
-                                  order.lat!,
-                                  order.lng!,
-                                ),
-                                width: 36,
-                                height: 36,
-                                child: AvatarGlow(
-                                  glowColor: appColorPrimary,
-                                  duration: const Duration(milliseconds: 2000),
-                                  repeat: true,
-                                  child: WidgetAvatar(
-                                    imageUrl: order.customer!.avatar,
-                                    radius1: 18.sw,
-                                    radius2: 18.sw - 2,
-                                    radius3: 18.sw - 2,
-                                    borderColor: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ];
+                            ],
+                          ),
+                          Expanded(
+                            child: ValueListenableBuilder(
+                                valueListenable:
+                                    socketController.driverLocation,
+                                builder: (context, driverLocation, child) {
+                                  // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
+                                  List<LatLng> polylinePoints = [];
+                                  if (order.shipPolyline?.isNotEmpty ?? false) {
+                                    try {
+                                      polylinePoints = FlexiblePolyline.decode(
+                                              order.shipPolyline!)
+                                          .map((e) => LatLng(e.lat, e.lng))
+                                          .toList();
+                                    } catch (e) {
+                                      debugPrint('Error decoding polyline: $e');
+                                    }
+                                  }
 
-                            mapController.future.then((controller) {
-                              updateMapToBoundsLatLng(
-                                markers.map((e) => e.point).toList(),
-                                controller,
-                              );
-                            });
-
-                            return WidgetAppFlutterMapAnimation(
-                              mapController: mapController,
-                              initialCenter: LatLng(
-                                order.lat!,
-                                order.lng!,
-                              ),
-                              markers: markers,
-                              polylines: [
-                                if (!isPickup)
-                                  Polyline(
-                                    pattern: const StrokePattern.dotted(
-                                      spacingFactor: 1.5,
-                                      patternFit: PatternFit.scaleUp,
+                                  List<Marker> markers = [
+                                    Marker(
+                                      point: LatLng(
+                                        order.store!.lat!,
+                                        order.store!.lng!,
+                                      ),
+                                      width: 36.sw,
+                                      height: 36.sw,
+                                      child: AvatarGlow(
+                                        glowColor: appColorPrimary,
+                                        duration:
+                                            const Duration(milliseconds: 2000),
+                                        repeat: true,
+                                        child: WidgetAvatar(
+                                          imageUrl: order.store!.avatarImage,
+                                          radius1: 18.sw,
+                                          radius2: 18.sw - 2,
+                                          radius3: 18.sw - 2,
+                                          borderColor: Colors.white,
+                                        ),
+                                      ),
                                     ),
-                                    color: appColorPrimary,
-                                    strokeWidth: 6.0,
-                                    borderColor: Colors.white,
-                                    borderStrokeWidth: 1.0,
-                                    points: polylinePoints,
-                                  )
+                                    if (order.driver != null &&
+                                        driverLocation != null)
+                                      Marker(
+                                        point: LatLng(
+                                          driverLocation.latitude,
+                                          driverLocation.longitude,
+                                        ),
+                                        width: 36.sw,
+                                        height: 36.sw,
+                                        child: WidgetAvatar(
+                                          imageUrl: order.driver!.avatar ?? '',
+                                          radius1: 18.sw,
+                                          radius2: 18.sw - 2,
+                                          radius3: 18.sw - 2,
+                                          borderColor: Colors.white,
+                                        ),
+                                      ),
+                                    Marker(
+                                      point: LatLng(
+                                        order.lat!,
+                                        order.lng!,
+                                      ),
+                                      width: 36,
+                                      height: 36,
+                                      child: AvatarGlow(
+                                        glowColor: appColorPrimary,
+                                        duration:
+                                            const Duration(milliseconds: 2000),
+                                        repeat: true,
+                                        child: WidgetAvatar(
+                                          imageUrl: order.customer!.avatar,
+                                          radius1: 18.sw,
+                                          radius2: 18.sw - 2,
+                                          radius3: 18.sw - 2,
+                                          borderColor: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ];
+
+                                  mapController.future.then((controller) {
+                                    updateMapToBoundsLatLng(
+                                      markers.map((e) => e.point).toList(),
+                                      controller,
+                                    );
+                                  });
+
+                                  return WidgetAppFlutterMapAnimation(
+                                    mapController: mapController,
+                                    initialCenter: LatLng(
+                                      order.lat!,
+                                      order.lng!,
+                                    ),
+                                    markers: markers,
+                                    polylines: [
+                                      if (!isPickup)
+                                        Polyline(
+                                          pattern: const StrokePattern.dotted(
+                                            spacingFactor: 1.5,
+                                            patternFit: PatternFit.scaleUp,
+                                          ),
+                                          color: appColorPrimary,
+                                          strokeWidth: 6.0,
+                                          borderColor: Colors.white,
+                                          borderStrokeWidth: 1.0,
+                                          points: polylinePoints,
+                                        )
+                                    ],
+                                    initialZoom: 14,
+                                  );
+                                }),
+                          ),
+                        ],
+                      ),
+                      SlidingUpPanel(
+                        controller: _panelController,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 20,
+                            offset: const Offset(0, -4),
+                          ),
+                        ],
+                        minHeight:
+                            320.sw + MediaQuery.of(context).padding.bottom,
+                        maxHeight:
+                            580.sw + MediaQuery.of(context).padding.bottom,
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        panel: SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(
+                            children: [
+                              if (isPickup) ...[
+                                _buildStoreStatus(statusStore ??
+                                    AppOrderStoreStatus.accepted),
+                              ] else ...[
+                                _buildProcessStatus(processStatus ??
+                                    AppOrderProcessStatus.pending),
                               ],
-                              initialZoom: 14,
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-                SlidingUpPanel(
-                  controller: _panelController,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, -4),
-                    ),
-                  ],
-                  minHeight: 320.sw + MediaQuery.of(context).padding.bottom,
-                  maxHeight: 580.sw + MediaQuery.of(context).padding.bottom,
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(16)),
-                  panel: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      children: [
-                        if (isPickup) ...[
-                          _buildStoreStatus(order.storeStatusEnum),
-                        ] else ...[
-                          _buildProcessStatus(
-                              value ?? AppOrderProcessStatus.pending),
-                        ],
-                        SizedBox(height: 12.sw),
-                        if (!isPickup) ...[
-                          _buildDriverInfo(order),
-                        ],
-                        _buildAddressCard(order),
-                        _buildOrderSummary(order),
-                        SizedBox(
-                            height:
-                                40 + MediaQuery.of(context).viewInsets.bottom),
-                      ],
-                    ),
+                              SizedBox(height: 12.sw),
+                              if (!isPickup) ...[
+                                _buildDriverInfo(order),
+                              ],
+                              _buildAddressCard(order),
+                              _buildOrderSummary(order),
+                              SizedBox(
+                                  height: 40 +
+                                      MediaQuery.of(context).viewInsets.bottom),
+                            ],
+                          ),
+                        ),
+                        body: Container(),
+                      ),
+                    ],
                   ),
-                  body: Container(),
-                ),
-              ],
-            ),
-          );
+                );
+              });
         });
   }
 

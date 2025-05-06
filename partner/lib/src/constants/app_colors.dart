@@ -7,6 +7,12 @@ Color get appColorPrimary => AppColors.instance.primary;
 Color get appColorPrimaryOrange => hexColor('#F17228');
 Color get appColorPrimaryRed => Colors.red;
 
+// Order status colors
+Color get orderStatusNew => hexColor('#FFA142'); // Orange
+Color get orderStatusProcessing => hexColor('#0085FF'); // Blue
+Color get orderStatusCompleted => hexColor('#12AD2A'); // Green
+Color get orderStatusCanceled => hexColor('#EE4444'); // Red
+
 Color get appColorPrimaryDark => hexColor('12AD2A');
 Color get appColorBackground => AppColors.instance.background;
 Color get appColorElement => AppColors.instance.element;

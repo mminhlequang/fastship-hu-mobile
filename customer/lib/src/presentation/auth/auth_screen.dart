@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/options.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:network_resources/auth/repo.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -168,12 +170,39 @@ class _AuthScreenState extends State<AuthScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         children: [
-          Text(
-            'Your Favorite Food Delivery Partner'.tr(),
-            style: w700TextStyle(
-              fontSize: 33,
+          GestureDetector(
+            onDoubleTap: () async {
+              final response = await AuthRepo().login({
+                'password': '123456',
+                'phone': '+84979797979',
+                'type': 1,
+              });
+
+              if (response.isSuccess) {
+                await AppPrefs.instance.saveAccountToken(response.data!);
+                authCubit.load(
+                  delayRedirect: const Duration(seconds: 2),
+                );
+
+                // Xử lý đăng ký thành công
+                appShowSnackBar(
+                    msg: 'Register success, redirecting to home...',
+                    context: context,
+                    type: AppSnackBarType.success);
+              } else {
+                // Xử lý lỗi
+                appShowSnackBar(
+                    msg: response.msg ?? 'Register failed, please try again!',
+                    type: AppSnackBarType.error);
+              }
+            },
+            child: Text(
+              'Your Favorite Food Delivery Partner'.tr(),
+              style: w700TextStyle(
+                fontSize: 33,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(

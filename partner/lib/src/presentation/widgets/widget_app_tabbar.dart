@@ -1,6 +1,7 @@
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:internal_core/setup/app_textstyles.dart';
 
 class WidgetAppTabBar extends StatelessWidget {
@@ -8,6 +9,7 @@ class WidgetAppTabBar extends StatelessWidget {
     super.key,
     required this.tabController,
     this.tabs = const [],
+    this.tabColors = const [],
     this.tabWidgets,
     this.body,
     this.children = const [],
@@ -20,6 +22,7 @@ class WidgetAppTabBar extends StatelessWidget {
 
   final TabController tabController;
   final List<String> tabs;
+  final List<Color>? tabColors;
   final List<Widget>? tabWidgets;
   final Widget? body;
   final List<Widget> children;
@@ -41,11 +44,18 @@ class WidgetAppTabBar extends StatelessWidget {
             isScrollable: isScrollable,
             tabs: tabWidgets ??
                 tabs
-                    .map((e) => Tab(
+                    .mapIndexed((index, e) => Tab(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(e),
+                              Text(
+                                e,
+                                style: w400TextStyle(
+                                    fontSize: 14.sw,
+                                    color: tabColors?.isNotEmpty == true
+                                        ? tabColors![index]
+                                        : appColorText),
+                              ),
                               if (count != null)
                                 Padding(
                                   padding: EdgeInsets.only(left: 4.sw),
@@ -59,7 +69,9 @@ class WidgetAppTabBar extends StatelessWidget {
                                     child: Center(
                                       child: Text(
                                         '$count',
-                                        style: w400TextStyle(fontSize: 10.sw, color: Colors.white),
+                                        style: w400TextStyle(
+                                            fontSize: 10.sw,
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ),
