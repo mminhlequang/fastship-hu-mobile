@@ -231,7 +231,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                             children: [
                               if (isPickup) ...[
                                 _buildStoreStatus(statusStore ??
-                                    AppOrderStoreStatus.accepted),
+                                    AppOrderStoreStatus.pending),
                               ] else ...[
                                 _buildProcessStatus(processStatus ??
                                     AppOrderProcessStatus.pending),
