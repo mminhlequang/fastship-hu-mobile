@@ -75,10 +75,14 @@ class CustomerSocketController {
         debugPrint('[Debug socket] order_status_updated: $data');
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
-          orderStatus.value = AppOrderProcessStatus.values
-              .byName(socketResponse.data!['processStatus']);
-          statusStore.value = AppOrderStoreStatus.values
-              .byName(socketResponse.data!['storeStatus']);
+          if (socketResponse.data!['processStatus'] != null) {
+            orderStatus.value = AppOrderProcessStatus.values
+                .byName(socketResponse.data!['processStatus']);
+          }
+          if (socketResponse.data!['storeStatus'] != null) {
+            statusStore.value = AppOrderStoreStatus.values
+                .byName(socketResponse.data!['storeStatus']);
+          }
           _refreshOrder();
         }
       });
@@ -209,6 +213,50 @@ class CustomerSocketController {
         }
       }
     }
+  }
+
+  late Completer<bool> _userPickedUpCompleter;
+  Future<bool> userPickedUp(String orderId) async {
+    if (currentOrder != null && socket?.connected == true) {
+      _userPickedUpCompleter = Completer<bool>();
+    
+      debugPrint(
+          'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: $orderId  ');
+      orderStatus.value = AppOrderProcessStatus.completed;
+      statusStore.value = AppOrderStoreStatus.completed;
+
+      // Gửi cập nhật lên server
+      socket?.emit('complete_order', {
+        'orderId': orderId,
+      });
+
+      // Lắng nghe phản hồi
+      socket?.once('order_completed_confirmation', (data) {
+        final socketResponse = _parseSocketResponse(data);
+        _userPickedUpCompleter.complete();
+        if (socketResponse.isSuccess) {
+          debugPrint(
+              'Debug socket: Trạng thái đơn hàng đã được hoàn thành thành công');
+
+          currentOrder = null;
+
+          Timer(const Duration(seconds: 10), () {
+            orderStatus.value = AppOrderProcessStatus.pending;
+          });
+        } else {
+          // orderStatus.value = AppOrderProcessStatus.completed;
+          debugPrint(
+              'Debug socket: Lỗi khi hoàn thành đơn hàng: ${socketResponse.messageCode}');
+          // appShowSnackBar(msg: 'Error when complete order'.tr());
+        }
+      });
+      return await _userPickedUpCompleter.future;
+    } else {
+      debugPrint(
+          'Debug socket: Không thể cập nhật trạng thái - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
+   
+      return false;
+       }
   }
 
 // Cập nhật phương thức để hủy đơn hàng

@@ -298,7 +298,7 @@ class __CategorySectionState extends State<_CategorySection> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        16.h,
         ValueListenableBuilder(
             valueListenable: widget.categoryNotifier,
             builder: (context, value, child) {
@@ -734,7 +734,7 @@ class __NewsSectionState extends State<_NewsSection> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        16.h,
         SingleChildScrollView(
           clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
@@ -797,7 +797,7 @@ class _PartnerSection extends StatelessWidget {
           "Let's be partners now!".tr(),
           style: w400TextStyle(fontSize: 20.sw),
         ),
-        const SizedBox(height: 16),
+        16.h,
         Row(
           children: [
             _buildPartnerCard(
@@ -940,13 +940,13 @@ class _LocationHeader extends StatelessWidget {
                           ),
                         );
                       }),
-                  const SizedBox(width: 4),
-                  WidgetAppSVG(
-                    'icon3',
-                    width: 18.sw,
-                    height: 18.sw,
-                    fit: BoxFit.contain,
-                  ),
+                  // const SizedBox(width: 4),
+                  // WidgetAppSVG(
+                  //   'icon3',
+                  //   width: 18.sw,
+                  //   height: 18.sw,
+                  //   fit: BoxFit.contain,
+                  // ),
                 ],
               ),
             ],

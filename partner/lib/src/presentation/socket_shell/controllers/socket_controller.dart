@@ -1,4 +1,5 @@
 import 'package:app/src/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:network_resources/network_resources.dart';
 import 'dart:convert';
 
@@ -125,6 +126,37 @@ class CustomerSocketController {
       debugPrint('Debug socket: Gửi token xác thực');
       socket?.emit('authenticate_customer',
           {'token': await AppPrefs.instance.getNormalToken()});
+    }
+  }
+
+  void updateStoreStatus(id, AppOrderStoreStatus storeStatus,
+        {VoidCallback? onSuccess}) {
+    if (socket?.connected == true) {
+      // debugPrint(
+      //     'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: ${currentOrder!.id} -> $status');
+
+      // Gửi cập nhật lên server
+      socket?.emit('update_order_status', {
+        'orderId': id,
+        'storeStatus': storeStatus.name,
+      });
+
+      // Lắng nghe phản hồi
+      socket?.once('order_status_updated_confirmation', (data) {
+        onSuccess?.call();
+        final socketResponse = _parseSocketResponse(data);
+        if (socketResponse.isSuccess) {
+          debugPrint(
+              'Debug socket: Trạng thái đơn hàng đã được cập nhật thành công');
+        } else {
+          debugPrint(
+              'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
+          appShowSnackBar(msg: 'Error when update order status'.tr());
+        }
+      });
+    } else {
+      debugPrint(
+          'Debug socket: Không thể cập nhật trạng thái - socket kết nối: ${socket?.connected}');
     }
   }
 

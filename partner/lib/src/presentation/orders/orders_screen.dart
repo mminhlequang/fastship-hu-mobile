@@ -1,7 +1,7 @@
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:internal_core/setup/app_utils.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/order.dart';
 import 'package:network_resources/order/repo.dart';
@@ -13,7 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadData();
   }
 
@@ -163,9 +163,10 @@ class _OrdersScreenState extends State<OrdersScreen>
         description = 'Order is completed';
     }
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         appHaptic();
-        appContext.push('/detail-order', extra: order.id);
+        await appContext.push('/detail-order', extra: order.id);
+        _loadData();
       },
       child: Container(
         padding: EdgeInsets.all(12.sw),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app/src/presentation/report/cubit/report_cubit.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart'; 
 import 'package:network_resources/network_resources.dart';
 
 class ReportView extends StatelessWidget {

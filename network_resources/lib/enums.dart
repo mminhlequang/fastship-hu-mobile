@@ -13,8 +13,8 @@ const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
 const String socketIOUrl =
-    kDebugMode ? "http://192.168.1.6:3000" :
-    "http://164.90.171.63:3000";
+    // kDebugMode ? "http://192.168.1.5:3000" :
+    "https://socket.mminhdev.io.vn";
 
 enum AppOrderDeliveryType {
   ship, // Giao hàng

@@ -3,8 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:network_resources/network_resources.dart';
 

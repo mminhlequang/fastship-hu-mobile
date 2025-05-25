@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:app/src/constants/app_colors.dart';
 import 'package:gap/gap.dart';
-import 'package:internal_core/extensions/context_extension.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 
 class WidgetAppBottomSheet extends StatelessWidget {
   static double get maxHeight =>

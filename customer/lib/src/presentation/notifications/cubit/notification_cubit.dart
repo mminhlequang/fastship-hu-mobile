@@ -2,7 +2,7 @@ import 'package:app/src/utils/app_get.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:internal_core/setup/app_utils.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/notification/models/models.dart';
 import 'package:network_resources/notification/repo.dart';
 

@@ -5,9 +5,8 @@ import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widgets.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 
 class WidgetBusinessType extends StatefulWidget {
   final List<int>? initialData;

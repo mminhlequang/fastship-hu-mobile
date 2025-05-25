@@ -43,31 +43,31 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
   final List<_SortOption> sortOptions = [
     _SortOption(
       id: 1,
-      label: 'Recommend',
+      label: 'Recommend'.tr(),
       fieldName: 'is_popular',
       value: 1,
     ),
     _SortOption(
       id: 2,
-      label: 'Best seller',
+      label: 'Best seller'.tr(),
       fieldName: 'is_topseller',
       value: 1,
     ),
     _SortOption(
       id: 3,
-      label: 'High rating',
+      label: 'High rating'.tr(),
       fieldName: 'is_topseller', //TODO: need correct
       value: 1,
     ),
     _SortOption(
       id: 4,
-      label: 'Preparation time',
+      label: 'Preparation time'.tr(),
       fieldName: 'is_topseller', //TODO: need correct
       value: 1,
     ),
     _SortOption(
       id: 5,
-      label: 'Delivery time',
+      label: 'Delivery time'.tr(),
       fieldName: 'is_topseller', //TODO: need correct
       value: 1,
     ),
@@ -75,7 +75,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
 
   int? _categoryIdSelected;
   List<int> subTypeIds = [];
-  RangeValues priceRange = const RangeValues(5.0, 200.0);
+  RangeValues priceRange = const RangeValues(2000.0, 10000.0);
 
   Map<String, dynamic> get paramFilters {
     var result = <String, dynamic>{};
@@ -165,7 +165,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildHeader(),
-                      const SizedBox(height: 16),
+                      16.h,
                       _buildSearchBar(),
                       const SizedBox(height: 12),
                       _buildSortBySection(),
@@ -190,7 +190,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Filter',
+          'Filter'.tr(),
           style: w500TextStyle(fontSize: 20.sw),
         ),
       ],
@@ -215,7 +215,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Search food, restaurant ...',
+              'Search food, restaurant ...'.tr(),
               style: TextStyle(
                 color: Color(0xFFAFAFAF),
                 fontFamily: 'Fredoka',
@@ -229,8 +229,8 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
               color: const Color(0xFF74CA45),
               borderRadius: BorderRadius.circular(56),
             ),
-            child: const Text(
-              'Search',
+            child:   Text(
+              'Search'.tr(),
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Fredoka',
@@ -421,11 +421,11 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        16.h,
         Row(
           children: [
             Text(
-              currencyFormatted(1),
+              currencyFormatted(1000),
               style: w400TextStyle(
                 color: appColorText2,
                 fontSize: 14.sw,
@@ -444,8 +444,8 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
                 ),
                 child: RangeSlider(
                   values: priceRange,
-                  min: 1.0,
-                  max: 1000.0,
+                  min: 1000.0,
+                  max: 100000.0,
                   onChanged: (RangeValues values) {
                     setState(() {
                       priceRange = values;
@@ -455,7 +455,7 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
               ),
             ),
             Text(
-              currencyFormatted(1000),
+              currencyFormatted(100000),
               style: w400TextStyle(
                 color: appColorText2,
                 fontSize: 14.sw,

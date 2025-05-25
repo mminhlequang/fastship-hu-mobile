@@ -1,11 +1,11 @@
+import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/store/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WidgetSheetRestaurantInfo extends StatelessWidget {
   final StoreModel store;
-  const WidgetSheetRestaurantInfo({Key? key, required this.store})
-      : super(key: key);
+  const WidgetSheetRestaurantInfo({super.key, required this.store});
 
   @override
   Widget build(BuildContext context) {
@@ -20,17 +20,17 @@ class WidgetSheetRestaurantInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildRestaurantInfo(),
-                  const SizedBox(height: 16),
+                  16.h,
                   const Divider(color: Color(0xFFEEEEEE)),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildRatingsSection(),
-                  const SizedBox(height: 16),
+                  16.h,
                   const Divider(color: Color(0xFFEEEEEE)),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildOverviewSection(),
-                  const SizedBox(height: 16),
+                  16.h,
                   const Divider(color: Color(0xFFEEEEEE)),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildAddressSection(),
                 ],
               ),
@@ -248,7 +248,7 @@ class WidgetSheetRestaurantInfo extends StatelessWidget {
             color: Color(0xFF120F0F),
           ),
         ),
-        const SizedBox(height: 16),
+        16.h,
         RichText(
           text: TextSpan(
             children: [
@@ -270,7 +270,7 @@ class WidgetSheetRestaurantInfo extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        16.h,
         _buildTimeRow('Monday - Friday', '10:00 - 22.00'),
         _buildTimeRow('Saturyday - Sunday', '12:00 - 20.00'),
       ],
@@ -288,7 +288,7 @@ class WidgetSheetRestaurantInfo extends StatelessWidget {
             color: Color(0xFF212121),
           ),
         ),
-        const SizedBox(height: 16),
+        16.h,
         Row(
           children: [
             SvgPicture.string(
@@ -307,7 +307,7 @@ class WidgetSheetRestaurantInfo extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        16.h,
         Container(
           height: 200,
           width: double.infinity,

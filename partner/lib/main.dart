@@ -10,8 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_portal/flutter_portal.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
+import 'package:internal_core/internal_core.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
@@ -89,7 +88,7 @@ class _AppState extends State<_App> {
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),
-          tabBarTheme: TabBarTheme(
+          tabBarTheme: TabBarThemeData(
             dividerHeight: 1.sw,
             dividerColor: hexColor('#F1F4F6'),
             indicator: _TabIndicator(),

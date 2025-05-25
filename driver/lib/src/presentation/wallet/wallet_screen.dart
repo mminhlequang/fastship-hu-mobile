@@ -312,10 +312,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   return Column(
                     children: [
                       Text(
-                        NumberFormat.currency(
-                          symbol: AppPrefs.instance.currencySymbol,
-                          decimalDigits: 1,
-                        ).format(state.wallet?.availableBalance ?? 0),
+                        currencyFormatted(state.wallet?.availableBalance ?? 0),
                         style: w500TextStyle(
                           fontSize: 40.sw,
                           color: Colors.white,
@@ -332,10 +329,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               color: Colors.white.withValues(alpha: .5)),
                         ),
                         child: Text(
-                          '${'Pending'.tr()} ${NumberFormat.currency(
-                            symbol: AppPrefs.instance.currencySymbol,
-                            decimalDigits: 1,
-                          ).format(state.wallet?.frozenBalance ?? 0)}',
+                          '${'Pending'.tr()} ${currencyFormatted(state.wallet?.frozenBalance ?? 0)}',
                           style: w400TextStyle(color: Colors.white),
                         ),
                       ),

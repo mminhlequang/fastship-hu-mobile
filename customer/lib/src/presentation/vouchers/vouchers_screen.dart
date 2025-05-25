@@ -109,14 +109,15 @@ class _VouchersScreenState extends State<VouchersScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    16.h,
                     DottedBorder(
-                      borderType: BorderType.RRect,
-                      radius: const Radius.circular(12),
-                      padding: const EdgeInsets.all(16),
-                      strokeWidth: 1,
-                      dashPattern: const [8, 4],
-                      color: const Color(0xFFCEC6C5),
+                      options: RoundedRectDottedBorderOptions(
+                        radius: Radius.circular(12),
+                        padding: EdgeInsets.all(16),
+                        strokeWidth: 1,
+                        dashPattern: [8, 4],
+                        color: Color(0xFFCEC6C5),
+                      ),
                       child: vouchers == null
                           ? _buildShimmerState()
                           : ListView.separated(

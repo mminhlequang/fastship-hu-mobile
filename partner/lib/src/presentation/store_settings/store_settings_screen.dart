@@ -7,7 +7,7 @@ import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
 class StoreSettingsScreen extends StatefulWidget {
@@ -30,8 +30,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             onTap: () => appContext.pushNamed('information'),
             radius: 0,
             child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -84,8 +83,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             },
             radius: 0,
             child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -129,8 +127,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             },
             radius: 0,
             child: Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -29,40 +29,32 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
   XFile? _avatarImage;
   XFile? _coverImage;
   final String? _currentAvatarUrl = authCubit.state.store!.avatarImage;
-  final String? _currentCoverUrl = authCubit.state.store!.bannerImages?.first.image;
+  final String? _currentCoverUrl =
+      authCubit.state.store!.bannerImages?.first.image;
 
   Future<void> _saveChanges() async {
     setLoading(true);
 
     try {
-      String? newAvatarUrl;
-      String? newCoverUrl;
-
-      // Upload new images if available
-      final uploadFutures = <Future>[];
+      String? newAvatarUrl = _currentAvatarUrl;
+      String? newCoverUrl = _currentCoverUrl;
 
       if (_avatarImage != null) {
-        uploadFutures
-            .add(StoreRepo().uploadImage(_avatarImage!.path, 'store_avatar'));
+        print('Debug: Uploading avatar image with path: ${_avatarImage!.path}');
+        final response =
+            await StoreRepo().uploadImage(_avatarImage!.path, 'store_avatar');
+        if (response.isSuccess) {
+          newAvatarUrl = response.data;
+        }
       }
 
       if (_coverImage != null) {
-        uploadFutures
-            .add(StoreRepo().uploadImage(_coverImage!.path, 'store_cover'));
-      }
-
-      final responses = await Future.wait(uploadFutures);
-
-      if (_avatarImage != null &&
-          responses.isNotEmpty &&
-          responses[0].isSuccess) {
-        newAvatarUrl = responses[0].data;
-      }
-
-      if (_coverImage != null &&
-          responses.length > 1 &&
-          responses[1].isSuccess) {
-        newCoverUrl = responses[1].data;
+        print('Debug: Uploading cover image with path: ${_coverImage!.path}');
+        final response =
+            await StoreRepo().uploadImage(_coverImage!.path, 'store_cover');
+        if (response.isSuccess) {
+          newCoverUrl = response.data;
+        }
       }
 
       // Gọi API update thông tin

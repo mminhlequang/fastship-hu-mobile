@@ -2,6 +2,7 @@ import 'package:app/src/base/auth/auth_cubit.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/wallet_banks_cards/banks_cards_screen.dart';
 import 'package:app/src/presentation/widgets/widget_bottom_sheet_base.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/transaction/models/models.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -71,10 +72,7 @@ class _WidgetTopUpSheetState extends State<WidgetTopUpSheet> {
                   ),
                 ),
                 Text(
-                  '${'Balance available'.tr()}: ${NumberFormat.currency(
-                    symbol: AppPrefs.instance.currencySymbol,
-                    decimalDigits: 1,
-                  ).format(state.wallet?.availableBalance ?? 0)}',
+                  '${'Balance available'.tr()}: ${currencyFormatted(state.wallet?.availableBalance ?? 0)}',
                   style: w400TextStyle(color: grey1),
                 ),
                 Gap(40.sw),
@@ -172,10 +170,7 @@ class _WidgetWithdrawSheetState extends State<WidgetWithdrawSheet> {
                 ),
               ),
               Text(
-                '${'Balance available'.tr()}: ${NumberFormat.currency(
-                  symbol: AppPrefs.instance.currencySymbol,
-                  decimalDigits: 1,
-                ).format(state.wallet?.availableBalance ?? 0)}',
+                '${'Balance available'.tr()}: ${currencyFormatted(state.wallet?.availableBalance ?? 0)}',
                 style: w400TextStyle(color: grey1),
               ),
               Gap(40.sw),

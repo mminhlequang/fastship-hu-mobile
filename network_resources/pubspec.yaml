@@ -15,12 +15,12 @@ dependencies:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
       path: core/
-      ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
+      ref: 9ebecbeadacbe7cb259e29d8cf8c956ae43b2890
   internal_network:
     git:
       url: https://github.com/mminhlequang/internal_libs_flutter.git
       path: network/
-      ref: 4b6abaac09604876311b80a3df2e7bf0b2ea3d5a
+      ref: 9ebecbeadacbe7cb259e29d8cf8c956ae43b2890
   tuple: ^2.0.2
   easy_localization: ^3.0.7+1
 

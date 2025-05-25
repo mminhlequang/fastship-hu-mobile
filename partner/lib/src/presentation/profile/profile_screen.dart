@@ -8,10 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internal_core/extensions/context_extension.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widgets.dart';
+import 'package:internal_core/internal_core.dart'; 
 
 enum ProfileItem {
   myProfile,
@@ -172,7 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: w400TextStyle(fontSize: 16.sw),
                     ),
                   ),
-                  if (item.route != null) WidgetAppSVG('chevron-right', color: grey9),
+                  if (item.route != null)
+                    WidgetAppSVG('chevron-right', color: grey9),
                 ],
               ),
             ),

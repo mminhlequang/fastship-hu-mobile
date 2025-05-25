@@ -245,10 +245,11 @@ class AppUploadImage2 extends StatelessWidget {
             )
           else
             DottedBorder(
-              color: grey8,
-              strokeWidth: 1,
-              radius: Radius.circular(8),
-              borderType: BorderType.RRect,
+              options: RoundedRectDottedBorderOptions(
+                color: grey8,
+                strokeWidth: 1,
+                radius: Radius.circular(8),
+              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.file(

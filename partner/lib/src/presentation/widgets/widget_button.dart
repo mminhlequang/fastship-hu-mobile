@@ -2,7 +2,7 @@ import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
 
 double get _height => 48.sw;
 

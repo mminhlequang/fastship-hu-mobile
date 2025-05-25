@@ -2,9 +2,8 @@ import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widgets.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 
 class AppDropdown<T> extends StatelessWidget {
   const AppDropdown({

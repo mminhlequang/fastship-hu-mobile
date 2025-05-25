@@ -5,8 +5,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
+import 'package:internal_core/internal_core.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widget_ripple_button.dart';
 import 'package:intl/intl.dart';
 

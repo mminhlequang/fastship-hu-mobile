@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:network_resources/network_resources.dart';
- 
 
 class WidgetRatingDriver extends StatefulWidget {
   const WidgetRatingDriver({Key? key}) : super(key: key);
@@ -152,7 +151,7 @@ class _WidgetRatingDriverState extends State<WidgetRatingDriver> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          16.h,
           Container(
             width: 140,
             height: 5,
@@ -170,7 +169,6 @@ class _WidgetRatingDriverState extends State<WidgetRatingDriver> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColorBackground,
-       
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -179,61 +177,61 @@ class _WidgetRatingDriverState extends State<WidgetRatingDriver> {
               child: Column(
                 children: [
                   Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        appHaptic();
-                        appContext.pop();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: WidgetAppSVG('icon40', width: 24, height: 24),
-                      ),
-                    ),
-                    
-                  ],
-                ),
-                Spacer(),
-                TextButton(
-                  onPressed: () {
-                    appHaptic();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: w400TextStyle(
-                      fontSize: 16,
-                      color: const Color(0xFFF17228),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                appHaptic();
+                                appContext.pop();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: WidgetAppSVG('icon40',
+                                    width: 24, height: 24),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            appHaptic();
+                          },
+                          child: Text(
+                            'Cancel',
+                            style: w400TextStyle(
+                              fontSize: 16,
+                              color: const Color(0xFFF17228),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ), 
                   Text('Perfect', style: w700TextStyle(fontSize: 24)),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildStarRating(),
-                  const SizedBox(height: 16),
+                  16.h,
                   Text(
                     'Send a tip as a thank you, the driver will receive 100% of this amount',
                     style: w400TextStyle(),
                   ),
-                  const SizedBox(height: 16),
+                  16.h,
                   TipAmountGrid(
                     selectedAmount: _selectedAmount,
                     onAmountSelected: (amount) {
                       setState(() => _selectedAmount = amount);
                     },
                   ),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildCustomAmountInput(),
-                  const SizedBox(height: 16),
+                  16.h,
                   Divider(color: appColorBorder),
-                  const SizedBox(height: 16),
+                  16.h,
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -241,9 +239,9 @@ class _WidgetRatingDriverState extends State<WidgetRatingDriver> {
                       style: w500TextStyle(),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildSatisfactionTags(),
-                  const SizedBox(height: 16),
+                  16.h,
                   _buildCommentInput(),
                 ],
               ),
@@ -267,8 +265,6 @@ class _WidgetRatingDriverState extends State<WidgetRatingDriver> {
     super.dispose();
   }
 }
-
-
 
 // Tip Amount Grid Widget
 class TipAmountGrid extends StatelessWidget {

@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:app/src/base/auth/auth_cubit.dart';
+import 'package:app/src/utils/utils.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../widgets/widget_dialog_confirm.dart';
 import 'controllers/socket_controller.dart';
 
 class SocketShellWrapper extends StatefulWidget {
@@ -25,46 +28,13 @@ class _SocketShellWrapperState extends State<SocketShellWrapper> {
     if (authCubit.isLoggedIn) {
       socketController.initializeSocket();
     }
-    _checkNotificationPermission();
+    FirebaseCloudMessaging.initFirebaseMessaging();
   }
 
   @override
   void dispose() {
     super.dispose();
     socketController.dispose();
-  }
-
-  Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-    if (status.isDenied) {
-      if (!kDebugMode) {
-        _showNotificationPermissionDialog();
-      }
-    }
-  }
-
-  void _showNotificationPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Thông báo'),
-        content: const Text(
-            'Ứng dụng cần quyền thông báo để gửi cập nhật về đơn hàng của bạn.'),
-        actions: [
-          TextButton(
-            child: const Text('Để sau'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text('Cài đặt'),
-            onPressed: () {
-              Navigator.pop(context);
-              openAppSettings();
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   @override

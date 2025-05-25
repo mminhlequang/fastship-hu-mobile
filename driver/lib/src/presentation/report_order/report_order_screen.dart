@@ -180,11 +180,12 @@ class _ReportOrderScreenState extends State<ReportOrderScreen> {
                           ],
                         )
                       : DottedBorder(
-                          borderType: BorderType.RRect,
-                          radius: const Radius.circular(2),
-                          color: hexColor('#E7E7E7'),
-                          strokeWidth: 1,
-                          dashPattern: [8, 8],
+                          options: RoundedRectDottedBorderOptions(
+                            radius: const Radius.circular(2),
+                            color: hexColor('#E7E7E7'),
+                            strokeWidth: 1,
+                            dashPattern: [8, 8],
+                          ),
                           child: Container(
                             width: 64.sw,
                             height: 64.sw,

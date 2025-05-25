@@ -290,18 +290,18 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                                 'Delivery: 25-30 mins',
                                 style: w400TextStyle(fontSize: 14.sw),
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8.sw),
-                                width: 1.sw,
-                                height: 16.sw,
-                                color: hexColor('#E6E6E6'),
-                              ),
-                              Text(
-                                '30 mins',
-                                style: w400TextStyle(
-                                    fontSize: 14.sw,
-                                    color: hexColor('#7A838C')),
-                              ),
+                              // Container(
+                              //   margin: EdgeInsets.symmetric(horizontal: 8.sw),
+                              //   width: 1.sw,
+                              //   height: 16.sw,
+                              //   color: hexColor('#E6E6E6'),
+                              // ),
+                              // Text(
+                              //   '30 mins',
+                              //   style: w400TextStyle(
+                              //       fontSize: 14.sw,
+                              //       color: hexColor('#7A838C')),
+                              // ),
                               Container(
                                 margin: EdgeInsets.symmetric(horizontal: 8.sw),
                                 width: 1.sw,
@@ -324,137 +324,137 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
           ),
 
           // Order information section
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE7E7E7)),
-                        color: Colors.white,
-                      ),
-                      child: RichText(
-                        text: TextSpan(
-                          style: w400TextStyle(
-                            fontSize: 14.sw,
-                            color: hexColor('#7A838C'),
-                          ),
-                          children: [
-                            TextSpan(text: 'Min order: '),
-                            TextSpan(
-                              text: currencyFormatted(1000),
-                              style: w400TextStyle(
-                                  fontSize: 14.sw, color: Color(0xFF3C3836)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE7E7E7)),
-                        color: Colors.white,
-                      ),
-                      child: Row(
-                        children: [
-                          WidgetAppSVG(
-                            'icon39',
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            currencyFormatted(2000),
-                            style: w400TextStyle(
-                                fontSize: 14.sw, color: Color(0xFF3C3836)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE7E7E7)),
-                        color: Colors.white,
-                      ),
-                      child: Text(
-                        'More',
-                        style: w400TextStyle(
-                          fontSize: 14.sw,
-                          color: hexColor('#F17228'),
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        appHaptic();
-                      },
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: WidgetAppSVG(
-                          'icon30',
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    Gap(8),
-                    GestureDetector(
-                      onTap: () {
-                        appHaptic();
-                      },
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: const Color(0xFFF4F4F4),
-                        ),
-                        child: WidgetAppSVG(
-                          'icon29',
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 16),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Row(
+          //         children: [
+          //           Container(
+          //             padding: const EdgeInsets.symmetric(
+          //               horizontal: 12,
+          //               vertical: 8,
+          //             ),
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(16),
+          //               border: Border.all(color: const Color(0xFFE7E7E7)),
+          //               color: Colors.white,
+          //             ),
+          //             child: RichText(
+          //               text: TextSpan(
+          //                 style: w400TextStyle(
+          //                   fontSize: 14.sw,
+          //                   color: hexColor('#7A838C'),
+          //                 ),
+          //                 children: [
+          //                   TextSpan(text: 'Min order: '),
+          //                   TextSpan(
+          //                     text: currencyFormatted(1000),
+          //                     style: w400TextStyle(
+          //                         fontSize: 14.sw, color: Color(0xFF3C3836)),
+          //                   ),
+          //                 ],
+          //               ),
+          //             ),
+          //           ),
+          //           const SizedBox(width: 4),
+          //           Container(
+          //             padding: const EdgeInsets.symmetric(
+          //               horizontal: 12,
+          //               vertical: 8,
+          //             ),
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(16),
+          //               border: Border.all(color: const Color(0xFFE7E7E7)),
+          //               color: Colors.white,
+          //             ),
+          //             child: Row(
+          //               children: [
+          //                 WidgetAppSVG(
+          //                   'icon39',
+          //                   width: 20,
+          //                   height: 20,
+          //                   fit: BoxFit.contain,
+          //                 ),
+          //                 const SizedBox(width: 4),
+          //                 Text(
+          //                   currencyFormatted(2000),
+          //                   style: w400TextStyle(
+          //                       fontSize: 14.sw, color: Color(0xFF3C3836)),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //           const SizedBox(width: 4),
+          //           Container(
+          //             padding: const EdgeInsets.symmetric(
+          //               horizontal: 12,
+          //               vertical: 8,
+          //             ),
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(16),
+          //               border: Border.all(color: const Color(0xFFE7E7E7)),
+          //               color: Colors.white,
+          //             ),
+          //             child: Text(
+          //               'More',
+          //               style: w400TextStyle(
+          //                 fontSize: 14.sw,
+          //                 color: hexColor('#F17228'),
+          //                 decoration: TextDecoration.underline,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               appHaptic();
+          //             },
+          //             child: Container(
+          //               width: 38,
+          //               height: 38,
+          //               padding: const EdgeInsets.all(7),
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(30),
+          //               ),
+          //               child: WidgetAppSVG(
+          //                 'icon30',
+          //                 width: 24,
+          //                 height: 24,
+          //                 fit: BoxFit.contain,
+          //               ),
+          //             ),
+          //           ),
+          //           Gap(8),
+          //           GestureDetector(
+          //             onTap: () {
+          //               appHaptic();
+          //             },
+          //             child: Container(
+          //               width: 38,
+          //               height: 38,
+          //               padding: const EdgeInsets.all(7),
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(30),
+          //                 color: const Color(0xFFF4F4F4),
+          //               ),
+          //               child: WidgetAppSVG(
+          //                 'icon29',
+          //                 width: 24,
+          //                 height: 24,
+          //                 fit: BoxFit.contain,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

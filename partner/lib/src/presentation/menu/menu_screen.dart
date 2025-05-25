@@ -14,10 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widgets.dart';
-import 'package:internal_network/network_resources/resources.dart';
+import 'package:internal_core/internal_core.dart';
 
 import 'widgets/widget_add_dish.dart';
 
@@ -233,7 +230,7 @@ class _MenuScreenState extends State<MenuScreen>
                                   Gap(2.sw),
                                 ],
                                 Text(
-                                 currencyFormatted(product.price) ,
+                                  currencyFormatted(product.price),
                                   style: w400TextStyle(color: darkGreen),
                                 ),
                               ],

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
 
 class OpeningTimeScreen extends StatefulWidget {
   final List<OpeningTimeModel>? initialData;

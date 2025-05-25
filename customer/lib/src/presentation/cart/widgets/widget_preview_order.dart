@@ -335,7 +335,11 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             },
           );
         } else {
-          processer.value = SheetProcessStatus.error_no_driver;
+          if (socketController.socketConnected.value) {
+            processer.value = SheetProcessStatus.error_no_driver;
+          } else {
+            processer.value = SheetProcessStatus.error_create_order;
+          }
         }
       } else {
         processer.value = SheetProcessStatus.error_create_order;
@@ -724,12 +728,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         ),
         const SizedBox(height: 12),
         DottedBorder(
-          borderType: BorderType.RRect,
-          radius: Radius.circular(16),
-          padding: EdgeInsets.all(12),
-          strokeWidth: .8,
-          dashPattern: [8, 4],
-          color: Color(0xFFCEC6C5),
+          options: RoundedRectDottedBorderOptions(
+            radius: Radius.circular(16),
+            padding: EdgeInsets.all(12),
+            strokeWidth: .8,
+            dashPattern: [8, 4],
+            color: Color(0xFFCEC6C5),
+          ),
           child: Column(
             spacing: 12.sw,
             children: widget.cart.cartItems
@@ -863,24 +868,23 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Payment method',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF14142A),
+              'Payment method'.tr(),
+              style: w400TextStyle(
+                fontSize: 16.sw,
               ),
             ),
-            Row(
-              children: [
-                Icon(Icons.add, color: Color(0xFF74CA45)),
-                Text(
-                  'Add more',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF74CA45),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Icon(Icons.add, color: Color(0xFF74CA45)),
+            //     Text(
+            //       'Add more',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         color: Color(0xFF74CA45),
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
         const SizedBox(height: 12),
@@ -1037,12 +1041,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
 
   Widget _buildOrderSummary() {
     return DottedBorder(
-      borderType: BorderType.RRect,
-      radius: Radius.circular(16),
-      padding: EdgeInsets.all(12),
-      strokeWidth: .8,
-      dashPattern: [8, 4],
-      color: Color(0xFFCEC6C5),
+      options: RoundedRectDottedBorderOptions(
+        radius: Radius.circular(16),
+        padding: EdgeInsets.all(12),
+        strokeWidth: .8,
+        dashPattern: [8, 4],
+        color: Color(0xFFCEC6C5),
+      ),
       child: Column(
         spacing: 12.sw,
         children: [

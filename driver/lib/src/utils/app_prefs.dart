@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:network_resources/auth/models/models.dart';
 import 'package:network_resources/auth/repo.dart';
-import 'package:internal_core/setup/app_base.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:internal_network/network_resources/resources.dart';

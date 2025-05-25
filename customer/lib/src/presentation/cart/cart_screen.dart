@@ -144,6 +144,10 @@ class _CartScreenState extends State<CartScreen> {
                     ));
                   }
 
+                  if (cartId == null && state.items.isNotEmpty) {
+                    cartId = state.items.first.id;
+                  }
+
                   return ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 16.sw),
                     itemBuilder: (context, index) {

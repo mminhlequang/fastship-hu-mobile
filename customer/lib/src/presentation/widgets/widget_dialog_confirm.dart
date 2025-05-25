@@ -6,14 +6,20 @@ import 'package:app/src/constants/constants.dart';
 class WidgetDialogConfirm extends StatelessWidget {
   final VoidCallback? onCancel;
   final VoidCallback? onConfirm;
+  final Widget? asset;
   final String title;
   final String message;
+  final String? confirmText;
+  final String? cancelText;
   const WidgetDialogConfirm({
     super.key,
     required this.title,
     required this.message,
     this.onCancel,
     this.onConfirm,
+    this.asset,
+    this.confirmText,
+    this.cancelText,
   });
 
   @override
@@ -40,6 +46,7 @@ class WidgetDialogConfirm extends StatelessWidget {
             children: [
               Column(
                 children: [
+                  if (asset != null) asset!,
                   Text(
                     title,
                     style: w500TextStyle(
@@ -47,7 +54,7 @@ class WidgetDialogConfirm extends StatelessWidget {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  16.h,
                   Text(
                     message,
                     textAlign: TextAlign.center,
@@ -72,6 +79,7 @@ class WidgetDialogConfirm extends StatelessWidget {
                           Navigator.pop(context, false);
                         }
                       },
+                      text: cancelText,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -85,7 +93,7 @@ class WidgetDialogConfirm extends StatelessWidget {
                           Navigator.pop(context, true);
                         }
                       },
-                       
+                      text: confirmText,
                     ),
                   ),
                 ],

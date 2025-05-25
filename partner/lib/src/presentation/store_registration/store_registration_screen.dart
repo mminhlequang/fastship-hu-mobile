@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/extensions/extensions.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:internal_core/widgets/widgets.dart';
 
 class StoreRegistrationScreen extends StatefulWidget {

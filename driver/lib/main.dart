@@ -94,7 +94,7 @@ class _AppState extends State<_App> {
             iconTheme: IconThemeData(color: Colors.white),
             actionsIconTheme: IconThemeData(color: Colors.white),
           ),
-          tabBarTheme: TabBarTheme(
+          tabBarTheme: TabBarThemeData(
             dividerHeight: 1.sw,
             dividerColor: hexColor('#F1F4F6'),
             indicator: _TabIndicator(),

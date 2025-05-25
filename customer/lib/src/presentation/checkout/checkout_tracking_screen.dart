@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
+import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:app/src/presentation/widgets/widget_dialog_notification.dart';
 import 'package:app/src/utils/app_map_helper.dart';
 import 'package:app/src/utils/utils.dart';
@@ -43,9 +44,19 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   final ValueNotifier<List<Polyline>> _polylinesNotifier =
       ValueNotifier<List<Polyline>>([]);
 
-  OrderModel? get currentOrder => widget.order ?? socketController.currentOrder;
+  OrderModel? get currentOrder => socketController.currentOrder ?? widget.order;
   bool get isPickup =>
       currentOrder?.deliveryTypeEnum == AppOrderDeliveryType.pickup;
+  bool loading = false;
+  Future<void> _userPickedUp() async {
+    setState(() {
+      loading = true;
+    });
+    await socketController.userPickedUp(currentOrder!.id.toString());
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   void initState() {
@@ -69,192 +80,202 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: socketController.statusStore,
-        builder: (context, statusStore, child) {
-          return ValueListenableBuilder(
-              valueListenable: socketController.orderStatus,
-              builder: (context, processStatus, child) {
-                if (currentOrder == null) return SizedBox();
-                OrderModel order = currentOrder!;
-                return Scaffold(
-                  body: Stack(
+      valueListenable: socketController.statusStore,
+      builder: (context, statusStore, child) {
+        return ValueListenableBuilder(
+          valueListenable: socketController.orderStatus,
+          builder: (context, processStatus, child) {
+            if (currentOrder == null) return SizedBox();
+            OrderModel order = currentOrder!;
+            return Scaffold(
+              body: Stack(
+                children: [
+                  Column(
                     children: [
-                      Column(
-                        children: [
-                          WidgetAppBar(
-                            title: 'Order Tracking'.tr(),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  appHaptic();
-                                  context.push('/help-center');
-                                },
-                                child: Text('Need help?'.tr(),
-                                    style: w400TextStyle(
-                                        fontSize: 16.sw,
-                                        color: appColorPrimaryOrange)),
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: ValueListenableBuilder(
-                                valueListenable:
-                                    socketController.driverLocation,
-                                builder: (context, driverLocation, child) {
-                                  // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
-                                  List<LatLng> polylinePoints = [];
-                                  if (order.shipPolyline?.isNotEmpty ?? false) {
-                                    try {
-                                      polylinePoints = FlexiblePolyline.decode(
-                                              order.shipPolyline!)
-                                          .map((e) => LatLng(e.lat, e.lng))
-                                          .toList();
-                                    } catch (e) {
-                                      debugPrint('Error decoding polyline: $e');
-                                    }
-                                  }
-
-                                  List<Marker> markers = [
-                                    Marker(
-                                      point: LatLng(
-                                        order.store!.lat!,
-                                        order.store!.lng!,
-                                      ),
-                                      width: 36.sw,
-                                      height: 36.sw,
-                                      child: AvatarGlow(
-                                        glowColor: appColorPrimary,
-                                        duration:
-                                            const Duration(milliseconds: 2000),
-                                        repeat: true,
-                                        child: WidgetAvatar(
-                                          imageUrl: order.store!.avatarImage,
-                                          radius1: 18.sw,
-                                          radius2: 18.sw - 2,
-                                          radius3: 18.sw - 2,
-                                          borderColor: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    if (order.driver != null &&
-                                        driverLocation != null)
-                                      Marker(
-                                        point: LatLng(
-                                          driverLocation.latitude,
-                                          driverLocation.longitude,
-                                        ),
-                                        width: 36.sw,
-                                        height: 36.sw,
-                                        child: WidgetAvatar(
-                                          imageUrl: order.driver!.avatar ?? '',
-                                          radius1: 18.sw,
-                                          radius2: 18.sw - 2,
-                                          radius3: 18.sw - 2,
-                                          borderColor: Colors.white,
-                                        ),
-                                      ),
-                                    Marker(
-                                      point: LatLng(
-                                        order.lat!,
-                                        order.lng!,
-                                      ),
-                                      width: 36,
-                                      height: 36,
-                                      child: AvatarGlow(
-                                        glowColor: appColorPrimary,
-                                        duration:
-                                            const Duration(milliseconds: 2000),
-                                        repeat: true,
-                                        child: WidgetAvatar(
-                                          imageUrl: order.customer!.avatar,
-                                          radius1: 18.sw,
-                                          radius2: 18.sw - 2,
-                                          radius3: 18.sw - 2,
-                                          borderColor: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ];
-
-                                  mapController.future.then((controller) {
-                                    updateMapToBoundsLatLng(
-                                      markers.map((e) => e.point).toList(),
-                                      controller,
-                                    );
-                                  });
-
-                                  return WidgetAppFlutterMapAnimation(
-                                    mapController: mapController,
-                                    initialCenter: LatLng(
-                                      order.lat!,
-                                      order.lng!,
-                                    ),
-                                    markers: markers,
-                                    polylines: [
-                                      if (!isPickup)
-                                        Polyline(
-                                          pattern: const StrokePattern.dotted(
-                                            spacingFactor: 1.5,
-                                            patternFit: PatternFit.scaleUp,
-                                          ),
-                                          color: appColorPrimary,
-                                          strokeWidth: 6.0,
-                                          borderColor: Colors.white,
-                                          borderStrokeWidth: 1.0,
-                                          points: polylinePoints,
-                                        )
-                                    ],
-                                    initialZoom: 14,
-                                  );
-                                }),
+                      WidgetAppBar(
+                        title: 'Order Tracking'.tr(),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              appHaptic();
+                              context.push('/help-center');
+                            },
+                            child: Text('Need help?'.tr(),
+                                style: w400TextStyle(
+                                    fontSize: 16.sw,
+                                    color: appColorPrimaryOrange)),
                           ),
                         ],
                       ),
-                      SlidingUpPanel(
-                        controller: _panelController,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, -4),
-                          ),
-                        ],
-                        minHeight:
-                            320.sw + MediaQuery.of(context).padding.bottom,
-                        maxHeight:
-                            580.sw + MediaQuery.of(context).padding.bottom,
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                        panel: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            children: [
-                              if (isPickup) ...[
-                                _buildStoreStatus(statusStore ??
-                                    AppOrderStoreStatus.pending),
-                              ] else ...[
-                                _buildProcessStatus(processStatus ??
-                                    AppOrderProcessStatus.pending),
-                              ],
-                              SizedBox(height: 12.sw),
-                              if (!isPickup) ...[
-                                _buildDriverInfo(order),
-                              ],
-                              _buildAddressCard(order),
-                              _buildOrderSummary(order),
-                              SizedBox(
-                                  height: 40 +
-                                      MediaQuery.of(context).viewInsets.bottom),
-                            ],
-                          ),
-                        ),
-                        body: Container(),
+                      Expanded(
+                        child: ValueListenableBuilder(
+                            valueListenable: socketController.driverLocation,
+                            builder: (context, driverLocation, child) {
+                              // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
+                              List<LatLng> polylinePoints = [];
+                              if (order.shipPolyline?.isNotEmpty ?? false) {
+                                try {
+                                  polylinePoints = FlexiblePolyline.decode(
+                                          order.shipPolyline!)
+                                      .map((e) => LatLng(e.lat, e.lng))
+                                      .toList();
+                                } catch (e) {
+                                  debugPrint('Error decoding polyline: $e');
+                                }
+                              }
+
+                              List<Marker> markers = [
+                                Marker(
+                                  point: LatLng(
+                                    order.store!.lat!,
+                                    order.store!.lng!,
+                                  ),
+                                  width: 36.sw,
+                                  height: 36.sw,
+                                  child: AvatarGlow(
+                                    glowColor: appColorPrimary,
+                                    duration:
+                                        const Duration(milliseconds: 2000),
+                                    repeat: true,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.store!.avatarImage,
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                if (order.driver != null &&
+                                    driverLocation != null)
+                                  Marker(
+                                    point: LatLng(
+                                      driverLocation.latitude,
+                                      driverLocation.longitude,
+                                    ),
+                                    width: 36.sw,
+                                    height: 36.sw,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.driver!.avatar ?? '',
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                Marker(
+                                  point: LatLng(
+                                    order.lat!,
+                                    order.lng!,
+                                  ),
+                                  width: 36,
+                                  height: 36,
+                                  child: AvatarGlow(
+                                    glowColor: appColorPrimary,
+                                    duration:
+                                        const Duration(milliseconds: 2000),
+                                    repeat: true,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.customer!.avatar,
+                                      radius1: 18.sw,
+                                      radius2: 18.sw - 2,
+                                      radius3: 18.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ];
+
+                              mapController.future.then((controller) {
+                                updateMapToBoundsLatLng(
+                                  markers.map((e) => e.point).toList(),
+                                  controller,
+                                );
+                              });
+
+                              return WidgetAppFlutterMapAnimation(
+                                mapController: mapController,
+                                initialCenter: LatLng(
+                                  order.lat!,
+                                  order.lng!,
+                                ),
+                                markers: markers,
+                                polylines: [
+                                  if (!isPickup)
+                                    Polyline(
+                                      pattern: const StrokePattern.dotted(
+                                        spacingFactor: 1.5,
+                                        patternFit: PatternFit.scaleUp,
+                                      ),
+                                      color: appColorPrimary,
+                                      strokeWidth: 6.0,
+                                      borderColor: Colors.white,
+                                      borderStrokeWidth: 1.0,
+                                      points: polylinePoints,
+                                    )
+                                ],
+                                initialZoom: 14,
+                              );
+                            }),
                       ),
                     ],
                   ),
-                );
-              });
-        });
+                  SlidingUpPanel(
+                    controller: _panelController,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                    minHeight: 320.sw + MediaQuery.of(context).padding.bottom,
+                    maxHeight: 580.sw + MediaQuery.of(context).padding.bottom,
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(16)),
+                    panel: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        children: [
+                          if (isPickup) ...[
+                            _buildStoreStatus(
+                                statusStore ?? AppOrderStoreStatus.pending),
+                          ] else ...[
+                            _buildProcessStatus(
+                                processStatus ?? AppOrderProcessStatus.pending),
+                          ],
+                          SizedBox(height: 12.sw),
+                          if (!isPickup) ...[
+                            _buildDriverInfo(order),
+                          ],
+                          _buildAddressCard(order),
+                          _buildOrderSummary(order),
+                          if (statusStore == AppOrderStoreStatus.completed) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 16),
+                              child: WidgetButtonConfirm(
+                                onPressed: _userPickedUp,
+                                isLoading: loading,
+                                text: "I'm picking up ready".tr(),
+                              ),
+                            ),
+                          ],
+                          SizedBox(
+                              height: 40 +
+                                  MediaQuery.of(context).viewInsets.bottom),
+                        ],
+                      ),
+                    ),
+                    body: Container(),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildProcessStatus(AppOrderProcessStatus status) {
@@ -365,20 +386,21 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                 Container(
                   width: 60,
                   height: 2,
-                  color: status.index >= AppOrderProcessStatus.completed.index
+                  color: status.index >= AppOrderStoreStatus.completed.index
                       ? appColorPrimary
                       : const Color(0xFFCEC6C5),
                 ),
                 _buildProgressIcon(
                   'icon61',
-                  isActive:
-                      status.index >= AppOrderProcessStatus.completed.index,
+                  isActive: status.index >= AppOrderStoreStatus.completed.index,
                 ),
               ],
             ),
           ),
           Text(
-            'Store is being processed'.tr(),
+            status == AppOrderStoreStatus.completed
+                ? "Order already, let pick up".tr()
+                : 'Store is being processed'.tr(),
             style: w400TextStyle(fontSize: 16.sw, color: hexColor('#847D79')),
           ),
           Gap(10.sw),
@@ -401,12 +423,13 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: DottedBorder(
-        borderType: BorderType.RRect,
-        radius: Radius.circular(16),
-        padding: EdgeInsets.all(12),
-        strokeWidth: .8,
-        dashPattern: [8, 4],
-        color: Color(0xFFCEC6C5),
+        options: RoundedRectDottedBorderOptions(
+          radius: Radius.circular(16),
+          padding: EdgeInsets.all(12),
+          strokeWidth: .8,
+          dashPattern: [8, 4],
+          color: Color(0xFFCEC6C5),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -582,12 +605,13 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: DottedBorder(
-        borderType: BorderType.RRect,
-        radius: Radius.circular(16),
-        padding: EdgeInsets.all(12),
-        strokeWidth: .8,
-        dashPattern: [8, 4],
-        color: Color(0xFFCEC6C5),
+        options: RoundedRectDottedBorderOptions(
+          radius: Radius.circular(16),
+          padding: EdgeInsets.all(12),
+          strokeWidth: .8,
+          dashPattern: [8, 4],
+          color: Color(0xFFCEC6C5),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

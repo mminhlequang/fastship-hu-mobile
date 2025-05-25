@@ -58,7 +58,7 @@ class SocketController {
       );
 
       socket?.onConnect((_) {
-        debugPrint('Debug socket: connect');
+        debugPrint('Debug socket: connected to $socketIOUrl');
         socketConnected.value = true;
         _authenticate();
         socket?.emit("joinRoom", "driver_${AppPrefs.instance.user?.id}");
@@ -163,7 +163,7 @@ class SocketController {
     debugPrint('Debug socket: Bắt đầu cập nhật vị trí');
     _locationTimer?.cancel();
     _locationTimer =
-        Timer.periodic(const Duration(seconds: kDebugMode ? 60 : 30), (_) {
+        Timer.periodic(const Duration(seconds: kDebugMode ? 120 : 30), (_) {
       debugPrint('Debug socket: Timer cập nhật vị trí kích hoạt');
       _sendCurrentLocation();
     });
@@ -190,7 +190,7 @@ class SocketController {
       currentLocation.value = LatLng(position.latitude, position.longitude);
 
       //TODO: remove later
-      // currentLocation.value = LatLng(47.495927, 19.0653831);
+      // currentLocation.value = LatLng(47.500976, 19.061095);
 
       if (socket?.connected == true && _isOnline) {
         debugPrint(

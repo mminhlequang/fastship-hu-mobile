@@ -1,18 +1,12 @@
-import 'dart:io';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_utils.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:internal_core/extensions/context_extension.dart';
 import 'package:internal_core/internal_core.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/setup/app_utils.dart';
-import 'package:internal_core/widgets/widgets.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'widget_bottomsheet.dart';

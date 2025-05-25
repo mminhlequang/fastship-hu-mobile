@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:app/src/constants/app_colors.dart';
 import 'package:app/src/constants/app_sizes.dart';
-import 'package:app/src/presentation/order_detail/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/order/repo.dart';
 import 'package:shimmer/shimmer.dart' as shimmer;
+
+import '../socket_shell/controllers/socket_controller.dart';
 
 class DetailOrderScreen extends StatefulWidget {
   final int id;
@@ -25,10 +25,17 @@ class DetailOrderScreen extends StatefulWidget {
 }
 
 class _DetailOrderScreenState extends State<DetailOrderScreen> {
-  double currentStep = -0.5;
   bool isLoading = true;
 
-  bool get isCompleted => true;
+  void _notifyToDriver() {
+    isLoading = true;
+    setState(() {});
+    socketController.updateStoreStatus(widget.id, AppOrderStoreStatus.completed,
+        onSuccess: () {
+      appShowSnackBar(msg: 'Order ready to pick up'.tr());
+      _fetchOrder();
+    });
+  }
 
   @override
   void initState() {
@@ -321,31 +328,31 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         /// status & stepper
-                        if (!isCompleted) ...[
-                          Gap(16.sw),
-                          Padding(
-                            padding: EdgeInsets.only(left: 16.sw),
-                            child: Text(
-                              '${'Expected delivery at'.tr()} 18:50',
-                              style:
-                                  w400TextStyle(fontSize: 12.sw, color: grey10),
-                            ),
-                          ),
-                          Gap(4.sw),
-                          Padding(
-                            padding: EdgeInsets.only(left: 16.sw),
-                            child: Text(
-                              'New order'.tr(),
-                              style: w600TextStyle(color: grey10),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8.sw, vertical: 24.sw),
-                            child:
-                                WidgetAnimatedStepper(currentStep: currentStep),
-                          ),
-                        ],
+                        // if (!isCompleted) ...[
+                        //   Gap(16.sw),
+                        //   Padding(
+                        //     padding: EdgeInsets.only(left: 16.sw),
+                        //     child: Text(
+                        //       '${'Expected delivery at'.tr()} 18:50',
+                        //       style:
+                        //           w400TextStyle(fontSize: 12.sw, color: grey10),
+                        //     ),
+                        //   ),
+                        //   Gap(4.sw),
+                        //   Padding(
+                        //     padding: EdgeInsets.only(left: 16.sw),
+                        //     child: Text(
+                        //       'New order'.tr(),
+                        //       style: w600TextStyle(color: grey10),
+                        //     ),
+                        //   ),
+                        //   Padding(
+                        //     padding: EdgeInsets.symmetric(
+                        //         horizontal: 8.sw, vertical: 24.sw),
+                        //     child:
+                        //         WidgetAnimatedStepper(currentStep: currentStep),
+                        //   ),
+                        // ],
 
                         /// contact customer & driver
                         // if (currentStep < 1)
@@ -955,28 +962,31 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                     ),
                   ),
           ),
-          const AppDivider(),
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              16.sw,
-              10.sw,
-              16.sw,
-              10.sw + context.mediaQueryPadding.bottom,
-            ),
-            child: Row(
-              children: [
-                if (currentStep < 1) ...[
+          if (order != null &&
+              order!.processStatusEnum.index <
+                  AppOrderProcessStatus.driverPicked.index) ...[
+            const AppDivider(),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                16.sw,
+                10.sw,
+                16.sw,
+                10.sw + context.mediaQueryPadding.bottom,
+              ),
+              child: Row(
+                children: [
                   Expanded(
                     child: WidgetRippleButton(
                       onTap: () {
                         // Todo:
+                        appHaptic();
                       },
                       borderSide: BorderSide(color: appColorPrimary),
                       child: SizedBox(
                         height: 48.sw,
                         child: Center(
                           child: Text(
-                            'Edit/Cancel order'.tr(),
+                            'Cancel order'.tr(),
                             style: w500TextStyle(
                                 fontSize: 16.sw, color: appColorPrimary),
                           ),
@@ -985,28 +995,28 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                     ),
                   ),
                   Gap(10.sw),
-                ],
-                Expanded(
-                  child: WidgetRippleButton(
-                    onTap: () {
-                      // Todo:
-                    },
-                    color: appColorPrimary,
-                    child: SizedBox(
-                      height: 48.sw,
-                      child: Center(
-                        child: Text(
-                          'Notify to driver'.tr(),
-                          style: w500TextStyle(
-                              fontSize: 16.sw, color: Colors.white),
+                  if (order!.storeStatusEnum.index <
+                      AppOrderStoreStatus.completed.index)
+                    Expanded(
+                      child: WidgetRippleButton(
+                        onTap: _notifyToDriver,
+                        color: appColorPrimary,
+                        child: SizedBox(
+                          height: 48.sw,
+                          child: Center(
+                            child: Text(
+                              'Order ready'.tr(),
+                              style: w500TextStyle(
+                                  fontSize: 16.sw, color: Colors.white),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

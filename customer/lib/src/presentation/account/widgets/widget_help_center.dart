@@ -255,9 +255,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       children: [
         const SizedBox(height: 20),
         WidgetSearchField(),
-        const SizedBox(height: 16),
+        16.h,
         _buildCategories(),
-        const SizedBox(height: 16),
+        16.h,
         _buildFaqList(),
       ],
     );

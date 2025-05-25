@@ -67,7 +67,7 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                   widget.product.name ?? '',
                   style: w600TextStyle(fontSize: 20.sw),
                 ),
-                const SizedBox(height: 16),
+                16.h,
                 Stack(
                   children: [
                     WidgetAppImage(
@@ -122,7 +122,7 @@ class _WidgetSheetDishDetailState extends State<WidgetSheetDishDetail> {
                   dashGapColor: Colors.transparent,
                   dashGapRadius: 0.0,
                 ),
-                const SizedBox(height: 16),
+                16.h,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:intl/intl.dart';
+import 'package:network_resources/network_resources.dart';
 
 class WidgetWallet extends StatefulWidget {
   final VoidCallback onTap;
@@ -46,18 +47,12 @@ class _WidgetWalletState extends State<WidgetWallet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      NumberFormat.currency(
-                        symbol: AppPrefs.instance.currencySymbol,
-                        decimalDigits: 1,
-                      ).format(state.wallet?.availableBalance ?? 0),
+                      currencyFormatted(state.wallet?.availableBalance ?? 0),
                       style: w600TextStyle(fontSize: 24.sw, color: Colors.white),
                     ),
                     Gap(23.sw),
                     Text(
-                      '${'PENDING'.tr()}: - ${NumberFormat.currency(
-                        symbol: AppPrefs.instance.currencySymbol,
-                        decimalDigits: 1,
-                      ).format(state.wallet?.frozenBalance ?? 0)}',
+                      '${'PENDING'.tr()}: - ${currencyFormatted(state.wallet?.frozenBalance ?? 0)}',
                       style: w400TextStyle(color: Colors.white),
                     ),
                   ],

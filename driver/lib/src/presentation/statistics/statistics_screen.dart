@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:network_resources/network_resources.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -62,10 +63,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 bloc: authCubit,
                 builder: (context, state) {
                   return Text(
-                    NumberFormat.currency(
-                      symbol: AppPrefs.instance.currencySymbol,
-                      decimalDigits: 1,
-                    ).format(state.wallet?.availableBalance ?? 0),
+                    currencyFormatted(state.wallet?.availableBalance ?? 0),
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

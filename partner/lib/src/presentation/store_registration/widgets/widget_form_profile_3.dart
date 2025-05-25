@@ -9,9 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:internal_core/extensions/context_extension.dart';
-import 'package:internal_core/setup/app_textstyles.dart';
-import 'package:internal_core/widgets/widgets.dart';
+import 'package:internal_core/internal_core.dart';
 
 class WidgetFormProfile3 extends StatefulWidget {
   final Map<String, dynamic> initialData;
