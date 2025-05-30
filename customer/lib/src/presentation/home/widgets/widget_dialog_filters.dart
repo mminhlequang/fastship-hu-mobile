@@ -226,10 +226,10 @@ class _WidgetDialogFiltersState extends State<WidgetDialogFilters> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFF74CA45),
+              color: appColorPrimary,
               borderRadius: BorderRadius.circular(56),
             ),
-            child:   Text(
+            child: Text(
               'Search'.tr(),
               style: TextStyle(
                 color: Colors.white,

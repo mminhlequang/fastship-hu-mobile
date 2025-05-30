@@ -190,7 +190,7 @@ class SocketController {
       currentLocation.value = LatLng(position.latitude, position.longitude);
 
       //TODO: remove later
-      // currentLocation.value = LatLng(47.500976, 19.061095);
+      currentLocation.value = LatLng(47.500976, 19.061095);
 
       if (socket?.connected == true && _isOnline) {
         debugPrint(

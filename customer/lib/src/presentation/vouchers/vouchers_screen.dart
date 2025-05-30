@@ -9,6 +9,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 
+import '../widgets/widget_button.dart';
+
 class VouchersScreen extends StatefulWidget {
   final int? storeId;
   const VouchersScreen({super.key, this.storeId});
@@ -86,26 +88,14 @@ class _VouchersScreenState extends State<VouchersScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: hexColor('#F17228'),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Apply',
-                            style: w500TextStyle(
-                              fontSize: 16.sw,
-                              height: 1,
-                              color: Colors.white,
-                            ),
-                          ),
+                        WidgetButtonConfirm(
+                          onPressed: () {
+                            appHaptic();
+                          },
+                          color: hexColor('#F17228'),
+                          text: 'Apply',
+                          borderRadius: 12,
+                           
                         ),
                       ],
                     ),

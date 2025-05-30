@@ -6,8 +6,9 @@ class CartModel {
   int? id;
   StoreModel? store;
   List<CartItemModel>? cartItems;
+  int? previousOrderId;
 
-  CartModel({this.id, this.store, this.cartItems});
+  CartModel({this.id, this.store, this.cartItems, this.previousOrderId});
 
   CartModel.fromJson(Map<String, dynamic> json) {
     id = json["id"];
@@ -18,6 +19,7 @@ class CartModel {
             : (json["cart_items"] as List)
                 .map((e) => CartItemModel.fromJson(e))
                 .toList();
+    previousOrderId = json["previous_order_id"];
   }
 
   static List<CartModel> fromList(List<Map<String, dynamic>> list) {
@@ -33,6 +35,7 @@ class CartModel {
     if (cartItems != null) {
       _data["cart_items"] = cartItems?.map((e) => e.toJson()).toList();
     }
+    _data["previous_order_id"] = previousOrderId;
     return _data;
   }
 }

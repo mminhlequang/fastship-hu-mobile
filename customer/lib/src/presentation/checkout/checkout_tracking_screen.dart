@@ -544,7 +544,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF74CA45)),
+        border: Border.all(color: appColorPrimary),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -646,8 +646,8 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
               child: const Divider(color: Color(0xFFF1EFE9)),
             ),
             _buildSummaryRow('Subtotal', currencyFormatted(order.subtotal)),
-            _buildSummaryRow(
-                'Application fee', currencyFormatted(order.applicationFee)),
+            // _buildSummaryRow(
+            //     'Application fee', currencyFormatted(order.applicationFee)),
             _buildSummaryRow('Courier tip', currencyFormatted(order.tip),
                 color: appColorPrimary),
             Padding(

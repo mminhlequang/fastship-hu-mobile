@@ -48,7 +48,7 @@ class SliderButton extends StatefulWidget {
   ///Direction of the slide action. Default is left to right.
   final DismissDirection direction;
 
-  SliderButton({
+  const SliderButton({
     super.key,
     required this.action,
     this.radius = 100,
@@ -60,7 +60,7 @@ class SliderButton extends StatefulWidget {
     this.height = 70,
     this.buttonSize,
     this.buttonWidth,
-    this.width = 270,
+    this.width = 300,
     this.alignLabel = const Alignment(0.6, 0),
     this.backgroundColor = const Color(0xffe0e0e0),
     this.baseColor = Colors.black87,
@@ -68,10 +68,10 @@ class SliderButton extends StatefulWidget {
     this.highlightedColor = Colors.white,
     this.label,
     this.icon,
-    this.dismissThresholds = 0.75,
+    this.dismissThresholds = 0.55,
     this.disable = false,
     this.direction = DismissDirection.startToEnd,
-  }) : assert((buttonSize ?? 60) <= (height));
+  }) : assert((buttonSize ?? (height * 0.85)) <= (height));
 
   @override
   _SliderButtonState createState() => _SliderButtonState();
@@ -154,6 +154,8 @@ class _SliderButtonState extends State<SliderButton> {
                     dismissThresholds: {
                       widget.direction: widget.dismissThresholds
                     },
+                    movementDuration: const Duration(milliseconds: 200),
+                    resizeDuration: const Duration(milliseconds: 200),
                     confirmDismiss: (_) async {
                       bool result;
                       try {
@@ -189,21 +191,21 @@ class _SliderButtonState extends State<SliderButton> {
                           ? EdgeInsets.only(
                               left: (widget.height -
                                       (widget.buttonSize == null
-                                          ? widget.height
+                                          ? widget.height * 0.85
                                           : widget.buttonSize!)) /
                                   2,
                             )
                           : EdgeInsets.only(
                               right: (widget.height -
                                       (widget.buttonSize == null
-                                          ? widget.height
+                                          ? widget.height * 0.85
                                           : widget.buttonSize!)) /
                                   2,
                             ),
                       child: widget.child ??
                           Container(
-                            height: widget.buttonSize ?? widget.height,
-                            width: widget.buttonSize ?? widget.height,
+                            height: widget.buttonSize ?? widget.height * 0.85,
+                            width: widget.buttonSize ?? widget.height * 0.85,
                             decoration: BoxDecoration(
                                 boxShadow: widget.boxShadow != null
                                     ? [

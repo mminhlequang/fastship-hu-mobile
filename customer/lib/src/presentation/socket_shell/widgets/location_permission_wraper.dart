@@ -52,6 +52,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
   }
 
   LatLng? _currentLocation;
+  HereSearchResult? addressDetail;
   _checkGeolocation() async {
     final position = await Geolocator.getCurrentPosition(
       locationSettings: LocationSettings(
@@ -62,11 +63,9 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
     _currentLocation = LatLng(position.latitude, position.longitude);
 
     //TODO: remove later
-    // _currentLocation = LatLng(47.495986, 19.0653862);
+    _currentLocation = LatLng(47.495986, 19.0653862);
 
     locationCubit.updateLocation(_currentLocation);
-
-    HereSearchResult? addressDetail;
 
     // Nếu đã có vị trí hiện tại, sử dụng HERE API để lấy địa chỉ
     if (_currentLocation != null) {
@@ -127,9 +126,9 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               final String formattedAddress = address['label'] ?? '';
               appDebugPrint('Địa chỉ hiện tại: $formattedAddress');
               addressDetail = HereSearchResult.fromJson(data['items'][0]);
-              if (addressDetail.address?.countryCode?.length == 3) {
-                addressDetail.address?.countryCode =
-                    convertAlpha3toAlpha2(addressDetail.address!.countryCode!);
+              if (addressDetail!.address?.countryCode?.length == 3) {
+                addressDetail!.address?.countryCode =
+                    convertAlpha3toAlpha2(addressDetail!.address!.countryCode!);
               }
             }
           } else {
@@ -147,6 +146,45 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    print('addressDetail: ${addressDetail?.address?.countryCode}');
+    if (addressDetail != null &&
+        addressDetail!.address?.countryCode?.toLowerCase() != "hu") {
+      return Scaffold(
+        backgroundColor: appColorBackground,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                WidgetAssetImage.png(
+                  'image4',
+                  width: double.infinity,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Location Restricted',
+                  style: w500TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'This application only operates within Hungary. Please ensure your location is set to Hungary to continue using the app.',
+                  textAlign: TextAlign.center,
+                  style: w400TextStyle(
+                    fontSize: 16,
+                    color: appColorText2,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     if (_permissionStatus?.isGranted == true) return widget.child;
     return Scaffold(
       backgroundColor: appColorBackground,
@@ -344,5 +382,5 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
 String convertAlpha3toAlpha2(String alpha3Code) {
   final country = CountryCodes.detailsForLocale(
       Locale.fromSubtags(countryCode: alpha3Code));
-  return country.alpha2Code!;
+  return country.alpha2Code!.toLowerCase();
 }

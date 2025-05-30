@@ -9,8 +9,17 @@ class WidgetButtonCancel extends StatelessWidget {
   final VoidCallback onPressed;
   final double? width;
   final double? height;
-  const WidgetButtonCancel(
-      {super.key, required this.onPressed, this.text, this.width, this.height});
+  final Color? color;
+  final double? borderRadius;
+  const WidgetButtonCancel({
+    super.key,
+    required this.onPressed,
+    this.text,
+    this.width,
+    this.height,
+    this.color,
+    this.borderRadius,
+  });
   @override
   Widget build(BuildContext context) {
     return _buildButton(
@@ -19,6 +28,8 @@ class WidgetButtonCancel extends StatelessWidget {
       onPressed: onPressed,
       width: width,
       height: height,
+      color: color,
+      borderRadius: borderRadius,
     );
   }
 }
@@ -27,20 +38,25 @@ class WidgetButtonConfirm extends StatelessWidget {
   final String? text;
   final double? width;
   final double? height;
+  final Color? color;
+  final double? borderRadius;
 
   final VoidCallback? onPressed;
 
   final bool isLoading;
   final bool isEnabled;
 
-  const WidgetButtonConfirm(
-      {super.key,
-      this.text,
-      required this.onPressed,
-      this.isLoading = false,
-      this.isEnabled = true,
-      this.width,
-      this.height});
+  const WidgetButtonConfirm({
+    super.key,
+    this.text,
+    required this.onPressed,
+    this.isLoading = false,
+    this.isEnabled = true,
+    this.width,
+    this.height,
+    this.color,
+    this.borderRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +68,8 @@ class WidgetButtonConfirm extends StatelessWidget {
       isEnabled: isEnabled,
       width: width,
       height: height,
+      color: color,
+      borderRadius: borderRadius,
     );
   }
 }
@@ -64,6 +82,8 @@ Widget _buildButton({
   bool isEnabled = true,
   double? width,
   double? height,
+  Color? color,
+  double? borderRadius,
 }) {
   return GestureDetector(
     onTap: isEnabled
@@ -76,14 +96,16 @@ Widget _buildButton({
       width: width,
       height: height ?? 48.sw,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(borderRadius ?? 26),
         border: !isEnabled
             ? Border()
             : Border.all(
-                color: isOutlined ? hexColor('#DEDEDE') : appColorPrimary),
+                color: isOutlined
+                    ? hexColor('#DEDEDE')
+                    : (color ?? appColorPrimary)),
         color: isOutlined
             ? Colors.white
-            : appColorPrimary.withOpacity(isEnabled ? 1 : 0.25),
+            : (color ?? appColorPrimary).withOpacity(isEnabled ? 1 : 0.25),
       ),
       child: Center(
         child: isLoading

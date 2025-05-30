@@ -89,6 +89,7 @@ class OrderModel {
   dynamic timePickupEstimate;
   dynamic timePickup;
   dynamic timeDelivery;
+  OrderRating? rating;
 
   AppOrderDeliveryType get deliveryTypeEnum => AppOrderDeliveryType.values
       .byName(deliveryType ?? AppOrderDeliveryType.ship.name);
@@ -142,6 +143,7 @@ class OrderModel {
     this.timePickupEstimate,
     this.timePickup,
     this.timeDelivery,
+    this.rating,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -189,6 +191,7 @@ class OrderModel {
     timePickupEstimate = json["time_pickup_estimate"];
     timePickup = json["time_pickup"];
     timeDelivery = json["time_delivery"];
+    rating = json["rating"] == null ? null : OrderRating.fromJson(json["rating"]);
   }
 
   static List<OrderModel> fromList(List<Map<String, dynamic>> list) {
@@ -246,6 +249,39 @@ class OrderModel {
     _data["time_pickup_estimate"] = timePickupEstimate;
     _data["time_pickup"] = timePickup;
     _data["time_delivery"] = timeDelivery;
+    if (rating != null) {
+      _data["rating"] = rating?.toJson();
+    }
     return _data;
   }
 } 
+
+class OrderRating {
+  StoreModel? store;
+  List<CartItemModel>? items;
+
+  OrderRating({this.store, this.items});
+
+  OrderRating.fromJson(Map<String, dynamic> json) {
+    store = json["store"] == null ? null : StoreModel.fromJson(json["store"]);
+    items =
+        json["items"] == null
+            ? null
+            : (json["items"] as List).map((e) => CartItemModel.fromJson(e)).toList();
+  }
+
+  static List<OrderRating> fromList(List<Map<String, dynamic>> list) {
+    return list.map(OrderRating.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    if (store != null) {
+      _data["store"] = store?.toJson();
+    }
+    if (items != null) {
+      _data["items"] = items?.map((e) => e.toJson()).toList();
+    }
+    return _data;
+  }
+}

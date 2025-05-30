@@ -1,3 +1,4 @@
+import 'package:app/src/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class LanguageOptionWidget extends StatelessWidget {
@@ -171,7 +172,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                     // Handle next button press
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF74CA45),
+                    backgroundColor: appColorPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),

@@ -26,7 +26,7 @@ class WidgetCartItem extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: isSelected ? const Color(0xFF74CA45) : Colors.transparent),
+            color: isSelected ? appColorPrimary : Colors.transparent),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -257,8 +257,8 @@ class __WidgetItemState extends State<_WidgetItem> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: "${currencyFormatted(
-                                    cartItem.product?.priceCompare ?? 0)}\n",
+                            text:
+                                "${currencyFormatted(cartItem.product?.priceCompare ?? 0)}\n",
                             style: w400TextStyle(
                               fontSize: 14.sw,
                               color: const Color(0xFFA6A0A0),

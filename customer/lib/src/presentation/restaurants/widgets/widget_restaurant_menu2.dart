@@ -1,3 +1,4 @@
+import 'package:app/src/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
@@ -203,7 +204,7 @@ class RestaurantMenuScroll extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Row(
-                        children:   [
+                        children: [
                           Text(
                             currencyFormatted(3300),
                             style: w400TextStyle(
@@ -360,7 +361,7 @@ class RestaurantMenuScroll extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(120),
-          color: const Color(0xFF74CA45),
+          color: appColorPrimary,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

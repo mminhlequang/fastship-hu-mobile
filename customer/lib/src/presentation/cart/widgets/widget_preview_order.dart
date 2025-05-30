@@ -29,12 +29,15 @@ import 'package:network_resources/order/repo.dart';
 import 'widget_sheet_locations.dart';
 
 // logic tính phí ship để tính khi giao hàng
-// Dưới 2 km	2.50 eur	 (Phí cơ bản)
-// Mỗi km tiếp theo	+1.00
+// Dưới 2 km	2000ft	 (Phí cơ bản)
+// Mỗi km tiếp theo	+1000ft
 
 class WidgetPreviewOrder extends StatefulWidget {
   final CartModel cart;
-  const WidgetPreviewOrder({super.key, required this.cart});
+  const WidgetPreviewOrder({
+    super.key,
+    required this.cart,
+  });
 
   @override
   _WidgetPreviewOrderState createState() => _WidgetPreviewOrderState();
@@ -54,6 +57,9 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
   // Các trường cần thiết cho HERE API
   Map<String, dynamic>? routeData;
 
+  bool get _isEnabled =>
+      isPickup ? true : (isCalculatingRoute == false && routeData != null);
+
   double get subtotal =>
       widget.cart.cartItems?.fold(
         0,
@@ -67,18 +73,23 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                     2),
       ) ??
       0;
+
+  // 2000ft = 2km và tiếp theo 1km = 1000ft
   double get shippingFee {
+    if (isPickup || routeData == null) {
+      return 0;
+    }
+
     if (distanceInMet < 2000) {
-      return 2.5;
+      return 2000;
     } else {
-      return 2.5 + (distanceInMet - 2000) * 1;
+      return 2000 + (distanceInMet - 2000) * 1000;
     }
   }
 
-  double get applicationFee => subtotal * 0.1; //TODO: Get from backend
-  double get discount => 0.5; //TODO: Get from backend;
+  // double get discount => 0.5; //TODO: Get from backend;
 
-  double get total => subtotal + applicationFee + tip - discount;
+  double get total => subtotal + shippingFee + tip;
 
   late int selectedPaymentWalletProvider = kDebugMode
       ? paymentWalletProviders.last.id!
@@ -122,6 +133,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     }
 
     setState(() {
+      routeData = null;
       isCalculatingRoute = true;
     });
 
@@ -153,15 +165,15 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
 
         print("calculate route data: $data");
 
-        // Lưu dữ liệu lộ trình
-        routeData = data;
-
         // Lấy thông tin quãng đường và thời gian
         if (data['routes'] != null && data['routes'].isNotEmpty) {
           final route = data['routes'][0];
           final sections = route['sections'];
 
           if (sections != null && sections.isNotEmpty) {
+            // Lưu dữ liệu lộ trình
+            routeData = data;
+
             final section = sections[0];
             final summary = section['summary'];
 
@@ -184,11 +196,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             setState(() {
               isCalculatingRoute = false;
             });
-
-            // Cập nhật giá shipping dựa trên quãng đường
-            _updateShippingFee();
           } else {
-            _showRouteError('Không tìm thấy chi tiết lộ trình');
+            _showRouteError('No route found, please try other address'.tr());
           }
         } else {
           _showRouteError('Không tìm thấy lộ trình phù hợp');
@@ -201,12 +210,6 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     }
   }
 
-  // Cập nhật phí shipping dựa trên quãng đường
-  void _updateShippingFee() {
-    // TODO: Thực hiện tính toán phí ship dựa trên quãng đường
-    // Đoạn này sẽ được thực hiện sau khi tích hợp với backend
-  }
-
   // Hiển thị lỗi khi tính toán lộ trình
   void _showRouteError(String message) {
     print('HERE API Error: $message');
@@ -217,7 +220,9 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     if (mounted) {
       appShowSnackBar(
         context: context,
-        msg: message,
+        msg:
+            "Oops, we can't find a route for your order, please try other address"
+                .tr(),
         type: AppSnackBarType.error,
       );
     }
@@ -236,12 +241,13 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     callback() async {
       processer.value = SheetProcessStatus.loading;
       final r = await OrderRepo().createOrder({
+        "previous_order_id": widget.cart.previousOrderId,
         "store_id": widget.cart.store!.id!,
         "delivery_type": deliveryType.name,
         "payment_id": selectedPaymentWalletProvider,
         // "voucher_id": 0,
         // "voucher_value": 0,
-        "tip": tip,
+        "price_tip": tip,
         "ship_fee": isPickup ? 0 : shippingFee,
         "ship_distance": isPickup ? 0 : ship_distance,
         "ship_estimate_time": isPickup ? '' : ship_estimate_time,
@@ -985,7 +991,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
               ),
             ),
             Text(
-              '100% of the tip goes to your courier'.tr(),
+              '100% of the tip goes to your driver'.tr(),
               style: w400TextStyle(
                 fontSize: 14.sw,
                 color: hexColor('#847D79'),
@@ -999,10 +1005,10 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
           runSpacing: 12.sw,
           children: [
             _buildTipOption(0),
-            _buildTipOption(5),
-            _buildTipOption(10),
-            _buildTipOption(15),
-            _buildTipOption(20),
+            _buildTipOption(1000),
+            _buildTipOption(2000),
+            _buildTipOption(3000),
+            _buildTipOption(5000),
           ],
         ),
       ],
@@ -1052,38 +1058,38 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         spacing: 12.sw,
         children: [
           _buildSummaryRow('Subtotal', currencyFormatted(subtotal)),
-          _buildSummaryRow(
-              'Application fee', currencyFormatted(applicationFee)),
+          // _buildSummaryRow(
+          //     'Application fee', currencyFormatted(applicationFee)),
           if (shippingFee > 0)
             _buildSummaryRow('Shipping fee', currencyFormatted(shippingFee)),
           _buildSummaryRow('Courier tip', currencyFormatted(tip),
               color: appColorPrimary),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  WidgetAppSVG('icon34',
-                      height: 18.sw, color: hexColor('#F17228')),
-                  const SizedBox(width: 8),
-                  Text(
-                    currencyFormatted(1000) + ' off, more deals below',
-                    style: w400TextStyle(
-                      fontSize: 16.sw,
-                      color: hexColor('#3C3836'),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                '- ${currencyFormatted(discount)}',
-                style: w500TextStyle(
-                  fontSize: 16.sw,
-                  color: hexColor('#F17228'),
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         WidgetAppSVG('icon34',
+          //             height: 18.sw, color: hexColor('#F17228')),
+          //         const SizedBox(width: 8),
+          //         Text(
+          //           currencyFormatted(1000) + ' off, more deals below',
+          //           style: w400TextStyle(
+          //             fontSize: 16.sw,
+          //             color: hexColor('#3C3836'),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     Text(
+          //       '- ${currencyFormatted(discount)}',
+          //       style: w500TextStyle(
+          //         fontSize: 16.sw,
+          //         color: hexColor('#F17228'),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -1186,6 +1192,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             ),
             const SizedBox(height: 10),
             WidgetButtonConfirm(
+              isEnabled: _isEnabled,
               onPressed: _createOrder,
               text: 'Check out'.tr(),
             ),

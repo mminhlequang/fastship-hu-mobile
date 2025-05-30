@@ -1,6 +1,7 @@
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/home/widgets/widget_restaurant_card.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
+import 'package:app/src/presentation/widgets/widget_button.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,6 +11,7 @@ import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/product/model/product.dart';
 
+import '../widgets/widget_appbar.dart';
 import 'cubit/cart_cubit.dart';
 import 'widgets/widget_cart_item.dart';
 
@@ -35,38 +37,22 @@ class _CartScreenState extends State<CartScreen> {
       backgroundColor: hexColor('#F9F8F6'),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
+          WidgetAppBar(
+            showBackButton: false,
+            title: 'My cart'.tr(),
+            actions: [
+              WidgetInkWellTransparent(
+                enableInkWell: false,
+                onTap: () {
+                  appHaptic();
+                  // context.push('/help-center');
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Icon(Icons.more_vert, size: 28),
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 12),
-                      Text(
-                        'My cart'.tr(),
-                        style: w500TextStyle(
-                          fontSize: 20.sw,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Icon(Icons.more_vert, size: 28),
-                ],
               ),
-            ),
+            ],
           ),
           Expanded(
             child: BlocBuilder<CartCubit, CartState>(
@@ -86,62 +72,48 @@ class _CartScreenState extends State<CartScreen> {
                     );
                   } else if (state.items.isEmpty) {
                     return Center(
-                        child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        WidgetAppSVG(
-                          'icon8',
-                          width: 237,
-                          height: 232,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'Empty',
-                          style: w500TextStyle(
-                            fontSize: 24,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          WidgetAppSVG(
+                            'icon89',
+                            width: 160,
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'You don\'t have any foods in cart at this time',
-                          textAlign: TextAlign.center,
-                          style: w400TextStyle(
-                            fontSize: 16,
-                            color: appColorText2,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: 21),
-                        // Order Now Button
-                        SizedBox(
-                          width: context.width * .65,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              appHaptic();
-                              navigationCubit.changeIndex(1);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF74CA45),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(120),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
-                            ),
-                            child: Text(
-                              'Order Now',
-                              style: w500TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Empty',
+                            style: w500TextStyle(
+                              fontSize: 24,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 48),
-                      ],
-                    ));
+                          const SizedBox(height: 24),
+                          Text(
+                            'You don\'t have any foods in cart at this time',
+                            textAlign: TextAlign.center,
+                            style: w400TextStyle(
+                              fontSize: 16,
+                              color: appColorText2,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 21),
+                          // Order Now Button
+                          SizedBox(
+                            width: context.width * .65,
+                            child: WidgetButtonConfirm(
+                              onPressed: () {
+                                appHaptic();
+                                navigationCubit.changeIndex(1);
+                              },
+                              color: appColorPrimary,
+                              text: 'Order Now',
+                              borderRadius: 120,
+                            ),
+                          ),
+                          const SizedBox(height: 48),
+                        ],
+                      ),
+                    );
                   }
 
                   if (cartId == null && state.items.isNotEmpty) {
