@@ -146,7 +146,7 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    print('addressDetail: ${addressDetail?.address?.countryCode}');
+    // print('addressDetail: ${addressDetail?.address?.countryCode}');
     if (addressDetail != null &&
         addressDetail!.address?.countryCode?.toLowerCase() != "hu") {
       return Scaffold(

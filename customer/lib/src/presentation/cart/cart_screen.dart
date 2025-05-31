@@ -2,8 +2,6 @@ import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/home/widgets/widget_restaurant_card.dart';
 import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
-import 'package:app/src/utils/utils.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +14,7 @@ import 'cubit/cart_cubit.dart';
 import 'widgets/widget_cart_item.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -106,7 +104,7 @@ class _CartScreenState extends State<CartScreen> {
                                 navigationCubit.changeIndex(1);
                               },
                               color: appColorPrimary,
-                              text: 'Order Now',
+                              text: 'Order Now'.tr(),
                               borderRadius: 120,
                             ),
                           ),

@@ -30,6 +30,13 @@ class _WidgetRatingState extends State<WidgetRating> {
   double storeRating = 5; // Rating cho quán ăn
   Map<int, double> itemRatings = {}; // Rating cho từng món ăn
   TextEditingController commentController = TextEditingController();
+  List<String> get _satisfactionTags => [
+        'Fast delivery',
+        'Friendly service',
+        'Delicious food',
+        'Good quality',
+        'Reasonable price',
+      ];
 
   @override
   void initState() {
@@ -353,18 +360,61 @@ class _WidgetRatingState extends State<WidgetRating> {
           ),
         ),
         const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _satisfactionTags
+              .map((tag) => WidgetInkWellTransparent(
+                    onTap: () {
+                      appHaptic();
+                      commentController.text = tag;
+                      setState(() {});
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: commentController.text == tag
+                          ? BoxDecoration(
+                              color: appColorPrimary,
+                              borderRadius: BorderRadius.circular(120),
+                              border: Border.all(color: appColorPrimary),
+                            )
+                          : BoxDecoration(
+                              color: appColorBackground,
+                              borderRadius: BorderRadius.circular(120),
+                              border: Border.all(color: appColorBorder),
+                            ),
+                      child: Text(tag,
+                          style: w400TextStyle(
+                            color: commentController.text == tag
+                                ? Colors.white
+                                : appColorText2,
+                          )),
+                    ),
+                  ))
+              .toList(),
+        ),
+        const SizedBox(height: 12),
         TextField(
           controller: commentController,
           maxLines: 4,
+          onChanged: (value) {
+            setState(() {});
+          },
           decoration: InputDecoration(
             hintText: "Write your comment here...".tr(),
             hintStyle: w400TextStyle(
               fontSize: 14,
               color: appColorText2,
             ),
+            fillColor: appColorBackground,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: appColorBorder2),
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: appColorBorder),
+              borderSide: BorderSide(color: appColorBorder2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

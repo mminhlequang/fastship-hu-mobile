@@ -5,16 +5,17 @@ import '../utils/utils.dart';
 
 Color get appColorBackground => AppColors.instance.background;
 
+Color get appColorBackground3 => AppColors.instance.background3;
 Color get appColorElement => AppColors.instance.element;
 
 Color get appColorPrimary => AppColors.instance.primary;
 Color get appColorPrimaryOrange => hexColor('#F17228');
 
-
 Color get appColorText => AppColors.instance.text;
 
 Color get appColorText2 => AppColors.instance.text2;
 Color get appColorBorder => hexColor('#EEEEEE');
+Color get appColorBorder2 => hexColor('#CEC6C5');
 
 class AppColors {
   AppColors._();
@@ -28,6 +29,7 @@ class AppColors {
   Color get text2 => appValueByTheme(hexColor('#54535A'), kdark: Colors.white);
 
   Color get background => appValueByTheme(Colors.white, kdark: Colors.black);
+  Color get background3 => hexColor('F9F8F6');
 
   Color get element =>
       appValueByTheme(Colors.grey[200]!, kdark: Colors.grey[200]!);

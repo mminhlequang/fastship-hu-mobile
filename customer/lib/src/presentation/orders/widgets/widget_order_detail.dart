@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:network_resources/cart/models/models.dart';
 import 'package:network_resources/network_resources.dart';
@@ -29,22 +30,15 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
           WidgetAppBar(
             title: widget.m.store?.name ?? "Order Detail".tr(),
             actions: [
-              if (widget.m.store?.lat != null && widget.m.store?.lng != null)
-                WidgetInkWellTransparent(
-                  onTap: () {
-                    MapLauncher.installedMaps.then((maps) {
-                      maps.first.showMarker(
-                        coords:
-                            Coords(widget.m.store!.lat!, widget.m.store!.lng!),
-                        title: widget.m.store?.name ?? "",
-                      );
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: WidgetAppSVG('icon20', width: 18.sw, height: 18.sw),
-                  ),
-                ),
+              TextButton(
+                onPressed: () {
+                  appHaptic();
+                  context.push('/help-center');
+                },
+                child: Text('Need help?'.tr(),
+                    style: w400TextStyle(
+                        fontSize: 16.sw, color: appColorPrimaryOrange)),
+              ),
             ],
           ),
           Expanded(

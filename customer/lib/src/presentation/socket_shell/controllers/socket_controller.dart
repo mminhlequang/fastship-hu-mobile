@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:app/src/constants/constants.dart';
-import 'package:app/src/presentation/checkout/widgets/widget_rating_driver.dart';
+import 'package:app/src/presentation/navigation/cubit/navigation_cubit.dart';
 import 'package:app/src/presentation/widgets/widget_dialog_notification.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -35,6 +34,13 @@ class CustomerSocketController {
 
   // Các callback để cập nhật UI
   Function(AppOrderProcessStatus)? onOrderStatusChanged;
+
+  _resetState() {
+    orderStatus.value = null;
+    statusStore.value = null;
+    currentOrder = null;
+    driverLocation.value = null;
+  }
 
   void initializeSocket() {
     try {
@@ -92,19 +98,38 @@ class CustomerSocketController {
 
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
-          orderStatus.value = AppOrderProcessStatus.cancelled;
+          _resetState();
 
           appContext.pop();
-          await appOpenDialog(WidgetDialogNotification(
+
+          // Randomly select a title and message to display
+          final List<String> titles = [
+            "Order Completed!".tr(),
+            "Your Meal is Ready!".tr(),
+            "Enjoy Your Meal!".tr(),
+            "Bon Appétit!".tr(),
+            "Meal Time!".tr()
+          ];
+          final List<String> messages = [
+            "Enjoy your meal!\nSee you in the next order :)",
+            "Bon appétit!\nLooking forward to serving you again!",
+            "Hope you have a delicious meal!\nCome back soon!",
+            "Savor your meal!\nWe can't wait to see you again!",
+            "Have a great meal!\nThank you for choosing us!"
+          ];
+          final String randomTitle = (titles..shuffle()).first;
+          final String randomMessage = (messages..shuffle()).first;
+          navigationCubit.changeIndex(3);
+
+          appOpenDialog(WidgetDialogNotification(
               iconPng: 'image3',
-              title: "Driver Has Arrived!".tr(),
-              message: "Enjoy your meal!\nSee you in the next order :)",
+              title: randomTitle,
+              message: randomMessage,
               buttonText: "Done".tr(),
               onPressed: () {
                 appHaptic();
                 appContext.pop();
               }));
-          appOpenBottomSheet(WidgetRatingDriver());
         }
       });
 
@@ -114,8 +139,7 @@ class CustomerSocketController {
 
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
-          orderStatus.value = AppOrderProcessStatus.values
-              .byName(socketResponse.data!['processStatus']);
+          _resetState();
 
           appContext.pop();
           await appOpenDialog(WidgetDialogNotification(
@@ -219,7 +243,7 @@ class CustomerSocketController {
   Future<bool> userPickedUp(String orderId) async {
     if (currentOrder != null && socket?.connected == true) {
       _userPickedUpCompleter = Completer<bool>();
-    
+
       debugPrint(
           'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: $orderId  ');
       orderStatus.value = AppOrderProcessStatus.completed;
@@ -233,16 +257,16 @@ class CustomerSocketController {
       // Lắng nghe phản hồi
       socket?.once('order_completed_confirmation', (data) {
         final socketResponse = _parseSocketResponse(data);
-        _userPickedUpCompleter.complete();
+        _userPickedUpCompleter.complete(socketResponse.isSuccess);
         if (socketResponse.isSuccess) {
           debugPrint(
               'Debug socket: Trạng thái đơn hàng đã được hoàn thành thành công');
 
-          currentOrder = null;
+          // currentOrder = null;
 
-          Timer(const Duration(seconds: 10), () {
-            orderStatus.value = AppOrderProcessStatus.pending;
-          });
+          // Timer(const Duration(seconds: 10), () {
+          //   orderStatus.value = AppOrderProcessStatus.pending;
+          // });
         } else {
           // orderStatus.value = AppOrderProcessStatus.completed;
           debugPrint(
@@ -254,9 +278,9 @@ class CustomerSocketController {
     } else {
       debugPrint(
           'Debug socket: Không thể cập nhật trạng thái - đơn hàng hiện tại: ${currentOrder != null}, socket kết nối: ${socket?.connected}');
-   
+
       return false;
-       }
+    }
   }
 
 // Cập nhật phương thức để hủy đơn hàng

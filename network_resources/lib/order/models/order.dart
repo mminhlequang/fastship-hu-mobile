@@ -257,17 +257,20 @@ class OrderModel {
 } 
 
 class OrderRating {
-  StoreModel? store;
-  List<CartItemModel>? items;
+  StoreOrderRating? store;
+  List<ProductOrderRating>? items;
 
   OrderRating({this.store, this.items});
 
   OrderRating.fromJson(Map<String, dynamic> json) {
-    store = json["store"] == null ? null : StoreModel.fromJson(json["store"]);
+    store =
+        json["store"] == null ? null : StoreOrderRating.fromJson(json["store"]);
     items =
         json["items"] == null
             ? null
-            : (json["items"] as List).map((e) => CartItemModel.fromJson(e)).toList();
+            : (json["items"] as List)
+                .map((e) => ProductOrderRating.fromJson(e))
+                .toList();
   }
 
   static List<OrderRating> fromList(List<Map<String, dynamic>> list) {
@@ -282,6 +285,64 @@ class OrderRating {
     if (items != null) {
       _data["items"] = items?.map((e) => e.toJson()).toList();
     }
+    return _data;
+  }
+}
+
+class ProductOrderRating {
+  int? star;
+  int? productId;
+  int? orderId;
+  String? content;
+
+  ProductOrderRating({this.star, this.productId, this.orderId, this.content});
+
+  ProductOrderRating.fromJson(Map<String, dynamic> json) {
+    star = json["star"];
+    productId = json["product_id"];
+    orderId = json["order_id"];
+    content = json["content"];
+  }
+
+  static List<ProductOrderRating> fromList(List<Map<String, dynamic>> list) {
+    return list.map(ProductOrderRating.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["star"] = star;
+    _data["product_id"] = productId;
+    _data["order_id"] = orderId;
+    _data["content"] = content;
+    return _data;
+  }
+}
+
+class StoreOrderRating {
+  int? storeId;
+  int? star;
+  int? orderId;
+  String? content;
+
+  StoreOrderRating({this.storeId, this.star, this.orderId, this.content});
+
+  StoreOrderRating.fromJson(Map<String, dynamic> json) {
+    storeId = json["store_id"];
+    star = json["star"];
+    orderId = json["order_id"];
+    content = json["content"];
+  }
+
+  static List<StoreOrderRating> fromList(List<Map<String, dynamic>> list) {
+    return list.map(StoreOrderRating.fromJson).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["store_id"] = storeId;
+    _data["star"] = star;
+    _data["order_id"] = orderId;
+    _data["content"] = content;
     return _data;
   }
 }

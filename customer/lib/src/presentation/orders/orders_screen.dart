@@ -2,7 +2,6 @@
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:internal_network/network_resources/resources.dart';
@@ -13,7 +12,6 @@ import 'package:network_resources/order/repo.dart';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
-import 'package:app/src/utils/app_utils.dart';
 import 'package:app/src/utils/utils.dart';
 
 import '../navigation/cubit/navigation_cubit.dart';
@@ -32,7 +30,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   List<OrderModel>? orders;
   bool isLoadingMore = false;
   bool hasMoreData = true;
-  int currentPage = 1;
+  int offset = 0;
   final int itemsPerPage = 10;
 
   @override
@@ -59,16 +57,20 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
+  AppOrderProcessStatus? orderStatus;
   // Load trang đầu tiên
   void _fetchOrders() async {
     setState(() {
       orders = null;
-      currentPage = 1;
+      offset = 0;
       hasMoreData = true;
     });
 
-    NetworkResponse response =
-        await OrderRepo().getOrdersByUser({"offset": 1, "limit": itemsPerPage});
+    NetworkResponse response = await OrderRepo().getOrdersByUser({
+      "process_status": orderStatus?.name,
+      "offset": 0,
+      "limit": itemsPerPage
+    });
 
     if (response.isSuccess) {
       final List<OrderModel> fetchedOrders = response.data as List<OrderModel>;
@@ -93,15 +95,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
       isLoadingMore = true;
     });
 
-    final nextPage = currentPage + 1;
-    NetworkResponse response = await OrderRepo().getOrdersByUser(
-        {"offset": nextPage * itemsPerPage, "limit": itemsPerPage});
+    final nextOffset = offset + 1;
+    NetworkResponse response = await OrderRepo().getOrdersByUser({
+      "process_status": orderStatus?.name,
+      "offset": nextOffset * itemsPerPage,
+      "limit": itemsPerPage
+    });
 
     if (response.isSuccess) {
       final List<OrderModel> newOrders = response.data as List<OrderModel>;
       if (newOrders.isNotEmpty) {
         orders!.addAll(newOrders);
-        currentPage = nextPage;
+        offset = nextOffset;
         hasMoreData = newOrders.length == itemsPerPage;
       } else {
         hasMoreData = false;
@@ -127,15 +132,114 @@ class _OrdersScreenState extends State<OrdersScreen> {
             showBackButton: false,
             title: 'My Orders'.tr(),
             actions: [
-              TextButton(
-                onPressed: () {
-                  appHaptic();
-                  context.push('/help-center');
+              WidgetOverlayActions(
+                inkwellBorderRadius: 8.sw,
+                childBuilder: (isOpen) => Container(
+                  width: 40,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: appColorBackground3,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  alignment: Alignment.center,
+                  child: WidgetAppSVG(
+                      isOpen || orderStatus != null ? 'icon94' : 'icon95',
+                      width: 24.sw,
+                      height: 24.sw),
+                ),
+                builder: (child, size, childPosition, pointerPosition,
+                    animationValue, hide) {
+                  return Positioned(
+                    top: childPosition.dy + size.height + 2,
+                    right: 12,
+                    child: Transform.scale(
+                      scaleY: animationValue,
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        margin: EdgeInsets.only(top: 4.sw),
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        width: 160,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: const [
+                            BoxShadow(
+                              offset: Offset(0, 4),
+                              blurRadius: 12,
+                              color: Colors.black12,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                                WidgetInkWellTransparent(
+                                  enableInkWell: false,
+                                  onTap: () async {
+                                    await hide();
+                                    orderStatus = null;
+                                    setState(() {});
+                                    _fetchOrders();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "All".tr(),
+                                          style: w400TextStyle(
+                                            fontSize: 16.sw,
+                                            color: orderStatus == null
+                                                ? appColorPrimary
+                                                : appColorText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ] +
+                              [
+                                AppOrderProcessStatus.pending,
+                                AppOrderProcessStatus.completed,
+                                AppOrderProcessStatus.cancelled
+                              ]
+                                  .map(
+                                    (e) => WidgetInkWellTransparent(
+                                      enableInkWell: false,
+                                      onTap: () async {
+                                        await hide();
+                                        orderStatus = e;
+                                        setState(() {});
+                                        _fetchOrders();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 16),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              e.friendlyName,
+                                              style: w400TextStyle(
+                                                fontSize: 16.sw,
+                                                color: orderStatus == e
+                                                    ? appColorPrimary
+                                                    : appColorText,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
+                    ),
+                  );
                 },
-                child: Text('Need help?'.tr(),
-                    style: w400TextStyle(
-                        fontSize: 16.sw, color: appColorPrimaryOrange)),
-              ),
+              )
             ],
           ),
           Expanded(
@@ -276,7 +380,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'You don\'t have any orders at this time',
+              orderStatus == null
+                  ? 'You don\'t have any orders at this time'.tr()
+                  : 'You don\'t have any "${orderStatus?.friendlyName}"\norders at this time'
+                      .tr(),
               textAlign: TextAlign.center,
               style: w400TextStyle(
                 fontSize: 16,
@@ -294,7 +401,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   navigationCubit.changeIndex(1);
                 },
                 color: appColorPrimary,
-                text: 'Order Now',
+                text: 'Order Now'.tr(),
                 borderRadius: 120,
               ),
             ),
@@ -309,8 +416,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
       padding: const EdgeInsets.all(16),
       itemCount: orders!.length + (hasMoreData || isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
-        // Nếu là item cuối cùng và đang load more hoặc còn data
-        if (index == orders!.length) {
+        // Kiểm tra bounds để tránh lỗi RangeError
+        if (index >= orders!.length) {
+          // Nếu đang load more, hiển thị shimmer loading
           if (isLoadingMore) {
             return Column(
               children: [
@@ -321,32 +429,36 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: _buildShimmerCard(),
+                ),
+                SizedBox(
+                  height: 120 + MediaQuery.of(context).padding.bottom,
                 )
               ],
             );
           } else if (hasMoreData) {
-            return const SizedBox(); // Placeholder cho trigger load more
+            // Placeholder cho trigger load more
+            return SizedBox(
+              height: 120 + MediaQuery.of(context).padding.bottom,
+            );
           } else {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: Text(
-                  'No more orders'.tr(),
-                  style: w400TextStyle(
-                    fontSize: 14.sw,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ),
+            // Kết thúc list với padding bottom
+            return SizedBox(
+              height: 120 + MediaQuery.of(context).padding.bottom,
             );
           }
+        }
+
+        // Kiểm tra index hợp lệ trước khi truy cập orders
+        if (index < 0 || index >= orders!.length) {
+          return const SizedBox
+              .shrink(); // Return empty widget nếu index không hợp lệ
         }
 
         // Hiển thị order card
         final order = orders![index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: _OrderCard(m: order),
+          child: _OrderCard(m: order, refreshCallback: _fetchOrders),
         );
       },
     );
@@ -355,10 +467,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
 class _OrderCard extends StatelessWidget {
   final OrderModel m;
+  final VoidCallback refreshCallback;
 
   const _OrderCard({
     super.key,
     required this.m,
+    required this.refreshCallback,
   });
 
   @override
@@ -458,7 +572,9 @@ class _OrderCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              m.driver?.name ?? '',
+                              m.deliveryTypeEnum == AppOrderDeliveryType.ship
+                                  ? m.driver?.name ?? ''
+                                  : 'You Pickup'.tr(),
                               textAlign: TextAlign.center,
                               style: w400TextStyle(
                                 fontSize: 14,
@@ -539,98 +655,99 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                if (m.processStatusEnum == AppOrderProcessStatus.completed) ...[
+                  const SizedBox(height: 16),
 
-                // Action buttons
-                Row(
-                  children: [
-                    // Review button hoặc Rating info
-                    if (m.rating == null) ...[
+                  // Action buttons
+                  Row(
+                    children: [
+                      // Review button hoặc Rating info
+                      if (m.rating?.store?.star == null) ...[
+                        Expanded(
+                          child: WidgetButtonConfirm(
+                            height: 44,
+                            onPressed: () async {
+                              appHaptic();
+                              await pushWidget(
+                                child: WidgetRating(m: m),
+                              );
+                              refreshCallback();
+                            },
+                            color: appColorPrimaryOrange,
+                            text: 'Review'.tr(),
+                            borderRadius: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ] else ...[
+                        // Hiển thị rating info khi đã đánh giá
+                        Expanded(
+                          child: Container(
+                            height: 44,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF9F8F6),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: appColorPrimaryOrange.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Rated:  '.tr(),
+                                  style: w400TextStyle(
+                                    fontSize: 14,
+                                    color: appColorPrimaryOrange,
+                                  ),
+                                ),
+                                WidgetAppSVG(
+                                  'icon91',
+                                  width: 16,
+                                  height: 16,
+                                  color: appColorPrimaryOrange,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  m.rating?.store?.star.toString() ?? "0.0",
+                                  style: w500TextStyle(
+                                    fontSize: 14,
+                                    color: appColorPrimaryOrange,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ],
+                      // Buy back button
                       Expanded(
                         child: WidgetButtonConfirm(
                           height: 44,
+                          color: appColorPrimary,
                           onPressed: () {
                             appHaptic();
-                            pushWidget(
-                              child: WidgetRating(
-                                m: m,
+
+                            context.push(
+                              '/preview-order',
+                              extra: CartModel(
+                                previousOrderId: m.id,
+                                store: m.store,
+                                cartItems: m.items,
                               ),
                             );
                           },
-                          color: appColorPrimaryOrange,
-                          text: 'Review'.tr(),
+                          text: 'Buy back'.tr(),
                           borderRadius: 12,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                    ] else ...[
-                      // Hiển thị rating info khi đã đánh giá
-                      Expanded(
-                        child: Container(
-                          height: 44,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF9F8F6),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: appColorPrimaryOrange.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Rated:  '.tr(),
-                                style: w400TextStyle(
-                                  fontSize: 14,
-                                  color: appColorPrimaryOrange,
-                                ),
-                              ),
-                              WidgetAppSVG(
-                                'icon91',
-                                width: 16,
-                                height: 16,
-                                color: appColorPrimaryOrange,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                m.rating?.toString() ?? "0.0",
-                                style: w500TextStyle(
-                                  fontSize: 14,
-                                  color: appColorPrimaryOrange,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
                     ],
-                    // Buy back button
-                    Expanded(
-                      child: WidgetButtonConfirm(
-                        height: 44,
-                        color: appColorPrimary,
-                        onPressed: () {
-                          appHaptic();
-
-                          context.push(
-                            '/preview-order',
-                            extra: CartModel(
-                              previousOrderId: m.id,
-                              store: m.store,
-                              cartItems: m.items,
-                            ),
-                          );
-                        },
-                        text: 'Buy back'.tr(),
-                        borderRadius: 12,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ]
               ],
             ),
           ],

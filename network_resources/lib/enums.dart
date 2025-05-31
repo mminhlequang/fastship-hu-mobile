@@ -40,6 +40,31 @@ enum AppOrderProcessStatus {
   cancelled,
 }
 
+extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
+  String get friendlyName {
+    switch (this) {
+      case AppOrderProcessStatus.pending:
+        return 'Pending'.tr();
+      case AppOrderProcessStatus.findDriver:
+        return 'Finding driver'.tr();
+      case AppOrderProcessStatus.driverAccepted:
+        return 'Driver accepted'.tr();
+      case AppOrderProcessStatus.storeAccepted:
+        return 'Store accepted'.tr();
+      case AppOrderProcessStatus.driverArrivedStore:
+        return 'Driver arrived store'.tr();
+      case AppOrderProcessStatus.driverPicked:
+        return 'Driver picked'.tr();
+      case AppOrderProcessStatus.driverArrivedDestination:
+        return 'Driver arrived destination'.tr();
+      case AppOrderProcessStatus.completed:
+        return 'Completed'.tr();
+      case AppOrderProcessStatus.cancelled:
+        return 'Cancelled'.tr();
+    }
+  }
+}
+
 enum AppFindDriverStatus {
   finding, // Đang tìm tài xế
   availableDrivers, // Tài xế khả dụng

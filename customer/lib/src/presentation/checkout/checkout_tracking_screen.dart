@@ -648,8 +648,9 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
             _buildSummaryRow('Subtotal', currencyFormatted(order.subtotal)),
             // _buildSummaryRow(
             //     'Application fee', currencyFormatted(order.applicationFee)),
-            _buildSummaryRow('Courier tip', currencyFormatted(order.tip),
-                color: appColorPrimary),
+            if (order.tip != null && order.tip != 0)
+              _buildSummaryRow('Courier tip', currencyFormatted(order.tip),
+                  color: appColorPrimary),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
@@ -661,7 +662,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                           height: 18.sw, color: hexColor('#F17228')),
                       const SizedBox(width: 8),
                       Text(
-                        currencyFormatted(1000) + ' off, more deals below',
+                        '${currencyFormatted(1000)} off, more deals below',
                         style: w400TextStyle(
                           fontSize: 16.sw,
                           color: hexColor('#3C3836'),
