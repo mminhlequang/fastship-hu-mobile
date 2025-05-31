@@ -172,25 +172,95 @@ class _OrdersScreenState extends State<OrdersScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.sw),
+          border: Border.all(color: grey8),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '#${order.code}',
-              style: w600TextStyle(fontSize: 16.sw, color: color),
+            // Header với order code và status badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '#${order.code}',
+                  style: w600TextStyle(fontSize: 16.sw, color: color),
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 8.sw, vertical: 4.sw),
+                  decoration: BoxDecoration(
+                    color: color?.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12.sw),
+                    border: Border.all(color: color ?? Colors.grey),
+                  ),
+                  child: Text(
+                    statusText ?? '',
+                    style: w500TextStyle(fontSize: 10.sw, color: color),
+                  ),
+                ),
+              ],
             ),
             Gap(2.sw),
             Text(
               description,
               style: w400TextStyle(fontSize: 12.sw, color: grey1),
             ),
-            Gap(16.sw),
-            // Text(
-            //   order.store?.name ?? '',
-            //   style: w400TextStyle(),
-            // ),
-            // _divider,
+            Gap(12.sw),
+
+            // Customer info
+            if (order.customer?.name != null) ...[
+              Row(
+                children: [
+                  Icon(Icons.person_outline, size: 16.sw, color: grey1),
+                  Gap(6.sw),
+                  Expanded(
+                    child: Text(
+                      order.customer?.name ?? '',
+                      style: w400TextStyle(fontSize: 13.sw),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              Gap(8.sw),
+            ],
+
+            // Delivery info for shipping orders
+            if (order.deliveryTypeEnum == AppOrderDeliveryType.ship &&
+                order.timePickupEstimate != null) ...[
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 16.sw, color: grey1),
+                  Gap(6.sw),
+                  Expanded(
+                    child: Text(
+                      'Est. pickup: ${order.timePickupEstimate}',
+                      style: w400TextStyle(fontSize: 13.sw, color: grey1),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              Gap(8.sw),
+            ],
+
+            // Distance for shipping orders
+            if (order.deliveryTypeEnum == AppOrderDeliveryType.ship &&
+                order.shipDistance != null &&
+                order.shipDistance! > 0) ...[
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined, size: 16.sw, color: grey1),
+                  Gap(6.sw),
+                  Text(
+                    '${order.shipDistance}km',
+                    style: w400TextStyle(fontSize: 13.sw, color: grey1),
+                  ),
+                ],
+              ),
+              Gap(8.sw),
+            ],
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -198,11 +268,23 @@ class _OrdersScreenState extends State<OrdersScreen>
                   'Delivery type'.tr(),
                   style: w400TextStyle(),
                 ),
-                Text(
-                  order.deliveryTypeEnum.name,
-                  style: w400TextStyle(
-                    color: color,
-                  ),
+                Row(
+                  children: [
+                    Icon(
+                      order.deliveryTypeEnum == AppOrderDeliveryType.ship
+                          ? Icons.delivery_dining
+                          : Icons.store,
+                      size: 16.sw,
+                      color: color,
+                    ),
+                    Gap(4.sw),
+                    Text(
+                      order.deliveryTypeEnum == AppOrderDeliveryType.ship
+                          ? 'Delivery'
+                          : 'Pickup',
+                      style: w400TextStyle(color: color),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -216,9 +298,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
                 Text(
                   order.processStatusEnum.name,
-                  style: w400TextStyle(
-                    color: color,
-                  ),
+                  style: w400TextStyle(color: color),
                 ),
               ],
             ),
@@ -227,12 +307,12 @@ class _OrdersScreenState extends State<OrdersScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${order.items?.length} ${'items'.tr()}',
+                  '${order.items?.length ?? 0} ${'items'.tr()}',
                   style: w400TextStyle(),
                 ),
                 Text(
-                  currencyFormatted(order.total),
-                  style: w400TextStyle(),
+                  currencyFormatted(order.total ?? 0),
+                  style: w600TextStyle(fontSize: 16.sw, color: darkGreen),
                 ),
               ],
             ),

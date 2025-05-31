@@ -59,6 +59,33 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
     }
   }
 
+  // Helper methods for order status display
+  Color _getStatusColor(AppOrderStoreStatus status) {
+    switch (status) {
+      case AppOrderStoreStatus.pending:
+        return orderStatusNew;
+      case AppOrderStoreStatus.completed:
+        return orderStatusCompleted;
+      case AppOrderStoreStatus.rejected:
+        return orderStatusCanceled;
+      default:
+        return grey1;
+    }
+  }
+
+  String _getStatusText(AppOrderStoreStatus status) {
+    switch (status) {
+      case AppOrderStoreStatus.pending:
+        return 'Pending'.tr();
+      case AppOrderStoreStatus.completed:
+        return 'Completed'.tr();
+      case AppOrderStoreStatus.rejected:
+        return 'Rejected'.tr();
+      default:
+        return 'Unknown'.tr();
+    }
+  }
+
   Widget _buildShimmer() {
     return shimmer.Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
@@ -355,12 +382,52 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                         // ],
 
                         /// contact customer & driver
-                        // if (currentStep < 1)
                         ...[
                           AppDivider(
                             color: grey8,
                             padding: EdgeInsets.symmetric(horizontal: 16.sw),
                           ),
+
+                          // Order status section
+                          Gap(16.sw),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Order status'.tr(),
+                                  style: w600TextStyle(fontSize: 16.sw),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12.sw, vertical: 6.sw),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _getStatusColor(order!.storeStatusEnum)
+                                            .withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16.sw),
+                                    border: Border.all(
+                                        color: _getStatusColor(
+                                            order!.storeStatusEnum)),
+                                  ),
+                                  child: Text(
+                                    _getStatusText(order!.storeStatusEnum),
+                                    style: w500TextStyle(
+                                        fontSize: 12.sw,
+                                        color: _getStatusColor(
+                                            order!.storeStatusEnum)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Gap(16.sw),
+                          AppDivider(
+                            color: grey8,
+                            padding: EdgeInsets.symmetric(horizontal: 16.sw),
+                          ),
+
                           Gap(14.sw),
                           Stack(
                             children: [
@@ -705,52 +772,104 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                           separatorBuilder: (context, index) =>
                               AppDivider(color: grey8),
                           itemBuilder: (context, index) {
+                            final item = order!.items?[index];
                             return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.sw),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                              padding: EdgeInsets.symmetric(vertical: 12.sw),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          order!.items?[index].product?.name ??
-                                              '',
-                                          style: w400TextStyle(),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Center(
-                                          child: Text(
-                                            order!.items?[index].quantity
-                                                    .toString() ??
-                                                '',
-                                            style: w400TextStyle(),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Center(
-                                          child: Text(
-                                            currencyFormatted(
-                                                order!.items?[index].price ??
-                                                    0),
-                                            style: w400TextStyle(),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  // Product image
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.sw),
+                                    child: Container(
+                                      width: 60.sw,
+                                      height: 60.sw,
+                                      color: grey8,
+                                      child: item?.product?.image != null
+                                          ? WidgetAppImage(
+                                              imageUrl: item!.product!.image!,
+                                              width: 60.sw,
+                                              height: 60.sw,
+                                            )
+                                          : Icon(
+                                              Icons.fastfood,
+                                              size: 30.sw,
+                                              color: grey1,
+                                            ),
+                                    ),
                                   ),
-                                  Gap(2.sw),
-                                  Text(
-                                    'Size M. Less ice',
-                                    style: w400TextStyle(
-                                        fontSize: 12.sw, color: grey1),
+                                  Gap(12.sw),
+                                  // Product details
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                item?.product?.name ?? '',
+                                                style: w500TextStyle(
+                                                    fontSize: 14.sw),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                              ),
+                                            ),
+                                            Gap(8.sw),
+                                            Text(
+                                              currencyFormatted(
+                                                  item?.price ?? 0),
+                                              style: w600TextStyle(
+                                                  fontSize: 14.sw,
+                                                  color: darkGreen),
+                                            ),
+                                          ],
+                                        ),
+                                        Gap(4.sw),
+                                        if (item?.product?.description !=
+                                            null) ...[
+                                          Text(
+                                            item!.product!.description!,
+                                            style: w400TextStyle(
+                                                fontSize: 12.sw, color: grey1),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Gap(4.sw),
+                                        ],
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8.sw,
+                                                  vertical: 4.sw),
+                                              decoration: BoxDecoration(
+                                                color: appColorPrimary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        12.sw),
+                                              ),
+                                              child: Text(
+                                                'x${item?.quantity ?? 0}',
+                                                style: w500TextStyle(
+                                                    fontSize: 12.sw,
+                                                    color: appColorPrimary),
+                                              ),
+                                            ),
+                                            Text(
+                                              'Total: ${currencyFormatted((item?.price ?? 0) * (item?.quantity ?? 1))}',
+                                              style: w400TextStyle(
+                                                  fontSize: 12.sw,
+                                                  color: grey1),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -843,12 +962,12 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                   ),
                                   GestureDetector(
                                     onTap: () =>
-                                        copyToClipboard('8765432345yu89'),
+                                        copyToClipboard(order!.code ?? ''),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          '8765432345yu89',
+                                          order!.code ?? '',
                                           style: w400TextStyle(color: blue1),
                                         ),
                                         Gap(4.sw),

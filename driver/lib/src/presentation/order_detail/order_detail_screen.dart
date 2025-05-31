@@ -1,6 +1,5 @@
 import 'package:network_resources/network_resources.dart';
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_go_router.dart';
 import 'package:app/src/utils/utils.dart';
@@ -284,48 +283,48 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             ),
           ),
           AppDivider(color: appColorBackground),
-          IgnorePointer(
-            ignoring: isCanceled,
-            child: Container(
-              width: context.width,
-              color: Colors.white,
-              padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
-                  16.sw + MediaQuery.paddingOf(context).bottom),
-              child: SliderButton(
-                action: () async {
-                  setState(() {
-                    if (step < 4) {
-                      step++;
-                    } else {
-                      appContext.push('/order-detail/report-order');
-                    }
-                  });
-                  return false;
-                },
-                label: Text(
-                  stepText,
-                  style: w500TextStyle(fontSize: 18.sw, color: Colors.white),
-                ),
-                icon: Center(
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: isCanceled ? grey9 : appColorPrimary,
-                    size: 24.sw,
-                  ),
-                ),
-                height: 48.sw,
-                buttonSize: 40.sw,
-                width: context.width,
-                radius: 8.sw,
-                alignLabel: Alignment.center,
-                buttonColor: Colors.white,
-                backgroundColor: isCanceled ? grey9 : appColorPrimary,
-                highlightedColor: appColorPrimary,
-                baseColor: Colors.white,
-                shimmer: !isCanceled,
-              ),
-            ),
-          ),
+          // IgnorePointer(
+          //   ignoring: isCanceled,
+          //   child: Container(
+          //     width: context.width,
+          //     color: Colors.white,
+          //     padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
+          //         16.sw + MediaQuery.paddingOf(context).bottom),
+          //     child: SliderButton(
+          //       action: () async {
+          //         setState(() {
+          //           if (step < 4) {
+          //             step++;
+          //           } else {
+          //             appContext.push('/order-detail/report-order');
+          //           }
+          //         });
+          //         return false;
+          //       },
+          //       label: Text(
+          //         stepText,
+          //         style: w500TextStyle(fontSize: 18.sw, color: Colors.white),
+          //       ),
+          //       icon: Center(
+          //         child: Icon(
+          //           Icons.arrow_forward_rounded,
+          //           color: isCanceled ? grey9 : appColorPrimary,
+          //           size: 24.sw,
+          //         ),
+          //       ),
+          //       height: 48.sw,
+          //       buttonSize: 40.sw,
+          //       width: context.width,
+          //       radius: 8.sw,
+          //       alignLabel: Alignment.center,
+          //       buttonColor: Colors.white,
+          //       backgroundColor: isCanceled ? grey9 : appColorPrimary,
+          //       highlightedColor: appColorPrimary,
+          //       baseColor: Colors.white,
+          //       shimmer: !isCanceled,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

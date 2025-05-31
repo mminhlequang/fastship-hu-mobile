@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
-import 'package:app/src/presentation/widgets/slider_button.dart';
 import 'package:app/src/presentation/widgets/widget_app_divider.dart';
+import 'package:app/src/presentation/widgets/widget_hold_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -130,36 +130,34 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                                   ),
                                 ),
                               )
-                            : SliderButton(
-                                key: Key(_nextStatus!.name),
-                                action: () async {
+                            : HoldToConfirmButton(
+                                onProgressCompleted: () {
                                   appHaptic();
                                   _handleStatusChange(_nextStatus!);
                                   setState(() {});
-                                  return true;
                                 },
-                                label: Text(
+                                child: Text(
                                   _nextStatus!.titleDisplay,
                                   style: w500TextStyle(
                                       fontSize: 18.sw, color: Colors.white),
                                 ),
-                                icon: Center(
-                                  child: Icon(
-                                    Icons.arrow_forward_rounded,
-                                    color: appColorPrimary,
-                                    size: 24.sw,
-                                  ),
-                                ),
-                                height: 48.sw,
-                                buttonSize: 40.sw,
-                                width: MediaQuery.of(context).size.width,
-                                radius: 99,
-                                alignLabel: Alignment.center,
-                                buttonColor: Colors.white,
+                                // icon: Center(
+                                //   child: Icon(
+                                //     Icons.arrow_forward_rounded,
+                                //     color: appColorPrimary,
+                                //     size: 24.sw,
+                                //   ),
+                                // ),
+                                // height: 48.sw,
+                                // buttonSize: 40.sw,
+                                // width: MediaQuery.of(context).size.width,
+                                // radius: 99,
+                                // alignLabel: Alignment.center,
+                                // buttonColor: Colors.white,
                                 backgroundColor: appColorPrimary,
-                                highlightedColor: appColorPrimary,
-                                baseColor: Colors.white,
-                                shimmer: false,
+                                // highlightedColor: appColorPrimary,
+                                // baseColor: Colors.white,
+                                // shimmer: false,
                               ),
                       ],
                     ),
@@ -252,7 +250,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                       appHaptic();
                       launchUrl(Uri.parse('tel:${widget.order!.store!.phone}'));
                     },
-                    radius: 0,
+                    radius: 99,
                     child: Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 6.sw, vertical: 6.sw),
@@ -305,7 +303,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                       appHaptic();
                       launchUrl(Uri.parse('tel:${widget.order!.phone!}'));
                     },
-                    radius: 0,
+                    radius: 99,
                     child: Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 6.sw, vertical: 6.sw),
