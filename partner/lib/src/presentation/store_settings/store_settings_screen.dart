@@ -30,7 +30,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             onTap: () => appContext.pushNamed('information'),
             radius: 0,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 16.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -83,7 +83,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             },
             radius: 0,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 16.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -95,6 +95,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                 ],
               ),
             ),
+          ),
+          AppDivider(
+            color: grey8,
+            padding: EdgeInsets.symmetric(horizontal: 16.sw),
           ),
           WidgetRippleButton(
             onTap: () async {
@@ -127,7 +131,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             },
             radius: 0,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 16.sw),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -8,7 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internal_core/internal_core.dart'; 
+import 'package:internal_core/internal_core.dart';
 
 enum ProfileItem {
   myProfile,
@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             radius: 0,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.sw, 14.sw, 12.sw, 14.sw),
+              padding: EdgeInsets.fromLTRB(16.sw, 16.sw, 12.sw, 16.sw),
               child: Row(
                 children: [
                   WidgetAppSVG(item.icon, width: 24.sw),

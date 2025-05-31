@@ -84,6 +84,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                 ),
               ),
               xFileImage: _avatarImage,
+              aspectRatio: 1.0,
               onPickImage: (image) {
                 setState(() {
                   _avatarImage = image;
@@ -105,6 +106,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                 ),
               ),
               xFileImage: _coverImage,
+              aspectRatio: 369 / 124,
               onPickImage: (image) {
                 setState(() {
                   _coverImage = image;
@@ -124,6 +126,7 @@ class _WidgetFormProfile3State extends State<WidgetFormProfile3> {
                 ),
               ),
               xFileImage: _facadeImage,
+              aspectRatio: 1.0,
               onPickImage: (image) {
                 setState(() {
                   _facadeImage = image;

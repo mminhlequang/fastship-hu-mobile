@@ -88,7 +88,7 @@ class WidgetPreferenceCurrencySelector extends StatefulWidget {
 
 class _WidgetPreferenceCurrencySelectorState
     extends State<WidgetPreferenceCurrencySelector> {
-  String get languageCode => AppPrefs.instance.languageCode;
+  String get currency => AppPrefs.instance.currency;
 
   @override
   Widget build(BuildContext context) {
@@ -97,83 +97,69 @@ class _WidgetPreferenceCurrencySelectorState
         title: Text('Currency'.tr()),
       ),
       backgroundColor: hexColor('F4F4F6'),
-      body: ListView.separated(
-        itemBuilder: (_, index) {
-          if (index == 0) {
-            return WidgetInkWellTransparent(
-              onTap: () {
-                appHaptic();
-                // setState(() {
-                //   AppPrefs.instance.languageCode =
-                //       appSupportedLocales[index].languageCode;
-                //   setLocale(languageCode);
-                // });
-              },
-              child: Container(
-                color: Colors.white,
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
-                child: Row(
-                  children: [
-                    WidgetAppSVG(
-                      appSupportedLocales[index].languageCode == languageCode
-                          ? 'radio-check'
-                          : 'radio-uncheck',
-                      width: 24.sw,
+      body: Column(
+        children: [
+          WidgetInkWellTransparent(
+            onTap: () {
+              appHaptic();
+              // setState(() {
+              //   AppPrefs.instance.languageCode =
+              //       appSupportedLocales[index].languageCode;
+              //   setLocale(languageCode);
+              // });
+            },
+            child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
+              child: Row(
+                children: [
+                  WidgetAppSVG(
+                    currency == 'HUF' ? 'radio-check' : 'radio-uncheck',
+                    width: 24.sw,
+                  ),
+                  Gap(20.sw),
+                  Expanded(
+                    child: Text(
+                      "Forint Hungary (HUF)",
+                      style: w500TextStyle(fontSize: 16.sw),
                     ),
-                    Gap(20.sw),
-                    Expanded(
-                      child: Text(
-                        "Forint Hungary (HUF)",
-                        style: w500TextStyle(fontSize: 16.sw),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          } else {
-            return WidgetInkWellTransparent(
-              onTap: () {
-                appHaptic();
-                // setState(() {
-                //   AppPrefs.instance.languageCode =
-                //       appSupportedLocales[index].languageCode;
-                //   setLocale(languageCode);
-                // });
-              },
-              child: Container(
-                color: Colors.white,
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
-                child: Row(
-                  children: [
-                    WidgetAppSVG(
-                      appSupportedLocales[index].languageCode == languageCode
-                          ? 'radio-check'
-                          : 'radio-uncheck',
-                      width: 24.sw,
-                    ),
-                    Gap(20.sw),
-                    Expanded(
-                      child: Text(
-                        "Dollar (USD)",
-                        style: w500TextStyle(fontSize: 16.sw),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
-        separatorBuilder: (_, __) {
-          return Container(
+            ),
+          ),
+          Container(
             height: 1,
             color: hexColor('F2F2F2'),
-          );
-        },
-        itemCount: 2,
+          ),
+          WidgetInkWellTransparent(
+            onTap: () {
+              appHaptic();
+              // setState(() {
+              //   AppPrefs.instance.currency = 'USD';
+              // });
+            },
+            child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 14.sw),
+              child: Row(
+                children: [
+                  WidgetAppSVG(
+                    currency == 'USD' ? 'radio-check' : 'radio-uncheck',
+                    width: 24.sw,
+                  ),
+                  Gap(20.sw),
+                  Expanded(
+                    child: Text(
+                      "Dollar (USD)",
+                      style: w500TextStyle(fontSize: 16.sw),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ).opacity(.4),
+        ],
       ),
     );
   }

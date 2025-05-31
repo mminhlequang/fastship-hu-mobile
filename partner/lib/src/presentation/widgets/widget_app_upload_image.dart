@@ -9,10 +9,45 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:internal_core/internal_core.dart';
 
+// Function để crop image với aspect ratio specific
+Future<XFile?> _cropImage(XFile imageFile, double aspectRatio) async {
+  final croppedFile = await ImageCropper().cropImage(
+    sourcePath: imageFile.path,
+    aspectRatio: CropAspectRatio(ratioX: aspectRatio, ratioY: 1.0),
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Crop Image'.tr(),
+        toolbarColor: Colors.black,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.original,
+        lockAspectRatio: true, // Khóa aspect ratio
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+        ],
+      ),
+      IOSUiSettings(
+        title: 'Crop Image'.tr(),
+        aspectRatioLockEnabled: true, // Khóa aspect ratio
+        resetAspectRatioEnabled: false,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+        ],
+      ),
+    ],
+  );
+
+  if (croppedFile != null) {
+    return XFile(croppedFile.path);
+  }
+  return null;
+}
+
 void _showImageSourceOptions(
-    BuildContext context, Function(XFile) onImagePicked) {
+    BuildContext context, Function(XFile) onImagePicked,
+    {double? aspectRatio}) {
   Future<void> _pickImage(
       ImageSource source, Function(XFile) onImagePicked) async {
     context.pop();
@@ -20,7 +55,15 @@ void _showImageSourceOptions(
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        onImagePicked(image);
+        if (aspectRatio != null) {
+          // Crop image theo aspect ratio nếu có
+          final croppedImage = await _cropImage(image, aspectRatio);
+          if (croppedImage != null) {
+            onImagePicked(croppedImage);
+          }
+        } else {
+          onImagePicked(image);
+        }
       }
     } catch (e) {
       debugPrint('Error picking image: $e');
@@ -107,6 +150,7 @@ class AppUploadImage extends StatelessWidget {
     this.width,
     this.xFileImage,
     this.imageUrl,
+    this.aspectRatio,
   });
 
   final String title;
@@ -119,6 +163,7 @@ class AppUploadImage extends StatelessWidget {
   final double? width;
   final XFile? xFileImage;
   final String? imageUrl;
+  final double? aspectRatio;
 
   bool get haveImage => xFileImage != null || imageUrl != null;
 
@@ -163,7 +208,8 @@ class AppUploadImage extends StatelessWidget {
               ),
           WidgetRippleButton(
             onTap: () {
-              _showImageSourceOptions(context, onPickImage);
+              _showImageSourceOptions(context, onPickImage,
+                  aspectRatio: aspectRatio);
             },
             radius: 4.sw,
             color: grey8,
@@ -222,18 +268,21 @@ class AppUploadImage2 extends StatelessWidget {
   final String assetSvg;
   final Function(XFile image) onPickImage;
   final XFile? image;
+  final double? aspectRatio;
+
   const AppUploadImage2(
       {super.key,
       required this.assetSvg,
       required this.onPickImage,
-      this.image});
+      this.image,
+      this.aspectRatio});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         appHaptic();
-        _showImageSourceOptions(context, onPickImage);
+        _showImageSourceOptions(context, onPickImage, aspectRatio: aspectRatio);
       },
       child: Stack(
         children: [

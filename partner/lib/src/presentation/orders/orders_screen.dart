@@ -27,7 +27,12 @@ class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   bool _isLoading = true;
-  Map<String, String> _mapParamByStatus = {};
+  Map<String, String> get _mapParamByStatus => switch (_tabController.index) {
+        0 => {"store_status": AppOrderStoreStatus.pending.name},
+        1 => {"store_status": AppOrderStoreStatus.completed.name},
+        2 => {"store_status": AppOrderStoreStatus.rejected.name},
+        _ => {},
+      };
   List<OrderModel> _orders = [];
 
   @override
@@ -78,13 +83,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       tabAlignment: TabAlignment.center,
       onTap: (index) {
         setState(() {});
-        _mapParamByStatus = switch (index) {
-          0 => {"store_status": AppOrderStoreStatus.pending.name},
-          // 1 => {"store_status": AppOrderStoreStatus.accepted.name},
-          2 => {"store_status": AppOrderStoreStatus.completed.name},
-          3 => {"store_status": AppOrderStoreStatus.rejected.name},
-          _ => {},
-        };
+
         _loadData();
       },
 

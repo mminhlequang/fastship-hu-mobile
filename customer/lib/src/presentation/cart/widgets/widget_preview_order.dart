@@ -264,6 +264,8 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "state": locationCubit.state.addressDetail!.address?.state,
         "country": locationCubit.state.addressDetail!.address?.countryName,
         "country_code": locationCubit.state.addressDetail!.address?.countryCode,
+        "process_status": AppOrderProcessStatus.pending.name,
+        "store_status": isPickup ? AppOrderStoreStatus.pending.name : null,
       });
       if (r.isSuccess) {
         cartCubit.fetchCarts();

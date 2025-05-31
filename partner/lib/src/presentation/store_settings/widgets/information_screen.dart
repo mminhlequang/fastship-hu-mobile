@@ -39,6 +39,7 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
       String? newAvatarUrl = _currentAvatarUrl;
       String? newCoverUrl = _currentCoverUrl;
 
+      // Upload avatar image với crop nếu có
       if (_avatarImage != null) {
         print('Debug: Uploading avatar image with path: ${_avatarImage!.path}');
         final response =
@@ -48,6 +49,7 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
         }
       }
 
+      // Upload cover image với crop nếu có
       if (_coverImage != null) {
         print('Debug: Uploading cover image with path: ${_coverImage!.path}');
         final response =
@@ -173,6 +175,7 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
               title: 'Avatar'.tr(),
               imageUrl: _avatarImage != null ? null : _currentAvatarUrl,
               xFileImage: _avatarImage,
+              aspectRatio: 1.0,
               subTitle: Padding(
                 padding: EdgeInsets.only(bottom: 8.sw, top: 4.sw),
                 child: Text(
@@ -191,6 +194,7 @@ class _InformationScreenState extends BaseLoadingState<InformationScreen> {
               xFileImage: _coverImage,
               height: 140.sw,
               width: context.width,
+              aspectRatio: 369 / 124,
               subTitle: Padding(
                 padding: EdgeInsets.only(bottom: 8.sw, top: 4.sw),
                 child: Text(
