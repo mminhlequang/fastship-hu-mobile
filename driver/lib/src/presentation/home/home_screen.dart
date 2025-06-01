@@ -199,56 +199,57 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Stack(
                   children: [
                     ValueListenableBuilder(
-                        valueListenable: socketController.orderStatus,
-                        builder: (context, status, child) {
-                          return ValueListenableBuilder(
-                            valueListenable: socketController.currentLocation,
-                            builder: (context, location, child) {
-                              List<Marker> markers = [];
-                              List<Polyline> polylines = [];
-                              OrderModel? order = socketController.currentOrder;
-                              if (location != null) {
-                                markers.add(Marker(
-                                  point: location,
-                                  width: 32.sw,
-                                  height: 32.sw,
-                                  child: Center(
-                                    child: AvatarGlow(
-                                      glowColor: appColorPrimary,
-                                      child: WidgetAppSVG(
-                                        'motor',
-                                        width: 28.sw,
-                                        height: 28.sw,
-                                      ),
+                      valueListenable: socketController.orderStatus,
+                      builder: (context, status, child) {
+                        return ValueListenableBuilder(
+                          valueListenable: socketController.currentLocation,
+                          builder: (context, location, child) {
+                            List<Marker> markers = [];
+                            List<Polyline> polylines = [];
+                            OrderModel? order = socketController.currentOrder;
+                            if (location != null) {
+                              markers.add(Marker(
+                                point: location,
+                                width: 44.sw,
+                                height: 44.sw,
+                                child: Center(
+                                  child: AvatarGlow(
+                                    glowColor: appColorPrimary,
+                                    child: WidgetAppSVG(
+                                      'motor',
+                                      width: 44.sw,
+                                      height: 44.sw,
                                     ),
                                   ),
-                                ));
-                              }
-                              if (status != AppOrderProcessStatus.pending) {
-                                if (order != null) {
-                                  markers.addAll([
-                                    Marker(
-                                      point: LatLng(
-                                        order.store!.lat!,
-                                        order.store!.lng!,
-                                      ),
-                                      width: 36.sw,
-                                      height: 36.sw,
-                                      child: WidgetAvatar(
-                                        imageUrl: order.store!.avatarImage,
-                                        radius1: 18.sw,
-                                        radius2: 18.sw - 2,
-                                        radius3: 18.sw - 2,
-                                        borderColor: Colors.white,
-                                      ),
+                                ),
+                              ));
+                            }
+                            if (status != AppOrderProcessStatus.pending) {
+                              if (order != null) {
+                                markers.addAll([
+                                  Marker(
+                                    point: LatLng(
+                                      order.store!.lat!,
+                                      order.store!.lng!,
                                     ),
+                                    width: 44.sw,
+                                    height: 44.sw,
+                                    child: WidgetAvatar(
+                                      imageUrl: order.store!.avatarImage,
+                                      radius1: 22.sw,
+                                      radius2: 22.sw - 2,
+                                      radius3: 22.sw - 2,
+                                      borderColor: Colors.white,
+                                    ),
+                                  ),
+                                  if (order.lat != null && order.lng != null)
                                     Marker(
                                       point: LatLng(
                                         order.lat!,
                                         order.lng!,
                                       ),
-                                      width: 36,
-                                      height: 36,
+                                      width: 44.sw,
+                                      height: 44.sw,
                                       child: AvatarGlow(
                                         glowColor: appColorPrimary,
                                         duration:
@@ -256,58 +257,59 @@ class _HomeScreenState extends State<HomeScreen> {
                                         repeat: true,
                                         child: WidgetAvatar(
                                           imageUrl: order.customer!.avatar,
-                                          radius1: 18.sw,
-                                          radius2: 18.sw - 2,
-                                          radius3: 18.sw - 2,
+                                          radius1: 22.sw,
+                                          radius2: 22.sw - 2,
+                                          radius3: 22.sw - 2,
                                           borderColor: Colors.white,
                                         ),
                                       ),
                                     ),
-                                  ]);
-                                }
-
-                                if (socketController.currentOrder?.shipPolyline
-                                        ?.isNotEmpty ??
-                                    false) {
-                                  try {
-                                    List<LatLng> polylinePoints =
-                                        FlexiblePolyline.decode(socketController
-                                                .currentOrder!.shipPolyline!)
-                                            .map((e) => LatLng(e.lat, e.lng))
-                                            .toList();
-                                    polylines.add(Polyline(
-                                      points: polylinePoints,
-                                      pattern: const StrokePattern.dotted(
-                                        spacingFactor: 1.5,
-                                        patternFit: PatternFit.scaleUp,
-                                      ),
-                                      color: appColorPrimary,
-                                      strokeWidth: 6.0,
-                                      borderColor: Colors.white,
-                                      borderStrokeWidth: 1.0,
-                                    ));
-                                  } catch (e) {
-                                    debugPrint('Error decoding polyline: $e');
-                                  }
-                                }
+                                ]);
                               }
 
-                              if (location != null) {
-                                mapController.future.then((e) {
-                                  updateMapToBoundsLatLng(
-                                      markers.map((e) => e.point).toList(), e);
-                                });
+                              if (socketController
+                                      .currentOrder?.shipPolyline?.isNotEmpty ??
+                                  false) {
+                                try {
+                                  List<LatLng> polylinePoints =
+                                      FlexiblePolyline.decode(socketController
+                                              .currentOrder!.shipPolyline!)
+                                          .map((e) => LatLng(e.lat, e.lng))
+                                          .toList();
+                                  polylines.add(Polyline(
+                                    points: polylinePoints,
+                                    pattern: const StrokePattern.dotted(
+                                      spacingFactor: 1.5,
+                                      patternFit: PatternFit.scaleUp,
+                                    ),
+                                    color: appColorPrimary,
+                                    strokeWidth: 6.0,
+                                    borderColor: Colors.white,
+                                    borderStrokeWidth: 1.0,
+                                  ));
+                                } catch (e) {
+                                  debugPrint('Error decoding polyline: $e');
+                                }
                               }
-                              return WidgetAppFlutterMapAnimation(
-                                mapController: mapController,
-                                initialCenter:
-                                    location ?? LatLng(37.7749, -122.4194),
-                                polylines: polylines,
-                                markers: markers,
-                              );
-                            },
-                          );
-                        }),
+                            }
+
+                            if (location != null) {
+                              mapController.future.then((e) {
+                                updateMapToBoundsLatLng(
+                                    markers.map((e) => e.point).toList(), e);
+                              });
+                            }
+                            return WidgetAppFlutterMapAnimation(
+                              mapController: mapController,
+                              initialCenter:
+                                  location ?? LatLng(37.7749, -122.4194),
+                              polylines: polylines,
+                              markers: markers,
+                            );
+                          },
+                        );
+                      },
+                    ),
                     Positioned(
                       left: 16,
                       right: 16,

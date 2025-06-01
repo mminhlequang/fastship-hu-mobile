@@ -12,7 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'utils.dart';
 
 updateMapToBoundsLatLng(List<LatLng> latLngs, AnimatedMapController controller,
-    {double zoomPlus = 1.0, Size? mapSize, bool isFlutterMap = false}) {
+    {double zoomPlus = .85, Size? mapSize, bool isFlutterMap = false}) {
   LatLngBounds bounds = LatLngBounds(
     latLngs.reduce((value, element) => LatLng(
         value.latitude < element.latitude ? value.latitude : element.latitude,

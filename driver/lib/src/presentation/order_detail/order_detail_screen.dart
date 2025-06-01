@@ -21,49 +21,34 @@ class OrderDetailScreen extends StatefulWidget {
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
-class _OrderDetailScreenState extends State<OrderDetailScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  bool isLate = false; // Muộn giao hàng
-  bool isCanceled = false; // Đơn hàng bị huỷ
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  bool isLate = false; // Late delivery
+  bool isCanceled = false; // Order canceled
   int step = 1;
   int? selectedReason;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
   String get stepText => switch (step) {
-        1 => 'Đã đến điểm lấy'.tr(),
-        2 => 'Đã lấy đơn'.tr(),
-        3 => 'Đã giao'.tr(),
-        _ => 'Cập nhật hình ảnh'.tr(),
+        1 => 'Arrived at pickup point'.tr(),
+        2 => 'Picked up order'.tr(),
+        3 => 'Delivered'.tr(),
+        _ => 'Update image'.tr(),
       };
 
   Future<void> _onPhoneCall() async {
     launchUrl(Uri.parse('tel:${widget.order.phone!}'));
   }
 
-  _onChat() {
+  void _onChat() {
     launchUrl(Uri.parse('sms:${widget.order.phone!}'));
-    // appContext.push('/order-detail/chat');
   }
 
   List<String> reasons = [
-    'Người nhận hẹn giao lại sau',
-    'Không liên hệ được người nhận',
-    'Người nhận muốn huỷ đơn/ thay đổi địa chỉ',
-    'Bận việc cá nhân',
-    'Kẹt xe',
-    'Khác',
+    'Recipient requested delivery later'.tr(),
+    'Cannot contact recipient'.tr(),
+    'Recipient wants to cancel order / change address'.tr(),
+    'Personal business'.tr(),
+    'Traffic jam'.tr(),
+    'Other'.tr(),
   ];
 
   _onRefuse() {
@@ -142,7 +127,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                     onTap: selectedReason == null
                         ? null
                         : () {
-                            // Todo:
+                            // Todo: Handle refusal
                           },
                     color: selectedReason == null ? grey8 : appColorPrimary,
                     child: SizedBox(
@@ -176,13 +161,654 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
       body: Column(
         children: [
           Expanded(
-            child: WidgetAppTabBar(
-              tabController: _tabController,
-              tabs: ['Merchant'.tr(), 'Customer'.tr()],
-              children: [
-                _buildMerchant(),
-                _buildCustomer(),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Order basic info section
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order Info'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Order ID'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              widget.order.id?.toString() ?? 'N/A',
+                              style: w500TextStyle(),
+                            ),
+                          ],
+                        ),
+                        Gap(4.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Order Time'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              // Use a placeholder time since createdAt doesn't exist
+                              DateFormat('dd/MM/yyyy HH:mm')
+                                  .format(DateTime.now()),
+                              style: w400TextStyle(),
+                            ),
+                          ],
+                        ),
+                        Gap(4.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Payment Method'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              'Cash'.tr(), // Use default payment method
+                              style: w400TextStyle(),
+                            ),
+                          ],
+                        ),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Status'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8.sw, vertical: 4.sw),
+                              decoration: BoxDecoration(
+                                color: appColorPrimary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4.sw),
+                              ),
+                              child: Text(
+                                widget.order.processStatus ??
+                                    'Order received'.tr(),
+                                style: w400TextStyle(
+                                    color: appColorPrimary, fontSize: 12.sw),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Merchant info section
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Merchant Info'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(8.sw),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.order.store?.name ??
+                                        'Unknown Store'.tr(),
+                                    style: w500TextStyle(fontSize: 16.sw),
+                                  ),
+                                  Gap(4.sw),
+                                  Text(
+                                    widget.order.store?.address ??
+                                        'No address available'.tr(),
+                                    style: w400TextStyle(color: grey1),
+                                  ),
+                                  if (widget.order.store?.phone != null) ...[
+                                    Gap(4.sw),
+                                    Text(
+                                      '${'Phone'.tr()}: ${widget.order.store!.phone}',
+                                      style: w400TextStyle(color: grey1),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            Gap(12.sw),
+                            WidgetRippleButton(
+                              onTap: () {
+                                // TODO: Implement store direction
+                              },
+                              radius: 99,
+                              borderSide:
+                                  BorderSide(color: hexColor('#E3E3E3')),
+                              child: SizedBox(
+                                height: 32.sw,
+                                width: 32.sw,
+                                child: Center(
+                                  child: Icon(Icons.directions, size: 18.sw),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Customer info section
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Customer Info'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(8.sw),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.order.customer?.name ??
+                                        'Unknown Customer'.tr(),
+                                    style: w500TextStyle(fontSize: 16.sw),
+                                  ),
+                                  Gap(4.sw),
+                                  Text(
+                                    widget.order.address ??
+                                        'No address available'.tr(),
+                                    style: w400TextStyle(color: grey1),
+                                  ),
+                                  if (widget.order.phone != null) ...[
+                                    Gap(4.sw),
+                                    Text(
+                                      '${'Phone'.tr()}: ${widget.order.phone}',
+                                      style: w400TextStyle(color: grey1),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            Gap(12.sw),
+                            WidgetRippleButton(
+                              onTap: () {
+                                // TODO: Implement customer direction
+                              },
+                              radius: 99,
+                              borderSide:
+                                  BorderSide(color: hexColor('#E3E3E3')),
+                              child: SizedBox(
+                                height: 32.sw,
+                                width: 32.sw,
+                                child: Center(
+                                  child: Icon(Icons.directions, size: 18.sw),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Gap(12.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Distance'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              widget.order.shipDistance != null
+                                  ? distanceFormatted(
+                                      widget.order.shipDistance!)
+                                  : 'Unknown'.tr(),
+                              style: w400TextStyle(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (!isCanceled) ...[
+                    // Delivery timer section
+                    // Container(
+                    //   color: isLate
+                    //       ? appColorError.withOpacity(0.05)
+                    //       : darkGreen.withOpacity(0.05),
+                    //   padding: EdgeInsets.symmetric(
+                    //       horizontal: 16.sw, vertical: 12.sw),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Icon(Icons.access_time,
+                    //           size: 18.sw,
+                    //           color: isLate ? appColorError : darkGreen),
+                    //       Gap(8.sw),
+                    //       Text.rich(
+                    //         isLate
+                    //             ? TextSpan(
+                    //                 text: 'Late'.tr(),
+                    //                 style: w500TextStyle(color: appColorError),
+                    //                 children: [
+                    //                   TextSpan(
+                    //                     text: ' 44 ${'minutes'.tr()}',
+                    //                     style:
+                    //                         w400TextStyle(color: appColorError),
+                    //                   ),
+                    //                 ],
+                    //               )
+                    //             : TextSpan(
+                    //                 text: '44 ${'minutes'.tr()}',
+                    //                 style: w500TextStyle(color: darkGreen),
+                    //                 children: [
+                    //                   TextSpan(
+                    //                     text: ' ${'left to deliver'.tr()}',
+                    //                     style:
+                    //                         w400TextStyle(color: appColorText),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                  ] else
+                    Container(
+                      color: appColorBackground,
+                      padding: EdgeInsets.symmetric(vertical: 12.sw),
+                      child: Center(
+                        child: Text(
+                          'Order canceled'.tr(),
+                          style: w500TextStyle(color: appColorError),
+                        ),
+                      ),
+                    ),
+
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Merchant notes section
+                  if (widget.order.note != null &&
+                      widget.order.note!.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.sw, vertical: 12.sw),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Merchant Note'.tr(),
+                            style: w600TextStyle(fontSize: 16.sw),
+                          ),
+                          Gap(8.sw),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(12.sw),
+                            decoration: BoxDecoration(
+                              color: appColorBackground,
+                              borderRadius: BorderRadius.circular(8.sw),
+                            ),
+                            child: Text(
+                              widget.order.note!,
+                              style: w400TextStyle(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Order details section
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.sw, 12.sw, 16.sw, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order Details'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Items'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              '${widget.order.items?.length ?? 0} ${'items'.tr()}',
+                              style: w500TextStyle(),
+                            ),
+                          ],
+                        ),
+                        Gap(12.sw),
+                        ...List.generate(
+                          widget.order.items?.length ?? 0,
+                          (index) {
+                            final item = widget.order.items![index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(12.sw),
+                                  decoration: BoxDecoration(
+                                    color: appColorBackground,
+                                    borderRadius: BorderRadius.circular(8.sw),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        height: 24.sw,
+                                        width: 24.sw,
+                                        decoration: BoxDecoration(
+                                          color: appColorPrimary,
+                                          borderRadius:
+                                              BorderRadius.circular(4.sw),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: w500TextStyle(
+                                              fontSize: 12.sw,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Gap(12.sw),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.product?.name ?? '',
+                                              style: w500TextStyle(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Gap(12.sw),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'x${item.quantity ?? 1}',
+                                            style:
+                                                w500TextStyle(color: darkGreen),
+                                          ),
+                                          Text(
+                                            currencyFormatted(item.price ?? 0),
+                                            style:
+                                                w400TextStyle(fontSize: 12.sw),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Gap(8.sw),
+                              ],
+                            );
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Merchant bill section
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Merchant Bill'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(12.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Subtotal'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              currencyFormatted(
+                                  widget.order.subtotal ?? widget.order.total),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                          ],
+                        ),
+                        Gap(4.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Merchant Discount'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              '- ${currencyFormatted(widget.order.discount)}',
+                              style: w400TextStyle(color: appColorError),
+                            ),
+                          ],
+                        ),
+                        Gap(4.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Additional Fee'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              currencyFormatted(
+                                  0), // No additionalFee property available
+                              style: w400TextStyle(color: grey1),
+                            ),
+                          ],
+                        ),
+                        Gap(12.sw),
+                        const AppDivider(),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Pay to Merchant'.tr(),
+                              style: w500TextStyle(),
+                            ),
+                            Text(
+                              currencyFormatted(widget.order.subtotal),
+                              style: w500TextStyle(color: darkGreen),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Customer bill section
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Customer Bill'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(12.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Subtotal'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              currencyFormatted(
+                                  widget.order.subtotal ?? widget.order.total),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                          ],
+                        ),
+                        Gap(4.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Delivery Fee'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              currencyFormatted(widget.order.shipFee),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                          ],
+                        ),
+                        if (widget.order.discount != null &&
+                            widget.order.discount! > 0) ...[
+                          Gap(4.sw),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Discount'.tr(),
+                                style: w400TextStyle(color: grey1),
+                              ),
+                              Text(
+                                '- ${currencyFormatted(widget.order.discount)}',
+                                style: w400TextStyle(color: appColorError),
+                              ),
+                            ],
+                          ),
+                        ],
+                        Gap(12.sw),
+                        const AppDivider(),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Collect from Customer'.tr(),
+                              style: w500TextStyle(),
+                            ),
+                            Text(
+                              currencyFormatted(widget.order.total),
+                              style: w500TextStyle(color: darkGreen),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  AppDivider(
+                      height: 5.sw, thickness: 5.sw, color: appColorBackground),
+
+                  // Driver earnings section
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.sw, vertical: 12.sw),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Driver Earnings'.tr(),
+                          style: w600TextStyle(fontSize: 16.sw),
+                        ),
+                        Gap(12.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Delivery Fee'.tr(),
+                              style: w400TextStyle(color: grey1),
+                            ),
+                            Text(
+                              currencyFormatted(widget.order.shipFee),
+                              style: w400TextStyle(color: darkGreen),
+                            ),
+                          ],
+                        ),
+                        if (widget.order.tip != null &&
+                            widget.order.tip! > 0) ...[
+                          Gap(4.sw),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Tip'.tr(),
+                                style: w400TextStyle(color: grey1),
+                              ),
+                              Text(
+                                currencyFormatted(widget.order.tip),
+                                style: w400TextStyle(color: darkGreen),
+                              ),
+                            ],
+                          ),
+                        ],
+                        Gap(12.sw),
+                        const AppDivider(),
+                        Gap(8.sw),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Earnings'.tr(),
+                              style: w500TextStyle(),
+                            ),
+                            Text(
+                              currencyFormatted((widget.order.shipFee ?? 0) +
+                                  (widget.order.tip ?? 0)),
+                              style: w500TextStyle(
+                                  color: darkGreen, fontSize: 16.sw),
+                            ),
+                          ],
+                        ),
+                        Gap(32.sw),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           AppDivider(color: appColorBackground),
@@ -190,8 +816,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             ignoring: isCanceled,
             child: Opacity(
               opacity: isCanceled ? .5 : 1,
-              child: SizedBox(
-                height: 61.sw,
+              child: Container(
+                padding:
+                    EdgeInsets.only(bottom: context.mediaQueryPadding.bottom),
+                height: 60.sw + context.mediaQueryPadding.bottom,
                 child: Row(
                   children: [
                     Expanded(
@@ -201,7 +829,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            WidgetAppSVG('ic_calling'),
+                            Icon(Icons.phone, size: 20.sw, color: grey1),
                             Gap(6.sw),
                             Text(
                               'Phone call'.tr(),
@@ -223,29 +851,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                             Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                WidgetAppSVG('ic_message'),
-                                Positioned(
-                                  top: -4.sw,
-                                  right: -6.sw,
-                                  child: Container(
-                                    height: 16.sw,
-                                    width: 16.sw,
-                                    decoration: BoxDecoration(
-                                      color: appColorPrimary,
-                                      border: Border.all(color: Colors.white),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '2',
-                                        style: w400TextStyle(
-                                          fontSize: 10.sw,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                Icon(Icons.message, size: 20.sw, color: grey1),
+                                // Positioned(
+                                //   top: -4.sw,
+                                //   right: -6.sw,
+                                //   child: Container(
+                                //     height: 16.sw,
+                                //     width: 16.sw,
+                                //     decoration: BoxDecoration(
+                                //       color: appColorPrimary,
+                                //       border: Border.all(color: Colors.white),
+                                //       shape: BoxShape.circle,
+                                //     ),
+                                //     child: Center(
+                                //       child: Text(
+                                //         '2',
+                                //         style: w400TextStyle(
+                                //           fontSize: 10.sw,
+                                //           color: Colors.white,
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                             Gap(6.sw),
@@ -266,7 +894,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            WidgetAppSVG('ic_close'),
+                            Icon(Icons.close, size: 20.sw, color: grey1),
                             Gap(6.sw),
                             Text(
                               'Cancel order'.tr(),
@@ -283,695 +911,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             ),
           ),
           AppDivider(color: appColorBackground),
+          // Delivery action button section commented out for now
           // IgnorePointer(
           //   ignoring: isCanceled,
-          //   child: Container(
-          //     width: context.width,
-          //     color: Colors.white,
-          //     padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
-          //         16.sw + MediaQuery.paddingOf(context).bottom),
-          //     child: SliderButton(
-          //       action: () async {
-          //         setState(() {
-          //           if (step < 4) {
-          //             step++;
-          //           } else {
-          //             appContext.push('/order-detail/report-order');
-          //           }
-          //         });
-          //         return false;
-          //       },
-          //       label: Text(
-          //         stepText,
-          //         style: w500TextStyle(fontSize: 18.sw, color: Colors.white),
-          //       ),
-          //       icon: Center(
-          //         child: Icon(
-          //           Icons.arrow_forward_rounded,
-          //           color: isCanceled ? grey9 : appColorPrimary,
-          //           size: 24.sw,
-          //         ),
-          //       ),
-          //       height: 48.sw,
-          //       buttonSize: 40.sw,
-          //       width: context.width,
-          //       radius: 8.sw,
-          //       alignLabel: Alignment.center,
-          //       buttonColor: Colors.white,
-          //       backgroundColor: isCanceled ? grey9 : appColorPrimary,
-          //       highlightedColor: appColorPrimary,
-          //       baseColor: Colors.white,
-          //       shimmer: !isCanceled,
-          //     ),
-          //   ),
+          //   child: Container(...),
           // ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMerchant() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.order.store?.name ?? 'Gong Cha Bubble Tea',
-                              style: w400TextStyle(),
-                            ),
-                            Gap(2.sw),
-                            Text(
-                              widget.order.store?.address ??
-                                  '41 Quang Trung, Ward 3, Go Vap District',
-                              style: w400TextStyle(color: grey1),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Gap(12.sw),
-                      WidgetRippleButton(
-                        onTap: () {
-                          // TODO: Implement store direction
-                        },
-                        radius: 99,
-                        borderSide: BorderSide(color: hexColor('#E3E3E3')),
-                        child: SizedBox(
-                          height: 32.sw,
-                          width: 32.sw,
-                          child: Center(
-                            child: WidgetAppSVG('ic_direction'),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const AppDivider(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Text.rich(
-                    TextSpan(
-                      text: '${'Pay'.tr()}: ',
-                      style: w400TextStyle(color: grey1),
-                      children: [
-                        TextSpan(
-                          text: currencyFormatted(widget.order.total),
-                          style: w400TextStyle(color: darkGreen),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const AppDivider(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Text(
-                    '${'Status'.tr()}: ${widget.order.processStatus ?? 'Order received'}',
-                    style: w400TextStyle(color: grey1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!isCanceled) ...[
-            AppDivider(
-                height: 5.sw, thickness: 5.sw, color: appColorBackground),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 7.sw),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  WidgetAppSVG('ic_timer'),
-                  Gap(4.sw),
-                  Text.rich(
-                    isLate
-                        ? TextSpan(
-                            text: 'Late'.tr(),
-                            style: w400TextStyle(),
-                            children: [
-                              TextSpan(
-                                text: ' 44 minutes',
-                                style: w400TextStyle(color: appColorError),
-                              ),
-                            ],
-                          )
-                        : TextSpan(
-                            text: '44 minutes',
-                            style: w400TextStyle(color: darkGreen),
-                            children: [
-                              TextSpan(
-                                text: ' ${'left to deliver'.tr()}',
-                                style: w400TextStyle(color: appColorText),
-                              ),
-                            ],
-                          ),
-                  ),
-                ],
-              ),
-            ),
-            AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground)
-          ] else
-            Container(
-              color: appColorBackground,
-              padding: EdgeInsets.symmetric(vertical: 8.sw),
-              child: Center(
-                child: Text(
-                  'Order canceled'.tr(),
-                  style: w400TextStyle(),
-                ),
-              ),
-            ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 12.sw),
-            child: Row(
-              children: [
-                WidgetAppSVG('ic_shop'),
-                Gap(8.sw),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Quán ghi chú',
-                        style: w400TextStyle(),
-                      ),
-                      Gap(2.sw),
-                      Text(
-                        widget.order.note?.toString() ??
-                            'Đơn hàng đã được chuẩn bị',
-                        style: w400TextStyle(),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.sw, 8.sw, 16.sw, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Order Details'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Text(
-                  '${'Quantity'.tr()}: ${widget.order.items?.length ?? 0}',
-                  style: w400TextStyle(),
-                ),
-                Gap(8.sw),
-                ...List.generate(
-                  widget.order.items?.length ?? 0,
-                  (index) {
-                    final item = widget.order.items![index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(8.sw),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 6,
-                              child: Text(
-                                '${index + 1}. ${item.toString()}',
-                                style: w400TextStyle(),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Center(
-                                child: Text(
-                                  '1',
-                                  style: w400TextStyle(color: darkGreen),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  currencyFormatted(widget.order.total),
-                                  style: w400TextStyle(),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Gap(8.sw),
-                        if (index != (widget.order.items?.length ?? 0) - 1)
-                          const AppDivider(),
-                      ],
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hoá đơn quán'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tổng đơn quán'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Quán giảm giá'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.discount),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Quán phụ thu'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Trả quán'.tr(),
-                      style: w400TextStyle(),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hoá đơn khách'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Thu tiền'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tài xế nhận được'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Phí ship'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.shipFee),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-                if (widget.order.tip != null && widget.order.tip! > 0) ...[
-                  Gap(4.sw),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Tiền tip'.tr(),
-                        style: w400TextStyle(color: grey1),
-                      ),
-                      Text(
-                        currencyFormatted(widget.order.tip),
-                        style: w400TextStyle(color: darkGreen),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCustomer() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.order.customer?.name ?? 'Hai Dang',
-                              style: w400TextStyle(),
-                            ),
-                            Gap(2.sw),
-                            Text(
-                              widget.order.address ??
-                                  '41 Quang Trung, Ward 3, Go Vap District',
-                              style: w400TextStyle(color: grey1),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Gap(12.sw),
-                      WidgetRippleButton(
-                        onTap: () {
-                          // TODO: Implement customer direction
-                        },
-                        radius: 99,
-                        borderSide: BorderSide(color: hexColor('#E3E3E3')),
-                        child: SizedBox(
-                          height: 32.sw,
-                          width: 32.sw,
-                          child: Center(
-                            child: WidgetAppSVG('ic_direction'),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const AppDivider(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Text.rich(
-                    TextSpan(
-                      text: '${'Thu'.tr()}: ',
-                      style: w400TextStyle(color: grey1),
-                      children: [
-                        TextSpan(
-                          text: currencyFormatted(widget.order.total),
-                          style: w400TextStyle(color: darkGreen),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          isCanceled
-              ? Container(
-                  color: appColorBackground,
-                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                  child: Center(
-                    child: Text(
-                      'Order canceled'.tr(),
-                      style: w400TextStyle(),
-                    ),
-                  ),
-                )
-              : AppDivider(
-                  height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.sw, 8.sw, 16.sw, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Order Details'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Text(
-                  '${'Quantity'.tr()}: ${widget.order.items?.length ?? 0}',
-                  style: w400TextStyle(),
-                ),
-                Gap(8.sw),
-                ...List.generate(
-                  widget.order.items?.length ?? 0,
-                  (index) {
-                    final item = widget.order.items![index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(8.sw),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 6,
-                              child: Text(
-                                '${index + 1}. ${item.toString()}',
-                                style: w400TextStyle(),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Center(
-                                child: Text(
-                                  '1',
-                                  style: w400TextStyle(color: darkGreen),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  currencyFormatted(widget.order.total),
-                                  style: w400TextStyle(),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Gap(8.sw),
-                        if (index != (widget.order.items?.length ?? 0) - 1)
-                          const AppDivider(),
-                      ],
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hoá đơn quán'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tổng đơn quán'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Quán giảm giá'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.discount),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Quán phụ thu'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                  ],
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Trả quán'.tr(),
-                      style: w400TextStyle(),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hoá đơn khách'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Thu tiền'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.total),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          AppDivider(height: 5.sw, thickness: 5.sw, color: appColorBackground),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sw, vertical: 8.sw),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tài xế nhận được'.tr(),
-                  style: w600TextStyle(),
-                ),
-                Gap(4.sw),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Phí ship'.tr(),
-                      style: w400TextStyle(color: grey1),
-                    ),
-                    Text(
-                      currencyFormatted(widget.order.shipFee),
-                      style: w400TextStyle(color: darkGreen),
-                    ),
-                  ],
-                ),
-                if (widget.order.tip != null && widget.order.tip! > 0) ...[
-                  Gap(4.sw),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Tiền tip'.tr(),
-                        style: w400TextStyle(color: grey1),
-                      ),
-                      Text(
-                        currencyFormatted(widget.order.tip),
-                        style: w400TextStyle(color: darkGreen),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
         ],
       ),
     );

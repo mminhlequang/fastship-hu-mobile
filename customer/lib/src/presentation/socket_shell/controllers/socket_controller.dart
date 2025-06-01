@@ -93,6 +93,16 @@ class CustomerSocketController {
         }
       });
 
+      //driver_location_update: {orderId: 278, driverId: 13, location: {lat: 37.785834, lng: -122.406417}, timestamp: 2025-06-01T14:16:06.587Z}
+      socket?.on('driver_location_update', (data) {
+        final Map<String, dynamic> socketResponse =
+            data is String ? jsonDecode(data) : Map<String, dynamic>.from(data);
+        driverLocation.value = LatLng(socketResponse['location']['lat'],
+            socketResponse['location']['lng']);
+        print(
+            'Debug socket: driverLocation: ${driverLocation.value?.latitude}, ${driverLocation.value?.longitude}');
+      });
+
       socket?.on('order_completed', (data) async {
         debugPrint('Debug socket: order_completed: $data');
 
@@ -119,9 +129,8 @@ class CustomerSocketController {
           ];
           final String randomTitle = (titles..shuffle()).first;
           final String randomMessage = (messages..shuffle()).first;
-          navigationCubit.changeIndex(3);
 
-          appOpenDialog(WidgetDialogNotification(
+          await appOpenDialog(WidgetDialogNotification(
               iconPng: 'image3',
               title: randomTitle,
               message: randomMessage,
@@ -130,6 +139,7 @@ class CustomerSocketController {
                 appHaptic();
                 appContext.pop();
               }));
+          navigationCubit.changeIndex(3);
         }
       });
 
@@ -216,13 +226,7 @@ class CustomerSocketController {
             break;
           case AppFindDriverStatus.found:
             orderStatus.value = AppOrderProcessStatus.driverAccepted;
-            socket?.on(
-                'driver_${socketResponse.data!['driverInfo']?['profile']?['id']}',
-                (data) {
-              debugPrint(
-                  'Debug socket: driver_${socketResponse.data!['driverInfo']?['profile']?['id']}: $data');
-            });
-            await Future.delayed(Duration(seconds: 1));
+            await Future.delayed(Duration(seconds: 2));
             await _refreshOrder();
             if (!_createOrderCompleter.isCompleted) {
               _createOrderCompleter.complete(true);

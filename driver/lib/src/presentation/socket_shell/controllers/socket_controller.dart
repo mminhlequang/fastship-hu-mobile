@@ -14,6 +14,32 @@ import 'package:vibration/vibration.dart';
 import '../../../constants/app_constants.dart';
 import '../models/socket_response.dart';
 
+// List of predefined locations with latitude and longitude
+const List<LatLng> listLocation = [
+  LatLng(47.49661, 19.06875),
+  LatLng(47.49663, 19.06888),
+  LatLng(47.49674, 19.06934),
+  LatLng(47.49675, 19.06939),
+  LatLng(47.49689, 19.0699),
+  LatLng(47.49695, 19.07007),
+  LatLng(47.49707, 19.07043),
+  LatLng(47.49682, 19.07045),
+  LatLng(47.49664, 19.07049),
+  LatLng(47.49642, 19.07057),
+  LatLng(47.49625, 19.07064),
+  LatLng(47.49619, 19.07066),
+  LatLng(47.49606, 19.0707),
+  LatLng(47.49571, 19.07078),
+  LatLng(47.49539, 19.07083),
+  LatLng(47.49423, 19.07096),
+  LatLng(47.49356, 19.07102),
+  LatLng(47.49347, 19.07039),
+  LatLng(47.49337, 19.06979),
+  LatLng(47.49356, 19.06978),
+  LatLng(47.49419, 19.06974),
+  LatLng(47.49454, 19.06971),
+];
+
 SocketController get socketController => findInstance<SocketController>();
 
 class SocketController {
@@ -163,7 +189,7 @@ class SocketController {
     debugPrint('Debug socket: Bắt đầu cập nhật vị trí');
     _locationTimer?.cancel();
     _locationTimer =
-        Timer.periodic(const Duration(seconds: kDebugMode ? 120 : 30), (_) {
+        Timer.periodic(const Duration(seconds: kDebugMode ? 15 : 30), (_) {
       debugPrint('Debug socket: Timer cập nhật vị trí kích hoạt');
       _sendCurrentLocation();
     });
@@ -187,17 +213,22 @@ class SocketController {
           timeLimit: const Duration(seconds: 15),
         ),
       );
-      currentLocation.value = LatLng(position.latitude, position.longitude);
-
+      LatLng latLng = LatLng(position.latitude, position.longitude);
       //TODO: remove later
-      currentLocation.value = LatLng(47.500976, 19.061095);
+      fakeIndexLocation++;
+      latLng =
+          fakeIndexLocation != -1 && fakeIndexLocation < listLocation.length
+              ? listLocation[fakeIndexLocation]
+              : LatLng(47.500976, 19.061095);
+
+      currentLocation.value = latLng;
 
       if (socket?.connected == true && _isOnline) {
         debugPrint(
-            'Debug socket: Gửi vị trí lên server ${position.latitude}, ${position.longitude}');
+            'Debug socket: Gửi vị trí lên server ${latLng.latitude}, ${latLng.longitude}');
         socket?.emit('driver_update_location', {
-          'latitude': position.latitude,
-          'longitude': position.longitude,
+          'latitude': latLng.latitude,
+          'longitude': latLng.longitude,
         });
       } else {
         debugPrint(
@@ -382,7 +413,12 @@ class SocketController {
     }
   }
 
+  int fakeIndexLocation = -1;
   void updateOrderStatus(AppOrderProcessStatus status) {
+    if (status == AppOrderProcessStatus.driverPicked) {
+      fakeIndexLocation = -1;
+      fakeIndexLocation++;
+    }
     AppOrderProcessStatus currentStatus = orderStatus.value;
     if (currentOrder != null && socket?.connected == true) {
       debugPrint(

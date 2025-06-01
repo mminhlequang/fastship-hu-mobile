@@ -109,91 +109,93 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                       ),
                       Expanded(
                         child: ValueListenableBuilder(
-                            valueListenable: socketController.driverLocation,
-                            builder: (context, driverLocation, child) {
-                              // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
-                              List<LatLng> polylinePoints = [];
-                              if (order.shipPolyline?.isNotEmpty ?? false) {
-                                try {
-                                  polylinePoints = FlexiblePolyline.decode(
-                                          order.shipPolyline!)
-                                      .map((e) => LatLng(e.lat, e.lng))
-                                      .toList();
-                                } catch (e) {
-                                  debugPrint('Error decoding polyline: $e');
-                                }
+                          valueListenable: socketController.driverLocation,
+                          builder: (context, driverLocation, child) {
+                            // Chuyển đổi chuỗi polyline thành danh sách điểm LatLng
+                            List<LatLng> polylinePoints = [];
+                            if (order.shipPolyline?.isNotEmpty ?? false) {
+                              try {
+                                polylinePoints =
+                                    FlexiblePolyline.decode(order.shipPolyline!)
+                                        .map((e) => LatLng(e.lat, e.lng))
+                                        .toList();
+                              } catch (e) {
+                                debugPrint('Error decoding polyline: $e');
                               }
+                            }
 
-                              List<Marker> markers = [
-                                Marker(
-                                  point: LatLng(
-                                    order.store!.lat!,
-                                    order.store!.lng!,
-                                  ),
-                                  width: 36.sw,
-                                  height: 36.sw,
-                                  child: AvatarGlow(
-                                    glowColor: appColorPrimary,
-                                    duration:
-                                        const Duration(milliseconds: 2000),
-                                    repeat: true,
-                                    child: WidgetAvatar(
-                                      imageUrl: order.store!.avatarImage,
-                                      radius1: 18.sw,
-                                      radius2: 18.sw - 2,
-                                      radius3: 18.sw - 2,
-                                      borderColor: Colors.white,
-                                    ),
+                            List<Marker> markers = [
+                              Marker(
+                                point: LatLng(
+                                  order.store!.lat!,
+                                  order.store!.lng!,
+                                ),
+                                width: 44.sw,
+                                height: 44.sw,
+                                child: AvatarGlow(
+                                  glowColor: appColorPrimary,
+                                  duration: const Duration(milliseconds: 2000),
+                                  repeat: true,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.store!.avatarImage,
+                                    radius1: 22.sw,
+                                    radius2: 22.sw - 2,
+                                    radius3: 22.sw - 2,
+                                    borderColor: Colors.white,
                                   ),
                                 ),
-                                if (order.driver != null &&
-                                    driverLocation != null)
-                                  Marker(
-                                    point: LatLng(
-                                      driverLocation.latitude,
-                                      driverLocation.longitude,
-                                    ),
-                                    width: 36.sw,
-                                    height: 36.sw,
-                                    child: WidgetAvatar(
-                                      imageUrl: order.driver!.avatar ?? '',
-                                      radius1: 18.sw,
-                                      radius2: 18.sw - 2,
-                                      radius3: 18.sw - 2,
-                                      borderColor: Colors.white,
-                                    ),
-                                  ),
+                              ),
+                              if (order.driver != null &&
+                                  driverLocation != null)
                                 Marker(
                                   point: LatLng(
-                                    order.lat!,
-                                    order.lng!,
+                                    driverLocation.latitude,
+                                    driverLocation.longitude,
                                   ),
-                                  width: 36,
-                                  height: 36,
-                                  child: AvatarGlow(
-                                    glowColor: appColorPrimary,
-                                    duration:
-                                        const Duration(milliseconds: 2000),
-                                    repeat: true,
-                                    child: WidgetAvatar(
-                                      imageUrl: order.customer!.avatar,
-                                      radius1: 18.sw,
-                                      radius2: 18.sw - 2,
-                                      radius3: 18.sw - 2,
-                                      borderColor: Colors.white,
-                                    ),
+                                  width: 44.sw,
+                                  height: 44.sw,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.driver!.avatar ?? '',
+                                    radius1: 22.sw,
+                                    radius2: 22.sw - 2,
+                                    radius3: 22.sw - 2,
+                                    borderColor: Colors.white,
                                   ),
                                 ),
-                              ];
+                              Marker(
+                                point: LatLng(
+                                  order.lat!,
+                                  order.lng!,
+                                ),
+                                width: 44.sw,
+                                height: 44.sw,
+                                child: AvatarGlow(
+                                  glowColor: appColorPrimary,
+                                  duration: const Duration(milliseconds: 2000),
+                                  repeat: true,
+                                  child: WidgetAvatar(
+                                    imageUrl: order.customer!.avatar,
+                                    radius1: 22.sw,
+                                    radius2: 22.sw - 2,
+                                    radius3: 22.sw - 2,
+                                    borderColor: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ];
 
-                              mapController.future.then((controller) {
-                                updateMapToBoundsLatLng(
-                                  markers.map((e) => e.point).toList(),
-                                  controller,
-                                );
-                              });
+                            mapController.future.then((controller) {
+                              updateMapToBoundsLatLng(
+                                markers.map((e) => e.point).toList(),
+                                controller,
+                              );
+                            });
 
-                              return WidgetAppFlutterMapAnimation(
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: 280.sw +
+                                      MediaQuery.of(context).padding.bottom),
+                              child: WidgetAppFlutterMapAnimation(
                                 mapController: mapController,
                                 initialCenter: LatLng(
                                   order.lat!,
@@ -215,8 +217,10 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                                     )
                                 ],
                                 initialZoom: 14,
-                              );
-                            }),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),

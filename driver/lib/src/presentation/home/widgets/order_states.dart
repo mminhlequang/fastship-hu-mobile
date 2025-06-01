@@ -1,12 +1,8 @@
-import 'dart:async';
-
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/home/widgets/widget_animated_stepper.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
-import 'package:app/src/presentation/widgets/widget_app_divider.dart';
 import 'package:app/src/presentation/widgets/widget_hold_button.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
-import 'package:app/src/utils/app_utils.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -85,8 +81,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
           ),
           padding: EdgeInsets.fromLTRB(
               16.sw, 16.sw, 16.sw, 16.sw + context.mediaQueryPadding.bottom),
-          child: _nextStatus == null ||
-                  widget.processStatus == AppOrderProcessStatus.cancelled
+          child: widget.processStatus == AppOrderProcessStatus.cancelled
               ? _buildCancelled()
               : _nextStatus == null ||
                       widget.processStatus == AppOrderProcessStatus.completed
@@ -123,7 +118,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                                   height: 48.sw,
                                   child: Center(
                                     child: Text(
-                                      '${'Accept order'.tr()} ($seconds s)',
+                                      '${'Accept order'.tr()} (${seconds}s)',
                                       style: w500TextStyle(
                                           fontSize: 16.sw, color: Colors.white),
                                     ),
@@ -131,16 +126,12 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                                 ),
                               )
                             : HoldToConfirmButton(
+                                duration: Duration(seconds: 1),
                                 onProgressCompleted: () {
                                   appHaptic();
                                   _handleStatusChange(_nextStatus!);
                                   setState(() {});
                                 },
-                                child: Text(
-                                  _nextStatus!.titleDisplay,
-                                  style: w500TextStyle(
-                                      fontSize: 18.sw, color: Colors.white),
-                                ),
                                 // icon: Center(
                                 //   child: Icon(
                                 //     Icons.arrow_forward_rounded,
@@ -155,6 +146,13 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                                 // alignLabel: Alignment.center,
                                 // buttonColor: Colors.white,
                                 backgroundColor: appColorPrimary,
+                                child: Center(
+                                  child: Text(
+                                    _nextStatus!.titleDisplay,
+                                    style: w500TextStyle(
+                                        fontSize: 18.sw, color: Colors.white),
+                                  ),
+                                ),
                                 // highlightedColor: appColorPrimary,
                                 // baseColor: Colors.white,
                                 // shimmer: false,
