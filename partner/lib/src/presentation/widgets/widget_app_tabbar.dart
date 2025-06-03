@@ -18,6 +18,7 @@ class WidgetAppTabBar extends StatelessWidget {
     this.count,
     this.isScrollable = false,
     this.tabAlignment,
+    this.indicatorColor,
   });
 
   final TabController tabController;
@@ -31,6 +32,7 @@ class WidgetAppTabBar extends StatelessWidget {
   final int? count;
   final bool isScrollable;
   final TabAlignment? tabAlignment;
+  final Color? indicatorColor;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,13 @@ class WidgetAppTabBar extends StatelessWidget {
           height: 36.sw,
           color: Colors.white,
           child: TabBar(
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                color: indicatorColor ?? appColorPrimary,
+                width: 2,
+              ),
+            ),
+            indicatorColor: indicatorColor,
             controller: tabController,
             isScrollable: isScrollable,
             tabs: tabWidgets ??

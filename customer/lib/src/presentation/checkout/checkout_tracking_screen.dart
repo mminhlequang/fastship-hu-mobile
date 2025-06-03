@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_button.dart';
-import 'package:app/src/presentation/widgets/widget_dialog_notification.dart';
+import 'package:app/src/presentation/widgets/widget_dialog_confirm.dart';
 import 'package:app/src/utils/app_map_helper.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:avatar_glow/avatar_glow.dart';
@@ -470,17 +470,21 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                           appHaptic();
                           final r = await appContext.push('/cancel-order');
                           if (r is String) {
-                            socketController.cancelOrder(r);
-                            context.pop();
-
                             appOpenDialog(
-                              WidgetDialogNotification(
-                                icon: 'icon60',
-                                title:
-                                    "We're so sad about your cancellation".tr(),
+                              WidgetDialogConfirm(
+                                title: "Cancel Order".tr(),
                                 message:
-                                    "We will continue to improve our service & satisfy you on the next order.",
-                                buttonText: "Done".tr(),
+                                    "Are you sure you want to cancel this order?, we will not refund you"
+                                        .tr(),
+                                onConfirm: () {
+                                  appHaptic();
+                                  appContext.pop();
+                                  socketController.cancelOrder(r);
+                                },
+                                onCancel: () {
+                                  appHaptic();
+                                  appContext.pop();
+                                },
                               ),
                             );
                           }

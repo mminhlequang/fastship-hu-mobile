@@ -55,14 +55,14 @@ class _WidgetTopUpSheetState extends State<WidgetTopUpSheet> {
                   },
                   inputFormatters: [
                     CurrencyTextInputFormatter.currency(
-                      locale: 'en_EU',
+                      locale: 'hu_HU',
                       symbol: AppPrefs.instance.currencySymbol,
                       enableNegative: false,
-                      decimalDigits: 1,
+                      decimalDigits: 0,
                     ),
                   ],
                   decoration: InputDecoration(
-                    hintText: '${AppPrefs.instance.currencySymbol}0.00',
+                    hintText: currencyFormatted(0),
                     hintStyle: w600TextStyle(
                       fontSize: 32.sw,
                       height: 24 / 32,
@@ -153,14 +153,14 @@ class _WidgetWithdrawSheetState extends State<WidgetWithdrawSheet> {
                 },
                 inputFormatters: [
                   CurrencyTextInputFormatter.currency(
-                    locale: 'en_EU',
+                    locale: 'hu_HU',
                     symbol: AppPrefs.instance.currencySymbol,
                     enableNegative: false,
-                    decimalDigits: 1,
+                    decimalDigits: 0,
                   ),
                 ],
                 decoration: InputDecoration(
-                  hintText: '${AppPrefs.instance.currencySymbol}0.00',
+                  hintText: currencyFormatted(0),
                   hintStyle: w600TextStyle(
                     fontSize: 32.sw,
                     height: 24 / 32,

@@ -320,12 +320,7 @@ class _WidgetAddDishState extends BaseLoadingState<WidgetAddDish> {
                             setState(() {});
                           },
                           inputFormatters: [
-                            CurrencyTextInputFormatter.currency(
-                              locale: 'en_EU',
-                              symbol: AppPrefs.instance.currencySymbol,
-                              enableNegative: false,
-                              decimalDigits: 1,
-                            ),
+                           currencyTextInputFormatter,
                           ],
                         ),
                         Gap(24.sw),

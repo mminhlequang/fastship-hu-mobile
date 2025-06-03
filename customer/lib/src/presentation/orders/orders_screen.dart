@@ -446,6 +446,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
               height: 120 + MediaQuery.of(context).padding.bottom,
             );
           }
+        } else if (index == orders!.length - 1 &&
+            !isLoadingMore &&
+            !hasMoreData) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: 120 + MediaQuery.of(context).padding.bottom),
+            child: _OrderCard(m: orders![index], refreshCallback: _fetchOrders),
+          );
         }
 
         // Kiểm tra index hợp lệ trước khi truy cập orders
@@ -477,23 +485,87 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Kiểm tra nếu order đang tiến hành (pending)
+    final bool isInProgress =
+        m.processStatusEnum != AppOrderProcessStatus.completed &&
+            m.processStatusEnum != AppOrderProcessStatus.cancelled;
+
     return GestureDetector(
       onTap: () {
         appHaptic();
-        pushWidget(
-          child: WidgetOrderDetail(m: m),
-        );
+        if (isInProgress) {
+          context.push('/checkout-tracking', extra: m);
+        } else {
+          pushWidget(
+            child: WidgetOrderDetail(m: m),
+          );
+        }
       },
       child: Container(
         constraints: const BoxConstraints(maxWidth: 361),
         decoration: BoxDecoration(
-          color: const Color(0xFFF9F8F6),
+          color: isInProgress
+              ? const Color(0xFFE8F5E8)
+              : const Color(0xFFF9F8F6), // Xanh nhạt cho đang tiến hành
           borderRadius: BorderRadius.circular(12),
+          border: isInProgress
+              ? Border.all(
+                  color: appColorPrimary.withOpacity(0.3),
+                  width: 1.5,
+                )
+              : null,
+          boxShadow: isInProgress
+              ? [
+                  BoxShadow(
+                    offset: const Offset(0, 2),
+                    blurRadius: 8,
+                    color: appColorPrimary.withOpacity(0.1),
+                  ),
+                ]
+              : null,
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Badge "In Progress" cho order đang tiến hành
+            if (isInProgress) ...[
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: appColorPrimary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'In Progress'.tr(),
+                          style: w500TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
+
             // Header with order ID and date/time
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -502,7 +574,9 @@ class _OrderCard extends StatelessWidget {
                   child: Text(
                     m.code ?? '',
                     style: w400TextStyle(
-                      color: appColorPrimaryOrange,
+                      color: isInProgress
+                          ? appColorPrimary
+                          : appColorPrimaryOrange,
                       fontSize: 16,
                     ),
                   ),
@@ -551,8 +625,16 @@ class _OrderCard extends StatelessWidget {
                 // Delivery information card
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isInProgress
+                        ? appColorPrimary.withOpacity(0.05)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(12),
+                    border: isInProgress
+                        ? Border.all(
+                            color: appColorPrimary.withOpacity(0.2),
+                            width: 1,
+                          )
+                        : null,
                   ),
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -609,9 +691,11 @@ class _OrderCard extends StatelessWidget {
                             Text(
                               m.processStatus?.toUpperCase() ?? '',
                               textAlign: TextAlign.center,
-                              style: w400TextStyle(
-                                color: appColorPrimary,
-                                fontSize: 14,
+                              style: w500TextStyle(
+                                color: isInProgress
+                                    ? appColorPrimary
+                                    : appColorPrimary,
+                                fontSize: isInProgress ? 15 : 14,
                                 height: 1.2,
                               ),
                             ),
@@ -644,8 +728,10 @@ class _OrderCard extends StatelessWidget {
                               currencyFormatted(m.total ?? 0),
                               textAlign: TextAlign.center,
                               style: w500TextStyle(
-                                color: appColorPrimaryOrange,
-                                fontSize: 14,
+                                color: isInProgress
+                                    ? appColorPrimary
+                                    : appColorPrimaryOrange,
+                                fontSize: isInProgress ? 15 : 14,
                                 height: 1.2,
                               ),
                             ),

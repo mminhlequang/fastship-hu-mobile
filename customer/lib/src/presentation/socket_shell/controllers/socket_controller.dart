@@ -14,6 +14,7 @@ import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/order/repo.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:toastification/toastification.dart';
 
 import '../models/socket_response.dart';
 
@@ -82,13 +83,30 @@ class CustomerSocketController {
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
           if (socketResponse.data!['processStatus'] != null) {
-            orderStatus.value = AppOrderProcessStatus.values
+            final newProcessStatus = AppOrderProcessStatus.values
                 .byName(socketResponse.data!['processStatus']);
+            if (orderStatus.value != newProcessStatus) {
+              appShowToastification(
+                title: "Order Status Updated".tr(),
+                description: newProcessStatus.textNotification.tr(),
+                type: ToastificationType.success,
+              );
+            }
+            orderStatus.value = newProcessStatus;
           }
           if (socketResponse.data!['storeStatus'] != null) {
-            statusStore.value = AppOrderStoreStatus.values
+            final newStoreStatus = AppOrderStoreStatus.values
                 .byName(socketResponse.data!['storeStatus']);
+            if (statusStore.value != newStoreStatus) {
+              appShowToastification(
+                title: "Store Status Updated".tr(),
+                description: newStoreStatus.textNotification.tr(),
+                type: ToastificationType.success,
+              );
+            }
+            statusStore.value = newStoreStatus;
           }
+
           _refreshOrder();
         }
       });
@@ -149,18 +167,30 @@ class CustomerSocketController {
 
         final socketResponse = _parseSocketResponse(data);
         if (socketResponse.isSuccess && socketResponse.data != null) {
-          _resetState();
+          bool isCancelledByUser =
+              socketResponse.data!["cancelledBy"]?['type'] == 'customer';
 
           appContext.pop();
-          await appOpenDialog(WidgetDialogNotification(
-              icon: 'icon60',
-              title: "Order Cancelled!".tr(),
-              message: "Your order has been cancelled.\nPlease try again.",
+
+          await appOpenDialog(
+            WidgetDialogNotification(
+              iconPng: 'image5',
+              title: isCancelledByUser
+                  ? "We're so sad about your cancellation".tr()
+                  : "Order Cancelled!".tr(),
+              message: isCancelledByUser
+                  ? "We will continue to improve our service & satisfy you on the next order."
+                      .tr()
+                  : "Your order has been cancelled.\nPlease try again.",
               buttonText: "Done".tr(),
               onPressed: () {
                 appHaptic();
                 appContext.pop();
-              }));
+                navigationCubit.changeIndex(3);
+              },
+            ),
+          );
+          _resetState();
         }
       });
 
@@ -287,7 +317,7 @@ class CustomerSocketController {
     }
   }
 
-// Cập nhật phương thức để hủy đơn hàng
+  // Cập nhật phương thức để hủy đơn hàng
   void cancelOrder(String reason) {
     debugPrint('Debug socket: Hủy đơn hàng với lý do: $reason');
 
@@ -392,6 +422,19 @@ extension AppOrderProcessStatusExtension on AppOrderProcessStatus {
         return "Order completed";
       case AppOrderProcessStatus.cancelled:
         return "Order cancelled";
+      default:
+        return "Being processed";
+    }
+  }
+}
+
+extension AppOrderStoreStatusExtension on AppOrderStoreStatus {
+  String get textNotification {
+    switch (this) {
+      case AppOrderStoreStatus.pending:
+        return "Store is being processed";
+      case AppOrderStoreStatus.completed:
+        return "Store completed";
       default:
         return "Being processed";
     }

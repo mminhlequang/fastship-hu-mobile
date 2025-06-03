@@ -249,6 +249,7 @@ class SocketController {
       //   responseTimeout: 30, // Thời gian chờ phản hồi (giây)
       //   timestamp: new Date().toISOString()
       // }
+      clearAllRouters();
       final driverNewOrder = DriverNewOrderModel.fromJson(socketResponse.data);
       currentOrder = driverNewOrder.order;
       responseTimeout = driverNewOrder.responseTimeout;
@@ -266,13 +267,17 @@ class SocketController {
       onNewOrder?.call(currentOrder!);
       onPlayNotification?.call();
 
-      // Bắt đầu nhấp nháy (thông qua callback)
-      debugPrint('Debug socket: Bắt đầu hiệu ứng nhấp nháy');
-      _startBlinking();
-
       // Rung điện thoại
       debugPrint('Debug socket: Kích hoạt rung');
       Vibration.vibrate(pattern: [500, 1000, 500, 1000]);
+      if (!isOldOrder) {
+        Timer(Duration(seconds: responseTimeout!), () {
+          if (orderStatus.value == AppOrderProcessStatus.findDriver) {
+            currentOrder = null;
+            orderStatus.value = AppOrderProcessStatus.pending;
+          }
+        });
+      }
     } else {
       debugPrint(
           'Debug socket: Lỗi khi nhận đơn hàng mới: ${socketResponse.messageCode}');
@@ -337,24 +342,6 @@ class SocketController {
   //         'Debug socket: Lỗi khi cập nhật trạng thái đơn hàng: ${socketResponse.messageCode}');
   //   }
   // }
-
-  // Xử lý nhấp nháy thông qua callback
-  void _startBlinking() {
-    debugPrint('Debug socket: Bắt đầu timer hiệu ứng nhấp nháy');
-    bool isBlinking = false;
-    Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      isBlinking = !isBlinking;
-      onBlinkingChanged?.call(isBlinking);
-
-      // Dừng nhấp nháy khi đơn hàng không còn ở trạng thái mới
-      if (orderStatus != AppOrderProcessStatus.findDriver) {
-        debugPrint(
-            'Debug socket: Dừng hiệu ứng nhấp nháy vì trạng thái đơn hàng đã thay đổi');
-        timer.cancel();
-        onBlinkingChanged?.call(false);
-      }
-    });
-  }
 
   void acceptOrder() {
     debugPrint('Debug socket: Chấp nhận đơn hàng');
@@ -511,8 +498,8 @@ class SocketController {
     socket?.disconnect();
     socket?.dispose();
     _locationTimer?.cancel();
-    orderStatus.dispose();
-    socketConnected.dispose();
+    // orderStatus.dispose();
+    // socketConnected.dispose();
   }
 
   // Phương thức trợ giúp phân tích phản hồi từ socket

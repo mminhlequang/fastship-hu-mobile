@@ -104,12 +104,7 @@ class _WidgetAddToppingState extends State<WidgetAddTopping> {
                     setState(() {});
                   },
                   inputFormatters: [
-                    CurrencyTextInputFormatter.currency(
-                      locale: 'en_EU',
-                      symbol: AppPrefs.instance.currencySymbol,
-                      enableNegative: false,
-                      decimalDigits: 1,
-                    ),
+                    currencyTextInputFormatter,
                   ],
                 ),
               ],

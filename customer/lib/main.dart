@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:toastification/toastification.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
@@ -73,40 +74,42 @@ class _AppState extends State<_App> {
   @override
   Widget build(BuildContext context) {
     return Portal(
-      child: MaterialApp.router(
-        routerConfig: goRouter,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        debugShowCheckedModeBanner: false,
-        theme: (AppPrefs.instance.isDarkTheme
-                ? ThemeData.dark()
-                : ThemeData.light())
-            .copyWith(
-          scaffoldBackgroundColor: appColorBackground,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: appColorPrimary,
-            brightness: AppPrefs.instance.isDarkTheme
-                ? Brightness.dark
-                : Brightness.light,
-          ),
-        ),
-        themeMode:
-            AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-        builder: (context, child) {
-          return GestureDetector(
-            onDoubleTap: kDebugMode
-                ? () {
-                    AppPrefs.instance.getNormalToken().then((value) {
-                      print(value);
-                    });
-                  }
-                : null,
-            child: KeyboardDismissOnTap(
-              child: child!,
+      child: ToastificationWrapper(
+        child: MaterialApp.router(
+          routerConfig: goRouter,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          debugShowCheckedModeBanner: false,
+          theme: (AppPrefs.instance.isDarkTheme
+                  ? ThemeData.dark()
+                  : ThemeData.light())
+              .copyWith(
+            scaffoldBackgroundColor: appColorBackground,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: appColorPrimary,
+              brightness: AppPrefs.instance.isDarkTheme
+                  ? Brightness.dark
+                  : Brightness.light,
             ),
-          );
-        },
+          ),
+          themeMode:
+              AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+          builder: (context, child) {
+            return GestureDetector(
+              onDoubleTap: kDebugMode
+                  ? () {
+                      AppPrefs.instance.getNormalToken().then((value) {
+                        print(value);
+                      });
+                    }
+                  : null,
+              child: KeyboardDismissOnTap(
+                child: child!,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

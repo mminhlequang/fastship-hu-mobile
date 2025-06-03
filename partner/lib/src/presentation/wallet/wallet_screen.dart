@@ -145,7 +145,7 @@ class _WalletScreenState extends State<WalletScreen> {
       _isLoadingTransactions = true;
     });
     final response = await TransactionRepo().getTransactions({
-      "store_id": authCubit.storeId,
+      "store_id": authCubit.state.store?.id,
     });
     setState(() {
       transactions = response.data ?? [];
@@ -153,130 +153,130 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
-  _verifyPassword({required VoidCallback onConfirm}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-              child: Center(
-                child: Material(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Container(
-                    width: appContext.width - 112.sw,
-                    padding: EdgeInsets.all(20.sw),
-                    constraints: BoxConstraints(maxWidth: 264.sw),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Enter password'.tr(),
-                          style: w600TextStyle(fontSize: 16.sw),
-                        ),
-                        Gap(12.sw),
-                        TextFormField(
-                          style: w400TextStyle(fontSize: 16.sw),
-                          obscureText: hidePass,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            isCollapsed: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12.sw, vertical: 8.sw),
-                            filled: true,
-                            fillColor: appColorBackground,
-                            hintText: 'Password'.tr(),
-                            hintStyle: w400TextStyle(
-                              fontSize: 16.sw,
-                              color: hexColor('#8A8C91'),
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(8.sw),
-                            ),
-                            suffixIcon: Padding(
-                              padding: EdgeInsets.only(right: 8.sw),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    hidePass = !hidePass;
-                                  });
-                                },
-                                child: WidgetAppSVG(
-                                  hidePass ? 'ic_eye' : 'ic_eye_off',
-                                  width: 20.sw,
-                                ),
-                              ),
-                            ),
-                            suffixIconConstraints: BoxConstraints(
-                                maxHeight: 24.sw, minWidth: 28.sw),
-                          ),
-                        ),
-                        Gap(20.sw),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: WidgetRippleButton(
-                                onTap: () {
-                                  Navigator.of(dialogContext).pop();
-                                },
-                                radius: 8,
-                                borderSide: BorderSide(color: appColorPrimary),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                                  child: Center(
-                                    child: Text(
-                                      'Close'.tr(),
-                                      style: w500TextStyle(
-                                        fontSize: 16.sw,
-                                        color: appColorPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Gap(10.sw),
-                            Expanded(
-                              child: WidgetRippleButton(
-                                onTap: () {
-                                  Navigator.of(dialogContext).pop();
-                                  // Todo: check password
-                                  onConfirm.call();
-                                },
-                                radius: 8,
-                                color: appColorPrimary,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.sw),
-                                  child: Center(
-                                    child: Text(
-                                      'Ok'.tr(),
-                                      style: w500TextStyle(
-                                        fontSize: 16.sw,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  // _verifyPassword({required VoidCallback onConfirm}) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext dialogContext) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return BackdropFilter(
+  //             filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+  //             child: Center(
+  //               child: Material(
+  //                 color: Colors.white,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(8),
+  //                 ),
+  //                 child: Container(
+  //                   width: appContext.width - 112.sw,
+  //                   padding: EdgeInsets.all(20.sw),
+  //                   constraints: BoxConstraints(maxWidth: 264.sw),
+  //                   child: Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       Text(
+  //                         'Enter password'.tr(),
+  //                         style: w600TextStyle(fontSize: 16.sw),
+  //                       ),
+  //                       Gap(12.sw),
+  //                       TextFormField(
+  //                         style: w400TextStyle(fontSize: 16.sw),
+  //                         obscureText: hidePass,
+  //                         decoration: InputDecoration(
+  //                           isDense: true,
+  //                           isCollapsed: true,
+  //                           contentPadding: EdgeInsets.symmetric(
+  //                               horizontal: 12.sw, vertical: 8.sw),
+  //                           filled: true,
+  //                           fillColor: appColorBackground,
+  //                           hintText: 'Password'.tr(),
+  //                           hintStyle: w400TextStyle(
+  //                             fontSize: 16.sw,
+  //                             color: hexColor('#8A8C91'),
+  //                           ),
+  //                           border: OutlineInputBorder(
+  //                             borderSide: BorderSide.none,
+  //                             borderRadius: BorderRadius.circular(8.sw),
+  //                           ),
+  //                           suffixIcon: Padding(
+  //                             padding: EdgeInsets.only(right: 8.sw),
+  //                             child: GestureDetector(
+  //                               onTap: () {
+  //                                 setState(() {
+  //                                   hidePass = !hidePass;
+  //                                 });
+  //                               },
+  //                               child: WidgetAppSVG(
+  //                                 hidePass ? 'ic_eye' : 'ic_eye_off',
+  //                                 width: 20.sw,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           suffixIconConstraints: BoxConstraints(
+  //                               maxHeight: 24.sw, minWidth: 28.sw),
+  //                         ),
+  //                       ),
+  //                       Gap(20.sw),
+  //                       Row(
+  //                         children: [
+  //                           Expanded(
+  //                             child: WidgetRippleButton(
+  //                               onTap: () {
+  //                                 Navigator.of(dialogContext).pop();
+  //                               },
+  //                               radius: 8,
+  //                               borderSide: BorderSide(color: appColorPrimary),
+  //                               child: Padding(
+  //                                 padding: EdgeInsets.symmetric(vertical: 8.sw),
+  //                                 child: Center(
+  //                                   child: Text(
+  //                                     'Close'.tr(),
+  //                                     style: w500TextStyle(
+  //                                       fontSize: 16.sw,
+  //                                       color: appColorPrimary,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           Gap(10.sw),
+  //                           Expanded(
+  //                             child: WidgetRippleButton(
+  //                               onTap: () {
+  //                                 Navigator.of(dialogContext).pop();
+  //                                 // Todo: check password
+  //                                 onConfirm.call();
+  //                               },
+  //                               radius: 8,
+  //                               color: appColorPrimary,
+  //                               child: Padding(
+  //                                 padding: EdgeInsets.symmetric(vertical: 8.sw),
+  //                                 child: Center(
+  //                                   child: Text(
+  //                                     'Ok'.tr(),
+  //                                     style: w500TextStyle(
+  //                                       fontSize: 16.sw,
+  //                                       color: Colors.white,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +293,7 @@ class _WalletScreenState extends State<WalletScreen> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text('Store Wallet'.tr()),
+            title: Text('My Wallet'.tr()),
             backgroundColor: Colors.transparent,
             actions: [
               IconButton(
@@ -344,41 +344,38 @@ class _WalletScreenState extends State<WalletScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.sw),
                 child: Row(
                   children: [
-                    // Expanded(
-                    //   child: Container(
-                    //     padding: EdgeInsets.only(bottom: 3.sw),
-                    //     decoration: BoxDecoration(
-                    //       color: hexColor('#EDEDED'),
-                    //       borderRadius: BorderRadius.circular(10.sw),
-                    //     ),
-                    //     child: WidgetRippleButton(
-                    //       onTap: () async {
-                    //         appHaptic();
-                    //         final r =
-                    //             await appOpenBottomSheet(WidgetTopUpSheet());
-                    //         if (r is num) {
-                    //           _verifyPassword(onConfirm: () => onTopUp(r));
-                    //         }
-                    //       },
-                    //       radius: 10.sw,
-                    //       child: Center(
-                    //         child: Padding(
-                    //           padding: EdgeInsets.symmetric(vertical: 14.5.sw),
-                    //           child: Text(
-                    //             'Top Up'.tr(),
-                    //             style: w500TextStyle(fontSize: 16.sw),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    // Gap(12.sw),
-                    Spacer(
-                      flex: 1,
-                    ),
                     Expanded(
-                      flex: 2,
+                      child: Container(
+                        padding: EdgeInsets.only(bottom: 3.sw),
+                        decoration: BoxDecoration(
+                          color: hexColor('#EDEDED'),
+                          borderRadius: BorderRadius.circular(10.sw),
+                        ),
+                        child: WidgetRippleButton(
+                          onTap: () async {
+                            appHaptic();
+                            final r =
+                                await appOpenBottomSheet(WidgetTopUpSheet());
+                            if (r is num) {
+                              onTopUp(r);
+                              // _verifyPassword(onConfirm: () => onTopUp(r));
+                            }
+                          },
+                          radius: 10.sw,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14.5.sw),
+                              child: Text(
+                                'Top Up'.tr(),
+                                style: w500TextStyle(fontSize: 16.sw),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Gap(12.sw),
+                    Expanded(
                       child: Container(
                         padding: EdgeInsets.only(bottom: 3.sw),
                         decoration: BoxDecoration(
@@ -395,8 +392,9 @@ class _WalletScreenState extends State<WalletScreen> {
                                 final r = await appOpenBottomSheet(
                                     WidgetWithdrawSheet(account: value));
                                 if (r is Map) {
-                                  _verifyPassword(
-                                      onConfirm: () => onRequestWithdraw(r));
+                                  onRequestWithdraw(r);
+                                  // _verifyPassword(
+                                  //     onConfirm: () => onRequestWithdraw(r));
                                 }
                               }
                             });
@@ -413,9 +411,6 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    Spacer(
-                      flex: 1,
                     ),
                   ],
                 ),
@@ -575,87 +570,102 @@ class _WalletScreenState extends State<WalletScreen> {
                                       separatorBuilder: (context, index) =>
                                           const AppDivider(),
                                       itemBuilder: (context, index) {
-                                        final transaction =
-                                            transactions![index];
-                                        bool isDeposit =
-                                            transaction.type?.toLowerCase() ==
-                                                'deposit';
+                                        final m = transactions![index];
 
-                                        return Padding(
-                                          padding: EdgeInsets.only(
-                                            top: index == 0 ? 0 : 8.sw,
-                                            bottom: 8.sw,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 16.sw,
-                                                backgroundColor:
-                                                    hexColor('#F9F9F9'),
-                                                child: WidgetAppSVG(
-                                                  isDeposit
-                                                      ? 'wallet-add'
-                                                      : 'wallet-minus',
-                                                  width: 24.sw,
+                                        Color color = (m.price ?? 0) > 0
+                                            ? appColorPrimary
+                                            : appColorError;
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            print(m.toJson());
+                                            // context.push('/order-detail',
+                                            //     extra: widget.order);
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              top: index == 0 ? 0 : 8.sw,
+                                              bottom: 8.sw,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: 16.sw,
+                                                  backgroundColor:
+                                                      hexColor('#F9F9F9'),
+                                                  child: WidgetAppSVG(
+                                                    (m.price ?? 0) > 0
+                                                        ? 'wallet-add'
+                                                        : 'wallet-minus',
+                                                    width: 24.sw,
+                                                    color: color,
+                                                  ),
                                                 ),
-                                              ),
-                                              Gap(8.sw),
-                                              Expanded(
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          isDeposit
-                                                              ? 'Depositing money'
-                                                                  .tr()
-                                                              : 'Withdrawing money'
-                                                                  .tr(),
-                                                          style:
-                                                              w400TextStyle(),
-                                                        ),
-                                                        Text(
-                                                          currencyFormatted(
-                                                              transaction
-                                                                  .price),
-                                                          style:
-                                                              w400TextStyle(),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Gap(2.sw),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          string2DateTime(transaction
-                                                                      .createdAt!)
-                                                                  ?.toLocal()
-                                                                  .formatDateTime() ??
-                                                              '',
-                                                          style: w400TextStyle(
-                                                            fontSize: 12.sw,
-                                                            color: grey1,
+                                                Gap(8.sw),
+                                                Expanded(
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                              m.description ??
+                                                                  m.typeEnum
+                                                                      .name,
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style:
+                                                                  w400TextStyle(),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Text(
-                                                          'Success'.tr(),
-                                                          style: w400TextStyle(
-                                                            fontSize: 12.sw,
-                                                            color: green2,
+                                                          Gap(8.sw),
+                                                          Text(
+                                                            currencyFormatted(
+                                                                m.price),
+                                                            style:
+                                                                w400TextStyle(),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
+                                                        ],
+                                                      ),
+                                                      Gap(2.sw),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            string2DateTime(m
+                                                                        .createdAt!)
+                                                                    ?.toLocal()
+                                                                    .formatDateTime() ??
+                                                                '',
+                                                            style:
+                                                                w400TextStyle(
+                                                              fontSize: 12.sw,
+                                                              color: grey1,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            m.status?.toUpperCase() ??
+                                                                "",
+                                                            style:
+                                                                w400TextStyle(
+                                                              fontSize: 12.sw,
+                                                              color: color,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         );
                                       },
@@ -672,18 +682,4 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
     );
   }
-}
-
-enum TransactionType { deposit, withdraw }
-
-class Transaction {
-  final TransactionType type;
-  final double amount;
-  final DateTime date;
-
-  Transaction({
-    required this.type,
-    required this.amount,
-    required this.date,
-  });
 }

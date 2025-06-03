@@ -1,3 +1,12 @@
+enum TransactionType {
+  deposit,
+  withdraw,
+  order,
+  refund,
+  other;
+
+}
+
 class TransactionModel {
   int? id;
   String? code;
@@ -14,6 +23,21 @@ class TransactionModel {
   String? paidDate;
   String? createdAt;
   String? updatedAt;
+
+  TransactionType get typeEnum {
+    switch (type) {
+      case 'deposit':
+        return TransactionType.deposit;
+      case 'withdraw':
+        return TransactionType.withdraw;
+      case 'order':
+        return TransactionType.order;
+      case 'refund':
+        return TransactionType.refund;
+      default:
+        return TransactionType.other;
+    }
+  }
 
   TransactionModel({
     this.id,

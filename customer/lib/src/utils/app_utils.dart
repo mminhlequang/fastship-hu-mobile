@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 import '../presentation/widgets/widget_bottom_pickdatetime.dart';
 import '../presentation/widgets/widget_dialog_confirm.dart';
@@ -137,6 +138,20 @@ appChangedTheme() {
 
 appCatchLog(e) {
   appDebugPrint('[catchLog] $e');
+}
+
+appShowToastification({
+  required String title,
+  String? description,
+  required ToastificationType type,
+}) {
+  toastification.show(
+    title: Text(title),
+    description: description != null ? Text(description) : null,
+    style: ToastificationStyle.fillColored,
+    type: type,
+    autoCloseDuration: const Duration(seconds: 3),
+  );
 }
 
 enum AppSnackBarType { error, success, notitfication }

@@ -237,12 +237,7 @@ class _WidgetAddVariationState extends State<WidgetAddVariation> {
                                   setState(() {});
                                 },
                                 inputFormatters: [
-                                  CurrencyTextInputFormatter.currency(
-                                    locale: 'en_EU',
-                                    symbol: AppPrefs.instance.currencySymbol,
-                                    enableNegative: false,
-                                    decimalDigits: 1,
-                                  ),
+                                  currencyTextInputFormatter,
                                 ],
                               ),
                             ),

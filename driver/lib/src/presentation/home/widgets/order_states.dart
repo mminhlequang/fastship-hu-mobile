@@ -126,7 +126,7 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
                                 ),
                               )
                             : HoldToConfirmButton(
-                                duration: Duration(seconds: 1),
+                                duration: Duration(milliseconds: 850),
                                 onProgressCompleted: () {
                                   appHaptic();
                                   _handleStatusChange(_nextStatus!);
@@ -354,11 +354,12 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
           'icon5',
           height: 140.sw,
         ),
+        Gap(32.sw),
         Text(
           'Order cancelled'.tr(),
           style: w500TextStyle(fontSize: 18.sw),
         ),
-        Gap(12.sw),
+        Gap(24.sw),
         RichText(
           text: TextSpan(
             style: w400TextStyle(),
@@ -394,11 +395,12 @@ class _WidgetOrderStatesState extends State<WidgetOrderStates> {
           'icon5',
           height: 140.sw,
         ),
+        Gap(32.sw),
         Text(
           'You have completed the delivery'.tr(),
           style: w500TextStyle(fontSize: 18.sw),
         ),
-        Gap(12.sw),
+        Gap(24.sw),
         RichText(
           text: TextSpan(
             style: w400TextStyle(),

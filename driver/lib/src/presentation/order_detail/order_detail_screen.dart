@@ -886,25 +886,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ),
                       ),
                     ),
-                    Container(width: 1.sw, color: appColorBackground),
-                    Expanded(
-                      child: WidgetRippleButton(
-                        onTap: _onRefuse,
-                        radius: 0,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.close, size: 20.sw, color: grey1),
-                            Gap(6.sw),
-                            Text(
-                              'Cancel order'.tr(),
-                              style:
-                                  w400TextStyle(fontSize: 12.sw, color: grey1),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Container(width: 1.sw, color: appColorBackground),
+                    // Expanded(
+                    //   child: WidgetRippleButton(
+                    //     onTap: _onRefuse,
+                    //     radius: 0,
+                    //     child: Column(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Icon(Icons.close, size: 20.sw, color: grey1),
+                    //         Gap(6.sw),
+                    //         Text(
+                    //           'Cancel order'.tr(),
+                    //           style:
+                    //               w400TextStyle(fontSize: 12.sw, color: grey1),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

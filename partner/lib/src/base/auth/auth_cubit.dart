@@ -69,6 +69,7 @@ class AuthCubit extends Cubit<AuthState> {
   fetchWallet() async {
     NetworkResponse response = await TransactionRepo().getMyWallet({
       "currency": AppPrefs.instance.currency,
+      "store_id": state.store?.id,
     });
     if (response.isSuccess) {
       state.wallet = response.data;

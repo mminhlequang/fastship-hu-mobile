@@ -7,7 +7,7 @@ import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
 
 class CancelOrderScreen extends StatefulWidget {
-  const CancelOrderScreen({Key? key}) : super(key: key);
+  const CancelOrderScreen({super.key});
 
   @override
   State<CancelOrderScreen> createState() => _CancelOrderScreenState();

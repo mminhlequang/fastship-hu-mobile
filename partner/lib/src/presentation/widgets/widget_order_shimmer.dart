@@ -9,17 +9,17 @@ class WidgetOrderShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Container(
+    return Container(
         padding: EdgeInsets.all(12.sw),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.sw),
           border: Border.all(color: grey8),
         ),
-        child: Column(
+        child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child:  Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header với order code và status badge

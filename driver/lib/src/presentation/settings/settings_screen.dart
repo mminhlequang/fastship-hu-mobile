@@ -167,6 +167,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    authCubit.fetchWallet();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

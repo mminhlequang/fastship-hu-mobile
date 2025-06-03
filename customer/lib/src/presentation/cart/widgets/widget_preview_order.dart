@@ -26,6 +26,7 @@ import 'package:network_resources/order/models/models.dart';
 import 'package:network_resources/transaction/models/models.dart';
 
 import 'package:network_resources/order/repo.dart';
+import 'package:toastification/toastification.dart';
 import 'widget_sheet_locations.dart';
 
 // logic tính phí ship để tính khi giao hàng
@@ -89,7 +90,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
 
   // double get discount => 0.5; //TODO: Get from backend;
 
-  double get total => subtotal + shippingFee + tip;
+  double get total => subtotal + shippingFee + (isPickup ? 0 : tip);
 
   late int selectedPaymentWalletProvider = kDebugMode
       ? paymentWalletProviders.last.id!
@@ -218,12 +219,11 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
     });
 
     if (mounted) {
-      appShowSnackBar(
-        context: context,
-        msg:
+      appShowToastification(
+        title:
             "Oops, we can't find a route for your order, please try other address"
                 .tr(),
-        type: AppSnackBarType.error,
+        type: ToastificationType.error,
       );
     }
   }
@@ -247,14 +247,14 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
         "payment_id": selectedPaymentWalletProvider,
         // "voucher_id": 0,
         // "voucher_value": 0,
-        "price_tip": tip,
+        "tip": isPickup ? 0 : tip,
         "ship_fee": isPickup ? 0 : shippingFee,
         "ship_distance": isPickup ? 0 : ship_distance,
         "ship_estimate_time": isPickup ? '' : ship_estimate_time,
         "ship_polyline": isPickup ? '' : ship_polyline,
         "ship_here_raw": isPickup ? '' : jsonEncode(routeData),
         // "note": "string",
-        // "phone": "123456",
+        "phone": AppPrefs.instance.user?.phone,
         "address": locationCubit.addressDetail ?? '',
         "lat": locationCubit.latitude,
         "lng": locationCubit.longitude,
@@ -310,17 +310,15 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
             // Mở Payment Sheet
             await Stripe.instance.presentPaymentSheet();
 
-            await appShowSnackBar(
-              context: context,
-              msg: "We received your payment!",
-              type: AppSnackBarType.success,
+            appShowToastification(
+              title: "We received your payment!",
+              type: ToastificationType.success,
             );
           } on StripeException catch (e) {
             print(e.error.message);
-            await appShowSnackBar(
-              context: context,
-              msg: e.error.message,
-              type: AppSnackBarType.error,
+            await appShowToastification(
+              title: e.error.message ?? "Error while processing payment",
+              type: ToastificationType.error,
             );
             processer.value = SheetProcessStatus.error_payment;
             return;
@@ -417,7 +415,7 @@ class _WidgetPreviewOrderState extends State<WidgetPreviewOrder> {
                         // _buildShippingOptions(),
                         _buildOrderItems(),
                         _buildPaymentMethod(),
-                        _buildCourierTip(),
+                        if (!isPickup) _buildCourierTip(),
                         _buildOrderSummary(),
                         _buildDiscountSection(),
                         SizedBox(

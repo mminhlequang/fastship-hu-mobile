@@ -1,4 +1,5 @@
 import 'package:app/src/constants/app_sizes.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:internal_core/internal_core.dart';
@@ -8,7 +9,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../presentation/widgets/widgets.dart';
 import 'utils.dart';
- 
+
+CurrencyTextInputFormatter get currencyTextInputFormatter =>
+    CurrencyTextInputFormatter.currency(
+      locale: 'hu_HU',
+      symbol: AppPrefs.instance.currencySymbol,
+      enableNegative: false,
+      decimalDigits: 0,
+    );
 
 bool appIsBottomSheetOpen = false;
 Future<T> appOpenBottomSheet<T>(

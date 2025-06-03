@@ -23,7 +23,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../notifications/cubit/notification_cubit.dart';
 import '../widgets/widget_blink.dart';
@@ -412,6 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           16.sw + MediaQuery.paddingOf(context).bottom),
                       child: HoldToConfirmButton(
                         key: ValueKey(isOnline),
+                        duration: Duration(milliseconds: 1000),
                         onProgressCompleted: () async {
                           appHaptic();
                           socketController.setOnlineStatus(!isOnline);
@@ -433,8 +433,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               Gap(8.sw),
                               Text(
                                 isOnline
-                                    ? 'You are online, hold to go offline'.tr()
-                                    : 'You are offline, hold to go online'.tr(),
+                                    ? 'You are online, hold to offline'.tr()
+                                    : 'You are offline, hold to online'.tr(),
                                 style: w500TextStyle(
                                   fontSize: 18.sw,
                                   color: Colors.white,
