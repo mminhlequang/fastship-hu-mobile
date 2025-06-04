@@ -4,13 +4,6 @@ import 'package:flutter/foundation.dart';
 
 const String appName = "Driver-FastshipHu";
 
-const String appHotlineNumber = "19008028";
-const String appMessengerUrl = "https://m.me/fastship.vn";
-const String appWhatsappUrl = "https://wa.me/84909090909";
-
-const String supportPhoneNumber = "+84909090909";
-const String supportEmail = "support@fastship.vn";
-const String supportAddress = "123 Main St, Anytown, USA";
 
 enum EmergencyContactType {
   family(1),

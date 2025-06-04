@@ -40,7 +40,7 @@ class _PermissionsWrapperState extends State<PermissionsWrapper>
   }
 
   Future<bool> _checkLocationPermission({bool needShowDialog = true}) async {
-    final status = await Permission.locationWhenInUse.status;
+    final status = await Permission.locationAlways.status;
 
     if (status.isGranted) {
       return true;
@@ -48,13 +48,12 @@ class _PermissionsWrapperState extends State<PermissionsWrapper>
 
     if (status.isDenied) {
       // Hiển thị dialog giải thích
-      final bool? userResponse = needShowDialog
-          ? await _showPermissionExplanationDialog()
-          : false;
+      final bool? userResponse =
+          needShowDialog ? await _showPermissionExplanationDialog() : false;
 
       if (userResponse == true) {
         // Yêu cầu quyền
-        final result = await Permission.locationWhenInUse.request();
+        final result = await Permission.locationAlways.request();
         if (result.isPermanentlyDenied) {
           openAppSettings();
         }
@@ -199,9 +198,10 @@ class _PermissionsWrapperState extends State<PermissionsWrapper>
                 ),
                 Gap(32.sw),
                 WidgetRippleButton(
-                  onTap: () {
+                  onTap: () async {
                     appHaptic();
-                    openAppSettings();
+                    await openAppSettings();
+                    _permissionCheckFuture = _checkLocationPermission();
                   },
                   color: appColorPrimary,
                   child: SizedBox(

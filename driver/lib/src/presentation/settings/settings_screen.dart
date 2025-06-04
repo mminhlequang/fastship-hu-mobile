@@ -10,6 +10,8 @@ import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/widget_wallet.dart';
 
@@ -22,7 +24,7 @@ enum SettingsItem {
   // vehicles,
   helpCenter,
   settings,
-  // deleteAccount,
+  deleteAccount,
   logout;
 
   String get title => switch (this) {
@@ -34,7 +36,7 @@ enum SettingsItem {
         // vehicles => 'Vehicles'.tr(),
         helpCenter => 'Help center'.tr(),
         settings => 'Preference settings'.tr(),
-        // deleteAccount => 'Delete account'.tr(),
+        deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
 
@@ -47,7 +49,7 @@ enum SettingsItem {
         // vehicles => assetsvg('ic_vehicle'),
         helpCenter => assetsvg('ic_support'),
         settings => assetsvg('ic_settings'),
-        // deleteAccount => assetsvg('ic_delete_acc'),
+        deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
 
@@ -82,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  _deleteAccount() {
+  void _deleteAccount() {
     showDialog(
       context: context,
       builder: (context) {
@@ -90,57 +92,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: 'Delete account'.tr(),
           subTitle: 'Are you sure you want to delete your account?'.tr(),
           onConfirm: () {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext dialogContext) {
-                Future.delayed(
-                  const Duration(seconds: 2),
-                  () {
-                    if (mounted) {
-                      Navigator.of(dialogContext).pop();
-                      authCubit.logout();
-                    }
-                  },
-                );
-                return BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                  child: Center(
-                    child: Material(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Container(
-                        width: appContext.width - 112.sw,
-                        padding: EdgeInsets.all(20.sw),
-                        constraints: BoxConstraints(maxWidth: 264.sw),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const WidgetAppSVG('ic_check_circle'),
-                            Gap(15.sw),
-                            Text(
-                              'Your account deletion request was successful! You will now be logged out.'
-                                  .tr(),
-                              style: w400TextStyle(color: grey1),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
+              launchUrl(Uri.parse(privacyPolicyUrl));
+              authCubit.logout();
           },
         );
       },
     );
   }
 
-  _logout() {
+  void _logout() {
     showDialog(
       context: context,
       builder: (context) {
@@ -155,9 +115,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void onTap(SettingsItem item) {
     switch (item) {
-      // case SettingsItem.deleteAccount:
-      //   _deleteAccount();
-      //   break;
+      case SettingsItem.deleteAccount:
+        _deleteAccount();
+        break;
       case SettingsItem.logout:
         _logout();
         break;

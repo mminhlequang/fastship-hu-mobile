@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/widget_appbar.dart';
 
@@ -210,13 +212,13 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Column(
         spacing: 8.sw,
         children: [
-          _buildMenuItem('Personal Data', 'icon70', () {
+          _buildMenuItem('Personal Data', 'icon70', onTap: () {
             appContext.push("/personal-data");
           }),
-          _buildMenuItem('My Favorite', 'icon65', () {
+          _buildMenuItem('My Favorite', 'icon65', onTap: () {
             appContext.push("/my-favorite");
           }),
-          _buildMenuItem('Settings', 'icon71', () {
+          _buildMenuItem('Settings', 'icon71', onTap: () {
             appContext.push("/settings");
           }),
           // _buildMenuItem('Security', 'icon72', () {
@@ -252,16 +254,27 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Column(
             spacing: 8.sw,
             children: [
-              _buildMenuItem('Help Center', 'icon67', () {
+              _buildMenuItem('Help Center', 'icon67', onTap: () {
                 appContext.push("/help-center");
               }),
-              _buildMenuItem('Request Account Deletion', 'icon70', () async {
+              _buildMenuItem('Privacy Policy', 'legal-system2', isPng: true,
+                  onTap: () {
+                launchUrl(Uri.parse(privacyPolicyUrl));
+              }),
+              _buildMenuItem('Terms of Service', 'legal-system1', isPng: true,
+                  onTap: () {
+                launchUrl(Uri.parse(termsOfServiceUrl));
+              }),
+              _buildMenuItem('Request Account Deletion', 'icon70',
+                  onTap: () async {
                 final r = await appOpenDialog(WidgetDialogConfirm(
                   title: "Request Account Deletion".tr(),
                   message: "Are you sure you want to delete your account?".tr(),
                 ));
                 if (r) {
-                  // authCubit.logout();
+                  launchUrl(Uri.parse(
+                      'https://mminhlequang-apps.web.app/legal/privacy-policy-fastship'));
+                  authCubit.logout();
                   // appContext.pushReplacement("/auth");
                 }
               }),
@@ -273,7 +286,8 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildMenuItem(String title, String imageUrl, [VoidCallback? onTap]) {
+  Widget _buildMenuItem(String title, String imageUrl,
+      {VoidCallback? onTap, bool isPng = false}) {
     return WidgetInkWellTransparent(
       enableInkWell: false,
       onTap: () {
@@ -292,11 +306,17 @@ class _AccountScreenState extends State<AccountScreen> {
               borderRadius: BorderRadius.circular(100),
             ),
             child: Center(
-              child: WidgetAppSVG(
-                imageUrl,
-                width: 24,
-                height: 24,
-              ),
+              child: isPng
+                  ? WidgetAssetImage.png(
+                      imageUrl,
+                      width: 20,
+                      height: 20,
+                    )
+                  : WidgetAppSVG(
+                      imageUrl,
+                      width: 24,
+                      height: 24,
+                    ),
             ),
           ),
           const SizedBox(width: 16),

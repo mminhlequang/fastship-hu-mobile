@@ -53,6 +53,7 @@ class WidgetConfirmDialog extends StatelessWidget {
                     Expanded(
                       child: WidgetRippleButton(
                         onTap: () {
+                          appHaptic();
                           Navigator.of(context).pop();
                           onConfirm.call();
                         },
@@ -76,6 +77,7 @@ class WidgetConfirmDialog extends StatelessWidget {
                     Expanded(
                       child: WidgetRippleButton(
                         onTap: () {
+                          appHaptic();
                           Navigator.of(context).pop();
                           onCancel?.call();
                         },

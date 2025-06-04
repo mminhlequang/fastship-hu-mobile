@@ -1,5 +1,16 @@
 part of 'network_resources.dart';
 
+
+const String appMessengerUrl = "https://m.me/fastship.vn";
+const String appWhatsappUrl = "https://wa.me/84909090909";
+
+const String privacyPolicyUrl = "https://mminhlequang-apps.web.app/legal/privacy-policy-fastship";
+const String termsOfServiceUrl = "https://mminhlequang-apps.web.app/legal/terms-of-use-fastship";
+
+const String supportPhoneNumber = "+36 307859588";
+const String supportEmail = "support@fastshiphu.com";
+const String supportAddress = "1089 BUDAPEST, ORCZY TÉR 4, HUNGARY";
+
 const String appCurrency = "HUF";
 const String appCurrencySymbol = "Ft";
 
@@ -13,7 +24,7 @@ const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
 const String socketIOUrl =
-    // kDebugMode ? "http://192.168.1.5:3000" :
+    // kDebugMode ? "http://192.168.1.3:3000" :
     "https://socket.mminhdev.io.vn";
 
 enum AppOrderDeliveryType {

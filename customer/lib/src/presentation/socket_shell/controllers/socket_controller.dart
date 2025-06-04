@@ -43,7 +43,7 @@ class CustomerSocketController {
     driverLocation.value = null;
   }
 
-  void initializeSocket() {
+  void initializeSocket() async {
     try {
       socket = IO.io(
         socketIOUrl,
@@ -51,14 +51,16 @@ class CustomerSocketController {
             .setTransports(['websocket'])
             .enableAutoConnect()
             .enableForceNew()
+            .setAuth({
+              'token': await AppPrefs.instance.getNormalToken(),
+              'userType': 'customer',
+            })
             .build(),
       );
 
       socket?.onConnect((_) {
         debugPrint('Debug socket: connected');
         socketConnected.value = true;
-        _authenticate();
-
         socket?.emit("joinRoom", "customer_${AppPrefs.instance.user?.id}");
       });
 
@@ -204,16 +206,6 @@ class CustomerSocketController {
       debugPrint('Debug socket: Đã gọi lệnh kết nối');
     } catch (e) {
       debugPrint('Debug socket: Lỗi kết nối socket: $e');
-    }
-  }
-
-  // Xác thực người dùng
-  void _authenticate() async {
-    debugPrint('Debug socket: Bắt đầu xác thực');
-    if (socket?.connected == true) {
-      debugPrint('Debug socket: Gửi token xác thực');
-      socket?.emit('authenticate_customer',
-          {'token': await AppPrefs.instance.getNormalToken()});
     }
   }
 

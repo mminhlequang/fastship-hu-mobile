@@ -45,6 +45,7 @@
 	<array>
 		<string>remote-notification</string>
 		<string>fetch</string>
+		<string>location</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -54,39 +55,39 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Allow access to apple music</string>
+	<string>This app requires access to Apple Music to play audio content and manage your music library for a better user experience.</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Allow access your calendar to fetch events</string>
+	<string>This app needs access to your calendar to schedule and manage delivery events, ensuring timely service coordination.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Allow access your calendar to fetch events</string>
+	<string>This app requires full calendar access to create, modify, and manage delivery schedules and appointments effectively.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow access to camera</string>
+	<string>This app needs camera access to scan documents, capture delivery proof photos, and verify package conditions.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Allow access to contacts</string>
+	<string>This app requires access to your contacts to help you quickly find and communicate with customers and delivery recipients.</string>
 	<key>LSApplicationQueriesSchemes</key>
     <array>
       <string>tel</string>
     </array>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow access to authentication using face id</string>
+	<string>This app uses Face ID to securely authenticate your identity and protect your account information.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app requires continuous location access to track your position for real-time delivery updates, route optimization, and to notify you of nearby delivery opportunities.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app needs background location access to provide real-time delivery tracking and receive location-based notifications even when the app is not active.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app requires location access while in use to show your current position on the map, calculate delivery routes, and find nearby delivery opportunities.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow access to microphone</string>
+	<string>This app needs microphone access to enable voice commands, record delivery notes, and facilitate hands-free communication during deliveries.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow access to photo library</string>
+	<string>This app requires access to save photos to your library for delivery documentation, proof of delivery, and package condition records.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow access to photo library</string>
+	<string>This app needs access to your photo library to upload delivery documentation, proof of delivery photos, and package condition images.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<false/>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Allow access to tts</string>
+	<string>This app requires speech recognition access to enable voice commands for hands-free operation during deliveries and navigation.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>Allow access to device's accelerometer for shake phone detection</string>
+	<string>This app needs access to the device's motion sensors to detect emergency situations, enable shake-to-report features, and enhance delivery safety monitoring.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>The app needs permission to send notifications so you don't miss new orders and important updates.</string>
 	<key>UILaunchStoryboardName</key>

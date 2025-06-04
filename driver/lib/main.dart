@@ -11,6 +11,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
@@ -63,11 +64,34 @@ class _App extends StatefulWidget {
   _AppState createState() => _AppState();
 }
 
-class _AppState extends State<_App> {
+class _AppState extends State<_App> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     authCubit.load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        socketController.onAppForeground();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        socketController.onAppBackground();
+        break;
+      default:
+        break;
+    }
   }
 
   @override

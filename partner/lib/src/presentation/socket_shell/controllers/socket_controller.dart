@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:network_resources/network_resources.dart';
 import 'dart:convert';
 
-import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/socket_shell/models/socket_response.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -16,7 +15,7 @@ class CustomerSocketController {
 
   final ValueNotifier<bool> socketConnected = ValueNotifier<bool>(false);
 
-  void initializeSocket() {
+  void initializeSocket() async {
     try {
       socket = IO.io(
         socketIOUrl,
@@ -24,13 +23,16 @@ class CustomerSocketController {
             .setTransports(['websocket'])
             .enableAutoConnect()
             .enableForceNew()
+            .setAuth({
+              'token': await AppPrefs.instance.getNormalToken(),
+              'userType': 'customer',
+            })
             .build(),
       );
 
       socket?.onConnect((_) {
         debugPrint('Debug socket: connected');
         socketConnected.value = true;
-        _authenticate();
 
         socket?.emit("joinRoom", "customer_${AppPrefs.instance.user?.id}");
       });
@@ -119,18 +121,8 @@ class CustomerSocketController {
     }
   }
 
-  // Xác thực người dùng
-  void _authenticate() async {
-    debugPrint('Debug socket: Bắt đầu xác thực');
-    if (socket?.connected == true) {
-      debugPrint('Debug socket: Gửi token xác thực');
-      socket?.emit('authenticate_customer',
-          {'token': await AppPrefs.instance.getNormalToken()});
-    }
-  }
-
   void updateStoreStatus(id, AppOrderStoreStatus storeStatus,
-        {VoidCallback? onSuccess}) {
+      {VoidCallback? onSuccess}) {
     if (socket?.connected == true) {
       // debugPrint(
       //     'Debug socket: Gửi yêu cầu cập nhật trạng thái đơn hàng ID: ${currentOrder!.id} -> $status');

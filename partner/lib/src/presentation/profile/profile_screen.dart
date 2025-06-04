@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:app/src/base/bloc.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widgets.dart';
@@ -9,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum ProfileItem {
   myProfile,
@@ -16,7 +16,7 @@ enum ProfileItem {
   // orderSettings,
   helpCenter,
   settings,
-  // deleteAccount,
+  deleteAccount,
   logout;
 
   String get title => switch (this) {
@@ -25,7 +25,7 @@ enum ProfileItem {
         // orderSettings => 'Order settings'.tr(),
         helpCenter => 'Help center'.tr(),
         settings => 'Preference Settings'.tr(),
-        // deleteAccount => 'Delete account'.tr(),
+        deleteAccount => 'Delete account'.tr(),
         logout => 'Log out'.tr(),
       };
 
@@ -35,7 +35,7 @@ enum ProfileItem {
         // orderSettings => assetsvg('ic_order_settings'),
         helpCenter => assetsvg('ic_support'),
         settings => assetsvg('ic_settings'),
-        // deleteAccount => assetsvg('ic_delete_acc'),
+        deleteAccount => assetsvg('ic_delete_acc'),
         logout => assetsvg('ic_logout'),
       };
 
@@ -57,7 +57,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  _deleteAccount() {
+  void _deleteAccount() {
     showDialog(
       context: context,
       builder: (context) {
@@ -65,57 +65,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'Delete account'.tr(),
           subTitle: 'Are you sure you want to delete your account?'.tr(),
           onConfirm: () {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext dialogContext) {
-                Future.delayed(
-                  const Duration(seconds: 2),
-                  () {
-                    if (mounted) {
-                      Navigator.of(dialogContext).pop();
-                      authCubit.logout();
-                    }
-                  },
-                );
-                return BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                  child: Center(
-                    child: Material(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Container(
-                        width: appContext.width - 112.sw,
-                        padding: EdgeInsets.all(20.sw),
-                        constraints: BoxConstraints(maxWidth: 264.sw),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const WidgetAppSVG('ic_check_circle'),
-                            Gap(15.sw),
-                            Text(
-                              'Your account deletion request was successful! You will now be logged out.'
-                                  .tr(),
-                              style: w400TextStyle(color: grey1),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
+            launchUrl(Uri.parse(privacyPolicyUrl));
+            authCubit.logout();
           },
         );
       },
     );
   }
 
-  _logout() {
+  void _logout() {
     showDialog(
       context: context,
       builder: (context) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app/src/services/location_service.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -60,19 +61,22 @@ class SocketController {
   Function(OrderModel)? onNewOrder;
   Function(OrderModel)? onOrderCanceled;
   Function(OrderModel)? onOrderStatusUpdated;
-  Function(bool)? onBlinkingChanged;
-  Function()? onPlayNotification;
+
+  final LocationService _locationService = LocationService();
+  bool _isInBackground = false;
+  StreamSubscription<LatLng>? _locationSubscription;
 
   bool get isOnline => _isOnline;
 
-  init() {
+  void init() {
     _initializeSocket();
+    _initializeLocationService();
     if (AppPrefs.instance.autoActiveOnlineStatus) {
       setOnlineStatus(true);
     }
   }
 
-  void _initializeSocket() {
+  void _initializeSocket() async {
     try {
       socket = IO.io(
         socketIOUrl,
@@ -80,13 +84,16 @@ class SocketController {
             .setTransports(['websocket'])
             .enableAutoConnect()
             .enableForceNew()
+            .setAuth({
+              'token': await AppPrefs.instance.getNormalToken(),
+              'userType': 'driver',
+            })
             .build(),
       );
 
       socket?.onConnect((_) {
         debugPrint('Debug socket: connected to $socketIOUrl');
         socketConnected.value = true;
-        _authenticate();
         socket?.emit("joinRoom", "driver_${AppPrefs.instance.user?.id}");
       });
 
@@ -146,16 +153,12 @@ class SocketController {
     }
   }
 
-  void _authenticate() async {
-    debugPrint('Debug socket: Bắt đầu xác thực');
-    final token = await AppPrefs.instance.getNormalToken();
-    debugPrint(
-        'Debug socket: Đã lấy token: ${token != null ? 'có token' : 'không có token'}');
-    if (token != null && socket?.connected == true) {
-      debugPrint(
-          'Debug socket: Gửi token xác thực với event authenticate_driver');
-      socket?.emit('authenticate_driver', {'token': token});
-    }
+  Future<void> _initializeLocationService() async {
+    await _locationService.initialize();
+    // Lắng nghe sự kiện vị trí từ LocationService
+    _locationSubscription = _locationService.locationStream.listen((latLng) {
+      updateLocationInBackground(latLng);
+    });
   }
 
   void setOnlineStatus(bool isOnline) {
@@ -165,11 +168,16 @@ class SocketController {
     // Gửi trạng thái lên server
     _emitDriverStatus(isOnline);
 
-    // Quản lý timer vị trí
+    // Quản lý timer vị trí và background service
     if (isOnline) {
-      _startLocationUpdates();
+      if (_isInBackground) {
+        _locationService.startService();
+      } else {
+        _startLocationUpdates();
+      }
     } else {
       _stopLocationUpdates();
+      _locationService.stopService();
     }
   }
 
@@ -265,7 +273,6 @@ class SocketController {
       // Thông báo cho UI
       debugPrint('Debug socket: Gọi callback cập nhật trạng thái đơn hàng');
       onNewOrder?.call(currentOrder!);
-      onPlayNotification?.call();
 
       // Rung điện thoại
       debugPrint('Debug socket: Kích hoạt rung');
@@ -493,11 +500,43 @@ class SocketController {
     }
   }
 
+  // Phương thức để cập nhật vị trí từ background service
+  void updateLocationInBackground(LatLng location) {
+    currentLocation.value = location;
+    if (socket?.connected == true && _isOnline) {
+      debugPrint(
+          'Debug socket: Gửi vị trí từ background ${location.latitude}, ${location.longitude}');
+      socket?.emit('driver_update_location', {
+        'latitude': location.latitude,
+        'longitude': location.longitude,
+      });
+    }
+  }
+
+  // Xử lý khi app chuyển background
+  void onAppBackground() {
+    _isInBackground = true;
+    if (_isOnline) {
+      _locationService.startService();
+    }
+  }
+
+  // Xử lý khi app chuyển foreground
+  void onAppForeground() {
+    _isInBackground = false;
+    if (_isOnline) {
+      _locationService.stopService();
+      _startLocationUpdates();
+    }
+  }
+
   void dispose() {
     debugPrint('Debug socket: Hủy SocketController');
     socket?.disconnect();
     socket?.dispose();
     _locationTimer?.cancel();
+    _locationService.stopService();
+    _locationSubscription?.cancel();
     // orderStatus.dispose();
     // socketConnected.dispose();
   }
