@@ -1,7 +1,7 @@
 name: app
 description: Customer mobile app
 
-version: 1.0.1+2
+version: 1.0.1+3
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
