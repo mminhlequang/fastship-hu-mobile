@@ -3,9 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:app/src/presentation/report/cubit/report_cubit.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
+import 'package:network_resources/reports/models/models.dart';
 
 class RevenueChartWidget extends StatefulWidget {
-  final RevenueChart revenueChart;
+  final ReportRevenueChartModel revenueChart;
 
   const RevenueChartWidget({
     super.key,
@@ -150,8 +151,8 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
     final data = _getCurrentData();
     if (data.isEmpty) return const SizedBox();
 
-    final maxY = data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
-    final minY = data.map((e) => e.value).reduce((a, b) => a < b ? a : b);
+    final maxY = data.map((e) => e.value ?? 0).reduce((a, b) => a > b ? a : b);
+    final minY = data.map((e) => e.value ?? 0).reduce((a, b) => a < b ? a : b);
 
     return LineChart(
       LineChartData(
@@ -160,7 +161,7 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
         lineBarsData: [
           LineChartBarData(
             spots: data.asMap().entries.map((entry) {
-              return FlSpot(entry.key.toDouble(), entry.value.value);
+              return FlSpot(entry.key.toDouble(), entry.value.value?.toDouble() ?? 0);
             }).toList(),
             isCurved: true,
             curveSmoothness: 0.35,
@@ -207,7 +208,7 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      data[index].period,
+                      data[index].period ?? '',
                       style: w400TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -277,7 +278,7 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
     final data = _getCurrentData();
     if (data.isEmpty) return const SizedBox();
 
-    final total = data.fold<double>(0, (sum, item) => sum + item.value);
+    final total = data.fold<double>(0, (sum, item) => sum + (item.value ?? 0));
     final average = total / data.length;
 
     return Row(
@@ -296,7 +297,7 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
         _buildLegendItem(
           title: 'Highest',
           value: currencyFormatted(
-              data.map((e) => e.value).reduce((a, b) => a > b ? a : b)),
+              data.map((e) => e.value ?? 0).reduce((a, b) => a > b ? a : b)),
           color: hexColor('#0085FF'),
         ),
       ],
@@ -340,16 +341,16 @@ class _RevenueChartWidgetState extends State<RevenueChartWidget>
     );
   }
 
-  List<ChartData> _getCurrentData() {
+  List<RevenueValue> _getCurrentData() {
     switch (selectedTabIndex) {
       case 0:
-        return widget.revenueChart.dailyRevenue;
+        return widget.revenueChart.dailyRevenue ?? [];
       case 1:
-        return widget.revenueChart.weeklyRevenue;
+        return widget.revenueChart.weeklyRevenue ?? [];
       case 2:
-        return widget.revenueChart.monthlyRevenue;
+        return widget.revenueChart.monthlyRevenue ?? [];
       default:
-        return widget.revenueChart.dailyRevenue;
+        return widget.revenueChart.dailyRevenue ?? [];
     }
   }
 

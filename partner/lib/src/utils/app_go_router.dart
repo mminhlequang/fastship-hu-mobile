@@ -28,7 +28,7 @@ import '../presentation/menu/widgets/widget_link_topping_group.dart';
 import '../presentation/navigation/navigation_screen.dart';
 import '../presentation/preference_settings/perference_settings_screen.dart';
 import '../presentation/ratings/ratings_screen.dart';
-import '../presentation/report/report_page.dart';
+import '../presentation/report/report_screen.dart';
 import '../presentation/socket_shell/socket_shell_wrapper.dart';
 import '../presentation/store_registration/cubit/store_registration_cubit.dart';
 import '../presentation/store_registration/widgets/widget_store_category.dart';
@@ -226,7 +226,7 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/report',
-          pageBuilder: _defaultPageBuilder((state) => const ReportPage()),
+          pageBuilder: _defaultPageBuilder((state) => const ReportScreen()),
         ),
         GoRoute(
           path: '/my-wallet',

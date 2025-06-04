@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:app/src/presentation/report/cubit/report_cubit.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
+import 'package:network_resources/reports/models/models.dart';
 
 class TopSellingItemsWidget extends StatefulWidget {
-  final List<TopSellingItem> items;
+  final List<ReportTopSellingItemModel> items;
 
   const TopSellingItemsWidget({
     super.key,
@@ -126,7 +127,7 @@ class _TopSellingItemsWidgetState extends State<TopSellingItemsWidget>
     );
   }
 
-  Widget _buildItemCard(TopSellingItem item, int rank) {
+  Widget _buildItemCard(ReportTopSellingItemModel item, int rank) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -181,7 +182,7 @@ class _TopSellingItemsWidgetState extends State<TopSellingItemsWidget>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.name,
+                  item.name ?? '',
                   style: w600TextStyle(fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -227,7 +228,7 @@ class _TopSellingItemsWidgetState extends State<TopSellingItemsWidget>
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  '${(item.revenue / (item.quantity * 20000) * 100).toInt()}%',
+                  '${((item.revenue ?? 0) / ((item.quantity ?? 0) * 20000) * 100).toInt()}%',
                   style: w500TextStyle(
                     fontSize: 10,
                     color: hexColor('#4CAF50'),

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:app/src/presentation/report/cubit/report_cubit.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
+import 'package:network_resources/reports/models/models.dart';
 
 class ReportOverviewCard extends StatefulWidget {
-  final ReportOverview overview;
+  final ReportOverviewModel overview;
 
   const ReportOverviewCard({
     super.key,
@@ -214,7 +215,7 @@ class _ReportOverviewCardState extends State<ReportOverviewCard>
   }
 
   Widget _buildGrowthIndicator() {
-    final isPositive = widget.overview.growthRate > 0;
+    final isPositive = (widget.overview.growthRate ?? 0) > 0;
     return Row(
       children: [
         Icon(
@@ -224,7 +225,7 @@ class _ReportOverviewCardState extends State<ReportOverviewCard>
         ),
         const SizedBox(width: 4),
         Text(
-          '${isPositive ? '+' : ''}${widget.overview.growthRate.toStringAsFixed(1)}%',
+          '${isPositive ? '+' : ''}${widget.overview.growthRate?.toStringAsFixed(1)}%',
           style: w600TextStyle(
             fontSize: 12,
             color: Colors.white70,

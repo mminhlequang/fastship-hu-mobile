@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:app/src/presentation/report/cubit/report_cubit.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:network_resources/network_resources.dart';
+import 'package:network_resources/reports/models/models.dart';
 
 class CustomerReviewsWidget extends StatefulWidget {
-  final List<CustomerReview> reviews;
+  final List<ReportRecentReviewModel> reviews;
 
   const CustomerReviewsWidget({
     super.key,
@@ -101,7 +102,7 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
   Widget _buildAverageRating() {
     final avgRating = widget.reviews.isEmpty
         ? 0.0
-        : widget.reviews.map((r) => r.rating).reduce((a, b) => a + b) /
+        : widget.reviews.map((r) => r.rating ?? 0).reduce((a, b) => a! + b!) /
             widget.reviews.length;
 
     return Container(
@@ -131,7 +132,7 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
     );
   }
 
-  Widget _buildReviewCard(CustomerReview review) {
+  Widget _buildReviewCard(ReportRecentReviewModel review) {
     return Container(
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(12),
@@ -155,8 +156,8 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
                 ),
                 child: Center(
                   child: Text(
-                    review.customerName.isNotEmpty
-                        ? review.customerName[0].toUpperCase()
+                    review.customerName?.isNotEmpty ?? false
+                        ? review.customerName![0].toUpperCase()
                         : 'A',
                     style: w600TextStyle(
                       fontSize: 16,
@@ -173,14 +174,14 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      review.customerName,
+                      review.customerName ?? '',
                       style: w600TextStyle(fontSize: 14),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _formatTimeAgo(review.date),
+                     review.createdAt ??'',
                       style: w400TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -194,9 +195,9 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
               Row(
                 children: List.generate(5, (index) {
                   return Icon(
-                    index < review.rating.floor()
+                    index < (review.rating ?? 0).floor()
                         ? Icons.star
-                        : index < review.rating
+                        : index < (review.rating ?? 0)
                             ? Icons.star_half
                             : Icons.star_border,
                     size: 16,
@@ -211,7 +212,7 @@ class _CustomerReviewsWidgetState extends State<CustomerReviewsWidget>
           // Comment
           Expanded(
             child: Text(
-              review.comment,
+              review.comment ?? '',
               style: w400TextStyle(
                 fontSize: 13,
                 color: Colors.grey[700],
