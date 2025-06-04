@@ -1,3 +1,5 @@
+import 'package:app/src/presentation/widgets/widgets.dart';
+import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:network_resources/cart/models/models.dart';
@@ -11,6 +13,8 @@ import 'package:network_resources/order/models/models.dart';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
+
+import 'widget_rating.dart';
 
 class WidgetOrderDetail extends StatefulWidget {
   final OrderModel m;
@@ -46,14 +50,110 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  spacing: 20.sw,
+                  spacing: 24.sw,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildOrderHeader(),
                     _buildDeliveryInfo(),
                     _buildOrderItems(),
                     _buildOrderSummary(),
-                    SizedBox(height: 20.sw),
+                    // SizedBox(height: 20.sw),
+                    if (widget.m.processStatusEnum ==
+                        AppOrderProcessStatus.completed) ...[
+                      // const SizedBox(height: 16),
+
+                      // Action buttons
+                      Row(
+                        children: [
+                          // Review button hoặc Rating info
+                          if (widget.m.rating?.store?.star == null) ...[
+                            Expanded(
+                              child: WidgetButtonConfirm(
+                                height: 44,
+                                onPressed: () async {
+                                  appHaptic();
+                                  await pushWidget(
+                                    child: WidgetRating(m: widget.m),
+                                  );
+                                  // refreshCallback();
+                                },
+                                color: appColorPrimaryOrange,
+                                text: 'Review'.tr(),
+                                borderRadius: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                          ] else ...[
+                            // Hiển thị rating info khi đã đánh giá
+                            Expanded(
+                              child: Container(
+                                height: 44,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF9F8F6),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        appColorPrimaryOrange.withOpacity(0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Rated:  '.tr(),
+                                      style: w400TextStyle(
+                                        fontSize: 14,
+                                        color: appColorPrimaryOrange,
+                                      ),
+                                    ),
+                                    WidgetAppSVG(
+                                      'icon91',
+                                      width: 16,
+                                      height: 16,
+                                      color: appColorPrimaryOrange,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      widget.m.rating?.store?.star.toString() ??
+                                          "0.0",
+                                      style: w500TextStyle(
+                                        fontSize: 14,
+                                        color: appColorPrimaryOrange,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                          ],
+                          // Buy back button
+                          Expanded(
+                            child: WidgetButtonConfirm(
+                              height: 44,
+                              color: appColorPrimary,
+                              onPressed: () {
+                                appHaptic();
+
+                                context.push(
+                                  '/preview-order',
+                                  extra: CartModel(
+                                    previousOrderId: widget.m.id,
+                                    store: widget.m.store,
+                                    cartItems: widget.m.items,
+                                  ),
+                                );
+                              },
+                              text: 'Buy back'.tr(),
+                              borderRadius: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]
                   ],
                 ),
               ),

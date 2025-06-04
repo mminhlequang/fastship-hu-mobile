@@ -58,6 +58,30 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
     });
   }
 
+  Future<void> _cancelOrder() async {
+    appHaptic();
+    final r = await appContext.push('/cancel-order');
+    if (r is String) {
+      appOpenDialog(
+        WidgetDialogConfirm(
+          title: "Cancel Order".tr(),
+          message:
+              "Are you sure you want to cancel this order?, we will not refund you"
+                  .tr(),
+          onConfirm: () {
+            appHaptic();
+            appContext.pop();
+            socketController.cancelOrder(r);
+          },
+          onCancel: () {
+            appHaptic();
+            appContext.pop();
+          },
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -264,7 +288,16 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                                 text: "I'm picking up ready".tr(),
                               ),
                             ),
-                          ],
+                          ]else Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 16),
+                              child: WidgetButtonConfirm(
+                                onPressed: _cancelOrder,
+                                isLoading: loading,
+                                color: appColorPrimaryRed,
+                                text: "I want cancel order".tr(),
+                              ),
+                            ),
                           SizedBox(
                               height: 40 +
                                   MediaQuery.of(context).viewInsets.bottom),
@@ -466,29 +499,7 @@ class _CheckoutTrackingScreenState extends State<CheckoutTrackingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () async {
-                          appHaptic();
-                          final r = await appContext.push('/cancel-order');
-                          if (r is String) {
-                            appOpenDialog(
-                              WidgetDialogConfirm(
-                                title: "Cancel Order".tr(),
-                                message:
-                                    "Are you sure you want to cancel this order?, we will not refund you"
-                                        .tr(),
-                                onConfirm: () {
-                                  appHaptic();
-                                  appContext.pop();
-                                  socketController.cancelOrder(r);
-                                },
-                                onCancel: () {
-                                  appHaptic();
-                                  appContext.pop();
-                                },
-                              ),
-                            );
-                          }
-                        },
+                        onTap: _cancelOrder,
                         child: Container(
                           height: 48.sw,
                           width: 48.sw,

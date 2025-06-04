@@ -10,6 +10,7 @@ Color get appColorElement => AppColors.instance.element;
 
 Color get appColorPrimary => AppColors.instance.primary;
 Color get appColorPrimaryOrange => hexColor('#F17228');
+Color get appColorPrimaryRed => hexColor('#FF0000');
 
 Color get appColorText => AppColors.instance.text;
 

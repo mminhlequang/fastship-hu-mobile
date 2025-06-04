@@ -491,15 +491,16 @@ class _OrderCard extends StatelessWidget {
             m.processStatusEnum != AppOrderProcessStatus.cancelled;
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         appHaptic();
         if (isInProgress) {
-          context.push('/checkout-tracking', extra: m);
+          await context.push('/checkout-tracking', extra: m);
         } else {
-          pushWidget(
+          await pushWidget(
             child: WidgetOrderDetail(m: m),
           );
         }
+        refreshCallback();
       },
       child: Container(
         constraints: const BoxConstraints(maxWidth: 361),
@@ -692,9 +693,12 @@ class _OrderCard extends StatelessWidget {
                               m.processStatus?.toUpperCase() ?? '',
                               textAlign: TextAlign.center,
                               style: w500TextStyle(
-                                color: isInProgress
-                                    ? appColorPrimary
-                                    : appColorPrimary,
+                                color: m.processStatusEnum ==
+                                        AppOrderProcessStatus.cancelled
+                                    ? appColorPrimaryRed
+                                    : isInProgress
+                                        ? appColorPrimary
+                                        : appColorPrimary,
                                 fontSize: isInProgress ? 15 : 14,
                                 height: 1.2,
                               ),

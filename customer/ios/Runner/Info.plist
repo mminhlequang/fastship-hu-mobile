@@ -54,33 +54,33 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Allow access to apple music</string>
+	<string>This app requires access to Apple Music to play audio content and manage your music library for a better user experience.</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Allow access your calendar to fetch events</string>
+	<string>This app needs access to your calendar to schedule and manage delivery events, appointments, and important dates.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Allow access your calendar to fetch events</string>
+	<string>This app requires full access to your calendar to create, modify, and manage delivery schedules and appointments effectively.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow access to camera</string>
+	<string>This app needs camera access to scan documents, capture delivery proof photos, and take pictures of packages for verification purposes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Allow access to contacts</string>
+	<string>This app requires access to your contacts to help you quickly select delivery recipients and manage your delivery address book.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow access to authentication using face id</string>
+	<string>This app uses Face ID to securely authenticate your identity and protect your personal information and delivery details.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app requires location access to track your position in real-time, optimize delivery routes, and provide accurate delivery status updates to customers.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app needs continuous location access to provide real-time delivery tracking, route optimization, and location-based notifications even when the app is in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The app needs location access to update your position and receive nearby orders.</string>
+	<string>This app requires location access while in use to track deliveries, provide real-time updates, and optimize delivery routes for better service.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow access to microphone</string>
+	<string>This app needs microphone access to record voice notes for delivery instructions and enable voice commands for hands-free operation.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow access to photo library</string>
+	<string>This app requires access to save delivery proof photos, scanned documents, and other delivery-related images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow access to photo library</string>
+	<string>This app needs access to your photo library to upload delivery proof photos, scan documents, and manage delivery-related images.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<false/>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Allow access to tts</string>
+	<string>This app requires speech recognition access to enable voice commands for hands-free operation and improve accessibility features.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Allow access to device's accelerometer for shake phone detection</string>
 	<key>NSUserNotificationsUsageDescription</key>
