@@ -56,20 +56,9 @@ void main() async {
     // }, appRunner: () => runApp(wrapEasyLocalization(child: const _App())));
   }
 }
-
-class _App extends StatefulWidget {
+class _App extends StatelessWidget {
   const _App({super.key});
-
-  @override
-  _AppState createState() => _AppState();
-}
-
-class _AppState extends State<_App> {
-  @override
-  void initState() {
-    super.initState();
-    authCubit.load();
-  }
+ 
 
   @override
   Widget build(BuildContext context) {

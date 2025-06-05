@@ -282,70 +282,71 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildNotificationItem({required NotificationModel item}) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  item.icon,
-                  color: _getIconColorByType(item.type),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title ?? '',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: w500TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.description ?? '',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: w400TextStyle(
-                        fontSize: 14,
-                        color: appColorText2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (item.isRead == 0)
+    return  
+        GestureDetector(
+          onTap: () => item.openDetail(),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Container(
-                  width: 10,
-                  height: 10,
+                  margin: const EdgeInsets.only(top: 4),
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
-                    color: appColorPrimaryOrange,
+                    color: const Color(0xFFF5F5F5),
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: appColorPrimaryOrange.withOpacity(0.2),
-                      width: 3,
-                    ),
+                  ),
+                  child: Icon(
+                    item.icon,
+                    color: _getIconColorByType(item.type),
+                    size: 24,
                   ),
                 ),
-            ],
-          ),
-        ),
-      ],
-    );
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: w500TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.description ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: w400TextStyle(
+                          fontSize: 14,
+                          color: appColorText2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (item.isRead == 0)
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: appColorPrimaryOrange,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: appColorPrimaryOrange.withOpacity(0.2),
+                        width: 3,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          
+              ),
+        );
   }
 }

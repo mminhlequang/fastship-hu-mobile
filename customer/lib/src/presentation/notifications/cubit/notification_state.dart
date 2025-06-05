@@ -42,6 +42,9 @@ extension XNotificationModel on NotificationModel {
     appHaptic();
     switch (type) {
       case NotificationModelType.order:
+          pushWidget(
+            child: WidgetOrderDetail(m: OrderModel(id: referenceId)),
+          );
         break;
       case NotificationModelType.promotion:
         break;

@@ -20,7 +20,6 @@ import '../presentation/notifications/notifications_screen.dart';
 import '../presentation/preference_settings/perference_settings_screen.dart';
 import '../presentation/settings/settings_screen.dart';
 import '../presentation/socket_shell/socket_shell_wraper.dart';
-import '../presentation/socket_shell/widgets/permissions_wraper.dart';
 import '../presentation/splash/splash_screen.dart';
 import '../presentation/statistics/statistics_screen.dart';
 import '../presentation/vehicles/vehicles_screen.dart';
@@ -33,8 +32,7 @@ GlobalKey<NavigatorState> get appNavigatorKey =>
 bool get isAppContextReady => appNavigatorKey.currentContext != null;
 BuildContext get appContext => appNavigatorKey.currentContext!;
 
-
-clearAllRouters([String? router]) {
+void clearAllRouters([String? router]) {
   try {
     while (appContext.canPop() == true) {
       appContext.pop();
@@ -45,7 +43,7 @@ clearAllRouters([String? router]) {
   }
 }
 
-pushWidget(
+Future pushWidget(
     {required child,
     String? routeName,
     bool opaque = true,
@@ -94,10 +92,8 @@ final goRouter = GoRouter(
       parentNavigatorKey: appNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child: PermissionsWrapper(
-            child: SocketShellWrapper(
-              child: child,
-            ),
+          child: SocketShellWrapper(
+            child: child,
           ),
         );
       },
@@ -112,7 +108,8 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/preference-settings',
-          pageBuilder: _defaultPageBuilder((state) => const PreferenceSettingsScreen()),
+          pageBuilder:
+              _defaultPageBuilder((state) => const PreferenceSettingsScreen()),
         ),
         GoRoute(
           path: '/statistics',

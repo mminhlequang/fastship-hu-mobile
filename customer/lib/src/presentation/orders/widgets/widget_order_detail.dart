@@ -1,6 +1,7 @@
 import 'package:app/src/presentation/widgets/widgets.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:internal_network/network_resources/resources.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:network_resources/cart/models/models.dart';
 import 'package:network_resources/network_resources.dart';
@@ -13,6 +14,8 @@ import 'package:network_resources/order/models/models.dart';
 
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/widgets/widget_appbar.dart';
+import 'package:network_resources/order/repo.dart';
+import 'package:app/src/presentation/widgets/widget_shimmer.dart';
 
 import 'widget_rating.dart';
 
@@ -26,13 +29,37 @@ class WidgetOrderDetail extends StatefulWidget {
 
 class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
   @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  late OrderModel m = widget.m;
+
+  bool isLoading = true;
+  void _fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+    NetworkResponse response = await OrderRepo().getOrderDetail({
+      'id': widget.m.id,
+    });
+    if (response.isSuccess) {
+      m = response.data;
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
           WidgetAppBar(
-            title: widget.m.store?.name ?? "Order Detail".tr(),
+            title: m.store?.name ?? "Order Detail".tr(),
             actions: [
               TextButton(
                 onPressed: () {
@@ -46,118 +73,121 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
             ],
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  spacing: 24.sw,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildOrderHeader(),
-                    _buildDeliveryInfo(),
-                    _buildOrderItems(),
-                    _buildOrderSummary(),
-                    // SizedBox(height: 20.sw),
-                    if (widget.m.processStatusEnum ==
-                        AppOrderProcessStatus.completed) ...[
-                      // const SizedBox(height: 16),
-
-                      // Action buttons
-                      Row(
+            child: isLoading
+                ? const WidgetShimmerOrderDetail()
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        spacing: 24.sw,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Review button hoặc Rating info
-                          if (widget.m.rating?.store?.star == null) ...[
-                            Expanded(
-                              child: WidgetButtonConfirm(
-                                height: 44,
-                                onPressed: () async {
-                                  appHaptic();
-                                  await pushWidget(
-                                    child: WidgetRating(m: widget.m),
-                                  );
-                                  // refreshCallback();
-                                },
-                                color: appColorPrimaryOrange,
-                                text: 'Review'.tr(),
-                                borderRadius: 12,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                          ] else ...[
-                            // Hiển thị rating info khi đã đánh giá
-                            Expanded(
-                              child: Container(
-                                height: 44,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF9F8F6),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color:
-                                        appColorPrimaryOrange.withOpacity(0.3),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Rated:  '.tr(),
-                                      style: w400TextStyle(
-                                        fontSize: 14,
-                                        color: appColorPrimaryOrange,
-                                      ),
-                                    ),
-                                    WidgetAppSVG(
-                                      'icon91',
-                                      width: 16,
-                                      height: 16,
-                                      color: appColorPrimaryOrange,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      widget.m.rating?.store?.star.toString() ??
-                                          "0.0",
-                                      style: w500TextStyle(
-                                        fontSize: 14,
-                                        color: appColorPrimaryOrange,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                          ],
-                          // Buy back button
-                          Expanded(
-                            child: WidgetButtonConfirm(
-                              height: 44,
-                              color: appColorPrimary,
-                              onPressed: () {
-                                appHaptic();
+                          _buildOrderHeader(),
+                          _buildDeliveryInfo(),
+                          _buildOrderItems(),
+                          _buildOrderSummary(),
+                          // SizedBox(height: 20.sw),
+                          if (m.processStatusEnum ==
+                              AppOrderProcessStatus.completed) ...[
+                            // const SizedBox(height: 16),
 
-                                context.push(
-                                  '/preview-order',
-                                  extra: CartModel(
-                                    previousOrderId: widget.m.id,
-                                    store: widget.m.store,
-                                    cartItems: widget.m.items,
+                            // Action buttons
+                            Row(
+                              children: [
+                                // Review button hoặc Rating info
+                                if (m.rating?.store?.star == null) ...[
+                                  Expanded(
+                                    child: WidgetButtonConfirm(
+                                      height: 44,
+                                      onPressed: () async {
+                                        appHaptic();
+                                        await pushWidget(
+                                          child: WidgetRating(m: m),
+                                        );
+                                        // refreshCallback();
+                                      },
+                                      color: appColorPrimaryOrange,
+                                      text: 'Review'.tr(),
+                                      borderRadius: 12,
+                                    ),
                                   ),
-                                );
-                              },
-                              text: 'Buy back'.tr(),
-                              borderRadius: 12,
+                                  const SizedBox(width: 16),
+                                ] else ...[
+                                  // Hiển thị rating info khi đã đánh giá
+                                  Expanded(
+                                    child: Container(
+                                      height: 44,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF9F8F6),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: appColorPrimaryOrange
+                                              .withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Rated:  '.tr(),
+                                            style: w400TextStyle(
+                                              fontSize: 14,
+                                              color: appColorPrimaryOrange,
+                                            ),
+                                          ),
+                                          WidgetAppSVG(
+                                            'icon91',
+                                            width: 16,
+                                            height: 16,
+                                            color: appColorPrimaryOrange,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            m.rating?.store?.star.toString() ??
+                                                "0.0",
+                                            style: w500TextStyle(
+                                              fontSize: 14,
+                                              color: appColorPrimaryOrange,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                ],
+                                // Buy back button
+                                Expanded(
+                                  child: WidgetButtonConfirm(
+                                    height: 44,
+                                    color: appColorPrimary,
+                                    onPressed: () {
+                                      appHaptic();
+
+                                      context.push(
+                                        '/preview-order',
+                                        extra: CartModel(
+                                          previousOrderId: m.id,
+                                          store: m.store,
+                                          cartItems: m.items,
+                                        ),
+                                      );
+                                    },
+                                    text: 'Buy back'.tr(),
+                                    borderRadius: 12,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                          ]
                         ],
                       ),
-                    ]
-                  ],
-                ),
-              ),
-            ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -185,7 +215,7 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
                 ),
               ),
               Text(
-                widget.m.code ?? '',
+                m.code ?? '',
                 style: w500TextStyle(
                   fontSize: 14.sw,
                   color: appColorPrimaryOrange,
@@ -205,7 +235,7 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
                 ),
               ),
               Text(
-                widget.m.timeOrder ?? '',
+                m.timeOrder ?? '',
                 style: w500TextStyle(
                   fontSize: 14.sw,
                 ),
@@ -231,7 +261,7 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  widget.m.processStatus?.toUpperCase() ?? '',
+                  m.processStatus?.toUpperCase() ?? '',
                   style: w500TextStyle(
                     fontSize: 12.sw,
                     color: appColorPrimary,
@@ -268,26 +298,24 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
                   WidgetAppSVG('icon20', width: 20.sw),
                   SizedBox(width: 8.sw),
                   Text(
-                    widget.m.deliveryType == 'pickup'
+                    m.deliveryType == 'pickup'
                         ? 'Pickup'.tr()
                         : 'Delivery'.tr(),
                     style: w500TextStyle(fontSize: 14.sw),
                   ),
                 ],
               ),
-              if (widget.m.deliveryType != 'pickup' &&
-                  widget.m.address != null) ...[
+              if (m.deliveryType != 'pickup' && m.address != null) ...[
                 SizedBox(height: 8.sw),
                 Text(
-                  widget.m.address ?? '',
+                  m.address ?? '',
                   style: w400TextStyle(
                     fontSize: 14.sw,
                     color: appColorText2,
                   ),
                 ),
               ],
-              if (widget.m.deliveryType != 'pickup' &&
-                  widget.m.shipEstimateTime != null) ...[
+              if (m.deliveryType != 'pickup' && m.shipEstimateTime != null) ...[
                 SizedBox(height: 8.sw),
                 Row(
                   children: [
@@ -295,7 +323,7 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
                         width: 16.sw, color: appColorPrimaryOrange),
                     SizedBox(width: 8.sw),
                     Text(
-                      'Estimated time: ${widget.m.shipEstimateTime}',
+                      'Estimated time: ${m.shipEstimateTime}',
                       style: w400TextStyle(
                         fontSize: 14.sw,
                         color: appColorPrimaryOrange,
@@ -330,7 +358,7 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
           ),
           child: Column(
             spacing: 12.sw,
-            children: widget.m.items
+            children: m.items
                     ?.map((orderItem) => _buildOrderItem(orderItem))
                     .toList() ??
                 [
@@ -450,18 +478,17 @@ class _WidgetOrderDetailState extends State<WidgetOrderDetail> {
             spacing: 12.sw,
             children: [
               _buildSummaryRow(
-                  'Subtotal'.tr(), currencyFormatted(widget.m.subtotal ?? 0)),
-              if ((widget.m.shipFee ?? 0) > 0)
-                _buildSummaryRow('Shipping Fee'.tr(),
-                    currencyFormatted(widget.m.shipFee ?? 0)),
-              if ((widget.m.tip ?? 0) > 0)
+                  'Subtotal'.tr(), currencyFormatted(m.subtotal ?? 0)),
+              if ((m.shipFee ?? 0) > 0)
                 _buildSummaryRow(
-                    'Tip'.tr(), currencyFormatted(widget.m.tip ?? 0),
+                    'Shipping Fee'.tr(), currencyFormatted(m.shipFee ?? 0)),
+              if ((m.tip ?? 0) > 0)
+                _buildSummaryRow('Tip'.tr(), currencyFormatted(m.tip ?? 0),
                     color: appColorPrimary),
               Divider(color: Color(0xFFCEC6C5)),
               _buildSummaryRow(
                 'Total'.tr(),
-                currencyFormatted(widget.m.total ?? 0),
+                currencyFormatted(m.total ?? 0),
                 isTotal: true,
               ),
             ],
