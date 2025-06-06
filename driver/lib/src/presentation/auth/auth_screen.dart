@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:internal_network/network_resources/resources.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:internal_core/widgets/widgets.dart';
 import 'package:network_resources/network_resources.dart';
@@ -99,7 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         // Xử lý lỗi
-        _showError(response.msg ?? 'Login failed, please try again!');
+        String msg = 'Login failed, please try again!';
+        if (response.msg == NetworkResponse.disconnectError) {
+          msg = 'No internet connection';
+        }
+        if (response.msg == NetworkResponse.unknownError) {
+          msg = 'Oops!, can\'t connect to server, please try again later';
+        }
+        _showError(msg);
       }
     } catch (e, stackTrace) {
       setState(() {

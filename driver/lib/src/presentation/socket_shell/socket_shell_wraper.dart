@@ -23,7 +23,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _permissionCheckFuture = _checkLocationPermission(needShowDialog: false);
+      _checkLocationPermissionSilently();
     }
   }
 
@@ -35,32 +35,47 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
     _permissionCheckFuture = _checkLocationPermission();
   }
 
-  Future<bool> _checkLocationPermission({bool needShowDialog = true}) async {
-    final status = await Permission.locationAlways.status;
+  Future<void> _checkLocationPermissionSilently() async {
+    final whenInUseStatus = await Permission.locationWhenInUse.status;
+    final alwaysStatus = await Permission.locationAlways.status;
 
-    if (status.isGranted) {
-      return true;
+    print('_checkLocation whenInUseStatus: $whenInUseStatus');
+    print('_checkLocation alwaysStatus: $alwaysStatus');
+
+    if (whenInUseStatus.isGranted && alwaysStatus.isGranted) {
+      _permissionCheckFuture = Future.value(true);
+    } else {
+      _permissionCheckFuture = Future.value(false);
+    }
+    setState(() {});
+  }
+
+  Future<bool> _checkLocationPermission() async {
+    // First check if we have whenInUse permission
+    final whenInUseStatus = await Permission.locationWhenInUse.status;
+    if (!whenInUseStatus.isGranted) {
+      // Request whenInUse permission first
+      final whenInUseResult = await Permission.locationWhenInUse.request();
+      if (!whenInUseResult.isGranted) {
+        await _showPermissionExplanationDialog();
+        return false;
+      }
     }
 
-    if (status.isDenied) {
-      // Hiển thị dialog giải thích
-      if (needShowDialog) {
-        await _showPermissionExplanationDialog();
-      }
+    // Then check always permission
+    final alwaysStatus = await Permission.locationAlways.status;
+    if (alwaysStatus.isGranted) {
+      return true;
+    } else {
+      await _showPermissionExplanationDialog();
 
-      // Yêu cầu quyền
+      // Request always permission
       final result = await Permission.locationAlways.request();
       if (result.isPermanentlyDenied) {
         openAppSettings();
       }
       return result.isGranted;
     }
-
-    // if (status.isPermanentlyDenied) {
-    //   openAppSettings();
-    // }
-
-    return status.isGranted;
   }
 
   Future<bool?> _showPermissionExplanationDialog() async {
@@ -95,7 +110,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
               ),
               Gap(8.sw),
               Text(
-                'You’ll need to give Fast Ship permission to always use your location to get notifications about order near you'
+                'You\'ll need to give Fast Ship permission to always use your location to get notifications about order near you'
                     .tr(),
                 style: w400TextStyle(fontSize: 16.sw),
                 textAlign: TextAlign.center,

@@ -23,6 +23,7 @@ String get appMapUrlTemplateHERE =>
 const String appMapUrlTemplateGg =
     "https://mt.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}";
 
+const String apiBaseUrl = "https://fastshiphu.com";
 const String socketIOUrl =
     // kDebugMode ? "http://192.168.1.3:3000" :
     "https://socket.mminhdev.io.vn";
