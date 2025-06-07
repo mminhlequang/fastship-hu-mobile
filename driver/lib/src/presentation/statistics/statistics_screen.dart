@@ -4,11 +4,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:network_resources/driver_statistics/models/models.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:gap/gap.dart';
 import 'package:app/src/constants/constants.dart';
 import 'package:app/src/presentation/statistics/widgets/income_pie_chart.dart';
+import 'package:app/src/presentation/statistics/cubit/statistics_cubit.dart';
 
 enum StatisticsPeriod {
   today('Today'),
@@ -34,22 +36,29 @@ enum StatisticsType {
   final String label;
 }
 
-class StatisticsScreen extends StatefulWidget {
+class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
 
   @override
-  State<StatisticsScreen> createState() => _StatisticsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => StatisticsCubit()..getStatistics(),
+      child: const StatisticsView(),
+    );
+  }
 }
 
-class _StatisticsScreenState extends State<StatisticsScreen>
-    with TickerProviderStateMixin {
-  // Sample data - in real app, this would come from API
-  final List<double> dailyIncome = [50, 40, 80, 45, 60, 200, 20];
-  final List<String> days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+class StatisticsView extends StatefulWidget {
+  const StatisticsView({super.key});
 
+  @override
+  State<StatisticsView> createState() => _StatisticsViewState();
+}
+
+class _StatisticsViewState extends State<StatisticsView>
+    with TickerProviderStateMixin {
   StatisticsPeriod selectedPeriod = StatisticsPeriod.thisWeek;
   StatisticsType selectedType = StatisticsType.income;
-  bool isLoading = false;
 
   late TabController _tabController;
   late AnimationController _animationController;
@@ -62,7 +71,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _loadData();
   }
 
   @override
@@ -73,18 +81,33 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   }
 
   Future<void> _loadData() async {
-    setState(() {
-      isLoading = true;
-    });
+    final params = _getParamsForPeriod(selectedPeriod);
+    context.read<StatisticsCubit>().getStatistics(params: params);
+  }
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      isLoading = false;
-    });
-
-    _animationController.forward();
+  Map<String, dynamic> _getParamsForPeriod(StatisticsPeriod period) {
+    // This is a simplified version. You might need a more robust implementation
+    // to handle date ranges for 'custom' period.
+    final now = DateTime.now();
+    switch (period) {
+      case StatisticsPeriod.today:
+        return {'from': now.toIso8601String(), 'to': now.toIso8601String()};
+      case StatisticsPeriod.yesterday:
+        final yesterday = now.subtract(const Duration(days: 1));
+        return {
+          'from': yesterday.toIso8601String(),
+          'to': yesterday.toIso8601String()
+        };
+      case StatisticsPeriod.thisWeek:
+        final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        return {
+          'from': startOfWeek.toIso8601String(),
+          'to': now.toIso8601String()
+        };
+      // Add other cases as needed
+      default:
+        return {};
+    }
   }
 
   @override
@@ -93,7 +116,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text('Statistics'.tr()),
-        // backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
@@ -106,7 +128,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           ),
         ],
       ),
-      body: isLoading ? _buildShimmerLoading() : _buildContent(),
+      body: BlocConsumer<StatisticsCubit, StatisticsState>(
+        listener: (context, state) {
+          if (state.status == StatisticsStatus.success) {
+            _animationController.forward(from: 0.0);
+          } else if (state.status == StatisticsStatus.failure) {
+            appShowSnackBar(
+              msg: state.errorMessage ?? 'Failed to load data',
+              context: context,
+              type: AppSnackBarType.error,
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state.status == StatisticsStatus.loading &&
+              state.overview == null) {
+            return _buildShimmerLoading();
+          }
+          return _buildContent(state);
+        },
+      ),
     );
   }
 
@@ -189,7 +230,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(StatisticsState state) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -198,15 +239,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           children: [
             _buildPeriodSelector(),
             const Gap(20),
-            _buildNetIncomeCard(),
+            _buildNetIncomeCard(state),
             const Gap(20),
             _buildTabSection(),
             const Gap(20),
-            _buildTabContent(),
+            _buildTabContent(state),
             const Gap(20),
-            _buildStatsCards(),
+            _buildStatsCards(state),
             const Gap(20),
-            _buildDetailsList(),
+            _buildDetailsList(state),
           ],
         ),
       ),
@@ -252,79 +293,54 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildNetIncomeCard() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.green[600]!, Colors.green[400]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Padding(
+  Widget _buildNetIncomeCard(StatisticsState state) {
+    final overview = state.overview;
+    final netIncome = overview?.netIncome?.amount ?? 0.0;
+    final grossIncome = overview?.grossIncome?.amount ?? 0.0;
+    final appFee = grossIncome - netIncome;
+
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
         padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade400, Colors.blue.shade600],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Net Income'.tr(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Gap(10),
+            Text(
+              currencyFormatted(netIncome),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Gap(20),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.account_balance_wallet,
-                  color: Colors.white.withOpacity(0.8),
-                  size: 24,
-                ),
-                const Gap(8),
-                Text(
-                  'NET INCOME',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                _buildIncomeInfo('Gross'.tr(), currencyFormatted(grossIncome)),
+                _buildIncomeInfo('App Fee'.tr(), currencyFormatted(appFee)),
               ],
-            ),
-            const Gap(12),
-            BlocBuilder<AuthCubit, AuthState>(
-              bloc: authCubit,
-              builder: (context, state) {
-                return Text(
-                  currencyFormatted(state.wallet?.availableBalance ?? 0),
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                );
-              },
-            ),
-            const Gap(8),
-            Row(
-              children: [
-                Icon(
-                  Icons.trending_up,
-                  color: Colors.white.withOpacity(0.8),
-                  size: 16,
-                ),
-                const Gap(4),
-                Text(
-                  '+12.5% from last period',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-              ],
-            ),
+            )
           ],
         ),
       ),
@@ -356,526 +372,224 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildTabContent() {
-    return SizedBox(
-      height: 350,
-      child: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildBarChart(), // Income tab
-          _buildTripChart(), // Trips tab
-          _buildDistanceChart(), // Distance tab
-          _buildTimeChart(), // Time tab
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBarChart() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Daily Income',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
-            const Gap(16),
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: 250,
-                  barGroups: List.generate(
-                    7,
-                    (index) => BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: dailyIncome[index],
-                          gradient: LinearGradient(
-                            colors: [Colors.green[400]!, Colors.green[600]!],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                          width: 20,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              days[value.toInt()],
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 50,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            '\$${value.toInt()}',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 10,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(
-                    show: true,
-                    drawHorizontalLine: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey[200]!,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTripChart() {
-    final tripData = [3, 5, 4, 6, 2, 8, 1];
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Daily Trips',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
-            const Gap(16),
-            Expanded(
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey[200]!,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            days[value.toInt()],
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: tripData
-                          .asMap()
-                          .entries
-                          .map((e) =>
-                              FlSpot(e.key.toDouble(), e.value.toDouble()))
-                          .toList(),
-                      isCurved: true,
-                      gradient: LinearGradient(
-                        colors: [Colors.blue[400]!, Colors.blue[600]!],
-                      ),
-                      barWidth: 3,
-                      dotData: const FlDotData(show: true),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.blue[400]!.withOpacity(0.1),
-                            Colors.blue[600]!.withOpacity(0.1),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDistanceChart() {
-    return IncomePieChart(
-      grossIncome: 285.06,
-      platformFee: 42.76,
-      fuelCost: 35.00,
-      insurance: 12.24,
-      netIncome: 195.06,
-    );
-  }
-
-  Widget _buildTimeChart() {
-    final timeData = [6.5, 7.2, 8.1, 7.8, 6.9, 9.2, 5.5];
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Daily Online Hours',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
-            const Gap(16),
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: 10,
-                  barGroups: List.generate(
-                    7,
-                    (index) => BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: timeData[index],
-                          gradient: LinearGradient(
-                            colors: [Colors.orange[400]!, Colors.orange[600]!],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                          width: 20,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            days[value.toInt()],
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 2,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            '${value.toInt()}h',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 10,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey[200]!,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatsCards() {
-    final stats = [
-      {
-        'label': 'Total Trips',
-        'value': '24',
-        'icon': Icons.local_taxi,
-        'color': Colors.blue
-      },
-      {
-        'label': 'Online Hours',
-        'value': '8:30',
-        'icon': Icons.access_time,
-        'color': Colors.orange
-      },
-      {
-        'label': 'Avg Rating',
-        'value': '4.8',
-        'icon': Icons.star,
-        'color': Colors.amber
-      },
-    ];
-
-    return Row(
-      children: stats.asMap().entries.map((entry) {
-        final index = entry.key;
-        final stat = entry.value;
-
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(
-              right: index < stats.length - 1 ? 8.0 : 0,
-              left: index > 0 ? 8.0 : 0,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
+  Widget _buildTabContent(StatisticsState state) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _animationController,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.1),
+              end: Offset.zero,
+            ).animate(_animationController),
+            child: SizedBox(
+              height: 300,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildChart(state.incomeChart?.chartData),
+                  _buildChart(state.tripsChart?.chartData),
+                  _buildPieChart(state.incomeBreakdown),
+                  _buildChart(state.timeChart?.chartData),
                 ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: (stat['color'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        stat['icon'] as IconData,
-                        color: stat['color'] as Color,
-                        size: 24,
-                      ),
-                    ),
-                    const Gap(8),
-                    Text(
-                      stat['value'] as String,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      stat['label'] as String,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
         );
-      }).toList(),
+      },
     );
   }
 
-  Widget _buildDetailsList() {
-    final details = [
-      {'label': 'Gross Income', 'value': '\$285.06', 'positive': true},
-      {'label': 'Platform Fee (15%)', 'value': '-\$42.76', 'positive': false},
-      {'label': 'Fuel & Maintenance', 'value': '-\$35.00', 'positive': false},
-      {'label': 'Insurance', 'value': '-\$12.24', 'positive': false},
-      {
-        'label': 'Net Income',
-        'value': '\$195.06',
-        'positive': true,
-        'isTotal': true
-      },
-    ];
+  Widget _buildChart(List<dynamic>? chartData) {
+    if (chartData == null || chartData.isEmpty) {
+      return Center(child: Text('No data available'.tr()));
+    }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    final spots = chartData.asMap().entries.map((entry) {
+      // Assuming each item in chartData has a 'value' property.
+      // The value can be int or double, so we handle it as num.
+      final num value = entry.value.value ?? 0;
+      return FlSpot(entry.key.toDouble(), value.toDouble());
+    }).toList();
+
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            color: Theme.of(context).primaryColor,
+            barWidth: 3,
+            belowBarData: BarAreaData(
+              show: true,
+              color: Theme.of(context).primaryColor.withOpacity(0.2),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  String timeFormatted(Duration d) {
+    final hours = d.inHours;
+    final minutes = d.inMinutes.remainder(60);
+    return '${hours}h ${minutes}m';
+  }
+
+  Widget _buildPieChart(DriverStatIncomeBreakdown? breakdownData) {
+    if (breakdownData == null ||
+        breakdownData.breakdown == null ||
+        breakdownData.breakdown!.isEmpty) {
+      return Center(child: Text('No data available'.tr()));
+    }
+
+    // Extract values from the breakdown list. This is an assumption based on
+    // the linter errors. You might need to adjust the 'type' strings.
+    final breakdownMap = {
+      for (var item in breakdownData.breakdown!)
+        item.type ?? '': item.amount ?? 0.0
+    };
+
+    return IncomePieChart(
+      grossIncome: breakdownData.grossIncome ?? 0.0,
+      netIncome: breakdownMap['net_income'] ??
+          (breakdownData.grossIncome ?? 0.0) -
+              (breakdownData.totalDeductions ?? 0.0),
+      platformFee: breakdownMap['platform_fee'] ?? 0.0,
+      fuelCost: breakdownMap['fuel_cost'] ?? 0.0,
+      insurance: breakdownMap['insurance_cost'] ?? 0.0,
+    );
+  }
+
+  Widget _buildStatsCards(StatisticsState state) {
+    final stats = state.overview?.stats;
+    return Row(
+      children: [
+        Expanded(
+          child: _buildStatCard(
+            'Completed Trips'.tr(),
+            stats?.totalTrips?.count?.toString() ?? '...',
+            Icons.check_circle_outline,
+            Colors.green,
+          ),
+        ),
+        const Gap(16),
+        Expanded(
+          child: _buildStatCard(
+            'Time Online'.tr(),
+            stats?.onlineHours?.totalMinutes != null
+                ? timeFormatted(
+                    Duration(minutes: stats!.onlineHours!.totalMinutes!))
+                : '...',
+            Icons.timer,
+            Colors.orange,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsList(StatisticsState state) {
+    final details = state.details?.incomeDetails;
+    if (details == null || details.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text('No details available for this period.'.tr(),
+              style: TextStyle(color: Colors.grey.shade600)),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Details'.tr(),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const Gap(10),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: details.length,
+          itemBuilder: (context, index) {
+            final item = details[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                title: Text(item.label ?? 'N/A'),
+                subtitle:
+                    item.description != null ? Text(item.description!) : null,
+                trailing: Text(
+                  currencyFormatted(item.amount ?? 0),
+                  style: TextStyle(
+                    color:
+                        (item.isPositive ?? false) ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncomeInfo(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 14,
+          ),
+        ),
+        const Gap(4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Icon(icon, size: 28, color: color),
+            const Gap(12),
             Text(
-              'Income Breakdown',
-              style: TextStyle(
-                fontSize: 18,
+              value,
+              style: const TextStyle(
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
               ),
             ),
-            const Gap(16),
-            ...details.map((detail) => _buildDetailRow(
-                  detail['label'] as String,
-                  detail['value'] as String,
-                  positive: detail['positive'] as bool,
-                  isTotal: detail['isTotal'] as bool? ?? false,
-                )),
+            const Gap(4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value,
-      {required bool positive, bool isTotal = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Colors.black : Colors.grey[700],
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-              color: isTotal
-                  ? Colors.green[600]
-                  : positive
-                      ? Colors.green[600]
-                      : Colors.red[600],
-            ),
-          ),
-        ],
       ),
     );
   }

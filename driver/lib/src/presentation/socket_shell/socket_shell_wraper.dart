@@ -37,12 +37,8 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
 
   Future<void> _checkLocationPermissionSilently() async {
     final whenInUseStatus = await Permission.locationWhenInUse.status;
-    final alwaysStatus = await Permission.locationAlways.status;
 
-    print('_checkLocation whenInUseStatus: $whenInUseStatus');
-    print('_checkLocation alwaysStatus: $alwaysStatus');
-
-    if (whenInUseStatus.isGranted && alwaysStatus.isGranted) {
+    if (whenInUseStatus.isGranted) {
       _permissionCheckFuture = Future.value(true);
     } else {
       _permissionCheckFuture = Future.value(false);
@@ -64,9 +60,7 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
 
     // Then check always permission
     final alwaysStatus = await Permission.locationAlways.status;
-    if (alwaysStatus.isGranted) {
-      return true;
-    } else {
+    if (!alwaysStatus.isGranted) {
       await _showPermissionExplanationDialog();
 
       // Request always permission
@@ -74,8 +68,8 @@ class _SocketShellWrapperState extends State<SocketShellWrapper>
       if (result.isPermanentlyDenied) {
         openAppSettings();
       }
-      return result.isGranted;
     }
+    return true;
   }
 
   Future<bool?> _showPermissionExplanationDialog() async {
