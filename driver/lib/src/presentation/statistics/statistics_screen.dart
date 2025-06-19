@@ -133,11 +133,11 @@ class _StatisticsViewState extends State<StatisticsView>
           if (state.status == StatisticsStatus.success) {
             _animationController.forward(from: 0.0);
           } else if (state.status == StatisticsStatus.failure) {
-            appShowSnackBar(
-              msg: state.errorMessage ?? 'Failed to load data',
-              context: context,
-              type: AppSnackBarType.error,
-            );
+            // appShowSnackBar(
+            //   msg: state.errorMessage ?? 'Failed to load data',
+            //   context: context,
+            //   type: AppSnackBarType.error,
+            // );
           }
         },
         builder: (context, state) {

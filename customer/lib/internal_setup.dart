@@ -1,6 +1,7 @@
 import 'package:internal_core/internal_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internal_network/options.dart';
+import 'package:network_resources/network_resources.dart';
 
 import 'src/constants/constants.dart';
 import 'src/utils/utils.dart';
@@ -16,8 +17,8 @@ internalSetup() {
       ),
       networkOptions: PNetworkOptionsImpl(
         loggingEnable: true,
-        baseUrl: 'https://zennail23.com',
-        baseUrlAsset: 'https://zennail23.com',
+        baseUrl: apiBaseUrl,
+        baseUrlAsset: apiBaseUrl,
         responsePrefixData: 'data',
         // errorInterceptor: (e) {
         //   print(e);

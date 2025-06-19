@@ -8,6 +8,7 @@ import 'package:flutter_background_service_ios/flutter_background_service_ios.da
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 @pragma('vm:entry-point')
 class LocationService {
@@ -154,5 +155,12 @@ class LocationService {
 
   void dispose() {
     _locationStreamController.close();
+  }
+
+  /// Check if location permission (always or when in use) is granted
+  Future<bool> isLocationPermissionGranted() async {
+    final whenInUseStatus = await Permission.locationWhenInUse.status;
+    final alwaysStatus = await Permission.locationAlways.status;
+    return whenInUseStatus.isGranted || alwaysStatus.isGranted;
   }
 }

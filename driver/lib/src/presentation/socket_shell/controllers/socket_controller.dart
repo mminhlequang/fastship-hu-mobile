@@ -1,18 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app/src/constants/constants.dart';
 import 'package:app/src/services/location_service.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:internal_core/internal_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:vibration/vibration.dart';
 
-import '../../../constants/app_constants.dart';
 import '../models/socket_response.dart';
 
 // List of predefined locations with latitude and longitude
@@ -161,7 +165,105 @@ class SocketController {
     });
   }
 
-  void setOnlineStatus(bool isOnline) {
+  Future askPermissionWithExplanationDialog() async {
+    final result = await showModalBottomSheet(
+      context: appContext,
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(appContext),
+        duration: const Duration(milliseconds: 300),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+              16.sw, 40.sw, 16.sw, 24.sw + context.mediaQueryPadding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 36.sw,
+                backgroundColor: hexColor('#74CA45').withValues(alpha: .25),
+                child: WidgetAppSVG('ic_redirect'),
+              ),
+              Gap(32.sw),
+              Text(
+                'Allow Location Access'.tr(),
+                style: w700TextStyle(fontSize: 20.sw),
+              ),
+              Gap(8.sw),
+              Text(
+                'You\'ll need to give Fast Ship permission to always use your location to get notifications about order near you'
+                    .tr(),
+                style: w400TextStyle(fontSize: 16.sw),
+                textAlign: TextAlign.center,
+              ),
+              Gap(32.sw),
+              WidgetRippleButton(
+                onTap: () => Navigator.pop(context, true),
+                color: appColorPrimary,
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'Continue'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Gap(8.sw),
+              WidgetRippleButton(
+                onTap: () {
+                  openAppSettings();
+                },
+                borderSide: BorderSide(color: appColorPrimary),
+                child: SizedBox(
+                  height: 48.sw,
+                  child: Center(
+                    child: Text(
+                      'Open settings'.tr(),
+                      style: w500TextStyle(
+                        fontSize: 16.sw,
+                        color: appColorPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (result == true) {
+      await Permission.locationWhenInUse.request();
+      await Permission.locationAlways.request();
+    }
+  }
+
+  /// Set online status for driver. Only allow online if location permission is granted.
+  Future<bool> setOnlineStatus(bool isOnline) async {
+    if (isOnline) {
+      final hasPermission =
+          await _locationService.isLocationPermissionGranted();
+      if (!hasPermission) {
+        debugPrint('Debug socket: Không thể online do chưa có quyền location');
+        await askPermissionWithExplanationDialog();
+        if (!(await _locationService.isLocationPermissionGranted())) {
+          appShowSnackBar(
+              msg: 'Location permission is required to be online'.tr());
+          return false;
+        }
+      }
+    }
     debugPrint('Debug socket: Đặt trạng thái online: $isOnline');
     _isOnline = isOnline;
 
@@ -179,6 +281,7 @@ class SocketController {
       _stopLocationUpdates();
       _locationService.stopService();
     }
+    return true;
   }
 
   void _emitDriverStatus(bool isOnline) {

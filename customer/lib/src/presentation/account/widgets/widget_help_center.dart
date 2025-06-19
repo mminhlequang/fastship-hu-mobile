@@ -4,6 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:app/src/constants/constants.dart';
+import 'package:network_resources/network_resources.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FaqItem {
   String category;
@@ -207,13 +209,18 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                               spacing: 12.sw,
                               children: [
                                 SizedBox(height: 12.sw),
-                                _buildContactItem(
-                                    'icon80', 'Customer Service', ''),
-                                _buildContactItem('icon75', 'WhatsApp', ''),
-                                _buildContactItem('icon76', 'Website', ''),
-                                _buildContactItem('icon77', 'Facebook', ''),
-                                _buildContactItem('icon78', 'Twitter', ''),
-                                _buildContactItem('icon79', 'Instagram', ''),
+                                _buildContactItem('icon80', 'Customer Service',
+                                    'tel: ${supportPhoneNumberRaw}'),
+                                _buildContactItem('icon75', 'WhatsApp',
+                                    'https://wa.me/${supportPhoneNumberRaw}'),
+                                _buildContactItem('icon76', 'Website',
+                                    'https://fastshiphu.com/'),
+                                _buildContactItem('icon77', 'Facebook',
+                                    'https://www.facebook.com/fastshiphu'),
+                                _buildContactItem('icon78', 'Twitter',
+                                    'https://www.twitter.com/fastshiphu'),
+                                _buildContactItem('icon79', 'Instagram',
+                                    'https://www.instagram.com/fastshiphu'),
                               ],
                             ),
                           ),
@@ -228,23 +235,31 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildContactItem(icon, text, link) {
-    return Container(
-      height: 48.sw,
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: hexColor('#F9F8F6'),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      alignment: Alignment.centerLeft,
-      child: Row(
-        children: [
-          WidgetAppSVG(icon, width: 24, height: 24),
-          SizedBox(width: 12),
-          Text(
-            text,
-            style: w400TextStyle(fontSize: 16, height: 1.2),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        appHaptic();
+        if (link.isNotEmpty) {
+          launchUrl(Uri.parse(link));
+        }
+      },
+      child: Container(
+        height: 48.sw,
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: hexColor('#F9F8F6'),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            WidgetAppSVG(icon, width: 24, height: 24),
+            SizedBox(width: 12),
+            Text(
+              text,
+              style: w400TextStyle(fontSize: 16, height: 1.2),
+            ),
+          ],
+        ),
       ),
     );
   }

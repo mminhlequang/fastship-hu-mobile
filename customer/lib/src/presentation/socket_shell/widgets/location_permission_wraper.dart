@@ -205,6 +205,17 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
                         const SizedBox(height: 40),
                         _buildLocationImage(),
                         const SizedBox(height: 40),
+                        Text(
+                          """Enabling location helps us show you nearby restaurants, stores, and services, and offer accurate delivery options. Your location is used only to improve your experience and is kept secure. Please enable location access to use all features."""
+                              .tr(),
+                          style: w400TextStyle(
+                            fontSize: 16.sw,
+                            color: appColorText2,
+                            height: 1.4,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
                         _buildActionButtons(),
                       ],
                     ),
@@ -309,15 +320,15 @@ class _LocationPermissionWrapperState extends State<LocationPermissionWrapper> {
               }
             },
           ),
-          Gap(12),
-          _buildActionButton(
-            icon: 'icon53',
-            alsoLoading: false,
-            label: 'Add other location'.tr(),
-            onTap: () {
-              appOpenBottomSheet(WidgetSheetLocations());
-            },
-          ),
+          // Gap(12),
+          // _buildActionButton(
+          //   icon: 'icon53',
+          //   alsoLoading: false,
+          //   label: 'Add other location'.tr(),
+          //   onTap: () {
+          //     appOpenBottomSheet(WidgetSheetLocations());
+          //   },
+          // ),
         ],
       ),
     );

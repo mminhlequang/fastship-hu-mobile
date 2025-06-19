@@ -39,9 +39,11 @@ extension XNotificationModel on NotificationModel {
   }
 
   void openDetail() {
+    print('openDetail: ${toJson()}');
     appHaptic();
     switch (type) {
       case NotificationModelType.order:
+        appContext.push('/detail-order', extra: referenceId);
         break;
       case NotificationModelType.promotion:
         break;

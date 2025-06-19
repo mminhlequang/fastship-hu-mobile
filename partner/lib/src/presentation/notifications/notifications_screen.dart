@@ -160,7 +160,6 @@ class _NotificationScreenState extends State<NotificationScreen>
                     return WidgetRippleButton(
                       onTap: () {
                         appHaptic();
-                        // Todo: go detail
                         item.openDetail();
                       },
                       radius: 12.sw,

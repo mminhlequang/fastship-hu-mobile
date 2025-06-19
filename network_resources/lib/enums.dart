@@ -8,6 +8,7 @@ const String privacyPolicyUrl = "https://mminhlequang-apps.web.app/legal/privacy
 const String termsOfServiceUrl = "https://mminhlequang-apps.web.app/legal/terms-of-use-fastship";
 
 const String supportPhoneNumber = "+36 307859588";
+const String supportPhoneNumberRaw = "+36307859588";
 const String supportEmail = "support@fastshiphu.com";
 const String supportAddress = "1089 BUDAPEST, ORCZY TÉR 4, HUNGARY";
 

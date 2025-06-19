@@ -50,32 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           {'device_token': await FirebaseMessaging.instance.getToken()});
     });
   }
-
-  // Future<void> _callCustomer() async {
-  //   if (_currentOrder != null && _currentOrder!.customer?.phone != null) {
-  //     final Uri url = Uri.parse('tel:${_currentOrder!.customer?.phone!}');
-  //     if (await canLaunchUrl(url)) {
-  //       await launchUrl(url);
-  //     }
-  //   }
-  // }
-
-  // Future<void> _sendSms(String message) async {
-  //   if (_currentOrder != null && _currentOrder!.customer?.phone != null) {
-  //     final Uri url =
-  //         Uri.parse('sms:${_currentOrder!.customer?.phone}?body=$message');
-  //     if (await canLaunchUrl(url)) {
-  //       await launchUrl(url);
-  //     }
-  //   }
-  // }
-
-  // Future<void> _contactSupport() async {
-  //   final Uri url = Uri.parse('tel:$supportPhoneNumber');
-  //   if (await canLaunchUrl(url)) {
-  //     await launchUrl(url);
-  //   }
-  // }
+ 
 
   Future<void> _checkNotificationPermission() async {
     final status = await Permission.notification.status;
