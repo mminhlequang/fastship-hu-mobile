@@ -1,7 +1,7 @@
 name: app
 description: Customer mobile app
 
-version: 1.0.1+6
+version: 1.0.2+7
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -12,16 +12,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  firebase_core: ^3.13.1
-  firebase_auth: ^5.5.4
-  firebase_messaging: ^15.2.6
+  firebase_core: ^3.14.0
+  firebase_auth: ^5.6.0
+  firebase_messaging: ^15.2.7
   equatable: ^2.0.7
   bloc: ^9.0.0
   flutter_bloc: ^9.1.1
   bloc_concurrency: ^0.3.0
   get_it: ^8.0.3
   easy_localization: ^3.0.7+1
-  go_router: ^15.1.2
+  go_router: ^15.2.4
 
   cupertino_icons: ^1.0.8
   dio: ^5.8.0+1
@@ -30,7 +30,7 @@ dependencies:
   hive: ^2.2.3
   path_provider: ^2.1.5
   cached_network_image: ^3.4.1
-  flutter_svg: ^2.1.0
+  flutter_svg: ^2.2.0
   image_picker: ^1.1.2
   image_cropper: ^9.1.0
   flutter_keyboard_visibility: ^6.0.0
@@ -46,7 +46,7 @@ dependencies:
   flutter_switch: ^0.3.2
   # sentry_flutter: ^8.14.0
   pin_code_fields: ^8.0.1
-  audioplayers: ^6.4.0
+  audioplayers: ^6.5.0
   permission_handler: ^12.0.0+1
   latlong2: ^0.9.1
   flutter_map: ^8.1.1
@@ -57,7 +57,7 @@ dependencies:
   fl_chart: ^1.0.0
   url_launcher: ^6.3.1
   currency_text_input_formatter: ^2.3.0
-  carousel_slider: ^5.0.0
+  carousel_slider: ^5.1.1
   language_code: ^0.5.5
   flutter_html: ^3.0.0
   map_launcher: ^3.5.0
@@ -91,7 +91,7 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   infinite_listview: ^1.1.0
   flutter_rating_bar: ^4.0.1
-  toastification: ^3.0.2
+  toastification: ^3.0.3
 
 
 dependency_overrides:
@@ -100,7 +100,7 @@ dependency_overrides:
   js: ^0.7.2
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.14.3
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
 
 flutter_icons:
