@@ -12,6 +12,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
+import 'package:toastification/toastification.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
@@ -97,56 +98,58 @@ class _AppState extends State<_App> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Portal(
-      child: MaterialApp.router(
-        routerConfig: goRouter,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        debugShowCheckedModeBanner: false,
-        theme: (AppPrefs.instance.isDarkTheme
-                ? ThemeData.dark()
-                : ThemeData.light())
-            .copyWith(
-          scaffoldBackgroundColor: appColorBackground,
-          appBarTheme: AppBarTheme(
-            backgroundColor: appColorPrimary,
-            centerTitle: true,
-            titleTextStyle: w500TextStyle(
-              fontSize: 20.sw,
-              color: Colors.white,
+      child: ToastificationWrapper(
+        child: MaterialApp.router(
+          routerConfig: goRouter,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          debugShowCheckedModeBanner: false,
+          theme: (AppPrefs.instance.isDarkTheme
+                  ? ThemeData.dark()
+                  : ThemeData.light())
+              .copyWith(
+            scaffoldBackgroundColor: appColorBackground,
+            appBarTheme: AppBarTheme(
+              backgroundColor: appColorPrimary,
+              centerTitle: true,
+              titleTextStyle: w500TextStyle(
+                fontSize: 20.sw,
+                color: Colors.white,
+              ),
+              iconTheme: IconThemeData(color: Colors.white),
+              actionsIconTheme: IconThemeData(color: Colors.white),
             ),
-            iconTheme: IconThemeData(color: Colors.white),
-            actionsIconTheme: IconThemeData(color: Colors.white),
+            tabBarTheme: TabBarThemeData(
+              dividerHeight: 1.sw,
+              dividerColor: hexColor('#F1F4F6'),
+              indicator: _TabIndicator(),
+              labelColor: appColorText,
+              labelStyle: w400TextStyle(fontSize: 16.sw),
+              unselectedLabelColor: appColorText,
+              unselectedLabelStyle: w400TextStyle(fontSize: 16.sw),
+              indicatorSize: TabBarIndicatorSize.tab,
+            ),
           ),
-          tabBarTheme: TabBarThemeData(
-            dividerHeight: 1.sw,
-            dividerColor: hexColor('#F1F4F6'),
-            indicator: _TabIndicator(),
-            labelColor: appColorText,
-            labelStyle: w400TextStyle(fontSize: 16.sw),
-            unselectedLabelColor: appColorText,
-            unselectedLabelStyle: w400TextStyle(fontSize: 16.sw),
-            indicatorSize: TabBarIndicatorSize.tab,
-          ),
-        ),
-        themeMode:
-            AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-        builder: (context, child) {
-          return kDebugMode
-              ? GestureDetector(
-                  onDoubleTap: () {
-                    AppPrefs.instance.getNormalToken().then((value) {
-                      print(value);
-                    });
-                  },
-                  child: KeyboardDismissOnTap(
+          themeMode:
+              AppPrefs.instance.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+          builder: (context, child) {
+            return kDebugMode
+                ? GestureDetector(
+                    onDoubleTap: () {
+                      AppPrefs.instance.getNormalToken().then((value) {
+                        print(value);
+                      });
+                    },
+                    child: KeyboardDismissOnTap(
+                      child: child!,
+                    ),
+                  )
+                : KeyboardDismissOnTap(
                     child: child!,
-                  ),
-                )
-              : KeyboardDismissOnTap(
-                  child: child!,
-                );
-        },
+                  );
+          },
+        ),
       ),
     );
   }

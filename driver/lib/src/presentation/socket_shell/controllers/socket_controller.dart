@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/src/constants/constants.dart';
-import 'package:app/src/services/location_service.dart';
 import 'package:app/src/utils/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -66,15 +65,13 @@ class SocketController {
   Function(OrderModel)? onOrderCanceled;
   Function(OrderModel)? onOrderStatusUpdated;
 
-  final LocationService _locationService = LocationService();
   bool _isInBackground = false;
-  StreamSubscription<LatLng>? _locationSubscription;
+  StreamSubscription<Position>? _positionStreamSubscription;
 
   bool get isOnline => _isOnline;
 
   void init() {
     _initializeSocket();
-    _initializeLocationService();
     if (AppPrefs.instance.autoActiveOnlineStatus) {
       setOnlineStatus(true);
     }
@@ -157,12 +154,11 @@ class SocketController {
     }
   }
 
-  Future<void> _initializeLocationService() async {
-    await _locationService.initialize();
-    // Lắng nghe sự kiện vị trí từ LocationService
-    _locationSubscription = _locationService.locationStream.listen((latLng) {
-      updateLocationInBackground(latLng);
-    });
+  /// Check if location permissions are granted
+  Future<bool> _isLocationPermissionGranted() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
   }
 
   Future askPermissionWithExplanationDialog() async {
@@ -252,12 +248,11 @@ class SocketController {
   /// Set online status for driver. Only allow online if location permission is granted.
   Future<bool> setOnlineStatus(bool isOnline) async {
     if (isOnline) {
-      final hasPermission =
-          await _locationService.isLocationPermissionGranted();
+      final hasPermission = await _isLocationPermissionGranted();
       if (!hasPermission) {
         debugPrint('Debug socket: Không thể online do chưa có quyền location');
         await askPermissionWithExplanationDialog();
-        if (!(await _locationService.isLocationPermissionGranted())) {
+        if (!(await _isLocationPermissionGranted())) {
           appShowSnackBar(
               msg: 'Location permission is required to be online'.tr());
           return false;
@@ -270,16 +265,11 @@ class SocketController {
     // Gửi trạng thái lên server
     _emitDriverStatus(isOnline);
 
-    // Quản lý timer vị trí và background service
+    // Quản lý timer vị trí
     if (isOnline) {
-      if (_isInBackground) {
-        _locationService.startService();
-      } else {
-        _startLocationUpdates();
-      }
+      _startLocationUpdates();
     } else {
       _stopLocationUpdates();
-      _locationService.stopService();
     }
     return true;
   }
@@ -313,6 +303,8 @@ class SocketController {
     debugPrint('Debug socket: Dừng cập nhật vị trí');
     _locationTimer?.cancel();
     _locationTimer = null;
+    _positionStreamSubscription?.cancel();
+    _positionStreamSubscription = null;
   }
 
   Future<void> _sendCurrentLocation() async {
@@ -619,16 +611,14 @@ class SocketController {
   // Xử lý khi app chuyển background
   void onAppBackground() {
     _isInBackground = true;
-    if (_isOnline) {
-      _locationService.startService();
-    }
+    // Không cần start background service nữa vì đã loại bỏ LocationService
   }
 
   // Xử lý khi app chuyển foreground
   void onAppForeground() {
     _isInBackground = false;
+    // Tiếp tục location updates nếu đang online
     if (_isOnline) {
-      _locationService.stopService();
       _startLocationUpdates();
     }
   }
@@ -638,8 +628,7 @@ class SocketController {
     socket?.disconnect();
     socket?.dispose();
     _locationTimer?.cancel();
-    _locationService.stopService();
-    _locationSubscription?.cancel();
+    _positionStreamSubscription?.cancel();
     // orderStatus.dispose();
     // socketConnected.dispose();
   }

@@ -23,6 +23,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:network_resources/network_resources.dart';
 import 'package:network_resources/order/models/models.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:toastification/toastification.dart';
 
 import '../notifications/cubit/notification_cubit.dart';
 import '../widgets/widget_blink.dart';
@@ -50,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
           {'device_token': await FirebaseMessaging.instance.getToken()});
     });
   }
- 
 
   Future<void> _checkNotificationPermission() async {
     final status = await Permission.notification.status;
@@ -377,24 +377,33 @@ class _HomeScreenState extends State<HomeScreen> {
               ValueListenableBuilder(
                   valueListenable: socketController.socketConnected,
                   builder: (context, isConnected, child) {
-                    bool isOnline = socketController.isOnline;
+                    bool isOnline = socketController.isOnline && isConnected;
                     return Container(
                       key: ValueKey(isOnline),
                       width: context.width,
                       color: Colors.white,
-                      padding: EdgeInsets.fromLTRB(16.sw, 10.sw, 16.sw,
+                      padding: EdgeInsets.fromLTRB(8.sw, 10.sw, 8.sw,
                           16.sw + MediaQuery.paddingOf(context).bottom),
                       child: HoldToConfirmButton(
                         key: ValueKey(isOnline),
                         duration: Duration(milliseconds: 1000),
                         onProgressCompleted: () async {
                           appHaptic();
-                          socketController.setOnlineStatus(!isOnline);
-                          setState(() {});
+                          if (!isConnected) {
+                            appShowToastification(
+                                title:
+                                    'Can not connect to server, please check your internet connection'
+                                        .tr(),
+                                type: ToastificationType.error);
+                          } else {
+                            socketController.setOnlineStatus(!isOnline);
+                            setState(() {});
+                          }
                         },
                         backgroundColor: !isOnline ? orange1 : appColorPrimary,
                         child: Center(
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               WidgetBlink(
                                 builder: (color) => WidgetAppSVG(
