@@ -12,6 +12,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:app/src/presentation/socket_shell/controllers/socket_controller.dart';
+import 'package:network_resources/network_resources.dart';
 import 'package:toastification/toastification.dart';
 
 import 'internal_setup.dart';
@@ -22,13 +23,9 @@ import 'src/utils/utils.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Stripe.publishableKey = !kDebugMode && false
-      ? "pk_live_51FdoD5FOB1XEXlZFImtB8bzWGoYDGYA6aZn5v2a9QrBQsdDmbxze6RExqKymtuT19uNY5pqZ1vth13WwSdNmQs0Z00ywRf7YmF"
-      : 'pk_test_51QwQfYGbnQCWi1BqsVDBmUNXwsA6ye6daczJ5E7j8zgGTjuVAWjLluexegaACZTaHP14XUtrGxDLHwxWzMksUVod00p0ZXsyPd';
-  Stripe.merchantIdentifier = !kDebugMode && false
-      ? 'merchant.flutter.stripe'
-      : 'merchant.flutter.stripe.test';
-  Stripe.urlScheme = 'flutterstripe';
+  Stripe.publishableKey = stripePublishableKey;
+  Stripe.merchantIdentifier = stripeMerchantIdentifier;
+  Stripe.urlScheme = stripeUrlScheme;
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),

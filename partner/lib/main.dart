@@ -10,7 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' as bloc;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:internal_core/internal_core.dart';
+import 'package:network_resources/network_resources.dart';
 
 import 'internal_setup.dart';
 import 'src/base/bloc.dart';
@@ -18,6 +20,10 @@ import 'src/utils/utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Stripe.publishableKey = stripePublishableKey;
+  Stripe.merchantIdentifier = stripeMerchantIdentifier;
+  Stripe.urlScheme = stripeUrlScheme;
 
   await Future.wait([
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),

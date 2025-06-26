@@ -1,11 +1,17 @@
 part of 'network_resources.dart';
 
+const String stripePublishableKey =
+    "pk_test_51QMyeHJAQGXpe77Iyoq4pT7xiBvVPbL5A1XQXfu4FATWJlq46RPMz75CdZxsuHEcpSK35dJ05mJjTw0DaWzH5ky000ED8uJISc";
+const String stripeMerchantIdentifier = "merchant.flutter.stripe.test";
+const String stripeUrlScheme = "flutterstripe";
 
 const String appMessengerUrl = "https://m.me/fastship.vn";
 const String appWhatsappUrl = "https://wa.me/84909090909";
 
-const String privacyPolicyUrl = "https://mminhlequang-apps.web.app/legal/privacy-policy-fastship";
-const String termsOfServiceUrl = "https://mminhlequang-apps.web.app/legal/terms-of-use-fastship";
+const String privacyPolicyUrl =
+    "https://mminhlequang-apps.web.app/legal/privacy-policy-fastship";
+const String termsOfServiceUrl =
+    "https://mminhlequang-apps.web.app/legal/terms-of-use-fastship";
 
 const String supportPhoneNumber = "+36 307859588";
 const String supportPhoneNumberRaw = "+36307859588";
